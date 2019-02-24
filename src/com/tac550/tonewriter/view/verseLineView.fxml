@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<StackPane minHeight="-Infinity" prefHeight="100.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonebuilder.view.VerseLineViewController">
+<StackPane minHeight="-Infinity" prefHeight="100.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.VerseLineViewController">
    <children>
       <GridPane fx:id="mainLayoutPane">
          <columnConstraints>
