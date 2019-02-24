@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
-import com.tac550.tonewriter.util.TBUtils;
+import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.VerseLineViewController;
@@ -576,8 +576,8 @@ public class LilyPondWriter {
 				workingSection = note_data.substring(position, note_data.length());
 			}
 			
-			int commaCount = TBUtils.countOccurrences(workingSection, ",");
-			int apostropheCount = TBUtils.countOccurrences(workingSection, "'");
+			int commaCount = TWUtils.countOccurrences(workingSection, ",");
+			int apostropheCount = TWUtils.countOccurrences(workingSection, "'");
 			boolean octave_up = workingOctave.contains("'");
 			boolean octave_down = workingOctave.contains(",");
 			

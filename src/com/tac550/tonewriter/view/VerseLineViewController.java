@@ -9,7 +9,7 @@ import java.util.Stack;
 
 import com.tac550.tonewriter.model.MappingAction;
 import com.tac550.tonewriter.model.VerseLine;
-import com.tac550.tonewriter.util.TBUtils;
+import com.tac550.tonewriter.util.TWUtils;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -268,7 +268,7 @@ public class VerseLineViewController {
 	
 	private Button createNoteButton(SyllableText syllable, boolean finalNote) {
 		Button noteButton = new Button(currentChord.getName());
-		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TBUtils.toRGBCode(currentChord.getColor())));
+		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(currentChord.getColor())));
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
@@ -315,7 +315,7 @@ public class VerseLineViewController {
 		
 		noteButton.setOnAction(event -> {
 			Point cursorLocation = MouseInfo.getPointerInfo().getLocation();
-			noteMenu.show(noteButton.getScene().getWindow(), cursorLocation.getX() / TBUtils.getUIScaleFactor(), cursorLocation.getY() / TBUtils.getUIScaleFactor());
+			noteMenu.show(noteButton.getScene().getWindow(), cursorLocation.getX() / TWUtils.getUIScaleFactor(), cursorLocation.getY() / TWUtils.getUIScaleFactor());
 		});
 		
 		return noteButton;

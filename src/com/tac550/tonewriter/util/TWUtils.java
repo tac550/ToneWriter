@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 
 import javafx.scene.paint.Color;
 
-public class TBUtils {
+public class TWUtils {
 	
 	// Color
 	

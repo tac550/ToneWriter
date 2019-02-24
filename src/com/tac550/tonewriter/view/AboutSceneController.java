@@ -3,7 +3,7 @@ package com.tac550.tonewriter.view;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import com.tac550.tonewriter.util.TBUtils;
+import com.tac550.tonewriter.util.TWUtils;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -24,7 +24,7 @@ public class AboutSceneController {
 		appNameText.setText(MainApp.APPNAME);
 		
 		try {
-			licenseTextArea.setText(TBUtils.readFile("licenses/third-party-licenses.txt", Charset.defaultCharset()));
+			licenseTextArea.setText(TWUtils.readFile("licenses/third-party-licenses.txt", Charset.defaultCharset()));
 		} catch (IOException e) {
 			licenseTextArea.setText("Error reading file \"licenses/third-party-licenses.txt\"");
 			e.printStackTrace();

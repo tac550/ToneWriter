@@ -13,7 +13,7 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
 
 import com.tac550.tonewriter.io.LilyPondWriter;
-import com.tac550.tonewriter.util.TBUtils;
+import com.tac550.tonewriter.util.TWUtils;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -121,7 +121,7 @@ public class ChantChordController implements CommentableView {
 	void setColor(Color color) {
 		chordColor = color;
 		for (Node node : new Node[] {preButton, posButton, SField, AField, TField, BField}) {
-			node.setStyle(String.format(Locale.US, "-fx-base: %s", TBUtils.toRGBCode(color)));
+			node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
 		}
 		
 		for (ChantChordController chord : prepsAndPosts) {
