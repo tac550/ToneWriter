@@ -1,0 +1,1 @@
+launch4jc TWBuild_WIN.xml && rd /s /q "..\win\Built-in Tones" & rd /s /q "..\win\licenses" & xcopy /s /i /y "..\..\Built-in Tones" "..\win\Built-in Tones" && xcopy /s /i /y "..\..\licenses" "..\win\licenses" && makensis nsi_WIN.nsi

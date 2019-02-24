@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonebuilder.view.MainSceneController">
+   <center>
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" SplitPane.resizableWithParent="false">
+               <children>
+                  <ScrollPane fitToWidth="true" pannable="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <content>
+                        <VBox fx:id="chantLineBox" prefWidth="1020.0" />
+                     </content>
+                  </ScrollPane>
+               </children></AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" SplitPane.resizableWithParent="false">
+               <children>
+                  <GridPane layoutX="452.0" layoutY="115.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1">
+                           <children>
+                              <HBox>
+                                 <children>
+                                    <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" />
+                                    <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
+                                    <ColumnConstraints hgrow="NEVER" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
+                                 </rowConstraints>
+                                 <children>
+                                    <TextField fx:id="verseTopField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </TextField>
+                                    <Button fx:id="verseTopButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <tooltip>
+                                          <Tooltip text="Remove" />
+                                       </tooltip>
+                                    </Button>
+                                    <ChoiceBox fx:id="verseTopChoice" />
+                                 </children>
+                              </GridPane>
+                              <TextArea fx:id="verseArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                              <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" />
+                                    <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
+                                    <ColumnConstraints hgrow="NEVER" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
+                                 </rowConstraints>
+                                 <children>
+                                    <TextField fx:id="verseBottomField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                       <GridPane.margin>
+                                          <Insets />
+                                       </GridPane.margin>
+                                    </TextField>
+                                    <Button fx:id="verseBottomButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <tooltip>
+                                          <Tooltip text="Remove" />
+                                       </tooltip>
+                                    </Button>
+                                    <ChoiceBox fx:id="verseBottomChoice" />
+                                 </children>
+                              </GridPane>
+                              <Button mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
+                              <Button mnemonicParsing="false" onAction="#handleFinalRender" text="Perform final Render" />
+                           </children>
+                        </VBox>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0">
+                           <content>
+                              <VBox fx:id="verseLineBox" prefWidth="610.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </GridPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone..." />
+                  <MenuItem fx:id="openToneMenuItem" mnemonicParsing="false" onAction="#handleOpenTone" text="Open Tone..." />
+                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone" />
+                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+            </items>
+          </Menu>
+          <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Line" />
+                  <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
+                  <MenuItem fx:id="setComposerMenuItem" mnemonicParsing="false" onAction="#handleSetComposerText" text="Set Composer Text..." />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Tools">
+              <items>
+                <MenuItem fx:id="combinePDFsMenuItem" mnemonicParsing="false" onAction="#handleCombinePDFs" text="Combine PDFs..." />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Options">
+               <items>
+                  <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
+                  <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
+                  <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use default)" />
+               </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>

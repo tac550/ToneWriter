@@ -1,0 +1,7 @@
+1: a-fs-d-d
+	Post: b-g-d-g
+2: a-fs-c-d
+	Post: fs-d-a,-d
+3: g-d-b,-g
+	Post: fs-d-a,-d
+END: e-b,-g,-e

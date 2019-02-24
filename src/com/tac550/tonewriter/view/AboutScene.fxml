@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonebuilder.view.AboutSceneController">
+   <bottom>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <buttons>
+          <Button defaultButton="true" mnemonicParsing="false" onAction="#handleClose" text="Close" />
+        </buttons>
+         <padding>
+            <Insets right="5.0" />
+         </padding>
+      </ButtonBar>
+   </bottom>
+   <top>
+      <HBox alignment="CENTER" spacing="25.0" BorderPane.alignment="CENTER">
+         <children>
+            <Text fx:id="appNameText" strokeType="OUTSIDE" strokeWidth="0.0" text="APPNAME">
+               <font>
+                  <Font size="48.0" />
+               </font>
+            </Text>
+            <ImageView fx:id="appIconView" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER" />
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Third-party Licenses:" />
+            <TextArea fx:id="licenseTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" />
+            <VBox alignment="CENTER_RIGHT" prefHeight="0.0" prefWidth="590.0">
+               <children>
+                  <Text fx:id="appVersionText" strokeType="OUTSIDE" strokeWidth="0.0" text="Version %VERSION%">
+                     <font>
+                        <Font size="16.0" />
+                     </font></Text>
+                  <Text fx:id="appVersionText1" layoutX="444.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="This is an Alpha build. Please help improve this app by sending feedback to ToneWriterDev@gmail.com">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Text>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets left="5.0" right="5.0" />
+         </padding>
+      </VBox>
+   </center>
+</BorderPane>

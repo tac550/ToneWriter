@@ -1,0 +1,8 @@
+1: a-g-c-e
+	Post: b-g-d-d
+2: c'-g-e-c
+END: g-d-b,-g
+	Prep: b-g-d-g
+	Prep: c'-g-e-g
+	Prep: b-g-d-g
+	Prep: a-g-c-g
