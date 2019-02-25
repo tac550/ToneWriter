@@ -79,9 +79,9 @@ public class ChantChordController implements CommentableView {
 		}
 
 		// Buttons
-		copyButton.setText("⎘");
-		pasteButton.setText("⎙");
-		playButton.setText("▶");
+		copyButton.setText("\u2398");
+		pasteButton.setText("\u2399");
+		playButton.setText("\u25B6");
 		// Comment button behavior
 		applyCommentGraphic(bubbleImage); // Initial state - No comments
 		commentButton.setOnMouseEntered((me) -> {
