@@ -106,7 +106,7 @@
                                  </children>
                               </GridPane>
                               <Button mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
-                              <Button mnemonicParsing="false" onAction="#handleFinalRender" text="Perform final Render" />
+                              <Button mnemonicParsing="false" onAction="#handleFinalRender" text="Perform Final Render" />
                            </children>
                         </VBox>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0">
