@@ -108,7 +108,6 @@ public class QuickVerseController {
 	    mainPane.setCenter(verseList);
 	    
 	    // Set up keyboard events
-	    
 	    EventHandler<KeyEvent> keyHandler = new EventHandler<KeyEvent>() {
 	        @Override
 	        public void handle(KeyEvent ke) {
@@ -119,14 +118,24 @@ public class QuickVerseController {
 	            if (ke.getCode() == KeyCode.ENTER) {
 	            	handleOK();
 	            }
+	            
+	            if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0)) {
+	            	filterInput.requestFocus();
+	            }
 	        }
 	    };
 	    
 		Platform.runLater(() -> {
-			// Set up escape key behavior for scene (cancels the window)
+			// Set escape, enter, and up key behavior for scene and list view
 			mainPane.getScene().setOnKeyPressed(keyHandler);
-			// Set up escape key behavior for listView (cancels the window)
 			verseList.setOnKeyPressed(keyHandler);
+			// Set down arrow key behavior for filter field (focuses list view)
+			filterInput.setOnKeyPressed((ke) -> {
+				if (ke.getCode() == KeyCode.DOWN) {
+					verseList.requestFocus();
+					verseList.getSelectionModel().select(0);
+				}
+			});
 			
 			// Request focus for filter field
 			filterInput.requestFocus();
