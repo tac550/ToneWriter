@@ -44,9 +44,9 @@ verse = \lyricmode {
 
 }
 
-\markup {
+
   
-}
+
 
 \score {
   \new ChoirStaff <<
@@ -81,6 +81,6 @@ verse = \lyricmode {
   
 }
 
-\markup {
+
   
-}
+

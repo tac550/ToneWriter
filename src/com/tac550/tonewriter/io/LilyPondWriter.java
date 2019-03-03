@@ -422,9 +422,13 @@ public class LilyPondWriter {
 		lines.set(42, verseText);
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(47, "  \\vspace #2 \\justify { \\halign #-3.5 \\bold {" + topReaderType + "} " + topReader + "}");	
+			lines.set(46, "\\markup {");
+			lines.set(47, "  \\vspace #2 \\justify { \\halign #-3.5 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(48, "}");
 		} if (!bottomReader.isEmpty()) {
-			lines.set(84, "  \\vspace #2 \\justify { \\halign #-3.5 \\bold {" + bottomReaderType + "} " + bottomReader + "}");			
+			lines.set(43, "\\markup {");
+			lines.set(84, "  \\vspace #2 \\justify { \\halign #-3.5 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(85, "}");
 		}
 		
 		// Write the file back out.
