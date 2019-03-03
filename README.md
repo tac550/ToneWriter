@@ -1,6 +1,6 @@
 # ToneWriter
 
-[Project Site](https://github.com/tac550/ToneWriter)
+[Project Site](https://github.com/tac550/ToneWriter) | [Download](https://github.com/tac550/ToneWriter/releases)
 
 ToneWriter is a JavaFX desktop application designed to make it easy to render sheet music for arbitrary chant melodies like those used in Orthodox Christian worship. This type of music is typically unmetered and relatively repetitive, with repeating melodies and long stretches of recitative. These characteristics allow a wide variety of texts to be set to the music, but are unusual in the wider musical world, and thus are not well-supported by conventional WYSIWYG engravers like Finale and MuseScore. LilyPond gives us the control we need to engrave this kind of music a little more easily, but the task is still laborious and the learning curve is steep.
 
