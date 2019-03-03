@@ -107,25 +107,26 @@ public class QuickVerseController {
 	    // Add elements to the UI
 	    mainPane.setCenter(verseList);
 	    
+	    // Set up keyboard events
+	    
+	    EventHandler<KeyEvent> keyHandler = new EventHandler<KeyEvent>() {
+	        @Override
+	        public void handle(KeyEvent ke) {
+	            if (ke.getCode() == KeyCode.ESCAPE) {
+	            	handleCancel();
+	            }
+	            
+	            if (ke.getCode() == KeyCode.ENTER) {
+	            	handleOK();
+	            }
+	        }
+	    };
+	    
 		Platform.runLater(() -> {
 			// Set up escape key behavior for scene (cancels the window)
-			mainPane.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
-		        @Override
-		        public void handle(KeyEvent ke) {
-		            if (ke.getCode() == KeyCode.ESCAPE) {
-		            	handleCancel();
-		            }
-		        }
-		    });
+			mainPane.getScene().setOnKeyPressed(keyHandler);
 			// Set up escape key behavior for listView (cancels the window)
-			verseList.setOnKeyPressed(new EventHandler<KeyEvent>() {
-		        @Override
-		        public void handle(KeyEvent ke) {
-		            if (ke.getCode() == KeyCode.ESCAPE) {
-		            	handleCancel();
-		            }
-		        }
-		    });
+			verseList.setOnKeyPressed(keyHandler);
 			
 			// Request focus for filter field
 			filterInput.requestFocus();
