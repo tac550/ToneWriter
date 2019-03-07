@@ -64,7 +64,7 @@ public class ChantLineViewController implements CommentableView {
 		});
 		
 		// Play button appearance and behavior
-		playButton.setText("▶");
+		playButton.setText("\u25B6");
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
 		}
