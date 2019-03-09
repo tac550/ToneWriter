@@ -23,26 +23,29 @@ public class TWUtils {
     // Display
     public static Float getRetinaScaleFactor() {
 		Object obj = Toolkit.getDefaultToolkit().getDesktopProperty("apple.awt.contentScaleFactor");
-		if(obj != null){
-			if(obj instanceof Float) return (Float) obj;
+		if (obj != null) {
+			if (obj instanceof Float) return (Float) obj;
 		}
+		
 		return null;
 	}
 	public static boolean hasRetinaDisplay() {
 		Float fRetinaFactor = getRetinaScaleFactor();
-		if(fRetinaFactor != null){
-			if(fRetinaFactor > 0){
+		if (fRetinaFactor != null) {
+			if (fRetinaFactor > 0) {
 				int nScale = fRetinaFactor.intValue();
 				return (nScale == 2); // 1 indicates a regular mac display, 2 is for retina
 			}
 		}
+		
 		return false;
 	}
 	public static float getUIScaleFactor() {
 		float fResolutionFactor = ((float) Toolkit.getDefaultToolkit().getScreenResolution() / 96f);
-		if(hasRetinaDisplay()){
+		if (hasRetinaDisplay()) {
 			fResolutionFactor = fResolutionFactor * getRetinaScaleFactor().floatValue();
 		}
+		
 		return fResolutionFactor;
 	}
     
@@ -54,6 +57,7 @@ public class TWUtils {
 	// I/O
 	public static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		
 		return new String(encoded, encoding);
 	}
 	
