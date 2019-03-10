@@ -495,9 +495,9 @@ public class LilyPondWriter {
 				newDur = "2.";
 			} else if (frac == 0.375) { // Dotted quarter
 				newDur = "4.";
-			} else if (frac == 1.5) { // Dotted whole
-				newDur = "1.";
-			} else { // If the non-whole computed value didn't have a definition, we just return the notes tied.
+			} else if (frac == 1.5) { // Dotted whole; but we'll return the more common whole tied to a half.
+				return String.format(Locale.US, noteFormat, "1") + "~ " + String.format(Locale.US, noteFormat, "2");
+			} else { // If the non-whole computed value didn't have a definition, we just return the notes as they came in, but tied.
 				return curr + "~ " + next;
 			}
 		}
