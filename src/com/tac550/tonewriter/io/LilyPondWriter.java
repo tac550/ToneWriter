@@ -231,7 +231,7 @@ public class LilyPondWriter {
 							if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))) {
 								
 								// The addNotes function handles adding the notes together.
-								String addedNotes = addNotes(currentNote, nextNote);
+								String addedNotes = combineNotes(currentNote, nextNote);
 								
 								// If the previous note was also combined, remove it (and any tokens after it).
 								if (!tempCurrentNotes[i].isEmpty()) {
@@ -461,9 +461,9 @@ public class LilyPondWriter {
 		return true;
 	}
 
-	// Takes two notes (which ought to have the same pitch) and returns their combination as if next to each other on a single syllable.
+	// Takes two notes in LilyPond syntax (which ought to have the same pitch) and returns their combination as if next to each other on a single syllable.
 	// Returns either a single note whose duration is the sum of the two given notes' durations with their original pitch, or returns the two notes combined with a tie.
-	private static String addNotes(String curr, String next) {
+	private static String combineNotes(String curr, String next) {
 		// This string replaces duration information from the current note with %s so we can "format in" its new duration (if the duration combination method is chosen later).
 		String noteFormat = curr.replaceAll("[0-9]+", "%s").replace(".", "");
 		// The duration of the current note.
