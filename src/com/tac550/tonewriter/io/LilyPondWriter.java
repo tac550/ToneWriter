@@ -236,13 +236,35 @@ public class LilyPondWriter {
 								// If the previous note was also combined, remove it (and any tokens after it).
 								if (!tempCurrentNotes[i].isEmpty()) {
 									String[] tokens = syllableNoteBuffers[i].split(" ");
+									// This flag gets set if the previous note was a note group.
+									boolean noteGroup = false;
 									// Work backward through the tokens.
 									for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
 										if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") || 
 												tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") || tokens[i1].contains("g")) {
+											if (noteGroup) {
+												// If we hit the beginning of the note group...
+												if (tokens[i1].contains("<")) {
+													// remove it and we're done.
+													tokens[i1] = "";
+													break;
+												}
+												
+											// If the note we're trying to remove is actually a note group...
+											} else if (tokens[i1].contains(">")) {
+												// Set the flag.
+												noteGroup = true;
+											}
+											
 											tokens[i1] = "";
-											// Stop here because we just removed the previous note.
-											break;
+											
+											if (noteGroup) {
+												// Keep removing tokens until we hit the beginning of the note group.
+												continue;
+											} else {
+												// Stop here because we just removed the previous note.
+												break;
+											}
 										} else {
 											// Remove tokens that aren't notes from the end.
 											tokens[i1] = "";
