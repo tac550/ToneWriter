@@ -15,11 +15,11 @@
          <children>
             <Text fx:id="dragInstructions" strokeType="OUTSIDE" strokeWidth="0.0" text="Drag to change page order.">
                <HBox.margin>
-                  <Insets right="90.0" />
+                  <Insets right="70.0" />
                </HBox.margin>
             </Text>
-            <Button mnemonicParsing="false" onAction="#handleAddFolder" text="Add all from folder..." />
-            <Button mnemonicParsing="false" onAction="#handleAddFiles" text="Add individual file(s)..." />
+            <Button mnemonicParsing="false" onAction="#handleAddFolder" prefHeight="26.0" text="Add all from folder..." />
+            <Button mnemonicParsing="false" onAction="#handleAddFiles" prefHeight="26.0" text="Add individual file(s)..." />
          </children>
          <padding>
             <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -31,8 +31,8 @@
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Combined PDF filename:" />
             <TextField fx:id="fileNameBox" prefHeight="25.0" prefWidth="275.0" />
-            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleCombine" text="Combine" />
-            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleCombine" prefHeight="26.0" prefWidth="93.0" text="Combine" />
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" prefHeight="26.0" prefWidth="80.0" text="Cancel" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
