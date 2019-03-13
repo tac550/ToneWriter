@@ -44,7 +44,7 @@ public class MainApp extends Application {
 	}
 	
 	@Override
-	public void start(Stage main_stage) throws Exception {
+	public void start(Stage main_stage) {
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
@@ -66,11 +66,7 @@ public class MainApp extends Application {
 		loadMainLayout();
 		
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	        public void handle(WindowEvent ev) {
-            	Platform.exit();
-	        }
-	    });
+		mainStage.setOnCloseRequest((ev) -> Platform.exit());
 		
 		// Start the application maximized.
 		// This also mitigates an issue with UI widgets disappearing when hovered (assuming the user keeps it maximized).
@@ -137,7 +133,7 @@ public class MainApp extends Application {
 		} else return null;
 	}
 	// Returns the default directory where LilyPond is installed.
-	public static String getPlatformSpecificDefaultLPDir() {
+	private static String getPlatformSpecificDefaultLPDir() {
 		String osName = System.getProperty("os.name").toLowerCase();
 		if (osName.startsWith("win")) {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
