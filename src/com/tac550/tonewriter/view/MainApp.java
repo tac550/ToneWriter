@@ -17,6 +17,8 @@ public class MainApp extends Application {
 
 	public static final String APPNAME = "ToneWriter";
 	public static final String APPVERSION = "0.2";
+
+	private static String osName = System.getProperty("os.name").toLowerCase();
 	
 	// Preferences object and key strings.
 	public static Preferences prefs;
@@ -121,7 +123,6 @@ public class MainApp extends Application {
 	}
 	// Returns the path from the LilyPond directory to the executable itself.
 	public static String getPlatformSpecificLPExecutable() {
-		String osName = System.getProperty("os.name").toLowerCase();
 		if (osName.startsWith("win")) {
 			return "\\lilypond.exe";
 		} if (osName.startsWith("mac")) {
@@ -132,7 +133,6 @@ public class MainApp extends Application {
 	}
 	// Returns the default directory where LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		String osName = System.getProperty("os.name").toLowerCase();
 		if (osName.startsWith("win")) {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		} if (osName.startsWith("mac")) {
@@ -143,7 +143,6 @@ public class MainApp extends Application {
 	}
 	// Returns the extension for midi files produced by LilyPond on the current platform.
 	public static String getPlatformSpecificMidiExtension() {
-		String osName = System.getProperty("os.name").toLowerCase();
 		if (osName.startsWith("win")) {
 			return ".mid";
 		} if (osName.startsWith("mac")) {
