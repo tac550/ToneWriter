@@ -128,7 +128,7 @@ public class MainApp extends Application {
 		} if (osName.startsWith("mac")) {
 			return "/LilyPond.app/Contents/Resources/bin/lilypond";
 		} if (osName.startsWith("lin")) {
-			return "UNKNOWN";
+			return "/lilypond";
 		} else return null;
 	}
 	// Returns the default directory where LilyPond is installed.
@@ -138,17 +138,17 @@ public class MainApp extends Application {
 		} if (osName.startsWith("mac")) {
 			return "/Applications";
 		} if (osName.startsWith("lin")) {
-			return "UNKNOWN";
+			return "/usr/bin";
 		} else return null;
 	}
 	// Returns the extension for midi files produced by LilyPond on the current platform.
-	public static String getPlatformSpecificMidiExtension() {
+	static String getPlatformSpecificMidiExtension() {
 		if (osName.startsWith("win")) {
 			return ".mid";
 		} if (osName.startsWith("mac")) {
 			return ".midi";
 		} if (osName.startsWith("lin")) {
-			return "UNKNOWN";
+			return ".midi";
 		} else return null;
 	}
 	

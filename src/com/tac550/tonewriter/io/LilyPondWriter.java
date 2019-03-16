@@ -1,11 +1,7 @@
 package com.tac550.tonewriter.io;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -21,6 +17,7 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.VerseLineViewController;
+import org.apache.commons.io.IOUtils;
 
 public class LilyPondWriter {
 	
@@ -691,17 +688,12 @@ public class LilyPondWriter {
 		
 		if (osName.startsWith("win")) {
 			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"", MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
-		} if (osName.startsWith("mac")) {
+		} else {
 			pr = rt.exec(new String[] {MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()});
-		} if (osName.startsWith("lin")) {
-			// TODO: UNKNOWN
 		}
 		
 		ProcessExitDetector prExitDectector = new ProcessExitDetector(pr);
-		prExitDectector.addProcessListener((process) -> {
-			exitingActions.run();
-			
-		});
+		prExitDectector.addProcessListener((process) -> exitingActions.run());
 		prExitDectector.start();
 	}
 	
