@@ -109,7 +109,7 @@ public class MainSceneController {
 	private boolean verseSet = false;
 	private boolean askToOverwrite = false;
 	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
-	private String currentRenderFileName = MainApp.APPNAME + " Render";
+	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 	private File currentSavingDirectory = new File(System.getProperty("user.home"));
 	
 	@FXML VBox chantLineBox;
@@ -175,8 +175,7 @@ public class MainSceneController {
 		combinePDFsMenuItem.setGraphic(pdfIcon);
 		
 		// Modify LilyPond location editing menu items on Mac
-		String osName = System.getProperty("os.name").toLowerCase();
-		if (osName.startsWith("mac")) {
+		if (MainApp.OS_NAME.startsWith("mac")) {
 			setLilyPondLocationItem.setText("Locate LilyPond.app");
 			resetLilyPondLocationItem.setText("Reset LilyPond.app Location (use /Applications)");
 		}
@@ -500,10 +499,10 @@ public class MainSceneController {
 	}
 	
 	private void resetStageTitle() {
-		thisStage.setTitle(MainApp.APPNAME);
+		thisStage.setTitle(MainApp.APP_NAME);
 	}
 	private void updateStageTitle() {
-		thisStage.setTitle(MainApp.APPNAME + " - " + toneDirectory.getName().replaceAll("-", " "));
+		thisStage.setTitle(MainApp.APP_NAME + " - " + toneDirectory.getName().replaceAll("-", " "));
 	}
 	
 	/*
@@ -670,7 +669,7 @@ public class MainSceneController {
 			MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Restart");
-			alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APPNAME));
+			alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
 			alert.initOwner(thisStage);
 			alert.showAndWait();
 		} else {
@@ -686,7 +685,7 @@ public class MainSceneController {
 		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Restart");
-		alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APPNAME));
+		alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
 		alert.initOwner(thisStage);
 		alert.showAndWait();
 	}
@@ -705,7 +704,7 @@ public class MainSceneController {
 				Stage aboutStage = new Stage();
 				aboutStage.setScene(new Scene(aboutLayout));
 				
-				aboutStage.setTitle("About " + MainApp.APPNAME);
+				aboutStage.setTitle("About " + MainApp.APP_NAME);
 				aboutStage.setResizable(false);
 				aboutStage.initOwner(thisStage);
 				aboutStage.initModality(Modality.APPLICATION_MODAL);
@@ -833,7 +832,7 @@ public class MainSceneController {
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 		
-		currentRenderFileName = result.orElse(MainApp.APPNAME + "-OUTPUT-" + new Timestamp(System.currentTimeMillis()).toString());
+		currentRenderFileName = result.orElse(MainApp.APP_NAME + "-OUTPUT-" + new Timestamp(System.currentTimeMillis()).toString());
 		
 		return true;
 	}

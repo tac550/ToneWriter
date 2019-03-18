@@ -99,7 +99,7 @@ public class ChantChordController implements CommentableView {
 		if (!MainApp.lilyPondAvailable()) return;
 		
 		// Create the temporary file to hold the lilypond markup
-		lilypondFile = File.createTempFile(MainApp.APPNAME + "--"
+		lilypondFile = File.createTempFile(MainApp.APP_NAME + "--"
 				+ parent.getMainController().getToneDirectory().getName() + "-", "-chord.ly");
 		lilypondFile.deleteOnExit();
 		

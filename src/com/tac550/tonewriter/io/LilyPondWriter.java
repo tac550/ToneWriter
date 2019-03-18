@@ -684,12 +684,11 @@ public class LilyPondWriter {
 	}
 	
 	public static void executePlatformSpecificLPRender(File lilypondFile, boolean renderPNG, Runnable exitingActions) throws IOException {
-		String osName = System.getProperty("os.name").toLowerCase();
-		
+
 		Runtime rt = Runtime.getRuntime();
 		Process pr = null;
 		
-		if (osName.startsWith("win")) {
+		if (MainApp.OS_NAME.startsWith("win")) {
 			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"", MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
 		} else {
 			pr = rt.exec(new String[] {MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()});

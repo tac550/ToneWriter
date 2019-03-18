@@ -101,7 +101,7 @@ public class ToneReaderWriter {
 			// Write out the Info file.
 			FileWriter infoWriter = new FileWriter(directory.getAbsolutePath() + File.separator + "_Info.dat");
 		    PrintWriter infoPrintWriter = new PrintWriter(infoWriter);
-		    infoPrintWriter.println("VERSION: " + MainApp.APPVERSION);
+		    infoPrintWriter.println("VERSION: " + MainApp.APP_VERSION);
 		    infoPrintWriter.println("First Repeated: " + firstRepeated);
 		    infoPrintWriter.println("Key Signature: " + keySig.replace("♯", "s").replace("♭", "f"));
 		    infoPrintWriter.println("Composer Text: " + composerText);
@@ -134,10 +134,10 @@ public class ToneReaderWriter {
 			fileReader.close();
 			
 			// Version checking
-			if (versionSaved > Float.parseFloat(MainApp.APPVERSION)) {
+			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Warning");
-				alert.setHeaderText(String.format(Locale.US, "This tone was created with a newer version of %s. Be advised there may be issues.", MainApp.APPNAME));
+				alert.setHeaderText(String.format(Locale.US, "This tone was created with a newer version of %s. Be advised there may be issues.", MainApp.APP_NAME));
 				
 				alert.showAndWait();
 			}

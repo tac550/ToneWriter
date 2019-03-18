@@ -113,15 +113,14 @@ public class QuickVerseIO {
 	}
 
 	private static File getPlatformSpecificVerseFile() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		String fileNameString = File.separator + MainApp.APPNAME + File.separator +
+		String fileNameString = File.separator + MainApp.APP_NAME + File.separator +
 				(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY_ENABLED, false) ? "CustomVersesTT.txt" : "CustomVersesYY.txt");
 
-		if (osName.startsWith("win")) {
+		if (MainApp.OS_NAME.startsWith("win")) {
 			return new File(System.getenv("APPDATA") + fileNameString);
-		} if (osName.startsWith("mac")) {
+		} if (MainApp.OS_NAME.startsWith("mac")) {
 			return new File(System.getProperty("user.home") + "/Library/Preferences" + fileNameString);
-		} if (osName.startsWith("lin")) {
+		} if (MainApp.OS_NAME.startsWith("lin")) {
 			return new File(System.getProperty("user.home") + "/.config" + fileNameString);
 		} else return null;
 	}

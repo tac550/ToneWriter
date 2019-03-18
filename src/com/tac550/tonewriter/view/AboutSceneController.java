@@ -21,7 +21,7 @@ public class AboutSceneController {
 	@FXML private ImageView appIconView;
 	
 	@FXML private void initialize() {
-		appNameText.setText(MainApp.APPNAME);
+		appNameText.setText(MainApp.APP_NAME);
 		
 		try {
 			licenseTextArea.setText(TWUtils.readFile("licenses/third-party-licenses.txt", Charset.defaultCharset()));
@@ -30,7 +30,7 @@ public class AboutSceneController {
 			e.printStackTrace();
 		}
 		
-		appVersionText.setText(appVersionText.getText().replaceAll("%VERSION%", MainApp.APPVERSION));
+		appVersionText.setText(appVersionText.getText().replaceAll("%VERSION%", MainApp.APP_VERSION));
 		
 		appIconView.setImage(new Image(getClass().getResourceAsStream("/media/AppIcon.png"), 100, 100, true, true));
 		

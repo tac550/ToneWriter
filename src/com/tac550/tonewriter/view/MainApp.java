@@ -15,10 +15,9 @@ import javafx.stage.Stage;
 
 public class MainApp extends Application {
 
-	public static final String APPNAME = "ToneWriter";
-	public static final String APPVERSION = "0.2";
-
-	private static String osName = System.getProperty("os.name").toLowerCase();
+	public static final String APP_NAME = "ToneWriter";
+	public static final String APP_VERSION = "0.2";
+	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 	
 	// Preferences object and key strings.
 	public static Preferences prefs;
@@ -61,7 +60,7 @@ public class MainApp extends Application {
 		}
 		
 		mainStage = main_stage;
-		mainStage.setTitle(APPNAME);
+		mainStage.setTitle(APP_NAME);
 		mainStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
 		loadMainLayout();
 		
@@ -123,31 +122,31 @@ public class MainApp extends Application {
 	}
 	// Returns the path from the LilyPond directory to the executable itself.
 	public static String getPlatformSpecificLPExecutable() {
-		if (osName.startsWith("win")) {
+		if (OS_NAME.startsWith("win")) {
 			return "\\lilypond.exe";
-		} if (osName.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return "/LilyPond.app/Contents/Resources/bin/lilypond";
-		} if (osName.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return "/lilypond";
 		} else return null;
 	}
 	// Returns the default directory where LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		if (osName.startsWith("win")) {
+		if (OS_NAME.startsWith("win")) {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
-		} if (osName.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return "/Applications";
-		} if (osName.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return "/usr/bin";
 		} else return null;
 	}
 	// Returns the extension for midi files produced by LilyPond on the current platform.
 	static String getPlatformSpecificMidiExtension() {
-		if (osName.startsWith("win")) {
+		if (OS_NAME.startsWith("win")) {
 			return ".mid";
-		} if (osName.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return ".midi";
-		} if (osName.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return ".midi";
 		} else return null;
 	}
