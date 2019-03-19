@@ -44,9 +44,9 @@ public class LilyPondWriter {
 		
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
-		if (lilypondFile.exists()) { // Have to do this because MacOS doesn't like overwriting existing files
-			lilypondFile.delete();
-		}
+
+		lilypondFile.delete(); // Have to do this because MacOS doesn't like overwriting existing files
+
 		if (!lilypondFile.createNewFile()) {
 			System.out.println("Filed to create new file");
 			return false;
@@ -303,18 +303,16 @@ public class LilyPondWriter {
 						}
 						
 						// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
-						if (previousNote == "" || currentNote == "" || nextNote == "") {
+						if (previousNote.equals("") || currentNote.equals("") || nextNote.equals("")) {
 							hideThisChord = false;
 						}
 						
-						// If the previous, current, and next notes are all quarters and they're all the same pitch...
-						if (previousNote.equals(currentNote) && currentNote.equals(nextNote) && currentNote.contains("4")) {
-							// Do nothing. This is actually the case where we want a chord hidden for sure, but it must be true for all 4 parts.
-						} else {
-							// Otherwise don't hide the current chord because neighboring chords are different.
+						// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
+						if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4")) {
+							// Don't hide the current chord because neighboring chords are different.
 							hideThisChord = false;
 						}
-						
+
 					}
 					
 					// If hideThisChord remained true after all the checks for all the parts in the chord...
@@ -505,7 +503,7 @@ public class LilyPondWriter {
 		float computedDur = 1 / (durCurrent + durNext);
 		
 		String newDur = "";
-		
+
 		// If the note combination process yielded a whole number...
 		if (computedDur % 1 == 0) {
 			// We just take it as the new duration and continue to the return statement.
@@ -599,7 +597,7 @@ public class LilyPondWriter {
 			// Otherwise...
 			} else {
 				// Working section goes to the end.
-				workingSection = note_data.substring(position, note_data.length());
+				workingSection = note_data.substring(position);
 			}
 			
 			int commaCount = TWUtils.countOccurrences(workingSection, ",");
@@ -658,9 +656,13 @@ public class LilyPondWriter {
         } catch (Exception ex) {
             throw ex;
         } finally {
-            stream.close();
-            resStreamOut.close();
-        }
+			if (stream != null) {
+				stream.close();
+			}
+			if (resStreamOut != null) {
+				resStreamOut.close();
+			}
+		}
         
     }
 	
