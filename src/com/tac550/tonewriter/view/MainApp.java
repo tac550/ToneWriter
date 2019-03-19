@@ -19,6 +19,8 @@ public class MainApp extends Application {
 	public static final String APP_VERSION = "0.2";
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 	
+	public static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
+	
 	// Preferences object and key strings.
 	public static Preferences prefs;
 	public static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";

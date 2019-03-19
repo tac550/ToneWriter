@@ -398,7 +398,9 @@ public class MainSceneController {
 		
 	
 	public boolean checkSave() {
-		if (toneDirectory == null || toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath())) {
+		if (toneDirectory == null) {
+			return true;
+		} if (toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode) {
 			return true;
 		}
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -529,7 +531,8 @@ public class MainSceneController {
 			saveToneAsMenuItem.setDisable(false);
 			updateStageTitle();
 			
-			saveToneMenuItem.setDisable(toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()));
+			saveToneMenuItem.setDisable(toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath())
+					&& !MainApp.developerMode);
 			
 		}
 		LoadingTone = false;
