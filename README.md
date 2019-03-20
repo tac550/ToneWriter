@@ -8,7 +8,7 @@ ToneWriter attempts to solve this problem by abstracting the chant melodies them
 
 ## Contributing
 
-Please feel free to fork this repo and send in pull requests! I'm happy to accept anything that makes the project better (from new features to improving the overall structure to fixing my broken code). I only ask that you be considerate of the style conventions you see in the code, and if any of them seem detrimental to you, let me know and we'll see if we should change them unilaterally. If you want to contribute but are not sure what to do, I would suggest working on improving our built-in tones if you are familiar with them ([this](https://oca.org/liturgics/learning-the-tones) is a useful resource for Ledkovsky Kievan Chant and L'vov/Bakhmetev Common Chant stichera), or adding new ones if your own musical tradition is not yet represented.
+Please feel free to fork this repo and send in pull requests! I'm happy to accept anything that makes the project better (from new features to improving the overall structure to fixing my broken code). I only ask that you be considerate of the style conventions you see in the code, and if any of them seem detrimental to you, let me know and we'll see if we should change them unilaterally. If you want to contribute but are not sure what to do, I would suggest working on improving our built-in tones if you are familiar with them ([this](https://oca.org/liturgics/learning-the-tones) is a useful resource for Ledkovsky Kievan Chant and L'vov/Bakhmetev Common Chant stichera), or adding new ones if your own musical tradition is not yet represented. By default, built-in tones can not be overwritten within the application, but this can be enabled by running with the VM argument "-DdeveloperMode=true" (without quotes).
 
 ### Wishlist
 
@@ -31,3 +31,7 @@ There are 2 dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sur
 To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (which executes the main() function in MainApp.java) to build/res and run build/res/BUILD_MAC.sh. The .app will be placed in build/mac along with a zipped copy.
 
 There is 1 dependency: jar2app, installed as described [here](https://github.com/Jorl17/jar2app).
+
+### Linux
+
+Export a runnable JAR and make sure the Built-in Tones and licenses folders are present in the same directory. Remember that Linux support is experimental at this point.
