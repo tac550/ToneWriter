@@ -2,13 +2,13 @@
 
 ; Define your application name
 !define APPNAME "ToneWriter"
-!define APPNAMEANDVERSION "ToneWriter 0.2"
+!define APPNAMEANDVERSION "ToneWriter 0.3"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\ToneWriter"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "..\win\ToneWriter0.2_Setup.exe"
+OutFile "..\win\ToneWriter0.3_Setup.exe"
 
 ; Modern interface settings
 !include "MUI.nsh"
