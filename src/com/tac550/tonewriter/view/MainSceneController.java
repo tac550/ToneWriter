@@ -373,7 +373,7 @@ public class MainSceneController {
 		if (verseSet) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Set Verse Confirmation");
-			alert.setHeaderText("Are you sure you want to set this verse text? (changes to current text will be lost)");
+			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignmets in the current text will be lost)");
 			alert.initOwner(thisStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.CANCEL) return;
