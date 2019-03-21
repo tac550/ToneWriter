@@ -1,6 +1,9 @@
 package com.tac550.tonewriter.view;
 
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 import com.tac550.tonewriter.util.TWUtils;
@@ -39,6 +42,14 @@ public class AboutSceneController {
 	@FXML private void handleClose() {
 		Stage stage = (Stage) appNameText.getScene().getWindow();
 		stage.close();
+	}
+	
+	@FXML private void handleGitHubLink() {
+		try {
+			Desktop.getDesktop().browse(new URL("https://github.com/tac550/ToneWriter/").toURI());
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
