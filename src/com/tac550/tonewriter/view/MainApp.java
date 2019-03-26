@@ -41,6 +41,9 @@ public class MainApp extends Application {
 	private MainSceneController mainController;
 
 	public static void main(String[] args) {
+
+		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
+
 		launch(args);
 	}
 	
