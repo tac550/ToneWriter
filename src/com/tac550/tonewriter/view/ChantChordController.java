@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
@@ -58,7 +59,7 @@ public class ChantChordController implements CommentableView {
 	@FXML private Button commentButton;
 	
 	private ArrayList<ChantChordController> prepsAndPosts = new ArrayList<>();
-	private ChantChordController associatedChord; // Only populated if this is a prep or post chord
+	private ChantChordController associatedRecitingChord; // Only populated if this is a prep or post chord
 	
 	@FXML private void initialize() {
 		// Fields
@@ -84,12 +85,8 @@ public class ChantChordController implements CommentableView {
 		playButton.setText("\u25B6");
 		// Comment button behavior
 		applyCommentGraphic(bubbleImage); // Initial state - No comments
-		commentButton.setOnMouseEntered((me) -> {
-			applyCommentGraphic(hoveredBubbleImage);
-		});
-		commentButton.setOnMouseExited((me) -> {
-			applyCommentGraphic(commentButtonState);
-		});
+		commentButton.setOnMouseEntered((me) -> applyCommentGraphic(hoveredBubbleImage));
+		commentButton.setOnMouseExited((me) -> applyCommentGraphic(commentButtonState));
 		
 	}
 	
@@ -128,7 +125,7 @@ public class ChantChordController implements CommentableView {
 			chord.setColor(color);
 		}
 	}
-	public Color getColor() {
+	Color getColor() {
 		return chordColor;
 	}
 	void setKeySignature(String new_key) {
@@ -141,20 +138,20 @@ public class ChantChordController implements CommentableView {
 	}
 	void makePrep() {
 		numText.setText("Prep");
-		setButtonsDisabled(true);
+		disableButtons();
 	}
 	void makePost() {
 		numText.setText("Post");
-		setButtonsDisabled(true);
+		disableButtons();
 	}
-	public void makeFinalChord() {
+	void makeFinalChord() {
 		numText.setText("End");
 		preButton.setDisable(false);
 		posButton.setDisable(true);
 	}
-	private void setButtonsDisabled(boolean disabled) {
-		preButton.setDisable(disabled);
-		posButton.setDisable(disabled);
+	private void disableButtons() {
+		preButton.setDisable(true);
+		posButton.setDisable(true);
 	}
 	public int getType() {
 		if (numText.getText().equals("Text")) return 0; // Default state; chord is not set up.
@@ -178,11 +175,8 @@ public class ChantChordController implements CommentableView {
 	public ArrayList<ChantChordController> getPrepsAndPosts() {
 		return prepsAndPosts;
 	}
-	private void setAssociatedChord(ChantChordController chord) {
-		associatedChord = chord;
-	}
-	public ChantChordController getAssociatedChord() {
-		return associatedChord;
+	private void setAssociatedRecitingChord(ChantChordController chord) {
+		associatedRecitingChord = chord;
 	}
 	public void setFields(String data) {
 		if (data == null || !data.contains("-")) {
@@ -234,16 +228,16 @@ public class ChantChordController implements CommentableView {
 
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
 		outputFile.deleteOnExit();
-		midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly", MainApp.getPlatformSpecificMidiExtension()));
+		midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+				Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
 		midiFile.deleteOnExit();
 		// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
 		File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
 		psFile.deleteOnExit();
 
 		
-		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () -> {
-			chordView.setImage(new Image(outputFile.toURI().toString()));
-		});
+		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
+				chordView.setImage(new Image(outputFile.toURI().toString())));
 	}
 	
 	@FXML public void addPrepChord() throws IOException {
@@ -252,7 +246,7 @@ public class ChantChordController implements CommentableView {
 	public ChantChordController addPrepChord(String values) throws IOException {
 		ChantChordController prepChordController = chantLineController.addPrepChord(this, chordColor);
 		prepsAndPosts.add(prepChordController);
-		prepChordController.setAssociatedChord(this);
+		prepChordController.setAssociatedRecitingChord(this);
 		prepChordController.setFields(values);
 		
 		return prepChordController;
@@ -261,7 +255,7 @@ public class ChantChordController implements CommentableView {
 		if (getType() == -3) {
 			ChantChordController endChord = chantLineController.addEndChord();
 			prepsAndPosts.add(endChord);
-			endChord.setAssociatedChord(this);
+			endChord.setAssociatedRecitingChord(this);
 		} else {
 			addPostChord("");
 		}
@@ -269,7 +263,7 @@ public class ChantChordController implements CommentableView {
 	public ChantChordController addPostChord(String values) throws IOException {
 		ChantChordController postChordController = chantLineController.addPostChord(this, chordColor);
 		prepsAndPosts.add(postChordController);
-		postChordController.setAssociatedChord(this);
+		postChordController.setAssociatedRecitingChord(this);
 		postChordController.setFields(values);
 		
 		return postChordController;
@@ -278,8 +272,8 @@ public class ChantChordController implements CommentableView {
 		for (ChantChordController chord : prepsAndPosts) {
 			chord.deleteAll();
 		}
-		if (associatedChord != null) {
-			associatedChord.getPrepsAndPosts().remove(this);
+		if (associatedRecitingChord != null) {
+			associatedRecitingChord.getPrepsAndPosts().remove(this);
 		}
 		chantLineController.removeChord(this);
 	}
@@ -290,35 +284,35 @@ public class ChantChordController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		Task<Integer> midiTask = new Task<Integer>() {
-			@Override
-			protected Integer call() throws Exception {
-				// From file
-				Sequence sequence = MidiSystem.getSequence(midiFile);
-		    
-				// Create a sequencer for the sequence
-				Sequencer sequencer = MidiSystem.getSequencer();
-				sequencer.open();
-				sequencer.setSequence(sequence);
-		    
-				// Start playing
-				sequencer.start();
-		       
-				// Thread to close midi after it's had long enough to finish playing. 
-				// This fixes the application not closing correctly if the user played midi.
-				Thread stopThread = new Thread(() -> {
-					try {
-						Thread.sleep(3000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					sequencer.close();
-				});
-				stopThread.start();
-				
-				return null;
-			}
-		};
+		Task midiTask = new Task() {
+            @Override
+            protected Integer call() throws Exception {
+                // From file
+                Sequence sequence = MidiSystem.getSequence(midiFile);
+
+                // Create a sequencer for the sequence
+                Sequencer sequencer = MidiSystem.getSequencer();
+                sequencer.open();
+                sequencer.setSequence(sequence);
+
+                // Start playing
+                sequencer.start();
+
+                // Thread to close midi after it's had long enough to finish playing.
+                // This fixes the application not closing correctly if the user played midi.
+                Thread stopThread = new Thread(() -> {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    sequencer.close();
+                });
+                stopThread.start();
+
+                return null;
+            }
+        };
 		
 		midiTask.run();
 	}
