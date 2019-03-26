@@ -56,12 +56,8 @@ public class ChantLineViewController implements CommentableView {
 		
 		// Comment button behavior
 		applyCommentGraphic(bubbleImage); // Initial state - No comments
-		commentButton.setOnMouseEntered((me) -> {
-			applyCommentGraphic(hoveredBubbleImage);
-		});
-		commentButton.setOnMouseExited((me) -> {
-			applyCommentGraphic(commentButtonState);
-		});
+		commentButton.setOnMouseEntered((me) -> applyCommentGraphic(hoveredBubbleImage));
+		commentButton.setOnMouseExited((me) -> applyCommentGraphic(commentButtonState));
 		
 		// Play button appearance and behavior
 		playButton.setText("\u25B6");
@@ -110,8 +106,8 @@ public class ChantLineViewController implements CommentableView {
 			downButton.setDisable(false);
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
-				    String.valueOf(new_letter), String.valueOf(--new_letter) + "'",
-				    String.valueOf(new_letter) + " alternate " + alternate_count)
+				    String.valueOf(new_letter), --new_letter + "'",
+					new_letter + " alternate " + alternate_count)
 				);
 			
 			setFirstRepeatedAvailable(true);
@@ -138,10 +134,10 @@ public class ChantLineViewController implements CommentableView {
 	public boolean getFirstRepeated() {
 		return firstRepeated;
 	}
-	public boolean getIsPrime() {
+	boolean getIsPrime() {
 		return nameChoice.getValue().contains("'");
 	}
-	public boolean getIsAlternate() {
+	boolean getIsAlternate() {
 		return nameChoice.getValue().contains("alternate");
 	}
 	public String getName() {
@@ -150,9 +146,7 @@ public class ChantLineViewController implements CommentableView {
 	public ArrayList<ChantChordController> getChords() {
 		return chantChordControllers;
 	}
-	public HBox getChordBox() {
-		return chordBox;
-	}
+
 	private void setFirstRepeatedAvailable(boolean available) {
 		if (available) {
 			firstRepeatedButton.setDisable(false);
@@ -367,10 +361,10 @@ public class ChantLineViewController implements CommentableView {
 			makePrimeLater = true;
 		}
 	}
-	public void setHasPrime(boolean has_prime) {
+	void setHasPrime(boolean has_prime) {
 		hasPrime = has_prime;
 	}
-	public boolean hasPrime() {
+	boolean hasPrime() {
 		return hasPrime;
 	}
 	public void makeAlternate() {
@@ -380,10 +374,10 @@ public class ChantLineViewController implements CommentableView {
 			makeAlternateLater = true;
 		}
 	}
-	public void setNumAlts(int num_alts) {
+	void setNumAlts(int num_alts) {
 		numAlternates = num_alts;
 	}
-	public int getNumAlts() {
+	int getNumAlts() {
 		return numAlternates;
 	}
 	@FXML public void addRecitingTone() throws IOException {
@@ -415,16 +409,16 @@ public class ChantLineViewController implements CommentableView {
 		});
 	}
 	@FXML private void handlePlay() {
-		Task<Integer> midiTask = new Task<Integer>() {
+		Task midiTask = new Task() {
 			@Override
 			protected Integer call() throws Exception {
-				
+
 				for (ChantChordController controller : chantChordControllers) {
 					controller.playMidi();
-					
+
 					Thread.sleep(1000);
 				}
-				
+
 				return null;
 			}
 		};
