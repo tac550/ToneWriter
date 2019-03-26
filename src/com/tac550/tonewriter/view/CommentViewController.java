@@ -7,19 +7,19 @@ import javafx.stage.Stage;
 
 public class CommentViewController {
 
-	CommentableView parentController;
+	private CommentableView parentController;
 	
 	@FXML Text targetText;
 	@FXML TextArea commentTextArea;
 	
-	public void setParentView(CommentableView view) {
+	void setParentView(CommentableView view) {
 		parentController = view;
 	}
 	
-	public void setTargetText(String text) {
+	void setTargetText(String text) {
 		targetText.setText(text);
 	}
-	public void setCommentText(String comment) {
+	void setCommentText(String comment) {
 		commentTextArea.setText(comment);
 	}
 	
