@@ -409,7 +409,7 @@ public class ChantLineViewController implements CommentableView {
 		});
 	}
 	@FXML private void handlePlay() {
-		Task midiTask = new Task() {
+		Task<Integer> midiTask = new Task<Integer>() {
 			@Override
 			protected Integer call() throws Exception {
 
@@ -419,7 +419,7 @@ public class ChantLineViewController implements CommentableView {
 					Thread.sleep(1000);
 				}
 
-				return null;
+				return 0;
 			}
 		};
 		
