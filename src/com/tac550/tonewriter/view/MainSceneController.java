@@ -72,10 +72,7 @@ public class MainSceneController {
 	
 	private String keyChoice = "C major";
 	private String composerText = "";
-	
-	// Menus
-	private double iconSize = 30;
-	
+
 	@FXML private MenuItem newToneMenuItem;
 	@FXML private MenuItem openToneMenuItem;
 	@FXML private MenuItem saveToneMenuItem;
@@ -115,7 +112,7 @@ public class MainSceneController {
 	@FXML VBox chantLineBox;
 	private ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
 	
-	List<ChantLineViewController> mainChantLines = new ArrayList<>();
+	private List<ChantLineViewController> mainChantLines = new ArrayList<>();
 	
 	@FXML VBox verseLineBox;
 	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
@@ -125,6 +122,8 @@ public class MainSceneController {
 		
 		// Interface icons
 		ImageView newIcon = new ImageView(getClass().getResource("/media/file-text.png").toExternalForm());
+		// Menus
+		double iconSize = 30;
 		newIcon.setFitHeight(iconSize);
 		newIcon.setFitWidth(iconSize);
 		newToneMenuItem.setGraphic(newIcon);
@@ -287,8 +286,10 @@ public class MainSceneController {
 				chantLine.setHasPrime(false);
 				
 				if (chantLine.getIsPrime()) { // Prime chant line
-					prevMainLine.setHasPrime(true);
-					
+					if (prevMainLine != null) {
+						prevMainLine.setHasPrime(true);
+					}
+
 					previousWasPrime = true;
 				} else if (chantLine.getIsAlternate()) { // Alternate chant line
 					alternateCount++;
@@ -376,7 +377,7 @@ public class MainSceneController {
 			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignmets in the current text will be lost)");
 			alert.initOwner(thisStage);
 			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.CANCEL) return;
+			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
 			else askToOverwrite = false;
 		}
 		
@@ -387,7 +388,7 @@ public class MainSceneController {
 		verseSet = true;
 		
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
-		String lines[] = Syllables.getSyllabificationLines(verseArea.getText());
+		String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
 		
 		for (String line : lines) {
 			createVerseLine(line);
@@ -397,7 +398,7 @@ public class MainSceneController {
 	}
 		
 	
-	public boolean checkSave() {
+	boolean checkSave() {
 		if (toneDirectory == null) {
 			return true;
 		} if (toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode) {
@@ -413,14 +414,12 @@ public class MainSceneController {
 		alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
 		
 		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == saveButton){
-			handleSave();
-		    return true;
-		} else if (result.get() == dontSaveButton) {
-		    return true;
-		} else {
-			return false;
-		}
+		if (result.isPresent()) {
+			if (result.get() == saveButton) {
+				handleSave();
+				return true;
+			} else return result.get() == dontSaveButton;
+		} else return false;
 	}
 	private boolean createNewTone() {
 		resetStageTitle();
@@ -616,9 +615,7 @@ public class MainSceneController {
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(letter -> {
-			setCurrentKey(result.get());
-		});
+		result.ifPresent(letter -> setCurrentKey(result.get()));
 	}
 	
 	@FXML private void handleSetComposerText() {
@@ -629,9 +626,7 @@ public class MainSceneController {
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(letter -> {
-			composerText = result.get();
-		});
+		result.ifPresent(letter -> composerText = result.get());
 	}
 	
 	/*
@@ -791,14 +786,20 @@ public class MainSceneController {
 			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to save as new)");
 			alert.initOwner(thisStage);
 			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.CANCEL) {
+			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 				if (!getNewRenderFilename()) return;
-			} else deletePreviousRender();
+			} else if (!deletePreviousRender()) {
+				Alert alert2 = new Alert(AlertType.ERROR);
+				alert2.setTitle("Error");
+				alert2.setHeaderText("An error occurred while overwriting the previous files, attempting to render anyway...");
+				alert2.initOwner(thisStage);
+				alert2.showAndWait();
+			}
 		} else {
-			if (!getNewRenderFilename()) {
-				return;
-			} else {
+			if (getNewRenderFilename()) {
 				askToOverwrite = true;
+			} else {
+				return;
 			}
 		}
 		
@@ -807,7 +808,7 @@ public class MainSceneController {
 					titleTextField.getText(), composerText, verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText())) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
-				alert.setHeaderText("There was a general error while saving!");
+				alert.setHeaderText("An error occurred while saving!");
 				alert.initOwner(thisStage);
 				alert.showAndWait();
 			}
@@ -840,13 +841,11 @@ public class MainSceneController {
 		return true;
 	}
 	
-	private void deletePreviousRender() {
+	private boolean deletePreviousRender() {
 		File lyFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
 		File pdfFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
-		
-		lyFile.delete();
-		pdfFile.delete();
-		
+
+		return lyFile.delete() && pdfFile.delete();
 	}
 	
 	private String showVerseBox() {
@@ -875,7 +874,7 @@ public class MainSceneController {
 		return "";
 	}
 	
-	public boolean playMidiAsAssigned() {
+	boolean playMidiAsAssigned() {
 		return playMidiMenuItem.isSelected();
 	}
 
