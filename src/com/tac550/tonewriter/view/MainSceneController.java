@@ -185,7 +185,13 @@ public class MainSceneController {
 			playMidiMenuItem.setSelected(false);
 			playMidiMenuItem.setDisable(true);
 		}
-		
+
+		// Behavior for "don't save LilyPond file" option
+		dontSaveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_DONT_SAVE_LILYPOND_FILE, newVal));
+		// Set initial state for "don't save LilyPond file" option
+		dontSaveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_DONT_SAVE_LILYPOND_FILE, false));
+
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {
 			String result = showVerseBox();
@@ -846,7 +852,12 @@ public class MainSceneController {
 		File lyFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
 		File pdfFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
 
-		return lyFile.delete() && pdfFile.delete();
+		if (lyFile.exists()) {
+            return pdfFile.delete() && lyFile.delete();
+        } else {
+		    return pdfFile.delete();
+        }
+
 	}
 	
 	private String showVerseBox() {
@@ -877,10 +888,6 @@ public class MainSceneController {
 	
 	boolean playMidiAsAssigned() {
 		return playMidiMenuItem.isSelected();
-	}
-	
-	boolean dontSaveLPFile() {
-		return dontSaveLPMenuItem.isSelected();
 	}
 
 }

@@ -459,6 +459,14 @@ public class LilyPondWriter {
 				try {
 					// After the render is complete, ask the OS to open the resulting PDF file.
 					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+
+					// Delete the lilypond file if the option is set
+					if (MainApp.prefs.getBoolean(MainApp.PREFS_DONT_SAVE_LILYPOND_FILE, false)) {
+						if (lilypondFile.delete()) {
+									System.out.println("Failed to delete LilyPond file!");
+						}
+					}
+
 				} catch (Exception e) {
 					// If the final rendered PDF can't be opened, open the folder instead.
 					e.printStackTrace();
