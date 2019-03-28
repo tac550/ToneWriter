@@ -85,6 +85,7 @@ public class MainSceneController {
 	
 	@FXML private Menu editMenu;
 	@FXML private CheckMenuItem playMidiMenuItem;
+	@FXML private CheckMenuItem dontSaveLPMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
 	
@@ -876,6 +877,10 @@ public class MainSceneController {
 	
 	boolean playMidiAsAssigned() {
 		return playMidiMenuItem.isSelected();
+	}
+	
+	boolean dontSaveLPFile() {
+		return dontSaveLPMenuItem.isSelected();
 	}
 
 }
