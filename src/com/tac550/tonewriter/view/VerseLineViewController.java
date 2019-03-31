@@ -88,6 +88,7 @@ public class VerseLineViewController {
 			
 			lineTextFlow.getChildren().clear();
 			
+			// Create the verseLine object, replacing any excess spaces with a single space.
 			verseLine = new VerseLine(line_text.trim().replaceAll(" +", " "));
 			
 			for (String syllable : verseLine.getSyllables()) {
@@ -108,6 +109,10 @@ public class VerseLineViewController {
 			
 		}
 		
+	}
+	
+	public String getVerseLineText() {
+		return verseLine.getLine();
 	}
 	
 	void setChantLines(ChantLineViewController[] chant_lines) {
@@ -330,7 +335,7 @@ public class VerseLineViewController {
 				BorderPane rootLayout = loader.load();
 				SyllableEditViewController controller = loader.getController();
 				controller.setParentController(this);
-				controller.setSyllableText(verseLine.getAllSyllables());
+				controller.setSyllableText(verseLine.getLine());
 				
 				Stage syllableStage = new Stage();
 				syllableStage.setTitle("Edit Line");

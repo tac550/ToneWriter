@@ -62,8 +62,6 @@ Hear me O Lord!
 
  */
 
-// TODO: Ability to re-order chords?
-
 public class MainSceneController {
 
 	private Stage thisStage;

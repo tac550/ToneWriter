@@ -23,8 +23,10 @@ public class SyllableEditViewController {
 	}
 	
 	@FXML private void handleOK() {
-		if (!syllableTextField.getText().isEmpty()) { // Sending an empty line would cause the verse line controller to think it's a separator. 
-			parentController.setVerseLine(syllableTextField.getText());	
+		// Sending an empty line would cause the verse line controller to think it's a separator.
+		// Also don't send if it's the same as the existing verse line.
+		if (!syllableTextField.getText().isEmpty() && !syllableTextField.getText().equals(parentController.getVerseLineText())) {
+			parentController.setVerseLine(syllableTextField.getText());
 		}
 		
 		closeStage();

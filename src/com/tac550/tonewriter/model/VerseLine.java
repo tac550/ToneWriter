@@ -34,8 +34,5 @@ public class VerseLine {
 	public String[] getSyllables() {
 		return syllables;
 	}
-	public String getAllSyllables() {
-		return String.join("", syllables);
-	}
 	
 }
