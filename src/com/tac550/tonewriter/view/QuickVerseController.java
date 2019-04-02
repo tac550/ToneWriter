@@ -36,7 +36,7 @@ public class QuickVerseController {
 	
 	private ListView<String> verseList;
 	
-	ObservableList<String> verses = FXCollections.observableArrayList();
+	private ObservableList<String> verses = FXCollections.observableArrayList();
 	
 	@FXML private void initialize() {
 
@@ -58,9 +58,7 @@ public class QuickVerseController {
 	    
 	    // Verse list setup
 	    verseList = new ListView<>(filteredData);
-	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> {
-	    	resultField.setText(newVal);
-	    });
+	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> resultField.setText(newVal));
 	    verseList.setOnMouseClicked((me) -> {
 	    	if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2) {
 	    		handleOK();
@@ -108,22 +106,19 @@ public class QuickVerseController {
 	    mainPane.setCenter(verseList);
 	    
 	    // Set up keyboard events
-	    EventHandler<KeyEvent> keyHandler = new EventHandler<KeyEvent>() {
-	        @Override
-	        public void handle(KeyEvent ke) {
-	            if (ke.getCode() == KeyCode.ESCAPE) {
-	            	handleCancel();
-	            }
-	            
-	            if (ke.getCode() == KeyCode.ENTER) {
-	            	handleOK();
-	            }
-	            
-	            if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0)) {
-	            	filterInput.requestFocus();
-	            }
-	        }
-	    };
+	    EventHandler<KeyEvent> keyHandler = ke -> {
+			if (ke.getCode() == KeyCode.ESCAPE) {
+				handleCancel();
+			}
+
+			if (ke.getCode() == KeyCode.ENTER) {
+				handleOK();
+			}
+
+			if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0)) {
+				filterInput.requestFocus();
+			}
+		};
 	    
 		Platform.runLater(() -> {
 			// Set escape, enter, and up key behavior for scene and list view
@@ -205,7 +200,7 @@ public class QuickVerseController {
 		stage.close();
 	}
 	
-	public String getSelectedVerse() {
+	String getSelectedVerse() {
 		return resultField.getText();
 	}
 	
