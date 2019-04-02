@@ -45,7 +45,12 @@ public class LilyPondWriter {
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		lilypondFile.delete(); // Have to do this because MacOS doesn't like overwriting existing files
+		if (lilypondFile.exists()) {
+			// Have to do this because MacOS doesn't like overwriting existing files
+			if (!lilypondFile.delete()) {
+				System.out.println("Error deleting existing LilyPond file. Continuing anyway...");
+			}
+		}
 
 		if (!lilypondFile.createNewFile()) {
 			System.out.println("Filed to create new file");
