@@ -587,31 +587,31 @@ public class MainSceneController {
 		choices.add("A major");
 		choices.add("E major");
 		choices.add("B major");
-		choices.add("F♯ major");
-		choices.add("C♯ major");
+		choices.add("F\u266F major");
+		choices.add("C\u266F major");
 		choices.add("F major");
-		choices.add("B♭ major");
-		choices.add("E♭ major");
-		choices.add("A♭ major");
-		choices.add("D♭ major");
-		choices.add("G♭ major");
-		choices.add("C♭ major");
+		choices.add("B\u266Dmajor");
+		choices.add("E\u266Dmajor");
+		choices.add("A\u266Dmajor");
+		choices.add("D\u266Dmajor");
+		choices.add("G\u266Dmajor");
+		choices.add("C\u266Dmajor");
 		
 		choices.add("A minor");
 		choices.add("E minor");
 		choices.add("B minor");
-		choices.add("F♯ minor");
-		choices.add("C♯ minor");
-		choices.add("G♯ minor");
-		choices.add("D♯ minor");
-		choices.add("A♯ minor");
+		choices.add("F\u266F minor");
+		choices.add("C\u266F minor");
+		choices.add("G\u266F minor");
+		choices.add("D\u266F minor");
+		choices.add("A\u266F minor");
 		choices.add("D minor");
 		choices.add("G minor");
 		choices.add("C minor");
 		choices.add("F minor");
-		choices.add("B♭ minor");
-		choices.add("E♭ minor");
-		choices.add("A♭ minor");
+		choices.add("B\u266Dminor");
+		choices.add("E\u266Dminor");
+		choices.add("A\u266Dminor");
 		
 
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(keyChoice, choices);
