@@ -514,7 +514,7 @@ public class MainSceneController {
 	/*
 	 * File Menu Actions
 	 */
-	@FXML private void handleNewTone() {
+	@FXML void handleNewTone() {
 		if (checkSave() && createNewTone()) {
 			clearChantLines();
 			editMenu.setDisable(false);
@@ -527,23 +527,24 @@ public class MainSceneController {
 			handleSave(); // So that the tone is loadable (will be empty)
 		}
 	}
-	@FXML private void handleOpenTone() {
+	@FXML void handleOpenTone() {
 		LoadingTone = true;
 		if (checkSave() && loadTone()) {
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
 			updateStageTitle();
-			
-			saveToneMenuItem.setDisable(toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath())
-					&& !MainApp.developerMode);
+
+			saveToneMenuItem.setDisable(saveDisabled());
 			
 		}
 		LoadingTone = false;
 		
 		refreshAllChords();
 	}
-	@FXML private void handleSave() {
+	@FXML void handleSave() {
+		if (toneDirectory == null || saveDisabled()) return;
+
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, keyChoice, composerText);
 		if (!toneWriter.saveTone(toneDirectory)) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -827,7 +828,12 @@ public class MainSceneController {
 		}
 		
 	}
-	
+
+	private boolean saveDisabled() {
+		return toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath())
+				&& !MainApp.developerMode;
+	}
+
 	private boolean getNewRenderFilename() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setInitialDirectory(currentSavingDirectory);

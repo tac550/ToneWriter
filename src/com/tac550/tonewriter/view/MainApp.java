@@ -9,6 +9,10 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -98,8 +102,24 @@ public class MainApp extends Application {
 			
 			// Apply the layout as the new scene
 			Scene scene = new Scene(rootLayout);
+
+			// Set up keyboard shortcuts
+			KeyCombination saveCombination = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
+			KeyCombination newCombination = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
+			KeyCombination openCombination = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
+
+			scene.addEventHandler(KeyEvent.KEY_RELEASED, (event) -> {
+				if (saveCombination.match(event)) {
+					mainController.handleSave();
+				} else if (newCombination.match(event)) {
+					mainController.handleNewTone();
+				} else if (openCombination.match(event)) {
+					mainController.handleOpenTone();
+				}
+			});
+
 			mainStage.setScene(scene);
-			
+
 			// Attempts to make sure the scene can't be made too small. TODO: It's still possible to make it a bit too small.
 			mainStage.setMinWidth(rootLayout.getPrefWidth());
 			mainStage.setMinHeight(rootLayout.getPrefHeight());
