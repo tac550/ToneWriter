@@ -537,6 +537,7 @@ public class MainSceneController {
 
 			saveToneMenuItem.setDisable(saveDisabled());
 			
+			askToOverwrite = false;
 		}
 		LoadingTone = false;
 		
