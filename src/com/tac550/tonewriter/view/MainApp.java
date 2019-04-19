@@ -6,16 +6,29 @@ import java.util.prefs.Preferences;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class MainApp extends Application {
 
@@ -24,6 +37,13 @@ public class MainApp extends Application {
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 	
 	public static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
+	
+	// Splash screen stuff
+	private static final Effect frostEffect =
+	        new BoxBlur(10, 10, 3);
+	private static final Stage splashStage = new Stage();
+    private static final ImageView splashBackground = new ImageView();
+	private static final StackPane splashPane = new StackPane();
 	
 	// Preferences object and key strings.
 	public static Preferences prefs;
@@ -69,6 +89,26 @@ public class MainApp extends Application {
 			System.out.println("LilyPond Missing!");
 		}
 		
+		showSplash();
+			
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		splashStage.close();
+		
+		loadMainStage(main_stage);
+		
+	}
+	
+	@Override
+	public void stop() {
+		mainController.checkSave();
+	}
+	
+	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
 		mainStage.setTitle(APP_NAME);
 		mainStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
@@ -84,13 +124,72 @@ public class MainApp extends Application {
 		mainStage.setMaximized(true);
 		
 		this.mainStage.show();
-		
 	}
 	
-	@Override
-	public void stop() {
-		mainController.checkSave();
+	private void showSplash() {
+		splashPane.setAlignment(Pos.CENTER);
+		splashPane.getChildren().setAll(createSplashContent());
+		splashPane.setStyle("-fx-background-color: null");
+
+        Scene scene = new Scene(
+        		splashPane,
+                300, 200,
+                Color.TRANSPARENT
+        );
+        
+        makeSmoke(splashStage);
+
+        splashStage.initStyle(StageStyle.TRANSPARENT);
+        splashStage.setScene(scene);
+        splashStage.show();
+        
+        Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
+        splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
+
+        splashBackground.setImage(copyBackground(splashStage));
+        splashBackground.setEffect(frostEffect);
 	}
+	private Image copyBackground(Stage stage) {
+        final int X = (int) stage.getX();
+        final int Y = (int) stage.getY();
+        final int W = (int) stage.getWidth();
+        final int H = (int) stage.getHeight();
+
+        try {
+            java.awt.Robot robot = new java.awt.Robot();
+            java.awt.image.BufferedImage image = robot.createScreenCapture(new java.awt.Rectangle(X, Y, W, H));
+
+            return SwingFXUtils.toFXImage(image, null);
+        } catch (java.awt.AWTException e) {
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+	private javafx.scene.shape.Rectangle makeSmoke(Stage stage) {
+        return new javafx.scene.shape.Rectangle(
+                stage.getWidth(),
+                stage.getHeight(),
+                Color.WHITESMOKE.deriveColor(
+                        0, 1, 1, 0.08
+                )
+        );
+    }
+	private Node[] createSplashContent() {
+    	VBox box = new VBox();
+    	box.setAlignment(Pos.CENTER);
+    	
+    	Text name = new Text(APP_NAME);
+    	name.setFont(new Font(100));
+
+    	Text loading = new Text("Loading...");
+    	name.setFont(new Font(25));
+    	
+    	box.getChildren().addAll(name, loading);
+    	
+    	return new Node[] {splashBackground, box} ;
+    }
 	
 	private void loadMainLayout() {
 		try {
