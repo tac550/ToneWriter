@@ -183,10 +183,19 @@ public class MainApp extends Application {
 	private void runLilyPond(Stage main_stage) throws IOException {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
+		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
 		lilypondFile.deleteOnExit();
+		outputFile.deleteOnExit();
+
+		try {
+			LilyPondWriter.ExportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, false, () -> {
 			lilypondFile.delete();
+			outputFile.delete();
 			Platform.runLater(() -> {
 				splashStage.close();
 				loadMainStage(main_stage);
