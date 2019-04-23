@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
 
+import com.tac550.tonewriter.io.LilyPondWriter;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
@@ -90,17 +92,20 @@ public class MainApp extends Application {
 		}
 		
 		showSplash();
-			
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (lilyPondAvailable()) {
+			try {
+				runLilyPond(main_stage);
+			} catch (IOException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setHeaderText("Failed to run LilyPond!");
+
+				alert.show();
+			}
+		} else {
+			splashStage.close();
+			loadMainStage(main_stage);
 		}
-		
-		splashStage.close();
-		
-		loadMainStage(main_stage);
-		
 	}
 	
 	@Override
@@ -142,31 +147,15 @@ public class MainApp extends Application {
         splashStage.initStyle(StageStyle.TRANSPARENT);
         splashStage.setScene(scene);
         splashStage.show();
-        
+
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
         splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
         splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
 
-        splashBackground.setImage(copyBackground(splashStage));
+        splashBackground.setImage(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
         splashBackground.setEffect(frostEffect);
 	}
-	private Image copyBackground(Stage stage) {
-        final int X = (int) stage.getX();
-        final int Y = (int) stage.getY();
-        final int W = (int) stage.getWidth();
-        final int H = (int) stage.getHeight();
 
-        try {
-            java.awt.Robot robot = new java.awt.Robot();
-            java.awt.image.BufferedImage image = robot.createScreenCapture(new java.awt.Rectangle(X, Y, W, H));
-
-            return SwingFXUtils.toFXImage(image, null);
-        } catch (java.awt.AWTException e) {
-            e.printStackTrace();
-
-            return null;
-        }
-    }
 	private javafx.scene.shape.Rectangle makeSmoke(Stage stage) {
         return new javafx.scene.shape.Rectangle(
                 stage.getWidth(),
@@ -190,6 +179,20 @@ public class MainApp extends Application {
     	
     	return new Node[] {splashBackground, box} ;
     }
+
+	private void runLilyPond(Stage main_stage) throws IOException {
+		// Create the temporary file to hold the lilypond markup
+		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
+		lilypondFile.deleteOnExit();
+
+		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, false, () -> {
+			lilypondFile.delete();
+			Platform.runLater(() -> {
+				splashStage.close();
+				loadMainStage(main_stage);
+			});
+		});
+	}
 	
 	private void loadMainLayout() {
 		try {
