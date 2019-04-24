@@ -845,8 +845,8 @@ public class MainSceneController {
 		else currentSavingDirectory = savingDirectory;
 		
 		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("Lilypond Output");
-		dialog.setHeaderText("Name the .ly file");
+		dialog.setTitle("Name Output");
+		dialog.setHeaderText("Name the output file(s)");
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 		
