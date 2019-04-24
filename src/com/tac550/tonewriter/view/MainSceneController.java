@@ -178,10 +178,12 @@ public class MainSceneController {
 			resetLilyPondLocationItem.setText("Reset LilyPond.app Location (use /Applications)");
 		}
 		
-		// If Lilypond is not present, disable the option to play midi as chords are assigned.
+		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
 		if (!MainApp.lilyPondAvailable()) {
 			playMidiMenuItem.setSelected(false);
 			playMidiMenuItem.setDisable(true);
+			saveLPMenuItem.setSelected(true);
+			saveLPMenuItem.setDisable(true);
 		}
 
 		// Behavior for "Save LilyPond file" option
