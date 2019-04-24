@@ -149,7 +149,7 @@
             <Menu mnemonicParsing="false" text="Options">
                <items>
                   <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
-                  <CheckMenuItem fx:id="dontSaveLPMenuItem" mnemonicParsing="false" text="Don't Save LilyPond File" />
+                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
                   <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use default)" />

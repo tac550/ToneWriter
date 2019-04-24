@@ -83,7 +83,7 @@ public class MainSceneController {
 	
 	@FXML private Menu editMenu;
 	@FXML private CheckMenuItem playMidiMenuItem;
-	@FXML private CheckMenuItem dontSaveLPMenuItem;
+	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
 	
@@ -184,11 +184,11 @@ public class MainSceneController {
 			playMidiMenuItem.setDisable(true);
 		}
 
-		// Behavior for "don't save LilyPond file" option
-		dontSaveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_DONT_SAVE_LILYPOND_FILE, newVal));
-		// Set initial state for "don't save LilyPond file" option
-		dontSaveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_DONT_SAVE_LILYPOND_FILE, false));
+		// Behavior for "Save LilyPond file" option
+		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
+		// Set initial state for "Save LilyPond file" option if previously set. Default to not selected.
+		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {
@@ -857,12 +857,8 @@ public class MainSceneController {
 		File lyFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
 		File pdfFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
 
-		if (lyFile.exists()) {
-            return pdfFile.delete() && lyFile.delete();
-        } else {
-		    return pdfFile.delete();
-        }
 
+        return pdfFile.delete() || lyFile.delete();
 	}
 	
 	private String showVerseBox() {

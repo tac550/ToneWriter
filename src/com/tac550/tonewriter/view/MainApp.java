@@ -51,7 +51,7 @@ public class MainApp extends Application {
 	public static Preferences prefs;
 	public static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";
 	public static final String PREFS_THOU_THY_ENABLED = "Thou-Thy-Enabled";
-	public static final String PREFS_DONT_SAVE_LILYPOND_FILE = "Dont-Save-LP-File";
+	public static final String PREFS_SAVE_LILYPOND_FILE = "Save-LP-File";
 	
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	public static final Color[] CHORDCOLORS = new Color[] {Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
