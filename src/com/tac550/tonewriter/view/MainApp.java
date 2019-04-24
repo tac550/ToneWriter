@@ -141,8 +141,6 @@ public class MainApp extends Application {
                 300, 200,
                 Color.TRANSPARENT
         );
-        
-        makeSmoke(splashStage);
 
         splashStage.initStyle(StageStyle.TRANSPARENT);
         splashStage.setScene(scene);
@@ -156,15 +154,6 @@ public class MainApp extends Application {
         splashBackground.setEffect(frostEffect);
 	}
 
-	private javafx.scene.shape.Rectangle makeSmoke(Stage stage) {
-        return new javafx.scene.shape.Rectangle(
-                stage.getWidth(),
-                stage.getHeight(),
-                Color.WHITESMOKE.deriveColor(
-                        0, 1, 1, 0.08
-                )
-        );
-    }
 	private Node[] createSplashContent() {
     	VBox box = new VBox();
     	box.setAlignment(Pos.CENTER);
@@ -177,7 +166,7 @@ public class MainApp extends Application {
     	
     	box.getChildren().addAll(name, loading);
     	
-    	return new Node[] {splashBackground, box} ;
+    	return new Node[] {splashBackground, box};
     }
 
 	private void runLilyPond(Stage main_stage) throws IOException {
