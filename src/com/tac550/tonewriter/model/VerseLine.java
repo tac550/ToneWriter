@@ -19,8 +19,8 @@ public class VerseLine {
 	}
 	
 	private String[] splitSyllables(String line) {
-		ArrayList<String> new_syllables = new ArrayList<String>();
-        new_syllables.addAll(Arrays.asList(line.replace("-", "_-").replace(" ", "_ ").split("_")));
+		ArrayList<String> new_syllables = new ArrayList<>(Arrays.asList(
+				line.replace("-", "_-").replace(" ", "_ ").split("_")));
 		
 		return new_syllables.toArray(new String[0]);
 	}
