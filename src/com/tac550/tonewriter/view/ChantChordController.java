@@ -284,35 +284,35 @@ public class ChantChordController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		Task<Integer> midiTask = new Task<Integer>() {
-            @Override
-            protected Integer call() throws Exception {
-                // From file
-                Sequence sequence = MidiSystem.getSequence(midiFile);
+		Task<Integer> midiTask = new Task<>() {
+			@Override
+			protected Integer call() throws Exception {
+				// From file
+				Sequence sequence = MidiSystem.getSequence(midiFile);
 
-                // Create a sequencer for the sequence
-                Sequencer sequencer = MidiSystem.getSequencer();
-                sequencer.open();
-                sequencer.setSequence(sequence);
+				// Create a sequencer for the sequence
+				Sequencer sequencer = MidiSystem.getSequencer();
+				sequencer.open();
+				sequencer.setSequence(sequence);
 
-                // Start playing
-                sequencer.start();
+				// Start playing
+				sequencer.start();
 
-                // Thread to close midi after it's had long enough to finish playing.
-                // This fixes the application not closing correctly if the user played midi.
-                Thread stopThread = new Thread(() -> {
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    sequencer.close();
-                });
-                stopThread.start();
+				// Thread to close midi after it's had long enough to finish playing.
+				// This fixes the application not closing correctly if the user played midi.
+				Thread stopThread = new Thread(() -> {
+					try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					sequencer.close();
+				});
+				stopThread.start();
 
-                return 0;
-            }
-        };
+				return 0;
+			}
+		};
 		
 		midiTask.run();
 	}

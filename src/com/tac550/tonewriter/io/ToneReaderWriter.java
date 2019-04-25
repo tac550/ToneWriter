@@ -144,7 +144,7 @@ public class ToneReaderWriter {
 			
 			// Loading chant lines
 			main_scene.clearChantLines();
-			List<File> toneFiles = Objects.requireNonNull(Arrays.asList(directory.listFiles()));
+			List<File> toneFiles = Objects.requireNonNull(Arrays.asList(Objects.requireNonNull(directory.listFiles())));
 
 			// Keep track of the letter of chant line we're loading files for.
 			char readingFilesFor = 'A';
@@ -247,9 +247,11 @@ public class ToneReaderWriter {
 				currentMainChord.setFields(fields);
 				currentMainChord.setComment(comment);
 			} else if (chantFileLine.contains("Post")) {
+				assert currentMainChord != null;
 				ChantChordController postChord = currentMainChord.addPostChord(fields);
 				postChord.setComment(comment);
 			} else if (chantFileLine.contains("Prep")) {
+				assert currentMainChord != null;
 				ChantChordController prepChord = currentMainChord.addPrepChord(fields);
 				prepChord.setComment(comment);
 			} else if (chantFileLine.contains("END")) {
@@ -269,7 +271,7 @@ public class ToneReaderWriter {
 		fileReader.close();
 	}
 
-	public static boolean containsFilesFor(List<File> file_list, char character) {
+	private static boolean containsFilesFor(List<File> file_list, char character) {
 		boolean result = false;
 		
 		for (File file : file_list) {
@@ -284,7 +286,7 @@ public class ToneReaderWriter {
 		
 	}
 	
-	public static List<File> getLineFiles(List<File> file_list, char character) {
+	private static List<File> getLineFiles(List<File> file_list, char character) {
 		List<File> lineFiles = new ArrayList<>();
 		
 		for (File file : file_list) {
