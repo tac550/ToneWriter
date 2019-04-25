@@ -240,7 +240,7 @@ public class VerseLineViewController {
 			undoFrame.syllableTexts.add(currentText);
 			
 			Button noteButton = null;
-			
+
 			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == indexClicked) { // If placing the final instance of the last chord in the chant line, make it a half note.
 				noteButton = createNoteButton(currentText, true);
@@ -252,7 +252,7 @@ public class VerseLineViewController {
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
 			}
-			
+
 		}
 		
 		lastSyllableAssigned = indexClicked;

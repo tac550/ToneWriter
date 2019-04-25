@@ -10,10 +10,10 @@ import javafx.scene.text.Text;
 
 public class SyllableText extends Text {
 
-	public static String NOTE_QUARTER = "4";
-	public static String NOTE_DOTTED_QUARTER = "4.";
-	public static String NOTE_HALF = "2";
-	public static String NOTE_EIGHTH = "8";
+	static final String NOTE_QUARTER = "4";
+	static final String NOTE_DOTTED_QUARTER = "4.";
+	static final String NOTE_HALF = "2";
+	static final String NOTE_EIGHTH = "8";
 	
 	private VerseLineViewController parentController;
 	
@@ -28,11 +28,11 @@ public class SyllableText extends Text {
 	private Color defaultColor = Color.BLACK;
 	private Color highlightColor = Color.DARKCYAN;
 	
-	public void setParent(VerseLineViewController controller) {
+	void setParent(VerseLineViewController controller) {
 		parentController = controller;
 	}
 	
-	public SyllableText(String text) {
+	SyllableText(String text) {
 		super(text);
 		
 		hoverProperty().addListener((o, old_val, new_val) -> {
@@ -53,8 +53,8 @@ public class SyllableText extends Text {
 		});
 	}
 	
-	public void select(ChantChordController chord, Button note_button, boolean startingPrep) {
-		if (clicked || startingPrep) {
+	void select(ChantChordController chord, Button note_button) {
+		if (clicked) {
 			nextNoteButtonYPos += MainApp.NOTEBUTTONHEIGHT;
 			clicked = false;
 		} else {
@@ -66,10 +66,7 @@ public class SyllableText extends Text {
 		
 		setColor(chord.getColor());
 	}
-	public void select(ChantChordController chord, Button note_button) {
-		select(chord, note_button, false);
-	}
-	public void clearSelection() {
+	void clearSelection() {
 		active = true;
 		nextNoteButtonYPos = 0;
 		setColor(Color.BLACK);
@@ -83,17 +80,17 @@ public class SyllableText extends Text {
 		setFill(color);
 	}
 	
-	public void deactivate() {
+	void deactivate() {
 		setFill(defaultColor);
 		active = false;
 	}
 	
-	public void reactivate() {
+	void reactivate() {
 		setFill(defaultColor);
 		active = true;
 	}
 	
-	public void setNoteDuration(String duration, Button note_button) {
+	void setNoteDuration(String duration, Button note_button) {
 		associatedChords.get(associatedButtons.indexOf(note_button)).setDuration(duration);
 	}
 	
@@ -101,11 +98,11 @@ public class SyllableText extends Text {
 		return associatedChords.toArray(new ChordData[] {});
 	}
 	
-	public int getNextNoteButtonPosY() {
+	int getNextNoteButtonPosY() {
 		return nextNoteButtonYPos;
 	}
 	
-	public void removeLastChord() {
+	void removeLastChord() {
 		associatedChords.remove(associatedChords.size()-1);
 		associatedButtons.remove(associatedButtons.size()-1);
 		
