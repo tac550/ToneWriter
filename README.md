@@ -8,7 +8,7 @@ ToneWriter attempts to solve this problem by abstracting the chant melodies them
 
 ## Contributing
 
-Please feel free to fork this repo and send in pull requests! I'm happy to accept anything that makes the project better (from new features to improving the overall structure to fixing my broken code). I only ask that you be considerate of the style conventions you see in the code, and if any of them seem detrimental to you, let me know and we'll see if we should change them. If you want to contribute but are not sure what to do, I would suggest working on improving our built-in tones if you are familiar with them ([this](https://oca.org/liturgics/learning-the-tones) is a useful resource for Ledkovsky Kievan Chant and L'vov/Bakhmetev Common Chant stichera), or adding new ones if your own musical tradition is not yet represented. By default, built-in tones can not be overwritten within the application, but this can be enabled by running with the VM argument "-DdeveloperMode=true" (without quotes).
+Please feel free to fork this repo and send in pull requests! I'm happy to accept anything that makes the project better (from new features to improving the overall structure to fixing my broken code). I only ask that you be considerate of the style conventions you see in the code, and if any of them seem detrimental to you, let me know and we'll see if we should change them. If you want to contribute but are not sure what to do, I would suggest working on improving our built-in tones if you are familiar with them ([this](https://oca.org/liturgics/learning-the-tones) is a useful resource for Ledkovsky Kievan Chant and L'vov/Bakhmetev Common Chant stichera), or adding new ones if your own musical tradition is not yet represented. By default, built-in tones can not be overwritten within the application, but this can be enabled by running with the VM argument "-DdeveloperMode=true".
 
 ### Wishlist
 
@@ -16,22 +16,22 @@ Please feel free to fork this repo and send in pull requests! I'm happy to accep
 
 ## Building
 
-You need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. On Windows the latest stable version (2.18.x at time of writing) should be fine. On MacOS, however, you need at least a recent version of 2.19 because older versions have bugs rendering PNG files for our chord previews. Also, if you use MacOS, make sure you engrave something with LilyPond (such as the sample file it comes with) BEFORE running ToneWriter. For some reason the first time LilyPond engraves anything it takes a very long time and this can really clog your system when we try rendering a couple dozen chord previews at once.
+You need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. On Windows the latest stable version (2.18.x at time of writing) should be fine. On MacOS, however, you need at least a recent version of 2.19 because older versions have bugs rendering PNG files for our chord previews.
 
-I'm building ToneWriter against Java 8 which is the minimum supported version. I don't see why things shouldn't work on newer versions but I have not tested extensively. This repo contains project files for both Eclipse and Idea, so importing the project into either of those IDEs should be easy. I recommend Gluon SceneBuilder for editing the .fxml interface files.
+I'm building ToneWriter against Java 8 which is the minimum supported version. Things should also work on newer versions but I have not tested extensively. This repo contains project files for both Eclipse and Idea, so importing the project into either of those IDEs should be easy. I use Gluon SceneBuilder to edit the .fxml interface files.
 
 ### Windows
 
-To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (which executes the main() function in MainApp.java) to build/res and run build/res/BUILD_WIN.cmd. The installer will be placed in build/win.
+dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sure launch4jc.exe is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure makensis.exe is on the PATH)
 
-There are 2 dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sure launch4jc.exe is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure makensis.exe is on the PATH)
+To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (which executes the main() function in MainApp.java) to build/res and run build/res/BUILD_WIN.cmd. The installer will be placed in build/win.
 
 ### MacOS
 
-To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (which executes the main() function in MainApp.java) to build/res and run build/res/BUILD_MAC.sh. The .app will be placed in build/mac along with a zipped copy.
+dependencies: jar2app, installed as described [here](https://github.com/Jorl17/jar2app).
 
-There is 1 dependency: jar2app, installed as described [here](https://github.com/Jorl17/jar2app).
+To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (which executes the main() function in MainApp.java) to build/res and run build/res/BUILD_MAC.sh. The .app will be placed in build/mac along with a zipped copy.
 
 ### Linux
 
-Export a runnable JAR and make sure the Built-in Tones and licenses folders are present in the same directory. Remember that Linux support is experimental at this point.
+Export a runnable JAR and make sure the Built-in Tones and licenses folders are present in the same directory. Remember that Linux support is experimental at the moment; contributions greatly appreciated.
