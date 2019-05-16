@@ -97,7 +97,7 @@ public class QuickVerseIO {
 		while ((currentLine = reader.readLine()) != null) {
 		    if (currentLine.trim().equals(verse) && !removed) {
 		    	removed = true;
-		    	continue;
+		    	continue; // Skips the following writer.write() line for the item to be removed (removes only one line)
 		    }
 		    writer.write(currentLine + System.getProperty("line.separator"));
 		}

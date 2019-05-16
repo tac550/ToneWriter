@@ -79,6 +79,12 @@ public class QuickVerseController {
                 	// Only remove the verse if it was a custom one (QuickVerseIO.removeCustomVerse returns true).
 					if (QuickVerseIO.removeCustomVerse(cell.itemProperty().get())) {
 						verses.remove(cell.itemProperty().get());	
+					} else {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Deletion");
+						alert.setHeaderText("Can't delete this verse because it's built-in.");
+						alert.initOwner(mainPane.getScene().getWindow());
+						alert.showAndWait();
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
