@@ -575,6 +575,11 @@ public class LilyPondWriter {
 	// Each ' shifts the user's input up one octave and each , shifts the same down one octave.
 	public static String parseNoteRelative(String note_data, String octave_data) {
 
+		// If there is no note, no adjustment is needed, but we do need to return a rest.
+		if (note_data.trim().isEmpty()) {
+			return "r";
+		}
+
 		// We construct the final adjusted note here.
 		String finalNoteData = "";
 

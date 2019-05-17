@@ -164,7 +164,11 @@ public class ChantChordController implements CommentableView {
 		return numText.getText();
 	}
 	public String getFields() {
-		return String.format("%s-%s-%s-%s", SField.getText(), AField.getText(), TField.getText(), BField.getText());
+		return String.format("%s-%s-%s-%s",
+				SField.getText().isEmpty() ? " " : SField.getText(),
+				AField.getText().isEmpty() ? " " : AField.getText(),
+				TField.getText().isEmpty() ? " " : TField.getText(),
+				BField.getText().isEmpty() ? " " : BField.getText());
 	}
 	public String getComment() {
 		return commentString.replaceAll("\n", "/n");

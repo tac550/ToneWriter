@@ -28,19 +28,19 @@ public class ChordData {
 	
 	public String getPart(int part_index) {
 		switch (part_index) {
-		
+
 		case 0:
 			return getSoprano();
-			
+
 		case 1:
 			return getAlto();
-			
+
 		case 2:
 			return getTenor();
-			
+
 		case 3:
 			return getBass();
-			
+
 		default:
 			return "";
 		}
@@ -48,16 +48,20 @@ public class ChordData {
 	}
 	
 	private String getSoprano() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[0], LilyPondWriter.ADJUSTMENT_SOPRANO) + duration;
+		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[0],
+				LilyPondWriter.ADJUSTMENT_SOPRANO) + duration;
 	}
 	private String getAlto() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[1], LilyPondWriter.ADJUSTMENT_ALTO) + duration;
+		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[1],
+				LilyPondWriter.ADJUSTMENT_ALTO) + duration;
 	}
 	private String getTenor() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[2], LilyPondWriter.ADJUSTMENT_TENOR) + duration;
+		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[2],
+				LilyPondWriter.ADJUSTMENT_TENOR) + duration;
 	}
 	private String getBass() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[3], LilyPondWriter.ADJUSTMENT_BASS) + duration;
+		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[3],
+				LilyPondWriter.ADJUSTMENT_BASS) + duration;
 	}
 	
 }
