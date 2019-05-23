@@ -83,6 +83,7 @@ public class MainSceneController {
 
 	@FXML private Menu editMenu;
 	@FXML private CheckMenuItem playMidiMenuItem;
+	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
@@ -321,8 +322,17 @@ public class MainSceneController {
 		syncCVLMapping();
 	}
 
-	public void syncCVLMapping() {
+	@FXML public void syncCVLMapping() {
 		if (toneDirectory == null) return; // No tone is loaded; don't do anything
+
+		// If manual mode is selected, allow user to choose all chant line assignments.
+		if (manualCLAssignmentMenuItem.isSelected()) {
+			for (VerseLineViewController verseLine : verseLineControllers) {
+				verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]));
+			}
+			return;
+		}
+
 		int firstRepeated = 0;
 		int CLNum = 0; // For retrieving proper chant line
 		for (int VLNum = 0; VLNum < verseLineControllers.size(); VLNum++) {

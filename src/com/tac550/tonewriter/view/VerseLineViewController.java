@@ -120,16 +120,12 @@ public class VerseLineViewController {
 		associatedChantLines = chant_lines;
 		selectedChantLine = 0;
 		chantLineChoice.getItems().clear();
-		chantLineChoice.getItems().add(associatedChantLines[0].getName());
-		chantLineChoice.getSelectionModel().select(0);
 
-		int altCounter = 1;
-		while (altCounter <= chant_lines.length - 1) {
-
-			chantLineChoice.getItems().add(associatedChantLines[0].getName() + " alt " + altCounter);
-
-			altCounter++;
+		for (ChantLineViewController chantLine : associatedChantLines) {
+			chantLineChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
 		}
+
+		chantLineChoice.getSelectionModel().select(0);
 
 		// ChoiceBox highlighting if choices are available
 		if (chantLineChoice.getItems().size() > 1) {
