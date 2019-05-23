@@ -131,6 +131,13 @@ public class VerseLineViewController {
 			altCounter++;
 		}
 
+		// ChoiceBox highlighting if choices are available
+		if (chantLineChoice.getItems().size() > 1) {
+			chantLineChoice.setStyle("-fx-base: #fcfc2f");
+		} else {
+			chantLineChoice.setStyle("");
+		}
+
 		resetChordAssignment();
 
 	}
