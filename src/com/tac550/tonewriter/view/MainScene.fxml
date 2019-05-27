@@ -36,86 +36,87 @@
                </children></AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" SplitPane.resizableWithParent="false">
                <children>
-                  <GridPane layoutX="452.0" layoutY="115.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="60.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="40.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1">
+                  <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
-                              <HBox>
-                                 <children>
-                                    <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS" />
-                                 </children>
-                              </HBox>
-                              <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="NEVER" />
-                                    <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
-                                    <ColumnConstraints hgrow="NEVER" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
-                                 </rowConstraints>
-                                 <children>
-                                    <TextField fx:id="verseTopField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                                       <GridPane.margin>
-                                          <Insets />
-                                       </GridPane.margin>
-                                    </TextField>
-                                    <Button fx:id="verseTopButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <tooltip>
-                                          <Tooltip text="Remove" />
-                                       </tooltip>
-                                    </Button>
-                                    <ChoiceBox fx:id="verseTopChoice" />
-                                 </children>
-                              </GridPane>
-                              <TextArea fx:id="verseArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                              <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="NEVER" />
-                                    <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
-                                    <ColumnConstraints hgrow="NEVER" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
-                                 </rowConstraints>
-                                 <children>
-                                    <TextField fx:id="verseBottomField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                                       <GridPane.margin>
-                                          <Insets />
-                                       </GridPane.margin>
-                                    </TextField>
-                                    <Button fx:id="verseBottomButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <tooltip>
-                                          <Tooltip text="Remove" />
-                                       </tooltip>
-                                    </Button>
-                                    <ChoiceBox fx:id="verseBottomChoice" />
-                                 </children>
-                              </GridPane>
-                              <Button mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
-                              <Button mnemonicParsing="false" onAction="#handleFinalRender" text="Perform Final Render" />
+                              <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <content>
+                                    <VBox fx:id="verseLineBox" prefWidth="610.0" />
+                                 </content>
+                              </ScrollPane>
                            </children>
-                        </VBox>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0">
-                           <content>
-                              <VBox fx:id="verseLineBox" prefWidth="610.0" />
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </GridPane>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <HBox>
+                                       <children>
+                                          <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                    <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="NEVER" />
+                                          <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
+                                          <ColumnConstraints hgrow="NEVER" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField fx:id="verseTopField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                             <GridPane.margin>
+                                                <Insets />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <Button fx:id="verseTopButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <tooltip>
+                                                <Tooltip text="Remove" />
+                                             </tooltip>
+                                          </Button>
+                                          <ChoiceBox fx:id="verseTopChoice" />
+                                       </children>
+                                    </GridPane>
+                                    <TextArea fx:id="verseArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="NEVER" />
+                                          <ColumnConstraints hgrow="ALWAYS" minWidth="-Infinity" />
+                                          <ColumnConstraints hgrow="NEVER" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
+                                       </rowConstraints>
+                                       <children>
+                                          <TextField fx:id="verseBottomField" promptText="(Leave blank to skip this section)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                             <GridPane.margin>
+                                                <Insets />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <Button fx:id="verseBottomButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                             <tooltip>
+                                                <Tooltip text="Remove" />
+                                             </tooltip>
+                                          </Button>
+                                          <ChoiceBox fx:id="verseBottomChoice" />
+                                       </children>
+                                    </GridPane>
+                                    <Button mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
+                                    <Button mnemonicParsing="false" onAction="#handleFinalRender" text="Perform Final Render" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
                </children>
             </AnchorPane>
         </items>
