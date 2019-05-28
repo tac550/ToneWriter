@@ -23,10 +23,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -44,7 +42,7 @@ public class VerseLineViewController {
 	@FXML private GridPane mainLayoutPane;
 
 	private boolean isSeparatorLine = false;
-	@FXML VBox separatorIndicatorBox;
+	@FXML private VBox separatorIndicatorBox;
 
 	private Stack<MappingAction> undoActions = new Stack<>();
 
@@ -53,11 +51,19 @@ public class VerseLineViewController {
 
 	@FXML private ChoiceBox<String> chantLineChoice;
 	@FXML private TextFlow lineTextFlow;
+	@FXML private RowConstraints textRow;
 
 	@FXML private Pane chordButtonPane;
 
-	@FXML Text chordEntryText;
-	@FXML Button skipChordButton;
+	@FXML private Text chordEntryText;
+	@FXML private Button skipChordButton;
+
+	@FXML private Button expandButton;
+	private ImageView plusIcon;
+	private ImageView minusIcon;
+	private boolean view_expanded = false;
+	private double defaultHeight;
+
 	private int currentChordIndex = 0; // Index of the chord currently being assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be clicked
 	private ChantChordController currentChord; // The chord currently being asigned
@@ -69,9 +75,24 @@ public class VerseLineViewController {
 			resetChordAssignment();
 
 		});
+
+		// Interface icons
+		double iconSize = 22;
+		plusIcon = new ImageView(getClass().getResource("/media/magnify.png").toExternalForm());
+		minusIcon = new ImageView(getClass().getResource("/media/magnify-less.png").toExternalForm());
+		plusIcon.setFitHeight(iconSize);
+		plusIcon.setFitWidth(iconSize);
+		minusIcon.setFitHeight(iconSize);
+		minusIcon.setFitWidth(iconSize);
+
+		// Button's initial state
+		expandButton.setGraphic(plusIcon);
+
+		defaultHeight = mainLayoutPane.getPrefHeight();
+
 	}
 
-	public void setParentController(MainSceneController parent) {
+	void setParentController(MainSceneController parent) {
 		parentController = parent;
 	}
 
@@ -111,7 +132,7 @@ public class VerseLineViewController {
 
 	}
 
-	public String getVerseLineText() {
+	String getVerseLineText() {
 		return verseLine.getLine();
 	}
 
@@ -217,7 +238,7 @@ public class VerseLineViewController {
 
 	}
 
-	public void syllableClicked(SyllableText clicked_text) {
+	void syllableClicked(SyllableText clicked_text) {
 		// First, play the chord if chord playing is on.
 		if (parentController.playMidiAsAssigned()) {
 			currentChord.playMidi();
@@ -242,7 +263,7 @@ public class VerseLineViewController {
 			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
 			undoFrame.syllableTexts.add(currentText);
 
-			Button noteButton = null;
+			Button noteButton;
 
 			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == indexClicked) { // If placing the final instance of the last chord in the chant line, make it a half note.
@@ -300,23 +321,23 @@ public class VerseLineViewController {
 		noteMenu.setOnAction(event -> {
 			for (MenuItem item : noteMenu.getItems()) {
 				// Deselect previous item when another is checked
-				if (!((CheckMenuItem) item).getText().equals(((CheckMenuItem) event.getTarget()).getText())) {
+				if (!item.getText().equals(((CheckMenuItem) event.getTarget()).getText())) {
 					((CheckMenuItem) item).setSelected(false);
 				}
 			}
-			// Something must always be selected. take clicking the currently selected one to have no effect (re-select it)
+			// Something must always be selected. Clicking the currently selected one should have no effect (re-select)
 			if (!((CheckMenuItem) event.getTarget()).isSelected()) {
 				((CheckMenuItem) event.getTarget()).setSelected(true);
 			}
 
 			// Individual actions
-			if (((CheckMenuItem) event.getTarget()).equals(quarterNote)) {
+			if (event.getTarget().equals(quarterNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButton);
-			} else if (((CheckMenuItem) event.getTarget()).equals(dottedQuarterNote)) {
+			} else if (event.getTarget().equals(dottedQuarterNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_DOTTED_QUARTER, noteButton);
-			} else if (((CheckMenuItem) event.getTarget()).equals(halfNote)) {
+			} else if (event.getTarget().equals(halfNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
-			} else if (((CheckMenuItem) event.getTarget()).equals(eighthNote)) {
+			} else if (event.getTarget().equals(eighthNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_EIGHTH, noteButton);
 			}
 		});
@@ -327,6 +348,28 @@ public class VerseLineViewController {
 		});
 
 		return noteButton;
+	}
+
+	@FXML private void toggleExpand() {
+		if (view_expanded) {
+			mainLayoutPane.setPrefHeight(defaultHeight);
+			expandButton.setGraphic(plusIcon);
+
+			view_expanded = false;
+		} else {
+			// Get note button with greatest LayoutY value
+			double maxLayoutY = 0;
+			for (Node node : chordButtonPane.getChildren()) {
+				if (node.getLayoutY() > maxLayoutY) {
+					maxLayoutY = node.getLayoutY();
+				}
+			}
+			// The following line might do nothing if less than minimum height.
+			mainLayoutPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTEBUTTONHEIGHT);
+			expandButton.setGraphic(minusIcon);
+
+			view_expanded = true;
+		}
 	}
 
 	@FXML private void editSyllables() {
@@ -364,7 +407,7 @@ public class VerseLineViewController {
 		return infoList.toArray(new SyllableText[] {});
 	}
 
-	public boolean isSeparator() {
+	boolean isSeparator() {
 		return isSeparatorLine;
 	}
 
