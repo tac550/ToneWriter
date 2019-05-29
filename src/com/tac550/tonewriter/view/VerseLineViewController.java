@@ -24,6 +24,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -267,12 +268,14 @@ public class VerseLineViewController {
 
 			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == indexClicked) { // If placing the final instance of the last chord in the chant line, make it a half note.
-				noteButton = createNoteButton(currentText, true);
+				noteButton = createNoteButton(currentText, true, currentChord);
+
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
 				currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
 			} else {
-				noteButton = createNoteButton(currentText, false);
+				noteButton = createNoteButton(currentText, false, currentChord);
+
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
 			}
@@ -295,7 +298,7 @@ public class VerseLineViewController {
 		nextChordAssignment();
 	}
 
-	private Button createNoteButton(SyllableText syllable, boolean finalNote) {
+	private Button createNoteButton(SyllableText syllable, boolean finalNote, ChantChordController chord) {
 		Button noteButton = new Button(currentChord.getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(currentChord.getColor())));
 		chordButtonPane.getChildren().add(noteButton);
@@ -317,6 +320,14 @@ public class VerseLineViewController {
 		}
 		else quarterNote.setSelected(true);
 
+		// Right click functionality plays chord associated with button
+		noteButton.setOnMouseClicked((e) -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+				chord.playMidi();
+			}
+		});
+
+		// context menu for changing chord duration
 		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote);
 		noteMenu.setOnAction(event -> {
 			for (MenuItem item : noteMenu.getItems()) {
