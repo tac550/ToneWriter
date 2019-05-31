@@ -6,11 +6,11 @@ import javafx.stage.Stage;
 
 public class SyllableEditViewController {
 
-	VerseLineViewController parentController;
+	private VerseLineViewController parentController;
 	
 	@FXML TextField syllableTextField;
 	
-	public void setParentController(VerseLineViewController controller) {
+	void setParentController(VerseLineViewController controller) {
 		parentController = controller;
 	}
 	
@@ -18,7 +18,7 @@ public class SyllableEditViewController {
 		
 	}
 	
-	public void setSyllableText(String text) {
+	void setSyllableText(String text) {
 		syllableTextField.setText(text);
 	}
 	
