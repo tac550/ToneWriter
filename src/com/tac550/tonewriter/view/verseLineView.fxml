@@ -16,9 +16,9 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<StackPane minHeight="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.VerseLineViewController">
+<StackPane fx:id="rootLayout" minHeight="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.VerseLineViewController">
    <children>
-      <GridPane fx:id="mainLayoutPane" minHeight="105.0" prefHeight="105.0">
+      <GridPane fx:id="mainContentPane" minHeight="105.0" prefHeight="105.0">
          <columnConstraints>
             <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -65,6 +65,11 @@
                      </children>
                   </VBox>
                   <Button fx:id="expandButton" mnemonicParsing="false" onAction="#toggleExpand" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                  <Button layoutX="10.0" layoutY="90.0" mnemonicParsing="false" onAction="#remove" text="X" textFill="RED" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
          </children>

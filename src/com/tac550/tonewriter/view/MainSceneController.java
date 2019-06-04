@@ -761,6 +761,11 @@ public class MainSceneController {
 		chantLineControllers.remove(chantLineViewController);
 		recalcCLNames();
 	}
+	void removeVerseLine(VerseLineViewController verseLineViewController) {
+		verseLineBox.getChildren().remove(verseLineViewController.getRootLayout());
+		verseLineControllers.remove(verseLineViewController);
+		syncCVLMapping();
+	}
 	void chantLineUp(ChantLineViewController chantLineViewController) {
 		int i = chantLineControllers.indexOf(chantLineViewController);
 		int j = i-1;

@@ -40,7 +40,8 @@ public class VerseLineViewController {
 
 	private VerseLine verseLine;
 
-	@FXML private GridPane mainLayoutPane;
+	@FXML private StackPane rootLayout;
+	@FXML private GridPane mainContentPane;
 
 	private boolean isSeparatorLine = false;
 	@FXML private VBox separatorIndicatorBox;
@@ -89,7 +90,7 @@ public class VerseLineViewController {
 		// Button's initial state
 		expandButton.setGraphic(plusIcon);
 
-		defaultHeight = mainLayoutPane.getPrefHeight();
+		defaultHeight = mainContentPane.getPrefHeight();
 
 	}
 
@@ -191,6 +192,14 @@ public class VerseLineViewController {
 		currentChordIndex = action.previousChordIndex;
 		nextChordAssignment();
 
+	}
+
+	@FXML private void remove() {
+		parentController.removeVerseLine(this);
+	}
+
+	StackPane getRootLayout() {
+		return rootLayout;
 	}
 
 	private void nextChordAssignment() {
@@ -363,7 +372,7 @@ public class VerseLineViewController {
 
 	@FXML private void toggleExpand() {
 		if (view_expanded) {
-			mainLayoutPane.setPrefHeight(defaultHeight);
+			mainContentPane.setPrefHeight(defaultHeight);
 			expandButton.setGraphic(plusIcon);
 
 			view_expanded = false;
@@ -376,7 +385,7 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainLayoutPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTEBUTTONHEIGHT);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTEBUTTONHEIGHT);
 			expandButton.setGraphic(minusIcon);
 
 			view_expanded = true;
