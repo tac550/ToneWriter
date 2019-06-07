@@ -3,6 +3,9 @@
 /build/lin/
 /build/res/ToneWriter.jar
 
+# Mac stuff
+*.DS_Store
+
 # Compiled class file
 *.class
 
