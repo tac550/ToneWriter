@@ -1,5 +1,7 @@
 \version "2.18.2"
 
+#(set-default-paper-size "letter")
+
 \language english
 
 \header {
