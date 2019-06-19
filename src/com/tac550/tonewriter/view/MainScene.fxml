@@ -152,6 +152,7 @@
                   <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
                   <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#syncCVLMapping" text="Manually Assign Chant Lines" />
                   <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSetPaperSize" text="Set Paper Size..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
                   <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use default)" />

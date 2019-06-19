@@ -40,7 +40,7 @@ public class LilyPondWriter {
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      String title, String composer, String topReaderType, String topReader, String bottomReaderType, String bottomReader) throws IOException {
+	                                      String title, String composer, String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
@@ -68,7 +68,8 @@ public class LilyPondWriter {
 		// The buffer in which we'll store the output file as we build it.
 		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		// Adding title and composer info.
+		// Adding paper size, title, and composer info.
+		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7, "  subtitle = \"" + title + "\"");
 		lines.set(8, "  composer = \"" + composer + "\"");
 

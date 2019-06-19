@@ -68,8 +68,9 @@ public class MainSceneController {
 
 	private File toneDirectory;
 
-	private String keyChoice = "C major";
+	private String currentKey = "C major";
 	private String composerText = "";
+	private String paperSize = "";
 
 	@FXML private MenuItem newToneMenuItem;
 	@FXML private MenuItem openToneMenuItem;
@@ -190,8 +191,9 @@ public class MainSceneController {
 		// Behavior for "Save LilyPond file" option
 		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
-		// Set initial state for "Save LilyPond file" option if previously set. Default to not selected.
+		// Set initial state for "Save LilyPond file" option and paper size, which may have been saved in preferences.
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
+		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {
@@ -224,14 +226,20 @@ public class MainSceneController {
 		return toneDirectory;
 	}
 	String getCurrentKey() {
-		return keyChoice;
+		return currentKey;
 	}
 	public void setCurrentKey(String key) {
-		keyChoice = key;
-		refreshChordKeySignatures(keyChoice);
+		currentKey = key;
+		refreshChordKeySignatures(currentKey);
 	}
 	public void setComposerText(String text) {
 		composerText = text;
+	}
+
+	private void setPaperSize(String size) {
+		paperSize = size;
+
+		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
 	}
 
 	private void createVerseLine(String line) {
@@ -558,7 +566,7 @@ public class MainSceneController {
 	@FXML void handleSave() {
 		if (toneDirectory == null || saveDisabled()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, keyChoice, composerText);
+		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, currentKey, composerText);
 		if (!toneWriter.saveTone(toneDirectory)) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -628,13 +636,13 @@ public class MainSceneController {
 		choices.add("A\u266Dminor");
 
 
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(keyChoice, choices);
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(letter -> setCurrentKey(result.get()));
+		result.ifPresent(this::setCurrentKey);
 	}
 
 	@FXML private void handleSetComposerText() {
@@ -645,7 +653,7 @@ public class MainSceneController {
 		dialog.initOwner(thisStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(letter -> composerText = result.get());
+		result.ifPresent(text -> composerText = text);
 	}
 
 	/*
@@ -705,6 +713,26 @@ public class MainSceneController {
 		alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
 		alert.initOwner(thisStage);
 		alert.showAndWait();
+	}
+	@FXML private void handleSetPaperSize() {
+		List<String> choices = new ArrayList<>();
+
+		choices.add("a4 (210 x 297 mm)");
+		choices.add("junior-legal (8.0 x 5.0 in)");
+		choices.add("legal (8.5 x 14.0 in)");
+		choices.add("ledger (17.0 x 11.0 in)");
+		choices.add("letter (8.5 x 11.0 in)");
+		choices.add("tabloid (11.0 x 17.0 in)");
+		choices.add("11x17 (11.0 x 17.0 in)");
+		choices.add("17x11 (17.0 x 11.0 in)");
+
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
+		dialog.setTitle("Paper sizes");
+		dialog.setHeaderText("Choose a paper size");
+		dialog.initOwner(thisStage);
+		Optional<String> result = dialog.showAndWait();
+
+		result.ifPresent(this::setPaperSize);
 	}
 
 	/*
@@ -828,8 +856,9 @@ public class MainSceneController {
 		}
 
 		try {
-			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, keyChoice,
-					titleTextField.getText(), composerText, verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText())) {
+			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
+					titleTextField.getText(), composerText, verseTopChoice.getValue(), verseTopField.getText(),
+					verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
 				alert.setHeaderText("An error occurred while saving!");
