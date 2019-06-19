@@ -690,14 +690,17 @@ public class LilyPondWriter {
 	public static String keySignatureToLilyPond(String key_sig) {
 		String keySigString = "  \\key ";
 
-		String[] keySigParts = key_sig.split(" ");
+		// Splitting up the two parts of the key string...
+		String[] keySigParts = new String[2];
+		keySigParts[1] = key_sig.substring(key_sig.length() - 5); // ...major or minor...
+		keySigParts[0] = key_sig.replace(keySigParts[1], "").trim(); // ...and the key name itself.
 		// Add the key's note letter.
 		keySigString += keySigParts[0].substring(0, 1).toLowerCase();
 		// Add sharp or flat, if any.
 		if (keySigParts[0].contains("♯")) {
-			keySigString += "s ";
+			keySigString += "s";
 		} else if (keySigParts[0].contains("♭")) {
-			keySigString += "f ";
+			keySigString += "f";
 		}
 		// Add " \major" or " \minor".
 		keySigString += (" \\" + keySigParts[1]);
