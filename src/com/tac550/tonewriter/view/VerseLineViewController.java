@@ -66,12 +66,16 @@ public class VerseLineViewController {
 	private boolean view_expanded = false;
 	private double defaultHeight;
 
+	private boolean changingAssignments = false;
+
 	private int currentChordIndex = 0; // Index of the chord currently being assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be clicked
 	private ChantChordController currentChord; // The chord currently being asigned
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
+
+			if (changingAssignments) return;
 
 			selectedChantLine = new_val.intValue();
 			resetChordAssignment();
@@ -139,6 +143,10 @@ public class VerseLineViewController {
 	}
 
 	void setChantLines(ChantLineViewController[] chant_lines) {
+		changingAssignments = true;
+		// Rembmber previous chant line selection
+		String previousChantLine = chantLineChoice.getValue();
+
 		// Show the proper chant line on the left
 		associatedChantLines = chant_lines;
 		selectedChantLine = 0;
@@ -157,8 +165,12 @@ public class VerseLineViewController {
 			chantLineChoice.setStyle("");
 		}
 
-		resetChordAssignment();
+		// Only reset chord assignments if the new chant line selection is different from the previous one.
+		if (!chantLineChoice.getValue().equals(previousChantLine)) {
+			resetChordAssignment();
+		}
 
+		changingAssignments = false;
 	}
 
 	private void resetChordAssignment() {
