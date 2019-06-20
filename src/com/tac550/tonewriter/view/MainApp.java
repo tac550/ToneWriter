@@ -35,7 +35,7 @@ import javafx.stage.StageStyle;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.3";
+	public static final String APP_VERSION = "0.4";
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
 	public static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
