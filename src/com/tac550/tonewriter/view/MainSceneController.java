@@ -447,7 +447,6 @@ public class MainSceneController {
 		} else return false;
 	}
 	private boolean createNewTone() {
-		resetStageTitle();
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
 		if (toneDirectory != null && !toneDirectory.getAbsolutePath().contains(System.getProperty("user.dir") + File.separator + "Built-in Tones")) {
@@ -478,7 +477,6 @@ public class MainSceneController {
 		}
 	}
 	private boolean loadTone() {
-		resetStageTitle();
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		if (toneDirectory != null) {
 			directoryChooser.setInitialDirectory(new File(toneDirectory.getAbsolutePath().substring(0, toneDirectory.getAbsolutePath().lastIndexOf(File.separator))));
@@ -536,6 +534,8 @@ public class MainSceneController {
 	 */
 	@FXML void handleNewTone() {
 		if (checkSave() && createNewTone()) {
+			resetAllAssignments();
+			resetStageTitle();
 			clearChantLines();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
@@ -550,6 +550,8 @@ public class MainSceneController {
 	@FXML void handleOpenTone() {
 		LoadingTone = true;
 		if (checkSave() && loadTone()) {
+			resetAllAssignments();
+			resetStageTitle();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
@@ -782,6 +784,11 @@ public class MainSceneController {
 				e.printStackTrace();
 			}
 	    }
+	}
+	private void resetAllAssignments() {
+		for (VerseLineViewController verseLine : verseLineControllers) {
+			verseLine.resetChordAssignment();
+		}
 	}
 
 	void removeChantLine(ChantLineViewController chantLineViewController) {

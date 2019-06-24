@@ -173,7 +173,7 @@ public class VerseLineViewController {
 		changingAssignments = false;
 	}
 
-	private void resetChordAssignment() {
+	void resetChordAssignment() {
 		// Set up the first step of chord assignment
 		for (Node syllable : lineTextFlow.getChildren()) {
 			((SyllableText) syllable).clearSelection();
