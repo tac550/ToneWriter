@@ -123,13 +123,19 @@ public class MainApp extends Application {
 		// Ensure that the process exits when the main window is closed
 		mainStage.setOnCloseRequest((ev) -> Platform.exit());
 
+		// Show the stage (requiured for the next operation to work)
+		this.mainStage.show();
+
+		// Makes sure the stage can't be made too small.
+		// The stage opens showing the scene at its pref size. This makes that initial size the minimum.
+		mainStage.setMinWidth(mainStage.getWidth());
+		mainStage.setMinHeight(mainStage.getHeight());
+
 		// Start the application maximized.
 		// This also mitigates an issue with UI widgets disappearing when hovered (assuming the user keeps it maximized).
 		// TODO: That issue needs a more comprehensive fix.
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
-
-		this.mainStage.show();
 	}
 
 	private void showSplash() {
@@ -220,10 +226,6 @@ public class MainApp extends Application {
 			});
 
 			mainStage.setScene(scene);
-
-			// Attempts to make sure the scene can't be made too small. TODO: It's still possible to make it a bit too small.
-			mainStage.setMinWidth(rootLayout.getPrefWidth());
-			mainStage.setMinHeight(rootLayout.getPrefHeight());
 
 			// Workaround for Mac bug where resizing is impossible after exiting fullscreen
 			// https://stackoverflow.com/questions/47476328/how-to-make-main-javafx-window-still-resizable-coming-back-from-full-screen-mode
