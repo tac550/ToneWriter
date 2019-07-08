@@ -43,7 +43,7 @@ Section "ToneWriter" Section1
 	CreateShortCut "$DESKTOP\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
 	CreateDirectory "$SMPROGRAMS\ToneWriter"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
-	CreateShortCut "$SMPROGRAMS\ToneWriter\Uninstall.lnk" "$INSTDIR\uninstall.exe"
+	CreateShortCut "$SMPROGRAMS\ToneWriter\Uninstall ToneWriter.lnk" "$INSTDIR\uninstall.exe"
 
 SectionEnd
 
@@ -89,6 +89,8 @@ Section Uninstall
 	; Delete Shortcuts
 	Delete "$DESKTOP\ToneWriter.lnk"
 	Delete "$SMPROGRAMS\ToneWriter\ToneWriter.lnk"
+	Delete "$SMPROGRAMS\ToneWriter\Uninstall ToneWriter.lnk"
+	; OLD
 	Delete "$SMPROGRAMS\ToneWriter\Uninstall.lnk"
 
 	; Clean up ToneWriter
