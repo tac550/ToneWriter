@@ -1,27 +1,16 @@
 package com.tac550.tonewriter.view;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Stack;
-
 import com.tac550.tonewriter.model.MappingAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -33,6 +22,11 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Stack;
 
 public class VerseLineViewController {
 
@@ -374,10 +368,8 @@ public class VerseLineViewController {
 			}
 		});
 
-		noteButton.setOnAction(event -> {
-			Point cursorLocation = MouseInfo.getPointerInfo().getLocation();
-			noteMenu.show(noteButton.getScene().getWindow(), cursorLocation.getX() / TWUtils.getUIScaleFactor(), cursorLocation.getY() / TWUtils.getUIScaleFactor());
-		});
+		noteButton.setOnAction(event ->
+				noteMenu.show(noteButton, Side.BOTTOM, 0, 0));
 
 		return noteButton;
 	}
