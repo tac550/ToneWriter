@@ -11,7 +11,7 @@ public class ProcessExitDetector extends Thread {
 	/** The process for which we have to detect the end. */
 	private Process process;
 	/** The associated listeners to be invoked at the end of the process. */
-	private List<ProcessListener> listeners = new ArrayList<ProcessListener>();
+	private List<ProcessListener> listeners = new ArrayList<>();
 
 	/**
 	 * Starts the detection for the given process
@@ -27,10 +27,10 @@ public class ProcessExitDetector extends Thread {
 		}
 	}
 
-	/** @return the process that it is watched by this detector. */
-	public Process getProcess() {
-		return process;
-	}
+//	/** @return the process that it is watched by this detector. */
+//	public Process getProcess() {
+//		return process;
+//	}
 
 	public void run() {
 		try {
@@ -40,7 +40,7 @@ public class ProcessExitDetector extends Thread {
 			for (ProcessListener listener : listeners) {
 				listener.processFinished(process);
 			}
-		} catch (InterruptedException e) {
+		} catch (InterruptedException ignored) {
 		}
 	}
 
@@ -51,10 +51,10 @@ public class ProcessExitDetector extends Thread {
 		listeners.add(listener);
 	}
 
-	/** Removes a process listener.
-	 * @param listener the listener to be removed
-	 */
-	public void removeProcessListener(ProcessListener listener) {
-		listeners.remove(listener);
-	}
+//	/** Removes a process listener.
+//	 * @param listener the listener to be removed
+//	 */
+//	public void removeProcessListener(ProcessListener listener) {
+//		listeners.remove(listener);
+//	}
 }
