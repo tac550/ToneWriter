@@ -1,19 +1,12 @@
 package com.tac550.tonewriter.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.tac550.tonewriter.view.MainApp;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.tac550.tonewriter.view.MainApp;
+import java.util.Collections;
 
 public class QuickVerseIO {
 
@@ -26,7 +19,7 @@ public class QuickVerseIO {
 
 		String line;
 
-		while ( (line = bufferedReader.readLine()) != null) {
+		while ((line = bufferedReader.readLine()) != null) {
 			if (!line.isEmpty() && !line.startsWith("#")) {
 				finalList.add(line);
 			}
@@ -45,7 +38,7 @@ public class QuickVerseIO {
 		File verseFile = getPlatformSpecificVerseFile();
 
 		// If verse file doesn't exist, just return the empty final list.
-		if (!verseFile.exists()) {
+		if (verseFile == null || !verseFile.exists()) {
 			return finalList;
 		}
 
@@ -69,20 +62,23 @@ public class QuickVerseIO {
 	public static void addCustomVerse(String verse) throws IOException {
 		File verseFile = getPlatformSpecificVerseFile();
 
+		if (verseFile == null) throw new IOException("Failed to get verse storage file!");
+
 		// Create custom verse file if it doesn't already exist.
 		if (!verseFile.exists()) {
-			verseFile.getParentFile().mkdirs();
-			verseFile.createNewFile();
+			if (!(verseFile.getParentFile().mkdirs() && verseFile.createNewFile())) {
+				throw new IOException("Failed to create new verse storage file!");
+			}
 		}
 
 		// Write the new custom verse to the file.
-		Files.write(verseFile.toPath(), Arrays.asList(verse), StandardOpenOption.APPEND);
+		Files.write(verseFile.toPath(), Collections.singletonList(verse), StandardOpenOption.APPEND);
 	}
 
 	public static boolean removeCustomVerse(String verse) throws IOException {
 		File verseFile = getPlatformSpecificVerseFile();
 
-		if (!verseFile.exists()) {
+		if (verseFile == null || !verseFile.exists()) {
 			return false;
 		}
 
@@ -105,8 +101,9 @@ public class QuickVerseIO {
 		writer.close();
 		reader.close();
 
-		verseFile.delete();
-		tempFile.renameTo(verseFile);
+		if (!(verseFile.delete() && tempFile.renameTo(verseFile))) {
+			throw new IOException("Failed to delete or rename verse file!");
+		}
 
 		// Only return true if a line was removed (otherise it must have been a built-in verse)
 		return removed;

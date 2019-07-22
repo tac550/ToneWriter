@@ -18,7 +18,7 @@ public class Syllables {
 	// Sends text off to the syllabification engine and returns the resulting lines as an array of strings.
 	public static String[] getSyllabificationLines(String full_verse) {
 		
-		ArrayList<String> lines = new ArrayList<String>();
+		ArrayList<String> lines;
 		
 		try (final WebClient webClient = new WebClient()) {
 			
@@ -29,11 +29,10 @@ public class Syllables {
 	        
 	        textField.setText(full_verse);
 	        final HtmlPage resultPage = submitButton.click();
-	        lines.addAll(Arrays.asList(resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n")));
-	        
-	        webClient.close();
-	        
-	    } catch (FailingHttpStatusCodeException | IOException e) {
+	        lines = new ArrayList<>(
+	        		Arrays.asList(resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n")));
+
+		} catch (FailingHttpStatusCodeException | IOException e) {
 	    	Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Internet connection failure! Use Edit buttons to break up syllables.");
