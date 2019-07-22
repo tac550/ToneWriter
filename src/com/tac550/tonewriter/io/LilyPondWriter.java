@@ -79,7 +79,7 @@ public class LilyPondWriter {
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.
-		String verseText = "";
+		StringBuilder verseText = new StringBuilder();
 
 		// For every verse line...
 		for (VerseLineViewController verseLineController : verse_lines) {
@@ -92,7 +92,7 @@ public class LilyPondWriter {
 			}
 
 			// Buffer for the line's text.
-			String verseLine = "";
+			StringBuilder verseLine = new StringBuilder();
 			// Number of beats in the line.
 			float lineBeats = 0;
 
@@ -101,7 +101,7 @@ public class LilyPondWriter {
 				// Note buffers for this syllable.           S   A   T   B
 				String[] syllableNoteBuffers = new String[]{"", "", "", ""};
 				// Buffer for the syllable's text.
-				String syllableTextBuffer = "";
+				StringBuilder syllableTextBuffer = new StringBuilder();
 
 				// Whether or not notes were combined for each part in the previous chord.
 				// Note that notes being combined means either being made into one note with a
@@ -139,14 +139,14 @@ public class LilyPondWriter {
 							// If the syllable contains a leading space... (Most do, to separate them from the previous word or syllable)
 							if (syll.toString().startsWith(" ")) {
 								// Surround just the syllable (not the leading space) with double quotes
-								syllableTextBuffer += syll.toString().replace(" ", " \"") + "\"";
+								syllableTextBuffer.append(syll.toString().replace(" ", " \"")).append("\"");
 							} else {
 								// Otherwise just surround the syllable without a leading space with quotes.
-								syllableTextBuffer += "\"" + syll.toString() + "\"";
+								syllableTextBuffer.append("\"").append(syll.toString()).append("\"");
 							}
 
 						} else { // If there are no double quotes, add the syllable normally (throwing away the leading hyphen, if any).
-							syllableTextBuffer += syllable.replace("-", "");
+							syllableTextBuffer.append(syllable.replace("-", ""));
 						}
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
@@ -154,7 +154,7 @@ public class LilyPondWriter {
 							// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
 							// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
 							if (syllableList.get(syllableList.indexOf(syllableData) + 1).getText().startsWith("-")) {
-								syllableTextBuffer += " -- ";
+								syllableTextBuffer.append(" -- ");
 							}
 						}
 
@@ -164,7 +164,7 @@ public class LilyPondWriter {
 						// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
 						if (!previousNoteCombined[PART_SOPRANO]) {
 							// For chords subsequent to the first for each syllable, we add this to tell Lilypond this syllable has an additional chord attached to it.
-							syllableTextBuffer += " _ ";
+							syllableTextBuffer.append(" _ ");
 						}
 					}
 
@@ -180,7 +180,7 @@ public class LilyPondWriter {
 					for (int i = 0; i < 4; i++) {
 						// We need to get a previous note, the current note, and the next note in order to do this processing.
 						String previousNote = "";
-						String currentNote = "";
+						String currentNote;
 						String nextNote = "";
 
 						// PREVIOUS NOTE
@@ -264,13 +264,11 @@ public class LilyPondWriter {
 
 											tokens[i1] = "";
 
-											if (noteGroup) {
-												// Keep removing tokens until we hit the beginning of the note group.
-												continue;
-											} else {
+											if (!noteGroup) {
 												// Stop here because we just removed the previous note.
 												break;
 											}
+
 										} else {
 											// Remove tokens that aren't notes from the end.
 											tokens[i1] = "";
@@ -278,13 +276,13 @@ public class LilyPondWriter {
 									}
 
 									// Remove any excess spaces from the syllable note buffer
-									String editedString = "";
+									StringBuilder editedString = new StringBuilder();
 									for (String token : tokens) {
 										if (token.isEmpty()) continue;
-										editedString += " " + token;
+										editedString.append(" ").append(token);
 									}
 									// Save back to the buffer.
-									syllableNoteBuffers[i] = editedString;
+									syllableNoteBuffers[i] = editedString.toString();
 
 								}
 
@@ -372,24 +370,24 @@ public class LilyPondWriter {
 						}
 
 						// Reconstruct the syllable note buffer, adding the beginning slur parenthese after the first note (as LilyPond syntax dictates).
-						String finalString = "";
+						StringBuilder finalString = new StringBuilder();
 						// For each token in the buffer...
 						for (int i1 = 0; i1 < tokens.length; i1++) {
 							// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
 							// note group... (two notes occurring in one part, which will be split across two tokens)
 							if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) {
 								// Add the beginning slur parenthese and the current token.
-								finalString += (" \\( " + tokens[i1]);
+								finalString.append(" \\( ").append(tokens[i1]);
 								addedSlur[i] = true;
 							} else {
 								// Otherwise skip empty tokens or add the current one.
 								if (tokens[i1].isEmpty()) continue;
-								finalString += " " + tokens[i1];
+								finalString.append(" ").append(tokens[i1]);
 							}
 						}
 
 						// Save the new string to the note buffer.
-						syllableNoteBuffers[i] = finalString;
+						syllableNoteBuffers[i] = finalString.toString();
 					}
 				}
 
@@ -406,7 +404,7 @@ public class LilyPondWriter {
 				// SYLLABLE BUFFER SAVE-OUTS
 
 				// Add the text buffer for the syllable to that of the line.
-				verseLine += syllableTextBuffer;
+				verseLine.append(syllableTextBuffer);
 
 				// Add the note data for the syllable from the buffers to the final part strings.
 				for (int i = 0; i < 4; i++) {
@@ -425,10 +423,10 @@ public class LilyPondWriter {
 			int finalBeats = roundedBeats == 0 ? 1 : roundedBeats;
 			// Add time signature information before each verse line except the first one.
 			if (verse_lines.indexOf(verseLineController) != 0) {
-				verseText += String.format(Locale.US, " \\time %d/4 ", finalBeats) + verseLine;
+				verseText.append(String.format(Locale.US, " \\time %d/4 ", finalBeats)).append(verseLine);
 			} else {
 				// If it's the first line, put its time signature in the header instead.
-				verseText += verseLine;
+				verseText.append(verseLine);
 				lines.set(13, String.format(Locale.US, "  \\time %d/4", finalBeats));
 			}
 
@@ -445,7 +443,7 @@ public class LilyPondWriter {
 		lines.set(26, parts[PART_ALTO]);
 		lines.set(32, parts[PART_TENOR]);
 		lines.set(38, parts[PART_BASS]);
-		lines.set(44, verseText);
+		lines.set(44, verseText.toString());
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
 			lines.set(48, "\\markup {");
@@ -517,7 +515,7 @@ public class LilyPondWriter {
 		// Add the note durations and inverse again to return to LilyPond's duration format.
 		float computedDur = 1 / (durCurrent + durNext);
 
-		String newDur = "";
+		String newDur;
 
 		// If the note combination process yielded a whole number...
 		if (computedDur % 1 == 0) {
@@ -582,7 +580,7 @@ public class LilyPondWriter {
 		}
 
 		// We construct the final adjusted note here.
-		String finalNoteData = "";
+		StringBuilder finalNoteData = new StringBuilder();
 
 		// This pattern looks for note names in the note_data.
 		Pattern p = Pattern.compile("[abcdefg]");
@@ -590,7 +588,7 @@ public class LilyPondWriter {
 		// Set until we encounter the first match.
 		boolean first = true;
 		// Set when we encounter the end of the note group (if that's what we were given)
-		boolean closeGroupFlag = false;
+		boolean closeGroupFlag;
 		// For each note name found...
 		while (m.find()) {
 			closeGroupFlag = false;
@@ -604,7 +602,7 @@ public class LilyPondWriter {
 			first = false;
 
 			String workingOctave = octave_data;
-			String workingSection = note_data;
+			String workingSection;
 			// If the note data contains its first space after the position of the match...
 			if (note_data.contains(" ") && note_data.indexOf(" ") > position) {
 				// The working section goes from the match to the next space.
@@ -647,14 +645,14 @@ public class LilyPondWriter {
 
 			if (closeGroupFlag) {
 				// Re-add the grouping syntax if this was the last note of a note group.
-				finalNoteData += (" " + workingSection + workingOctave + ">");
+				finalNoteData.append(" ").append(workingSection).append(workingOctave).append(">");
 			} else {
-				finalNoteData += (workingSection + workingOctave);
+				finalNoteData.append(workingSection).append(workingOctave);
 			}
 
 		}
 
-		return finalNoteData;
+		return finalNoteData.toString();
 	}
 
 	// Copies internal file on the classpath to an external location.
@@ -673,8 +671,6 @@ public class LilyPondWriter {
 			while ((readBytes = stream.read(buffer)) > 0) {
 				resStreamOut.write(buffer, 0, readBytes);
 			}
-		} catch (Exception ex) {
-			throw ex;
 		} finally {
 			if (stream != null) {
 				stream.close();
@@ -711,7 +707,7 @@ public class LilyPondWriter {
 	public static void executePlatformSpecificLPRender(File lilypondFile, boolean renderPNG, Runnable exitingActions) throws IOException {
 
 		Runtime rt = Runtime.getRuntime();
-		Process pr = null;
+		Process pr;
 
 		if (MainApp.OS_NAME.startsWith("win")) {
 			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"", MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
