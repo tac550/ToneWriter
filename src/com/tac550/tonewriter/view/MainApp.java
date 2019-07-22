@@ -1,9 +1,5 @@
 package com.tac550.tonewriter.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.prefs.Preferences;
-
 import com.tac550.tonewriter.io.LilyPondWriter;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,10 +14,6 @@ import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -32,13 +24,17 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.prefs.Preferences;
+
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
 	public static final String APP_VERSION = "0.4";
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
-	public static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
+	static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
 
 	// Splash screen stuff
 	private static final Effect frostEffect =
@@ -49,16 +45,16 @@ public class MainApp extends Application {
 
 	// Preferences object and key strings.
 	public static Preferences prefs;
-	public static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";
+	static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";
 	public static final String PREFS_THOU_THY_ENABLED = "Thou-Thy-Enabled";
 	public static final String PREFS_SAVE_LILYPOND_FILE = "Save-LP-File";
-	public static final String PREFS_PAPER_SIZE = "Paper-Size";
+	static final String PREFS_PAPER_SIZE = "Paper-Size";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
-	public static final Color[] CHORDCOLORS = new Color[]{Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
+	static final Color[] CHORDCOLORS = new Color[]{Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
 
 	// How tall to make note buttons in the verse view.
-	public static final int NOTEBUTTONHEIGHT = 15;
+	static final int NOTEBUTTONHEIGHT = 15;
 
 	// LilyPond connection stuff.
 	private static boolean lilyPondAvailable = false;
@@ -95,7 +91,7 @@ public class MainApp extends Application {
 		showSplash();
 		if (lilyPondAvailable()) {
 			try {
-				runLilyPond(main_stage);
+				runLilyPondStartup(main_stage);
 			} catch (IOException e) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
@@ -176,7 +172,7 @@ public class MainApp extends Application {
 		return new Node[]{splashBackground, box};
 	}
 
-	private void runLilyPond(Stage main_stage) throws IOException {
+	private void runLilyPondStartup(Stage main_stage) throws IOException {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
@@ -190,8 +186,9 @@ public class MainApp extends Application {
 		}
 
 		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, false, () -> {
-			lilypondFile.delete();
-			outputFile.delete();
+			if (!(lilypondFile.delete() && outputFile.delete())) {
+				System.out.println("Warning: Could not delete temporary file(s)");
+			}
 			Platform.runLater(() -> {
 				splashStage.close();
 				loadMainStage(main_stage);
