@@ -13,6 +13,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -127,9 +128,18 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone..." />
-                  <MenuItem fx:id="openToneMenuItem" mnemonicParsing="false" onAction="#handleOpenTone" text="Open Tone..." />
-                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone" />
+              <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
+                  <MenuItem fx:id="openToneMenuItem" mnemonicParsing="false" onAction="#handleOpenTone" text="Open Tone...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
+                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
                   <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />

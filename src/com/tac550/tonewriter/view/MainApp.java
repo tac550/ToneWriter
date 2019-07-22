@@ -210,21 +210,6 @@ public class MainApp extends Application {
 			// Apply the layout as the new scene
 			Scene scene = new Scene(rootLayout);
 
-			// Set up keyboard shortcuts
-			KeyCombination saveCombination = new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
-			KeyCombination newCombination = new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN);
-			KeyCombination openCombination = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
-
-			scene.addEventHandler(KeyEvent.KEY_RELEASED, (event) -> {
-				if (saveCombination.match(event)) {
-					mainController.handleSave();
-				} else if (newCombination.match(event)) {
-					mainController.handleNewTone();
-				} else if (openCombination.match(event)) {
-					mainController.handleOpenTone();
-				}
-			});
-
 			mainStage.setScene(scene);
 
 			// Workaround for Mac bug where resizing is impossible after exiting fullscreen
