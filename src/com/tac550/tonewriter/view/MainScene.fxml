@@ -140,7 +140,10 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator></MenuItem>
-                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New..." />
+                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                     </accelerator></MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
             </items>
