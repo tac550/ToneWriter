@@ -1,27 +1,14 @@
 package com.tac550.tonewriter.io;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import org.apache.commons.io.FileUtils;
-
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+
+import java.io.*;
+import java.util.*;
 
 public class ToneReaderWriter {
 
@@ -45,6 +32,7 @@ public class ToneReaderWriter {
 	public boolean saveTone(File toneFile) {
 		try {
 			// Clear out old save data.
+			// TODO: Causing error if file doesn't exist (should just make a new one)
 			if (!(toneFile.delete() && toneFile.createNewFile())) {
 				return false;
 			}
@@ -103,18 +91,18 @@ public class ToneReaderWriter {
 			    			(child.hasComment() ? ": " + child.getComment() : ""));
 			    		}
 			    	}
-
-			    	printWriter.println();
 			    }
 
-			    printWriter.close();
-			    fileWriter.close();
+				printWriter.println();
 
 			}
 
 			// Footer info
 			printWriter.println();
 		    printWriter.println("First Repeated: " + firstRepeated);
+
+			printWriter.close();
+			fileWriter.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
