@@ -271,6 +271,17 @@ public class ToneReaderWriter {
 		fileReader.close();
 	}
 
+	public static boolean createToneFile(File file_to_create) {
+		if (file_to_create.getParentFile().mkdirs() || file_to_create.getParentFile().exists()) {
+			try {
+				return file_to_create.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else return false;
+	}
+
 	private static boolean containsFilesFor(List<File> file_list, char character) {
 		boolean result = false;
 		
