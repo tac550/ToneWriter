@@ -26,13 +26,13 @@ import javafx.scene.control.Alert.AlertType;
 public class ToneReaderWriter {
 
 	private ArrayList<ChantLineViewController> chantLines;
-	
+
 	private String composerText;
-	
+
 	private String keySig;
 
 	private MainSceneController mainScene;
-	
+
 	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, String key, String composer) {
 		chantLines = lines;
 		keySig = key;
@@ -41,12 +41,26 @@ public class ToneReaderWriter {
 	public ToneReaderWriter(ArrayList<ChantLineViewController> lines) {
 		chantLines = lines;
 	}
-	
-	public boolean saveTone(File directory) {
+
+	public boolean saveTone(File toneFile) {
 		try {
 			// Clear out old save data.
-			FileUtils.cleanDirectory(directory);
-		    
+			if (!(toneFile.delete() && toneFile.createNewFile())) {
+				return false;
+			}
+
+			// Set up PrintWriter
+			FileWriter fileWriter = new FileWriter(toneFile);
+			PrintWriter printWriter = new PrintWriter(fileWriter);
+
+			// Header info
+			printWriter.println("VERSION: " + MainApp.APP_VERSION);
+			// TODO: Does the following work correctly (unicode stuff)?
+			printWriter.println("Key Signature: " +
+					keySig.replace("♯", "s").replace("♭", "f"));
+			printWriter.println("Composer Text: " + composerText);
+			printWriter.println();
+
 			// Line name which is marked first repeated. Filled when found.
 			String firstRepeated = "";
 
@@ -57,9 +71,7 @@ public class ToneReaderWriter {
 					firstRepeated = chantLine.getName();
 				}
 
-				// Create the output .dat file with the name of the chant line.
-				FileWriter fileWriter = new FileWriter(directory.getAbsolutePath() + File.separator + chantLine.getName() + ".dat");
-				PrintWriter printWriter = new PrintWriter(fileWriter);
+				printWriter.println(chantLine.getName());
 
 				// Place chant line comment on the first line, if any.
 			    if (chantLine.hasComment()) {
@@ -91,6 +103,8 @@ public class ToneReaderWriter {
 			    			(child.hasComment() ? ": " + child.getComment() : ""));
 			    		}
 			    	}
+
+			    	printWriter.println();
 			    }
 
 			    printWriter.close();
@@ -98,16 +112,10 @@ public class ToneReaderWriter {
 
 			}
 
-			// Write out the Info file.
-			FileWriter infoWriter = new FileWriter(directory.getAbsolutePath() + File.separator + "_Info.dat");
-		    PrintWriter infoPrintWriter = new PrintWriter(infoWriter);
-		    infoPrintWriter.println("VERSION: " + MainApp.APP_VERSION);
-		    infoPrintWriter.println("First Repeated: " + firstRepeated);
-		    infoPrintWriter.println("Key Signature: " + keySig.replace("♯", "s").replace("♭", "f"));
-		    infoPrintWriter.println("Composer Text: " + composerText);
+			// Footer info
+			printWriter.println();
+		    printWriter.println("First Repeated: " + firstRepeated);
 
-		    infoPrintWriter.close();
-		    infoWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -116,6 +124,7 @@ public class ToneReaderWriter {
 		return true;
 	}
 
+	// TODO: Read whole thing, use splits based on number of \n?
 	public boolean loadTone(MainSceneController main_scene, File directory) {
 		this.mainScene = main_scene;
 
