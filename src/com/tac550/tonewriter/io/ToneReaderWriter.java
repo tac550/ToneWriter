@@ -6,8 +6,14 @@ import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import org.apache.commons.text.TextStringBuilder;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ToneReaderWriter {
@@ -112,87 +118,44 @@ public class ToneReaderWriter {
 		return true;
 	}
 
-	// TODO: Read whole thing, use splits based on number of \n?
-	public boolean loadTone(MainSceneController main_scene, File directory) {
+	public boolean loadTone(MainSceneController main_scene, File toneFile) {
 		this.mainScene = main_scene;
 
 		String firstRepeated;
 		float versionSaved;
 
 		try {
-			// Loading from info file
-			File infoFile = new File(directory.getAbsolutePath() + File.separator + "_Info.dat");
-			FileReader fileReader = new FileReader(infoFile);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
-			versionSaved = Float.parseFloat(bufferedReader.readLine().split(":")[1].trim());
-			firstRepeated = bufferedReader.readLine().split(":")[1].trim();
-			keySig = bufferedReader.readLine().split(":")[1].trim().replace("s", "♯").replace("f", "♭");
-			composerText = bufferedReader.readLine().split(":")[1].trim();
-			fileReader.close();
-			
+
+			// Load entire tone file and split it as necessary
+			TextStringBuilder fileStringBuilder = new TextStringBuilder();
+			Files.lines(toneFile.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
+			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
+			String[] headerAndFooter = String.join("\n", sections[0], sections[2]).split("\\r?\\n");
+			String[] chantLines = sections[1].split("\\r?\\n\\r?\\n");
+
+			versionSaved = Float.parseFloat(headerAndFooter[0].split(":")[1].trim());
+			keySig = headerAndFooter[1].split(":")[1].trim().replace("s", "♯").replace("f", "♭");
+			composerText = headerAndFooter[2].split(":")[1].trim();
+			firstRepeated = headerAndFooter[3].split(":")[1].trim();
+
 			// Version checking
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Warning");
-				alert.setHeaderText(String.format(Locale.US, "This tone was created with a newer version of %s. Be advised there may be issues.", MainApp.APP_NAME));
+				alert.setHeaderText(String.format(Locale.US,
+						"This tone was created with a newer version of %s. Be advised there may be issues.",
+						MainApp.APP_NAME));
 				
 				alert.showAndWait();
 			}
 			
 			// Loading chant lines
 			main_scene.clearChantLines();
-			List<File> toneFiles = Objects.requireNonNull(Arrays.asList(Objects.requireNonNull(directory.listFiles())));
 
-			// Keep track of the letter of chant line we're loading files for.
-			char readingFilesFor = 'A';
-			
-			while (containsFilesFor(toneFiles, readingFilesFor)) {
-				List<File> AltsForLine = new ArrayList<>();
-				File primeFile = null;
-				File mainFile = null;
-				
-				// For each file we found that's associated with the current line letter...
-				for (File file : getLineFiles(toneFiles, readingFilesFor)) {
-					String fileName = file.getName().replace(".dat", "");
-					if (!fileName.contains("Info") && !fileName.contains("Cadence")) {
-						if (fileName.startsWith(String.valueOf(readingFilesFor))) {
-							if (fileName.endsWith(String.valueOf(readingFilesFor))) {
-								// File both starts and ends with the CL letter, so it's the normal chant line file.
-								mainFile = file;
-							} else if (fileName.endsWith("'")) {
-								// It's the prime for the letter.
-								primeFile = file;
-							} else {
-								// It's an alternate.
-								AltsForLine.add(file);
-							}
-						}
-					}
-				}
-				
-				// Load in the main file first.
-				readFile(mainFile);
-				
-				// Then sort and load any alternates.
-				Collections.sort(AltsForLine);
-				for (File file : AltsForLine) {
-					readFile(file);
-				}
-				
-				// Then load the prime, if any.
-				if (primeFile != null) {
-					readFile(primeFile);
-				}
-				
-				readingFilesFor++;
+			for (String chantLine : chantLines) {
+				readChantLine(chantLine);
 			}
-			
-			// Load the cadence last.
-			readFile(new File(directory.getAbsolutePath() + File.separator + "Cadence.dat"));
 
-			bufferedReader.close();
-			fileReader.close();
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 			main_scene.clearChantLines();
@@ -205,67 +168,63 @@ public class ToneReaderWriter {
 		main_scene.setFirstRepeated(firstRepeated);
 		
 		// This was already done by recalcCLNames() above, but this updates the listing with the firstRepeated info.
+		// TODO: Also done by setFirstRepeated() above; check whether below call is necessary.
 		main_scene.syncCVLMapping();
 		
 		return true;
 	}
 
-	private void readFile(File file) throws IOException {
+	private void readChantLine(String chantLine) throws IOException {
 
 		ChantLineViewController currentChantLine = mainScene.createChantLine(false);
-		FileReader fileReader = new FileReader(file);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		String chantFileLine;
+		Scanner chantLineScanner = new Scanner(chantLine);
+		String chantLineLine;
+
 		ChantChordController currentMainChord = null;
 
-		boolean firstLine = true;
-		
-		while ((chantFileLine = bufferedReader.readLine()) != null) {
-			if (firstLine) { // First line used for chant line comment, if any
-				if (chantFileLine.startsWith("Comment: ")) {
-					String[] commentData = chantFileLine.split(": ");
-					String comment = String.join(": ", Arrays.copyOfRange(commentData, 1, commentData.length));
-					currentChantLine.setComment(comment);
-					
-					firstLine = false;
-					continue;
-				}
-				firstLine = false;
+		String chantLineName = chantLineScanner.nextLine();
+
+		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+			if (chantLineLine.startsWith("Comment: ")) {
+				String[] commentData = chantLineLine.split(": ");
+				String comment = String.join(": ", Arrays.copyOfRange(commentData, 1, commentData.length));
+				currentChantLine.setComment(comment);
+
+				continue;
 			}
-			
-			String[] chordData = chantFileLine.split(": ");
+
+			String[] chordData = chantLineLine.split(": ");
 			String fields = chordData[1];
 			// Since the comment may include ": "s, we need to account for the possibility that it's been split and re-combine it here.
 			String comment = String.join(": ", Arrays.copyOfRange(chordData, 2, chordData.length));
 			
 			// Add the appropriate chord type.
-			if (!chantFileLine.startsWith("\t") && !chantFileLine.contains("END")) {
+			if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
 				currentMainChord = currentChantLine.addRecitingChord();
 				currentMainChord.setFields(fields);
 				currentMainChord.setComment(comment);
-			} else if (chantFileLine.contains("Post")) {
+			} else if (chantLineLine.contains("Post")) {
 				assert currentMainChord != null;
 				ChantChordController postChord = currentMainChord.addPostChord(fields);
 				postChord.setComment(comment);
-			} else if (chantFileLine.contains("Prep")) {
+			} else if (chantLineLine.contains("Prep")) {
 				assert currentMainChord != null;
 				ChantChordController prepChord = currentMainChord.addPrepChord(fields);
 				prepChord.setComment(comment);
-			} else if (chantFileLine.contains("END")) {
+			} else if (chantLineLine.contains("END")) {
 				currentMainChord = currentChantLine.addEndChord();
 				currentMainChord.setFields(fields);
 				currentMainChord.setComment(comment);
 			}
 		}
 		
-		if (file.getName().contains("'")) {
+		if (chantLineName.contains("'")) {
 			currentChantLine.makePrime();
-		} else if (file.getName().contains("alt")) {
+		} else if (chantLineName.contains("alt")) {
 			currentChantLine.makeAlternate();
 		}
-		
-		bufferedReader.close();
-		fileReader.close();
+
+		chantLineScanner.close();
 	}
 
 	public static boolean createToneFile(File file_to_create) {
@@ -278,35 +237,4 @@ public class ToneReaderWriter {
 			}
 		} else return false;
 	}
-
-	private static boolean containsFilesFor(List<File> file_list, char character) {
-		boolean result = false;
-		
-		for (File file : file_list) {
-			if (file.getName().startsWith(String.valueOf(character))
-					&& !file.getName().contains("Cadence")) {
-				result = true;
-				break;
-			}
-		}
-		
-		return result;
-		
-	}
-	
-	private static List<File> getLineFiles(List<File> file_list, char character) {
-		List<File> lineFiles = new ArrayList<>();
-		
-		for (File file : file_list) {
-			if (file.getName().startsWith(String.valueOf(character))
-					&& !file.getName().contains("Cadence")) {
-				
-				lineFiles.add(file);
-			}
-		}
-		
-		return lineFiles;
-		
-	}
-
 }

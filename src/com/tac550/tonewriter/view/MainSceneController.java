@@ -261,7 +261,7 @@ public class MainSceneController {
 			e.printStackTrace();
 		}
 	}
-	public ChantLineViewController createChantLine(boolean manual) {
+	public ChantLineViewController createChantLine(boolean recalculateNames) {
 		ChantLineViewController controller;
 
 		try {
@@ -280,7 +280,7 @@ public class MainSceneController {
 			return null;
 		}
 
-		if (manual) {
+		if (recalculateNames) {
 			recalcCLNames();
 		}
 
