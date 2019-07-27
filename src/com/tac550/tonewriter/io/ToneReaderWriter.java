@@ -43,10 +43,10 @@ public class ToneReaderWriter {
 
 			// Header info
 			printWriter.println("VERSION: " + MainApp.APP_VERSION);
-			// TODO: Does the following work correctly (unicode stuff)?
 			printWriter.println("Key Signature: " +
 					keySig.replace("♯", "s").replace("♭", "f"));
 			printWriter.println("Composer Text: " + composerText);
+			printWriter.println();
 			printWriter.println();
 
 			// Line name which is marked first repeated. Filled when found.
