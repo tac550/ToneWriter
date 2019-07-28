@@ -447,7 +447,7 @@ public class MainSceneController {
 		} else return false;
 	}
 	private boolean createNewTone() {
-		FileChooser fileChooser = new FileChooser();
+		FileChooser fileChooser = new FileChooser(); // TODO: Error shown on cancel press
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
 		if (toneFile != null && !saveDisabled()) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
