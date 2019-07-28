@@ -1,9 +1,0 @@
-1: a-fs-d-d
-2: b-g-d-g
-	Post: d'-g-f-b,
-	Post: c'-g-e-c
-3: b-g-d-g
-	Prep: c'-g-e-c
-END: a-e-c-a
-	Prep: c'-g-e-e
-	Prep: b-g-d-g

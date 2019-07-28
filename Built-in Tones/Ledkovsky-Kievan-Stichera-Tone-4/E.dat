@@ -1,7 +1,0 @@
-1: a-fs-c-d
-END: fs-d-a,-d
-	Prep: g-d-b,-g
-	Prep: a-d-c-g
-	Prep: b-d-d-g
-	Prep: a-d-c-fs
-	Prep: g-d-b,-g

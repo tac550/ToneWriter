@@ -1,0 +1,64 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: B. Ledkovsky - Kievan Tone 4
+
+
+A
+1: fs-d-a,-d
+	Post: g-d-b,-d
+	Post: a-d-c-d
+2: g-d-b,-g
+	Prep: fs-d-a,-d
+
+B
+1: e-e-g,-e
+	Post: fs-e-a,-e
+2: a-fs-c-d
+	Prep: g-e-b,-e
+	Post: g-g-b,-d
+3: a-fs-c-d
+END: g-d-b,-g
+
+C
+1: g-d-b,-g
+	Post: b-g-d-g
+	Post: a-d-c-g
+2: g-d-b,-g
+	Prep: a-d-c-fs
+3: a-fs-c-d
+END: g-d-b,-g
+
+D
+1: g-d-b,-g
+	Post: fs-d-a,-d
+2: g-d-b,-d
+END: a-fs-c-d
+
+E
+1: a-fs-c-d
+END: fs-d-a,-d
+	Prep: g-d-b,-g
+	Prep: a-d-c-g
+	Prep: b-d-d-g
+	Prep: a-d-c-fs
+	Prep: g-d-b,-g
+
+F
+1: g-d-b,-g
+2: a-fs-c-d
+END: g-d-b,-g
+
+Cadence
+1: a-fs-c-d
+END: e-b,-g,-e
+	Prep: g-d-b,-d
+	Prep: fs-d-a,-d
+	Prep: g-d-b,-g
+	Prep: a-d-c-fs
+	Prep: g-d-b,-g
+	Prep: fs-d-a,-d
+	Prep: e-cs-a,-a,
+	Prep: d-b,-fs,-b,
+
+
+First Repeated: D

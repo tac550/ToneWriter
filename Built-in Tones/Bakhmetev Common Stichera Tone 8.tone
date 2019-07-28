@@ -1,0 +1,57 @@
+VERSION: 0.5
+Key Signature: F major
+Composer Text: L'vov/Bakhmetev - Obikhod Tone 8
+
+
+A
+1: g-e-c-c
+2: g-e-c-c
+	Prep: a-f-c-f
+3: a-f-c-f
+	Post: g-e-c-c
+END: f-d-a,-d
+
+B
+1: a-f-c-f
+END: g-e-c-c
+	Prep: bf-g-c-e
+	Prep: a-f-c-f
+
+C
+1: a-f-c-f
+	Post: f-d-c-c
+	Post: g-e-c-c
+2: f-d-b,-<g g,>
+	Prep: a-f-c-f
+	Prep: g-e-c-g
+END: e-c-g,-c
+
+D
+1: g-e-c-c
+2: a-f-c-f
+	Post: g-e-c-c
+END: f-d-a,-d
+
+E
+1: a-f-c-f
+END: g-e-c-c
+	Prep: bf-g-c-e
+	Prep: a-f-c-f
+
+F
+1: a-f-c-f
+	Post: f-d-c-c
+	Post: g-e-c-c
+2: f-d-b,-<g g,>
+	Prep: a-f-c-f
+	Prep: g-e-c-g
+END: e-c-g,-c
+
+Cadence
+1: bf-g-d-<g g,>
+2: a-f-d-<a a,>
+3: g-e-cs-<a a,>
+END: f-d-a,-d
+
+
+First Repeated: D

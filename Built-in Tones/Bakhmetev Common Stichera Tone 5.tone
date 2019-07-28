@@ -1,0 +1,32 @@
+VERSION: 0.5
+Key Signature: F major
+Composer Text: L'vov/Bakhmetev - Obikhod Tone 5
+
+
+A
+1: bf-g-c-c
+	Post: c'-a-c-f
+2: a-f-c-f
+
+B
+1: c'-a-c-f
+END: bf-g-c-c
+
+C
+1: bf-g-c-c
+2: a-f-c-f
+	Prep: g-e-c-c
+	Post: g-e-c-c
+END: f-d-a,-d
+
+Cadence
+1: c'-a-c-f
+	Post: bf-g-c-e
+2: a-f-c-f
+	Post: g-e-cs-<a a,>
+	Post: a-f-c-f
+	Post: g-e-c-c
+END: f-d-a,-d
+
+
+First Repeated: 

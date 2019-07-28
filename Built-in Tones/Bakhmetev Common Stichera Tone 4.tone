@@ -1,0 +1,51 @@
+VERSION: 0.5
+Key Signature: F major
+Composer Text: L'vov/Bakhmetev - Obikhod Tone 4
+
+
+A
+1: g-e-c-c
+2: a-f-c-f
+
+B
+1: bf-g-c-c
+END: a-f-c-f
+
+C
+1: a-f-c-f: This chord is typically skipped on lines where the stress/ngoes on the second syllable, which will get Chord 2.
+2: c'-a-<f c>-f
+	Prep: bf-g-c-f
+	Post: bf-g-c-e
+3: a-f-c-f
+4: bf-g-c-c
+END: a-f-c-f
+
+D
+1: a-f-c-f
+	Post: g-e-c-c
+2: a-f-<f c>-c
+END: bf-g-<e c>-c
+
+E
+1: bf-g-c-c
+2: a-f-c-f
+	Post: c'-a-<f c>-f
+	Post: bf-g-c-f
+END: g-e-c-c
+	Prep: bf-g-c-e
+	Prep: a-f-c-f
+
+F
+1: a-f-c-f
+2: bf-g-c-c
+END: a-f-c-f
+
+Cadence
+1: bf-g-c-c
+2: a-f-c-f
+	Prep: g-e-c-c
+3: g-e-cs-<a a,>
+END: f-d-a,-d
+
+
+First Repeated: D
