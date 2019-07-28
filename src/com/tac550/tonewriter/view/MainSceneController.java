@@ -472,7 +472,7 @@ public class MainSceneController {
 		}
 	}
 	private boolean loadTone() {
-		FileChooser fileChooser = new FileChooser();
+		FileChooser fileChooser = new FileChooser(); // TODO: Error shown on cancel press
 		if (toneFile != null) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
