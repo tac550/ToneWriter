@@ -1,0 +1,47 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: B. Ledkovsky - Kievan Tone 8
+
+
+A
+1: b-g-d-g
+	Prep: c'-g-e-c: This chord is skipped on all but the first line of the verse.
+2: c'-g-e-c
+	Post: b-g-d-g
+END: a-e-c-a
+
+B
+1: c'-g-e-g
+	Prep: a-e-c-a
+	Prep: b-g-d-g
+	Prep: c'-g-e-g
+	Prep: d'-g-f-g
+	Post: b-g-d-g
+2: c'-g-e-c
+END: b-g-d-g
+	Prep: d'-g-f-b,
+	Prep: c'-g-e-c
+
+C
+1: c'-g-e-c
+	Prep: a-e-c-a
+	Prep: b-g-d-g
+	Post: b-g-d-g
+2: a-g-c-e
+	Post: c'-g-e-c
+3: a-fs-c-d
+	Prep: b-g-d-d
+END: g-d-b,-g
+
+Cadence
+1: a-e-c-a
+	Post: b-g-d-g
+2: c'-g-e-c
+	Post: b-g-d-g
+	Post: d'-g-f-g
+3: c'-g-e-c
+4: b-g-d-g
+END: a-e-c-a
+
+
+First Repeated: 

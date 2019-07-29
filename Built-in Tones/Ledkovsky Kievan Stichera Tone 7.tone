@@ -1,0 +1,54 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: B. Ledkovsky - Kievan Tone 7
+
+
+A
+1: c'-g-e-c
+2: b-g-d-g
+	Post: c'-g-e-g
+3: d'-g-f-g
+4: c'-g-e-c
+END: b-g-d-g
+
+A alternate 1
+1: g-d-b,-g
+2: b-g-d-g
+	Prep: a-fs-d-d
+	Post: c'-g-e-g
+3: d'-g-f-g
+4: c'-g-e-c
+END: b-g-d-g
+
+A alternate 2
+1: g-d-b,-g
+	Post: a-d-c-g
+2: b-g-d-g
+3: b-g-d-g
+	Prep: a-g-c-g
+4: c'-g-e-c
+END: b-g-d-g
+
+B
+1: b-g-d-g
+	Post: c'-g-e-g
+2: d'-g-f-g
+	Post: c'-g-e-g
+3: b-g-d-g
+4: a-fs-d-d
+	Post: a-fs-c-d
+END: g-d-b,-g
+
+Cadence
+1: a-fs-d-d
+2: b-g-d-g
+	Post: d'-g-f-b,
+	Post: c'-g-e-c
+3: b-g-d-g
+	Prep: c'-g-e-c
+END: a-e-c-a
+	Prep: c'-g-e-e
+	Prep: b-g-d-g
+
+
+First Repeated: 

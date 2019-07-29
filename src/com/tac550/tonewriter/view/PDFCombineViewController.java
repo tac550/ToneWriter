@@ -113,10 +113,11 @@ public class PDFCombineViewController {
 		
 		File outFolder = DirChooser.showDialog(fileBox.getScene().getWindow());
 		
-		String destFileName = outFolder.getAbsolutePath() + File.separator + fileNameBox.getText().replace(".pdf", "") + ".pdf";
+		String destinationFileName = outFolder.getAbsolutePath() +
+				File.separator + fileNameBox.getText().replace(".pdf", "") + ".pdf";
 		
 		PDFMergerUtility pdfMerger = new PDFMergerUtility();
-		pdfMerger.setDestinationFileName(destFileName);
+		pdfMerger.setDestinationFileName(destinationFileName);
 		
 		for (Node node : fileBox.getChildren()) {
 			GridPane pane = (GridPane) node;
@@ -147,7 +148,7 @@ public class PDFCombineViewController {
 		}
 		
 		try {
-			Desktop.getDesktop().open(new File(destFileName));
+			Desktop.getDesktop().open(new File(destinationFileName));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

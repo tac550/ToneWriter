@@ -129,20 +129,20 @@ public class LilyPondWriter {
 						// Make any double quotes in the text understandable to LilyPond.
 						if (syllable.contains("\"")) { // If the syllable contains a double quote...
 							// Store the syllable without the leading hyphen, if any (we always throw this hyphen away in the end).
-							StringBuilder syll = new StringBuilder(syllable.replace("-", ""));
+							StringBuilder cleanSyllable = new StringBuilder(syllable.replace("-", ""));
 
 							// Insert the escape character before each occurrence of a double quote in the syllable.
-							for (int index = syll.indexOf("\""); index >= 0; index = syll.indexOf("\"", index + 2)) {
-								syll.insert(index, "\\");
+							for (int index = cleanSyllable.indexOf("\""); index >= 0; index = cleanSyllable.indexOf("\"", index + 2)) {
+								cleanSyllable.insert(index, "\\");
 							}
 
 							// If the syllable contains a leading space... (Most do, to separate them from the previous word or syllable)
-							if (syll.toString().startsWith(" ")) {
+							if (cleanSyllable.toString().startsWith(" ")) {
 								// Surround just the syllable (not the leading space) with double quotes
-								syllableTextBuffer.append(syll.toString().replace(" ", " \"")).append("\"");
+								syllableTextBuffer.append(cleanSyllable.toString().replace(" ", " \"")).append("\"");
 							} else {
 								// Otherwise just surround the syllable without a leading space with quotes.
-								syllableTextBuffer.append("\"").append(syll.toString()).append("\"");
+								syllableTextBuffer.append("\"").append(cleanSyllable.toString()).append("\"");
 							}
 
 						} else { // If there are no double quotes, add the syllable normally (throwing away the leading hyphen, if any).
@@ -369,14 +369,14 @@ public class LilyPondWriter {
 							continue;
 						}
 
-						// Reconstruct the syllable note buffer, adding the beginning slur parenthese after the first note (as LilyPond syntax dictates).
+						// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 						StringBuilder finalString = new StringBuilder();
 						// For each token in the buffer...
 						for (int i1 = 0; i1 < tokens.length; i1++) {
 							// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
 							// note group... (two notes occurring in one part, which will be split across two tokens)
 							if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) {
-								// Add the beginning slur parenthese and the current token.
+								// Add the beginning slur parenthesis and the current token.
 								finalString.append(" \\( ").append(tokens[i1]);
 								addedSlur[i] = true;
 							} else {
@@ -396,7 +396,7 @@ public class LilyPondWriter {
 				for (int i = 0; i < 4; i++) {
 					// If a slur was begun to be added for the part...
 					if (addedSlur[i]) {
-						// Complete the slur by adding a closing parenthese.
+						// Complete the slur by adding a closing parenthesis.
 						syllableNoteBuffers[i] += ("\\)");
 					}
 				}
@@ -415,7 +415,7 @@ public class LilyPondWriter {
 
 			// Ceil the beat total because we never want time signatures with fractional parts.
 			// Using ceil here instead of floor because LilyPond won't change the time signature until the current bar is completed.
-			// If a bar ends before we want it to we may be stuck without a bar reset (for accidenals and such) for a very long time
+			// If a bar ends before we want it to we may be stuck without a bar reset (for accidentals and such) for a very long time
 			// depending on the length of the previous line. It seems better to overshoot a little so any accidental engraving errors may be
 			// kept to a minimum and hopefully occur only at the start of a line.
 			int roundedBeats = (int) Math.ceil(lineBeats);
@@ -523,12 +523,12 @@ public class LilyPondWriter {
 			newDur = String.valueOf((int) computedDur);
 		} else { // If a fractional number resulted it may be covered by a special case.
 			// Inverse the computed duration.
-			float frac = 1 / computedDur;
-			if (frac == 0.75) { // Dotted half
+			float inverse = 1 / computedDur;
+			if (inverse == 0.75) { // Dotted half
 				newDur = "2.";
-			} else if (frac == 0.375) { // Dotted quarter
+			} else if (inverse == 0.375) { // Dotted quarter
 				newDur = "4.";
-			} else if (frac == 1.5) { // Dotted whole; but we'll return the more common whole tied to a half.
+			} else if (inverse == 1.5) { // Dotted whole; but we'll return the more common whole tied to a half.
 				return String.format(Locale.US, noteFormat, "1") + "~ " + String.format(Locale.US, noteFormat, "2");
 			} else { // If the non-whole computed value didn't have a definition, we just return the notes as they came in, but tied.
 				return curr + "~ " + next;
@@ -715,9 +715,9 @@ public class LilyPondWriter {
 			pr = rt.exec(new String[]{MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()});
 		}
 
-		ProcessExitDetector prExitDectector = new ProcessExitDetector(pr);
-		prExitDectector.addProcessListener((process) -> exitingActions.run());
-		prExitDectector.start();
+		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
+		prExitDetector.addProcessListener((process) -> exitingActions.run());
+		prExitDetector.start();
 	}
 
 }

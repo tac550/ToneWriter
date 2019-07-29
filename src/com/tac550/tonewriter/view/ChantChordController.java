@@ -32,6 +32,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 
 public class ChantChordController implements CommentableView {
 	
@@ -65,7 +66,7 @@ public class ChantChordController implements CommentableView {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
 			field.focusedProperty().addListener((ov, old_val, new_val) -> {
-				if (!new_val) { // Rerender when focus switched away from field
+				if (!new_val) { // Re-render when focus switched away from field
 					playButton.setDisable(true);
 					try {
 						constructAndRenderChord();
@@ -97,7 +98,8 @@ public class ChantChordController implements CommentableView {
 		
 		// Create the temporary file to hold the lilypond markup
 		lilypondFile = File.createTempFile(MainApp.APP_NAME + "--"
-				+ parent.getMainController().getToneDirectory().getName() + "-", "-chord.ly");
+				+ FilenameUtils.removeExtension(parent.getMainController().getToneFile().getName()) + "-",
+				"-chord.ly");
 		lilypondFile.deleteOnExit();
 		
 		try {

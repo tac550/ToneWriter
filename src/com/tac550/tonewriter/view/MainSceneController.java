@@ -40,6 +40,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -66,7 +67,7 @@ public class MainSceneController {
 
 	private Stage thisStage;
 
-	private File toneDirectory;
+	private File toneFile;
 
 	private String currentKey = "C major";
 	private String composerText = "";
@@ -222,8 +223,8 @@ public class MainSceneController {
 	void setStage(Stage stage) {
 		thisStage = stage;
 	}
-	File getToneDirectory() {
-		return toneDirectory;
+	File getToneFile() {
+		return toneFile;
 	}
 	String getCurrentKey() {
 		return currentKey;
@@ -260,7 +261,7 @@ public class MainSceneController {
 			e.printStackTrace();
 		}
 	}
-	public ChantLineViewController createChantLine(boolean manual) {
+	public ChantLineViewController createChantLine(boolean recalculateNames) {
 		ChantLineViewController controller;
 
 		try {
@@ -279,7 +280,7 @@ public class MainSceneController {
 			return null;
 		}
 
-		if (manual) {
+		if (recalculateNames) {
 			recalcCLNames();
 		}
 
@@ -331,7 +332,7 @@ public class MainSceneController {
 	}
 
 	@FXML public void syncCVLMapping() {
-		if (toneDirectory == null) return; // No tone is loaded; don't do anything
+		if (toneFile == null) return; // No tone is loaded; don't do anything
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
 		if (manualCLAssignmentMenuItem.isSelected()) {
@@ -399,7 +400,7 @@ public class MainSceneController {
 		if (verseSet) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Set Verse Confirmation");
-			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignmets in the current text will be lost)");
+			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)");
 			alert.initOwner(thisStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
@@ -424,49 +425,43 @@ public class MainSceneController {
 
 
 	boolean checkSave() {
-		if (toneDirectory == null) {
-			return true;
-		} if (toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode) {
+		if (toneFile == null ||
+				(toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode)) {
 			return true;
 		}
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Save Confirmation");
-		alert.setHeaderText("Do you want to save tone \"" + toneDirectory.getName().replaceAll("-", " ") + "\"?");
+		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
 		alert.initOwner(thisStage);
 		ButtonType saveButton = new ButtonType("Save");
-		ButtonType dontSaveButton = new ButtonType("Don't Save");
+		ButtonType noSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-		alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
+		alert.getButtonTypes().setAll(saveButton, noSaveButton, cancelButton);
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
 				handleSave();
 				return true;
-			} else return result.get() == dontSaveButton;
+			} else return result.get() == noSaveButton;
 		} else return false;
 	}
 	private boolean createNewTone() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
+		FileChooser fileChooser = new FileChooser();
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
-		if (toneDirectory != null && !toneDirectory.getAbsolutePath().contains(System.getProperty("user.dir") + File.separator + "Built-in Tones")) {
-			directoryChooser.setInitialDirectory(new File(toneDirectory.getAbsolutePath().substring(0, toneDirectory.getAbsolutePath().lastIndexOf(File.separator))));
+		if (toneFile != null && !saveDisabled()) {
+			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
-			directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		}
-		File workingDirectory = directoryChooser.showDialog(thisStage);
-		if (workingDirectory == null) return false;
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
+		File saveFile = fileChooser.showSaveDialog(thisStage);
+		if (saveFile == null) return false;
 
-		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("New Tone");
-		dialog.setHeaderText("New Tone Name");
-		dialog.initOwner(thisStage);
-		Optional<String> result = dialog.showAndWait();
-		result.ifPresent(name -> toneDirectory = new File(workingDirectory.getAbsolutePath() + "/"
-				+ name.replace(" ", "-")));
-		if (!toneDirectory.exists()) {
-			return toneDirectory.mkdirs();
+		if (ToneReaderWriter.createToneFile(saveFile)) {
+			toneFile = saveFile;
 
+			return true;
 		} else {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -477,56 +472,55 @@ public class MainSceneController {
 		}
 	}
 	private boolean loadTone() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		if (toneDirectory != null) {
-			directoryChooser.setInitialDirectory(new File(toneDirectory.getAbsolutePath().substring(0, toneDirectory.getAbsolutePath().lastIndexOf(File.separator))));
+		FileChooser fileChooser = new FileChooser();
+		if (toneFile != null) {
+			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
 			if (builtInDir.exists()) {
-				directoryChooser.setInitialDirectory(builtInDir);
+				fileChooser.setInitialDirectory(builtInDir);
 			} else {
-				directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 			}
 		}
-		File selectedDirectory = directoryChooser.showDialog(thisStage);
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
+		File selectedFile = fileChooser.showOpenDialog(thisStage);
 
 		ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
-		if (selectedDirectory != null) {
-			if (selectedDirectory.exists()) {
-				toneDirectory = selectedDirectory;
+		if (selectedFile == null) return false;
 
-				if (toneReader.loadTone(this, toneDirectory)) {
-					return true;
-				} else {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("");
-					alert.setHeaderText("Error loading tone!");
-					alert.initOwner(thisStage);
-					alert.showAndWait();
+		if (selectedFile.exists()) {
+			toneFile = selectedFile;
 
-					// Since a tone was not loaded (or at least, not correctly),
-					toneDirectory = null;
-
-					return false;
-				}
-
+			if (toneReader.loadTone(this, toneFile)) {
+				return true;
 			} else {
 				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("That folder doesn't exist!");
+				alert.setTitle("");
+				alert.setHeaderText("Error loading tone!");
 				alert.initOwner(thisStage);
 				alert.showAndWait();
+
+				// Since a tone was not loaded (or at least, not correctly),
+				toneFile = null;
+
 				return false;
 			}
 
-		} else return false;
-
+		} else {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("That file doesn't exist!");
+			alert.initOwner(thisStage);
+			alert.showAndWait();
+			return false;
+		}
 	}
 
 	private void resetStageTitle() {
 		thisStage.setTitle(MainApp.APP_NAME);
 	}
 	private void updateStageTitle() {
-		thisStage.setTitle(MainApp.APP_NAME + " - " + toneDirectory.getName().replaceAll("-", " "));
+		thisStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
 	}
 
 	/*
@@ -564,10 +558,10 @@ public class MainSceneController {
 		refreshAllChords();
 	}
 	@FXML void handleSave() {
-		if (toneDirectory == null || saveDisabled()) return;
+		if (toneFile == null || saveDisabled()) return;
 
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, currentKey, composerText);
-		if (!toneWriter.saveTone(toneDirectory)) {
+		if (!toneWriter.saveTone(toneFile)) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Saving error!");
@@ -579,13 +573,7 @@ public class MainSceneController {
 
 	}
 	@FXML private void handleSaveAs() {
-		if (!createNewTone()) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Error creating new tone!");
-			alert.initOwner(thisStage);
-			alert.showAndWait();
-		} else { // Success
+		if (createNewTone()) {
 			handleSave();
 			updateStageTitle();
 		}
@@ -877,7 +865,7 @@ public class MainSceneController {
 	}
 
 	private boolean saveDisabled() {
-		return toneDirectory.getAbsolutePath().startsWith(builtInDir.getAbsolutePath())
+		return toneFile.getAbsolutePath().contains(builtInDir.getAbsolutePath())
 				&& !MainApp.developerMode;
 	}
 

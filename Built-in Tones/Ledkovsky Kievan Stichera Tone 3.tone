@@ -1,0 +1,37 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: B. Ledkovsky - Kievan Tone 3
+
+
+A
+1: a-fs-d-d
+2: b-g-d-g
+	Post: c'-g-e-g
+3: b-g-d-g
+END: a-fs-d-d
+	Prep: a-fs-d-d
+	Prep: g-g-b,-d
+
+B
+1: a-fs-d-d
+2: b-g-d-g
+3: a-fs-d-a
+END: fs-d-a,-d
+	Prep: a-e-cs-a,
+	Prep: g-e-cs-a,
+
+Cadence
+1: b-g-d-g
+END: fs-d-a,-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-g
+	Prep: a-d-c-fs
+	Prep: g-d-b,-g
+	Prep: fs-d-a,-d
+	Prep: g-d-b,-g
+	Prep: a-fs-d-d
+	Prep: a-fs-c-d
+	Prep: g-d-b,-g
+
+
+First Repeated: 

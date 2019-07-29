@@ -1,8 +1,0 @@
-1: a-f-c-f
-	Post: f-d-g,-c
-	Post: e-c-g,-c
-	Post: g-e-c-c
-2: f-d-b,-g,
-	Prep: g-e-c-c
-	Prep: a-f-c-c
-END: e-c-g,-c

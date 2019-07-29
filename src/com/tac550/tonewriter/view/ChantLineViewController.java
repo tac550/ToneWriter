@@ -210,7 +210,7 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	public ChantChordController addRecitingChord() throws IOException {
-		if (countMainChords() >= MainApp.CHORDCOLORS.length) { // Cap number of main (reciting) chords to available colors
+		if (countMainChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
 			return null;
 		}
 		FXMLLoader loader = loadChord();
@@ -309,7 +309,7 @@ public class ChantLineViewController implements CommentableView {
 		for (ChantChordController chantChord : chantChordControllers) {
 			if (!(chantChord.getType() < 0)) { // If not special
 				chantChord.setNumber(currentNumber + 1);
-				chantChord.setColor(MainApp.CHORDCOLORS[currentNumber]);
+				chantChord.setColor(MainApp.CHORD_COLORS[currentNumber]);
 				currentNumber++;
 			}
 		}

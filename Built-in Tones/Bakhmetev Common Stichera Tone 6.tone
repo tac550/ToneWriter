@@ -1,0 +1,34 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: L'vov/Bakhmetev - Obikhod Tone 6
+
+
+A
+1: g-e-b,-e
+2: fs-ds-b,-b,
+END: g-e-b,-e
+
+B
+1: a-fs-d-d
+2: g-e-d-d
+END: a-fs-d-d
+
+B'
+1: a-fs-d-d
+2: g-e-b,-e
+END: fs-ds-b,-b,
+
+C
+1: b-g-d-<g g,>
+2: a-fs-d-d
+END: fs-ds-b,-b,
+	Prep: g-e-b,-e
+
+Cadence
+1: g-e-b,-e
+2: g-e-c-a,
+3: fs-ds-b,-b,
+END: g-e-b,-e
+
+
+First Repeated: 
