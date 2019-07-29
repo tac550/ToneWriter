@@ -459,12 +459,20 @@ public class ChantLineViewController implements CommentableView {
 	@Override
 	public boolean equals(Object obj) {
 
-		return false;
+		if (obj == this) return true;
+		if (!(obj instanceof ChantLineViewController)) return false;
+		ChantLineViewController cc = (ChantLineViewController) obj;
 
-		// TODO: Implement equality checking!
-//		if (obj == this) return true;
-//		if (!(obj instanceof VerseLineViewController)) return false;
-//		VerseLineViewController vc = (VerseLineViewController) obj;
+		if (cc.getChords().size() != this.getChords().size()) return false;
+
+		for (int i = 0; i < this.getChords().size(); i++) {
+			if (!(cc.getChords().get(i).getFields().equals(this.getChords().get(i).getFields()) &&
+					cc.getChords().get(i).getName().equals(this.getChords().get(i).getName()) &&
+					cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
+				return false;
+		}
+
+		return true;
 
 	}
 
