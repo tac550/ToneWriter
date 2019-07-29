@@ -49,6 +49,7 @@ public class MainApp extends Application {
 	public static final String PREFS_THOU_THY_ENABLED = "Thou-Thy-Enabled";
 	public static final String PREFS_SAVE_LILYPOND_FILE = "Save-LP-File";
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
+	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
@@ -74,7 +75,11 @@ public class MainApp extends Application {
 	@Override
 	public void start(Stage main_stage) {
 
-		setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		// Determine whether or not to enable dark mode
+//		if (prefs.getBoolean(MainApp.PREFS_DARK_MODE, getSystemDarkMode())) {
+//			setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+//		}
+
 
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
@@ -240,11 +245,9 @@ public class MainApp extends Application {
 	public static String getPlatformSpecificLPExecutable() {
 		if (OS_NAME.startsWith("win")) {
 			return "\\lilypond.exe";
-		}
-		if (OS_NAME.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return "/LilyPond.app/Contents/Resources/bin/lilypond";
-		}
-		if (OS_NAME.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return "/lilypond";
 		} else return null;
 	}
@@ -253,11 +256,9 @@ public class MainApp extends Application {
 	private static String getPlatformSpecificDefaultLPDir() {
 		if (OS_NAME.startsWith("win")) {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
-		}
-		if (OS_NAME.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return "/Applications";
-		}
-		if (OS_NAME.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return "/usr/bin";
 		} else return null;
 	}
@@ -266,13 +267,27 @@ public class MainApp extends Application {
 	static String getPlatformSpecificMidiExtension() {
 		if (OS_NAME.startsWith("win")) {
 			return ".mid";
-		}
-		if (OS_NAME.startsWith("mac")) {
+		} if (OS_NAME.startsWith("mac")) {
 			return ".midi";
-		}
-		if (OS_NAME.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			return ".midi";
 		} else return null;
+	}
+
+	static boolean darkModeEnabled() {
+		return MainApp.prefs.getBoolean(MainApp.PREFS_DARK_MODE, MainApp.getSystemDarkMode());
+	}
+
+	private static boolean getSystemDarkMode() {
+		if (OS_NAME.startsWith("win")) {
+			// TODO: Check for windows dark mode
+			return true;
+//			return ".mid";
+		} if (OS_NAME.startsWith("mac")) {
+			// TODO: Check for Mac dark mode
+			return true;
+//			return ".midi";
+		} else return false;
 	}
 
 }

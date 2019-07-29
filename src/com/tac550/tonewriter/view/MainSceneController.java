@@ -13,6 +13,7 @@ import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -89,6 +90,7 @@ public class MainSceneController {
 	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
+	@FXML private CheckMenuItem darkModeMenuItem;
 
 	@FXML private MenuItem combinePDFsMenuItem;
 
@@ -195,6 +197,14 @@ public class MainSceneController {
 		// Set initial state for "Save LilyPond file" option and paper size, which may have been saved in preferences.
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
+
+		// Dark Mode menu item initial state and behavior
+		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
+			if (newVal) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+			else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+		});
+		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {

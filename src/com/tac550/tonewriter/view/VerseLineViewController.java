@@ -90,6 +90,8 @@ public class VerseLineViewController {
 
 		defaultHeight = mainContentPane.getPrefHeight();
 
+
+
 	}
 
 	void setParentController(MainSceneController parent) {
