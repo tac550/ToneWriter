@@ -64,7 +64,7 @@ public class VerseLineViewController {
 
 	private int currentChordIndex = 0; // Index of the chord currently being assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be clicked
-	private ChantChordController currentChord; // The chord currently being asigned
+	private ChantChordController currentChord; // The chord currently being assigned
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -138,7 +138,7 @@ public class VerseLineViewController {
 
 	void setChantLines(ChantLineViewController[] chant_lines) {
 		changingAssignments = true;
-		// Rembmber previous chant line selection, if any.
+		// Remember previous chant line selection, if any.
 		ChantLineViewController previousChantLine = null;
 		if (associatedChantLines != null) {
 			previousChantLine = associatedChantLines[selectedChantLine];
