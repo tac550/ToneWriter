@@ -447,7 +447,7 @@ public class MainSceneController {
 		} else return false;
 	}
 	private boolean createNewTone() {
-		FileChooser fileChooser = new FileChooser(); // TODO: Error shown on cancel press
+		FileChooser fileChooser = new FileChooser();
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
 		if (toneFile != null && !saveDisabled()) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
@@ -472,7 +472,7 @@ public class MainSceneController {
 		}
 	}
 	private boolean loadTone() {
-		FileChooser fileChooser = new FileChooser(); // TODO: Error shown on cancel press
+		FileChooser fileChooser = new FileChooser();
 		if (toneFile != null) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
@@ -486,7 +486,9 @@ public class MainSceneController {
 		File selectedFile = fileChooser.showOpenDialog(thisStage);
 
 		ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
-		if (selectedFile != null && selectedFile.exists()) {
+		if (selectedFile == null) return false;
+
+		if (selectedFile.exists()) {
 			toneFile = selectedFile;
 
 			if (toneReader.loadTone(this, toneFile)) {
@@ -573,13 +575,7 @@ public class MainSceneController {
 
 	}
 	@FXML private void handleSaveAs() {
-		if (!createNewTone()) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Error creating new tone!");
-			alert.initOwner(thisStage);
-			alert.showAndWait();
-		} else { // Success
+		if (createNewTone()) {
 			handleSave();
 			updateStageTitle();
 		}
