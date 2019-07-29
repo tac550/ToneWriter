@@ -323,9 +323,9 @@ public class VerseLineViewController {
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
-		noteButton.setMaxHeight(MainApp.NOTEBUTTONHEIGHT);
-		noteButton.setPrefHeight(MainApp.NOTEBUTTONHEIGHT);
-		noteButton.setMinHeight(MainApp.NOTEBUTTONHEIGHT);
+		noteButton.setMaxHeight(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.setPrefHeight(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.setMinHeight(MainApp.NOTE_BUTTON_HEIGHT);
 		noteButton.setPrefWidth(30);
 		noteButton.setPadding(Insets.EMPTY);
 
@@ -393,7 +393,7 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTEBUTTONHEIGHT);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT);
 			expandButton.setGraphic(minusIcon);
 
 			view_expanded = true;
