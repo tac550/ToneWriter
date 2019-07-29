@@ -198,11 +198,17 @@ public class MainSceneController {
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 
-		// Dark Mode menu item initial state and behavior
+		// Dark Mode menu item behavior and initial state
 		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
 			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
+
 			if (newVal) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 			else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+
+			for (VerseLineViewController verseLine : verseLineControllers) {
+				verseLine.refreshTextStyle();
+			}
+
 		});
 		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
 

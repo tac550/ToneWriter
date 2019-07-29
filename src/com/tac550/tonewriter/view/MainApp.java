@@ -281,11 +281,11 @@ public class MainApp extends Application {
 	private static boolean getSystemDarkMode() {
 		if (OS_NAME.startsWith("win")) {
 			// TODO: Check for windows dark mode
-			return true;
+			return false;
 //			return ".mid";
 		} if (OS_NAME.startsWith("mac")) {
 			// TODO: Check for Mac dark mode
-			return true;
+			return false;
 //			return ".midi";
 		} else return false;
 	}

@@ -4,6 +4,7 @@ import com.tac550.tonewriter.model.MappingAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -439,6 +440,13 @@ public class VerseLineViewController {
 
 	boolean isSeparator() {
 		return isSeparatorLine;
+	}
+
+	void refreshTextStyle() {
+		for (Object item : lineTextFlow.getChildren()) {
+			SyllableText text = (SyllableText) item;
+			text.refreshStyle();
+		}
 	}
 
 }

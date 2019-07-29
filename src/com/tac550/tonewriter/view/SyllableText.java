@@ -118,5 +118,12 @@ public class SyllableText extends Text {
 			clearSelection();
 		}
 	}
-	
+
+	void refreshStyle() {
+		if (getFill().equals(Color.BLACK) || getFill().equals(Color.WHITE)) {
+			defaultColor = MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK;
+			setFill(defaultColor);
+		}
+	}
+
 }
