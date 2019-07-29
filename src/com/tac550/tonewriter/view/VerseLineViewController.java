@@ -64,7 +64,7 @@ public class VerseLineViewController {
 
 	private int currentChordIndex = 0; // Index of the chord currently being assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be clicked
-	private ChantChordController currentChord; // The chord currently being asigned
+	private ChantChordController currentChord; // The chord currently being assigned
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -138,7 +138,7 @@ public class VerseLineViewController {
 
 	void setChantLines(ChantLineViewController[] chant_lines) {
 		changingAssignments = true;
-		// Rembmber previous chant line selection
+		// Remember previous chant line selection
 		String previousChantLine = chantLineChoice.getValue();
 
 		// Show the proper chant line on the left
@@ -319,9 +319,9 @@ public class VerseLineViewController {
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
-		noteButton.setMaxHeight(MainApp.NOTEBUTTONHEIGHT);
-		noteButton.setPrefHeight(MainApp.NOTEBUTTONHEIGHT);
-		noteButton.setMinHeight(MainApp.NOTEBUTTONHEIGHT);
+		noteButton.setMaxHeight(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.setPrefHeight(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.setMinHeight(MainApp.NOTE_BUTTON_HEIGHT);
 		noteButton.setPrefWidth(30);
 		noteButton.setPadding(Insets.EMPTY);
 
@@ -389,7 +389,7 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTEBUTTONHEIGHT);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT);
 			expandButton.setGraphic(minusIcon);
 
 			view_expanded = true;

@@ -55,7 +55,7 @@ public class SyllableText extends Text {
 	
 	void select(ChantChordController chord, Button note_button) {
 		if (clicked) {
-			nextNoteButtonYPos += MainApp.NOTEBUTTONHEIGHT;
+			nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
 			clicked = false;
 		} else {
 			active = false;
@@ -106,7 +106,7 @@ public class SyllableText extends Text {
 		associatedChords.remove(associatedChords.size()-1);
 		associatedButtons.remove(associatedButtons.size()-1);
 		
-		nextNoteButtonYPos -= MainApp.NOTEBUTTONHEIGHT;
+		nextNoteButtonYPos -= MainApp.NOTE_BUTTON_HEIGHT;
 		
 		if (!associatedButtons.isEmpty()) {
 			String colorString = "#" + associatedButtons.get(associatedButtons.size()-1).getStyle().split("#")[1];

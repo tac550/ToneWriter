@@ -66,7 +66,7 @@ public class ChantChordController implements CommentableView {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
 			field.focusedProperty().addListener((ov, old_val, new_val) -> {
-				if (!new_val) { // Rerender when focus switched away from field
+				if (!new_val) { // Re-render when focus switched away from field
 					playButton.setDisable(true);
 					try {
 						constructAndRenderChord();

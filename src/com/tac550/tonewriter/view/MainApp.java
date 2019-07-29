@@ -51,10 +51,10 @@ public class MainApp extends Application {
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
-	static final Color[] CHORDCOLORS = new Color[]{Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
+	static final Color[] CHORD_COLORS = new Color[]{Color.DARKGREEN, Color.BROWN, Color.BLUEVIOLET, Color.DEEPSKYBLUE, Color.CADETBLUE, Color.BURLYWOOD, Color.GOLD};
 
 	// How tall to make note buttons in the verse view.
-	static final int NOTEBUTTONHEIGHT = 15;
+	static final int NOTE_BUTTON_HEIGHT = 15;
 
 	// LilyPond connection stuff.
 	private static boolean lilyPondAvailable = false;
@@ -119,7 +119,7 @@ public class MainApp extends Application {
 		// Ensure that the process exits when the main window is closed
 		mainStage.setOnCloseRequest((ev) -> Platform.exit());
 
-		// Show the stage (requiured for the next operation to work)
+		// Show the stage (required for the next operation to work)
 		this.mainStage.show();
 
 		// Makes sure the stage can't be made too small.
@@ -209,7 +209,7 @@ public class MainApp extends Application {
 
 			mainStage.setScene(scene);
 
-			// Workaround for Mac bug where resizing is impossible after exiting fullscreen
+			// Workaround for Mac bug where resizing is impossible after exiting full screen
 			// https://stackoverflow.com/questions/47476328/how-to-make-main-javafx-window-still-resizable-coming-back-from-full-screen-mode
 			mainStage.fullScreenProperty().addListener((v, o, n) -> {
 				if (!mainStage.isFullScreen()) {

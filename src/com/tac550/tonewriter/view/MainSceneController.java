@@ -400,7 +400,7 @@ public class MainSceneController {
 		if (verseSet) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Set Verse Confirmation");
-			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignmets in the current text will be lost)");
+			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)");
 			alert.initOwner(thisStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
@@ -434,16 +434,16 @@ public class MainSceneController {
 		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
 		alert.initOwner(thisStage);
 		ButtonType saveButton = new ButtonType("Save");
-		ButtonType dontSaveButton = new ButtonType("Don't Save");
+		ButtonType noSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-		alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
+		alert.getButtonTypes().setAll(saveButton, noSaveButton, cancelButton);
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
 				handleSave();
 				return true;
-			} else return result.get() == dontSaveButton;
+			} else return result.get() == noSaveButton;
 		} else return false;
 	}
 	private boolean createNewTone() {

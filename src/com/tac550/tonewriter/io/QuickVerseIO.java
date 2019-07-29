@@ -105,7 +105,7 @@ public class QuickVerseIO {
 			throw new IOException("Failed to delete or rename verse file!");
 		}
 
-		// Only return true if a line was removed (otherise it must have been a built-in verse)
+		// Only return true if a line was removed (otherwise it must have been a built-in verse)
 		return removed;
 	}
 
