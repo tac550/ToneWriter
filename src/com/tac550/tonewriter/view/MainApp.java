@@ -73,6 +73,9 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage main_stage) {
+
+		setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
