@@ -534,7 +534,6 @@ public class MainSceneController {
 	 */
 	@FXML void handleNewTone() {
 		if (checkSave() && createNewTone()) {
-			resetAllAssignments();
 			resetStageTitle();
 			clearChantLines();
 			editMenu.setDisable(false);
@@ -550,7 +549,6 @@ public class MainSceneController {
 	@FXML void handleOpenTone() {
 		LoadingTone = true;
 		if (checkSave() && loadTone()) {
-			resetAllAssignments();
 			resetStageTitle();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
@@ -784,11 +782,6 @@ public class MainSceneController {
 				e.printStackTrace();
 			}
 	    }
-	}
-	private void resetAllAssignments() {
-		for (VerseLineViewController verseLine : verseLineControllers) {
-			verseLine.resetChordAssignment();
-		}
 	}
 
 	void removeChantLine(ChantLineViewController chantLineViewController) {

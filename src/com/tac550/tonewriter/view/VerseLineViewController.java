@@ -138,8 +138,11 @@ public class VerseLineViewController {
 
 	void setChantLines(ChantLineViewController[] chant_lines) {
 		changingAssignments = true;
-		// Rembmber previous chant line selection
-		String previousChantLine = chantLineChoice.getValue();
+		// Rembmber previous chant line selection, if any.
+		ChantLineViewController previousChantLine = null;
+		if (associatedChantLines != null) {
+			previousChantLine = associatedChantLines[selectedChantLine];
+		}
 
 		// Show the proper chant line on the left
 		associatedChantLines = chant_lines;
@@ -160,14 +163,15 @@ public class VerseLineViewController {
 		}
 
 		// Only reset chord assignments if the new chant line selection is different from the previous one.
-		if (!chantLineChoice.getValue().equals(previousChantLine)) {
+		if (!associatedChantLines[selectedChantLine].equals(previousChantLine)) {
 			resetChordAssignment();
 		}
 
 		changingAssignments = false;
+
 	}
 
-	void resetChordAssignment() {
+	private void resetChordAssignment() {
 		// Set up the first step of chord assignment
 		for (Node syllable : lineTextFlow.getChildren()) {
 			((SyllableText) syllable).clearSelection();

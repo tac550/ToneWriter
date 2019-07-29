@@ -455,5 +455,17 @@ public class ChantLineViewController implements CommentableView {
 			commentButtonState = image;
 		}
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+
+		return false;
+
+		// TODO: Implement equality checking!
+//		if (obj == this) return true;
+//		if (!(obj instanceof VerseLineViewController)) return false;
+//		VerseLineViewController vc = (VerseLineViewController) obj;
+
+	}
+
 }
