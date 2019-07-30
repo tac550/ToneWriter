@@ -31,7 +31,6 @@ public class ChantChordController implements CommentableView {
 	
 	private ChantLineViewController chantLineController;
 
-	private File lilypondFile;
 	private File midiFile;
 	
 	private String keySignature = "C major";
@@ -86,8 +85,6 @@ public class ChantChordController implements CommentableView {
 		chantLineController = parent;
 		
 		if (!MainApp.lilyPondAvailable()) return;
-		
-		lilypondFile = LilyPondWriter.createTempLYChordFile(chantLineController.getMainController().getToneFile().getName());
 		
 		refreshChordPreview();
 	}
@@ -193,6 +190,8 @@ public class ChantChordController implements CommentableView {
 					"/media/NoLilyPondMessage-Dark.png" : "/media/NoLilyPondMessage.png").toExternalForm()));
 			return null;
 		}
+
+		File lilypondFile = LilyPondWriter.createTempLYChordFile(chantLineController.getMainController().getToneFile().getName());
 
 		try {
 			File[] files = LilyPondWriter.renderChord(lilypondFile, getFields(), keySignature, chordView);
