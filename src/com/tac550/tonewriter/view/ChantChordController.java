@@ -223,13 +223,13 @@ public class ChantChordController implements CommentableView {
 		
 		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		// Key signature parsing
-	
 		lines.set(10, LilyPondWriter.keySignatureToLilyPond(keySignature));
 		lines.set(18, LilyPondWriter.parseNoteRelative(SField.getText(), LilyPondWriter.ADJUSTMENT_SOPRANO));
-		lines.set(24, LilyPondWriter.parseNoteRelative(AField.getText(), LilyPondWriter.ADJUSTMENT_ALTO));
-		lines.set(30, LilyPondWriter.parseNoteRelative(TField.getText(), LilyPondWriter.ADJUSTMENT_TENOR));
-		lines.set(36, LilyPondWriter.parseNoteRelative(BField.getText(), LilyPondWriter.ADJUSTMENT_BASS));
+		lines.set(24, "\\with-color #(rgb-color " + (MainApp.darkModeEnabled() ?
+				"0.345 0.361 0.373)" : "0.957 0.957 0.957)"));
+		lines.set(34, LilyPondWriter.parseNoteRelative(AField.getText(), LilyPondWriter.ADJUSTMENT_ALTO));
+		lines.set(40, LilyPondWriter.parseNoteRelative(TField.getText(), LilyPondWriter.ADJUSTMENT_TENOR));
+		lines.set(46, LilyPondWriter.parseNoteRelative(BField.getText(), LilyPondWriter.ADJUSTMENT_BASS));
 		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));

@@ -10,6 +10,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
@@ -321,9 +322,20 @@ public class ChantLineViewController implements CommentableView {
 		}
 	}
 	
-	void refreshAllChords() throws IOException {
+	void refreshAllChords() {
 		for (ChantChordController chord : chantChordControllers) {
-			chord.constructAndRenderChord();
+			try {
+				chord.constructAndRenderChord();
+			} catch (IOException e) {
+				if (e.getMessage().contains("Cannot run program")) {
+					Alert alert = new Alert(Alert.AlertType.ERROR);
+					alert.setTitle("Error");
+					alert.setHeaderText(String.format(Locale.US, "Error running \"%s\"!", MainApp.getPlatformSpecificLPExecutable()));
+					alert.initOwner(mainController.mainStage);
+					alert.showAndWait();
+				}
+				e.printStackTrace();
+			}
 		}
 	}
 

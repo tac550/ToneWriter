@@ -74,7 +74,7 @@
             </AnchorPane>
          </children>
       </GridPane>
-      <VBox fx:id="separatorIndicatorBox" alignment="CENTER" style="-fx-background-color: #f4f4f4;" visible="false">
+      <VBox fx:id="separatorIndicatorBox" alignment="CENTER" visible="false">
          <children>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="—————————">
                <font>

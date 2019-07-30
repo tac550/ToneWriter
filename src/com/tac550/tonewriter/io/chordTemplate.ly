@@ -17,6 +17,16 @@ noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \
 soprano = {
   \global
   c''4
+
+  -\tweak layer #-1
+   -\markup {
+     \with-dimensions #'(0 . 0) #'(0 . 0)
+     % specify color
+     \with-color #(rgb-color 0.345 0.361 0.373)
+     % specify size
+     \filled-box #'(-1000 . 1000) #'(-1000 . 4000) #0
+   }
+
   
 }
 

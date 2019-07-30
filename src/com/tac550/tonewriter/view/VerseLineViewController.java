@@ -4,7 +4,6 @@ import com.tac550.tonewriter.model.MappingAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -91,7 +90,7 @@ public class VerseLineViewController {
 
 		defaultHeight = mainContentPane.getPrefHeight();
 
-
+		refreshTextStyle();
 
 	}
 
@@ -256,9 +255,7 @@ public class VerseLineViewController {
 			for (Node syllable : lineTextFlow.getChildren()) { // Disable all syllables
 				((SyllableText) syllable).deactivate();
 			}
-
 		}
-
 	}
 
 	void syllableClicked(SyllableText clicked_text) {
@@ -447,6 +444,8 @@ public class VerseLineViewController {
 			SyllableText text = (SyllableText) item;
 			text.refreshStyle();
 		}
+
+		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.darkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
 }

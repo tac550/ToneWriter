@@ -66,7 +66,7 @@ Hear me O Lord!
 
 public class MainSceneController {
 
-	private Stage thisStage;
+	Stage mainStage;
 
 	private File toneFile;
 
@@ -207,6 +207,8 @@ public class MainSceneController {
 
 			for (VerseLineViewController verseLine : verseLineControllers) {
 				verseLine.refreshTextStyle();
+			} for (ChantLineViewController chantLine : chantLineControllers) {
+				chantLine.refreshAllChords();
 			}
 
 		});
@@ -237,7 +239,7 @@ public class MainSceneController {
 
 	}
 	void setStage(Stage stage) {
-		thisStage = stage;
+		mainStage = stage;
 	}
 	File getToneFile() {
 		return toneFile;
@@ -417,7 +419,7 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Set Verse Confirmation");
 			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
 			else askToOverwrite = false;
@@ -448,7 +450,7 @@ public class MainSceneController {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Save Confirmation");
 		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
-		alert.initOwner(thisStage);
+		alert.initOwner(mainStage);
 		ButtonType saveButton = new ButtonType("Save");
 		ButtonType noSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
@@ -471,7 +473,7 @@ public class MainSceneController {
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		}
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
-		File saveFile = fileChooser.showSaveDialog(thisStage);
+		File saveFile = fileChooser.showSaveDialog(mainStage);
 		if (saveFile == null) return false;
 
 		if (ToneReaderWriter.createToneFile(saveFile)) {
@@ -482,7 +484,7 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("That tone already exists!");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 			return false;
 		}
@@ -499,7 +501,7 @@ public class MainSceneController {
 			}
 		}
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
-		File selectedFile = fileChooser.showOpenDialog(thisStage);
+		File selectedFile = fileChooser.showOpenDialog(mainStage);
 
 		ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
 		if (selectedFile == null) return false;
@@ -513,7 +515,7 @@ public class MainSceneController {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("");
 				alert.setHeaderText("Error loading tone!");
-				alert.initOwner(thisStage);
+				alert.initOwner(mainStage);
 				alert.showAndWait();
 
 				// Since a tone was not loaded (or at least, not correctly),
@@ -526,17 +528,17 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("That file doesn't exist!");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 			return false;
 		}
 	}
 
 	private void resetStageTitle() {
-		thisStage.setTitle(MainApp.APP_NAME);
+		mainStage.setTitle(MainApp.APP_NAME);
 	}
 	private void updateStageTitle() {
-		thisStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
+		mainStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
 	}
 
 	/*
@@ -581,7 +583,7 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("Saving error!");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 		} else {
 			saveToneMenuItem.setDisable(false);
@@ -643,7 +645,7 @@ public class MainSceneController {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
-		dialog.initOwner(thisStage);
+		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
 		result.ifPresent(this::setCurrentKey);
@@ -654,7 +656,7 @@ public class MainSceneController {
 		TextInputDialog dialog = new TextInputDialog(composerText); // Initial text is existing composer text, if any.
 		dialog.setTitle("Composer Text");
 		dialog.setHeaderText("Set composer text (usually tone number and name of the system)");
-		dialog.initOwner(thisStage);
+		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
 		result.ifPresent(text -> composerText = text);
@@ -691,7 +693,7 @@ public class MainSceneController {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Please select the folder which contains lilypond.exe");
 		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, System.getProperty("user.home"))));
-		File savingDirectory = directoryChooser.showDialog(thisStage);
+		File savingDirectory = directoryChooser.showDialog(mainStage);
 		if (savingDirectory == null) return;
 
 		if (new File(savingDirectory.getAbsolutePath() + File.separator + MainApp.getPlatformSpecificLPExecutable()).exists()) {
@@ -699,13 +701,13 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Restart");
 			alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 		} else {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("That directory does not contain a valid LilyPond executable.");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 		}
 
@@ -715,7 +717,7 @@ public class MainSceneController {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Restart");
 		alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
-		alert.initOwner(thisStage);
+		alert.initOwner(mainStage);
 		alert.showAndWait();
 	}
 	@FXML private void handleSetPaperSize() {
@@ -733,7 +735,7 @@ public class MainSceneController {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
 		dialog.setTitle("Paper sizes");
 		dialog.setHeaderText("Choose a paper size");
-		dialog.initOwner(thisStage);
+		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
 		result.ifPresent(this::setPaperSize);
@@ -755,7 +757,7 @@ public class MainSceneController {
 
 				aboutStage.setTitle("About " + MainApp.APP_NAME);
 				aboutStage.setResizable(false);
-				aboutStage.initOwner(thisStage);
+				aboutStage.initOwner(mainStage);
 				aboutStage.initModality(Modality.APPLICATION_MODAL);
 				aboutStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
 				aboutStage.show();
@@ -773,18 +775,7 @@ public class MainSceneController {
 	}
 	private void refreshAllChords() {
 		for (ChantLineViewController chantLineController : chantLineControllers) {
-	    	try {
-				chantLineController.refreshAllChords();
-			} catch (IOException e) {
-				if (e.getMessage().contains("Cannot run program")) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Error");
-					alert.setHeaderText(String.format(Locale.US, "Error running \"%s\"!", MainApp.getPlatformSpecificLPExecutable()));
-					alert.initOwner(thisStage);
-					alert.showAndWait();
-				}
-				e.printStackTrace();
-			}
+			chantLineController.refreshAllChords();
 	    }
 	}
 
@@ -840,7 +831,7 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Overwrite");
 			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to create new file)");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 				if (!getNewRenderFilename()) return;
@@ -848,7 +839,7 @@ public class MainSceneController {
 				Alert alert2 = new Alert(AlertType.ERROR);
 				alert2.setTitle("Error");
 				alert2.setHeaderText("An error occurred while overwriting the previous files, attempting to render anyway...");
-				alert2.initOwner(thisStage);
+				alert2.initOwner(mainStage);
 				alert2.showAndWait();
 			}
 		} else {
@@ -866,7 +857,7 @@ public class MainSceneController {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
 				alert.setHeaderText("An error occurred while saving!");
-				alert.initOwner(thisStage);
+				alert.initOwner(mainStage);
 				alert.showAndWait();
 			}
 		} catch (IOException e) {
@@ -874,7 +865,7 @@ public class MainSceneController {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("There was an IO error while saving!");
-			alert.initOwner(thisStage);
+			alert.initOwner(mainStage);
 			alert.showAndWait();
 		}
 
@@ -888,14 +879,14 @@ public class MainSceneController {
 	private boolean getNewRenderFilename() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setInitialDirectory(currentSavingDirectory);
-		File savingDirectory = directoryChooser.showDialog(thisStage);
+		File savingDirectory = directoryChooser.showDialog(mainStage);
 		if (savingDirectory == null) return false;
 		else currentSavingDirectory = savingDirectory;
 
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Name Output");
 		dialog.setHeaderText("Name the output file(s)");
-		dialog.initOwner(thisStage);
+		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
 		currentRenderFileName = result.orElse(MainApp.APP_NAME + "-OUTPUT-" + new Timestamp(System.currentTimeMillis()).toString());
@@ -925,7 +916,7 @@ public class MainSceneController {
 			syllableStage.setScene(new Scene(rootLayout));
 			syllableStage.initModality(Modality.APPLICATION_MODAL);
 			syllableStage.setResizable(false);
-			syllableStage.initOwner(thisStage);
+			syllableStage.initOwner(mainStage);
 			syllableStage.showAndWait();
 
 			return controller.getSelectedVerse();
