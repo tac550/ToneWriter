@@ -184,21 +184,12 @@ public class MainSceneController {
 		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 
 		// Dark Mode menu item behavior and initial state
-		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
-			if (newVal) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
-			else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-
-			for (VerseLineViewController verseLine : verseLineControllers) {
-				verseLine.refreshTextStyle();
-			} for (ChantLineViewController chantLine : chantLineControllers) {
-				chantLine.refreshAllChords();
-			}
-
-		});
-		darkModeMenuItem.setOnAction((event) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, darkModeMenuItem.isSelected()));
-
 		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
+		setDarkModeEnabled(MainApp.darkModeEnabled());
+		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, darkModeMenuItem.isSelected());
+			setDarkModeEnabled(newVal);
+		});
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {
@@ -916,6 +907,17 @@ public class MainSceneController {
 
 	boolean playMidiAsAssigned() {
 		return playMidiMenuItem.isSelected();
+	}
+
+	void setDarkModeEnabled(boolean value) {
+		if (value) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+
+		for (VerseLineViewController verseLine : verseLineControllers) {
+			verseLine.refreshTextStyle();
+		} for (ChantLineViewController chantLine : chantLineControllers) {
+			chantLine.refreshAllChords();
+		}
 	}
 
 }
