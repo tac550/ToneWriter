@@ -24,7 +24,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
