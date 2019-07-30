@@ -187,7 +187,7 @@ public class ChantLineViewController implements CommentableView {
 	private int countEndChords() {
 		int result = 0;
 		for (ChantChordController chord : chantChordControllers) {
-			if (chord.getColor() == Color.RED) {
+			if (chord.getColor() == MainApp.endChordColor) {
 				result++;
 			}
 		}
@@ -279,7 +279,7 @@ public class ChantLineViewController implements CommentableView {
 		chantChordControllers.add(controller);
 		chordBox.getChildren().add(chordLayout);
 
-		controller.setColor(Color.RED);
+		controller.setColor(MainApp.endChordColor);
 		controller.setChantLineController(this);
 		controller.makeFinalChord();
 		
