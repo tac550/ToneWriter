@@ -217,7 +217,8 @@ public class ChantChordController implements CommentableView {
 		
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
-			chordView.setImage(new Image(getClass().getResource("/media/NoLilyPondMessage.png").toExternalForm()));
+			chordView.setImage(new Image(getClass().getResource(MainApp.darkModeEnabled() ?
+					"/media/NoLilyPondMessage-Dark.png" : "/media/NoLilyPondMessage.png").toExternalForm()));
 			return;
 		}
 		
