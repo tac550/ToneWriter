@@ -26,6 +26,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
 public class MainApp extends Application {
@@ -76,12 +77,6 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage main_stage) {
-
-		// Determine whether or not to enable dark mode
-//		if (prefs.getBoolean(MainApp.PREFS_DARK_MODE, getSystemDarkMode())) {
-//			setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
-//		}
-
 
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
@@ -282,13 +277,20 @@ public class MainApp extends Application {
 
 	private static boolean getSystemDarkMode() {
 		if (OS_NAME.startsWith("win")) {
-			// TODO: Check for windows dark mode
+
+			// Not sure how to determine light/dark theme on Windows
+
 			return false;
-//			return ".mid";
 		} if (OS_NAME.startsWith("mac")) {
-			// TODO: Check for Mac dark mode
-			return false;
-//			return ".midi";
+			try {
+				// checking for exit status only.
+				final Process process = Runtime.getRuntime().exec(new String[] {"defaults", "read", "-g", "AppleInterfaceStyle"});
+				process.waitFor(100, TimeUnit.MILLISECONDS);
+				return process.exitValue() == 0;
+			} catch (IOException | InterruptedException | IllegalThreadStateException ex) {
+				// IllegalThreadStateException thrown by process.exitValue(), if process didn't terminate
+				return false;
+			}
 		} else return false;
 	}
 

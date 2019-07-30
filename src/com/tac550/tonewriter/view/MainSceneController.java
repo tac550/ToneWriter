@@ -1,18 +1,8 @@
 package com.tac550.tonewriter.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,19 +11,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -44,6 +24,11 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /*
  * TEST VERSES:
@@ -200,8 +185,6 @@ public class MainSceneController {
 
 		// Dark Mode menu item behavior and initial state
 		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
-			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
-
 			if (newVal) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 			else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
@@ -212,6 +195,9 @@ public class MainSceneController {
 			}
 
 		});
+		darkModeMenuItem.setOnAction((event) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, darkModeMenuItem.isSelected()));
+
 		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
 
 		// Set up behavior for reader verse text completion buttons and fields
