@@ -82,13 +82,13 @@
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
                      <children>
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="S" />
-                        <TextField fx:id="SField" onAction="#constructAndRenderChord" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
+                        <TextField fx:id="SField" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
                         <Text layoutX="67.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="A" />
-                        <TextField fx:id="AField" layoutX="74.0" layoutY="10.0" onAction="#constructAndRenderChord" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
+                        <TextField fx:id="AField" layoutX="74.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
                         <Text layoutX="100.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="T" />
-                        <TextField fx:id="TField" layoutX="107.0" layoutY="10.0" onAction="#constructAndRenderChord" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
+                        <TextField fx:id="TField" layoutX="107.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
                         <Text layoutX="78.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="B" />
-                        <TextField fx:id="BField" layoutX="85.0" layoutY="10.0" onAction="#constructAndRenderChord" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
+                        <TextField fx:id="BField" layoutX="85.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
                      </children>
                   </HBox>
                </children>

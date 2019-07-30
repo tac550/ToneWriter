@@ -283,6 +283,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="JavaFX" level="project" />
   </component>
 </module>

@@ -1,26 +1,24 @@
 package com.tac550.tonewriter.io;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.ChantLineViewController;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.VerseLineViewController;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import org.apache.commons.io.FilenameUtils;
+
+import java.awt.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LilyPondWriter {
 
@@ -683,7 +681,7 @@ public class LilyPondWriter {
 	}
 
 	// Converts the UI string for the selected key signature into the format LilyPond expects.
-	public static String keySignatureToLilyPond(String key_sig) {
+	private static String keySignatureToLilyPond(String key_sig) {
 		String keySigString = "  \\key ";
 
 		// Splitting up the two parts of the key string...
@@ -718,6 +716,64 @@ public class LilyPondWriter {
 		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
 		prExitDetector.addProcessListener((process) -> exitingActions.run());
 		prExitDetector.start();
+	}
+
+	public static File[] renderChord(File lilypondFile, String fields, String keySignature, ChantLineViewController chantLineView) throws IOException {
+		return renderChord(lilypondFile, fields, keySignature, null, chantLineView);
+	}
+	public static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView) throws IOException {
+		return renderChord(lilypondFile, fields, keySignature, chordView, null);
+	}
+	private static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView, ChantLineViewController chantLineView) throws IOException {
+
+		String[] parts = fields.split("-");
+
+		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+
+		lines.set(10, LilyPondWriter.keySignatureToLilyPond(keySignature));
+		lines.set(18, LilyPondWriter.parseNoteRelative(parts[PART_SOPRANO], LilyPondWriter.ADJUSTMENT_SOPRANO));
+		lines.set(24, "\\with-color #(rgb-color " + (MainApp.darkModeEnabled() ?
+				"0.345 0.361 0.373)" : "0.957 0.957 0.957)"));
+		lines.set(34, LilyPondWriter.parseNoteRelative(parts[PART_ALTO], LilyPondWriter.ADJUSTMENT_ALTO));
+		lines.set(40, LilyPondWriter.parseNoteRelative(parts[PART_TENOR], LilyPondWriter.ADJUSTMENT_TENOR));
+		lines.set(46, LilyPondWriter.parseNoteRelative(parts[PART_BASS], LilyPondWriter.ADJUSTMENT_BASS));
+		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+
+		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
+		outputFile.deleteOnExit();
+		File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+				Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
+		midiFile.deleteOnExit();
+		// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
+		File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
+		psFile.deleteOnExit();
+
+		if (chordView != null) {
+			LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
+					chordView.setImage(new Image(outputFile.toURI().toString())));
+		} else {
+			LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
+					chantLineView.chordRendered(fields));
+		}
+
+		return new File[] {outputFile, midiFile};
+	}
+
+	public static File createTempLYChordFile(String toneFileName) {
+		File tempFile = null;
+		try {
+			// Create the temporary file to hold the lilypond markup
+			tempFile = File.createTempFile(MainApp.APP_NAME + "--"
+							+ FilenameUtils.removeExtension(toneFileName) + "-",
+					"-chord.ly");
+			tempFile.deleteOnExit();
+
+			LilyPondWriter.ExportResource("chordTemplate.ly", tempFile.getAbsolutePath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return tempFile;
 	}
 
 }

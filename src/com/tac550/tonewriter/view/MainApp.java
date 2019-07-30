@@ -261,7 +261,7 @@ public class MainApp extends Application {
 	}
 
 	// Returns the extension for midi files produced by LilyPond on the current platform.
-	static String getPlatformSpecificMidiExtension() {
+	public static String getPlatformSpecificMidiExtension() {
 		if (OS_NAME.startsWith("win")) {
 			return ".mid";
 		} if (OS_NAME.startsWith("mac")) {
@@ -271,7 +271,7 @@ public class MainApp extends Application {
 		} else return null;
 	}
 
-	static boolean darkModeEnabled() {
+	public static boolean darkModeEnabled() {
 		return MainApp.prefs.getBoolean(MainApp.PREFS_DARK_MODE, MainApp.getSystemDarkMode());
 	}
 

@@ -1,16 +1,16 @@
 package com.tac550.tonewriter.view;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Locale;
+import java.util.*;
 
+import com.tac550.tonewriter.io.LilyPondWriter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
@@ -51,6 +51,8 @@ public class ChantLineViewController implements CommentableView {
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
+
+	private Map<String, File[]> renderResultMap = new HashMap<>();
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -323,18 +325,27 @@ public class ChantLineViewController implements CommentableView {
 	}
 	
 	void refreshAllChords() {
+		Set<String> fieldSet = new HashSet<>();
+
 		for (ChantChordController chord : chantChordControllers) {
+			fieldSet.add(chord.getFields());
+		}
+
+		for (String fields : fieldSet) {
 			try {
-				chord.constructAndRenderChord();
+				renderResultMap.put(fields, LilyPondWriter.renderChord(LilyPondWriter.createTempLYChordFile(getMainController().getToneFile().getName()),
+						fields, mainController.getCurrentKey(), this));
 			} catch (IOException e) {
-				if (e.getMessage().contains("Cannot run program")) {
-					Alert alert = new Alert(Alert.AlertType.ERROR);
-					alert.setTitle("Error");
-					alert.setHeaderText(String.format(Locale.US, "Error running \"%s\"!", MainApp.getPlatformSpecificLPExecutable()));
-					alert.initOwner(mainController.mainStage);
-					alert.showAndWait();
-				}
+				System.out.println("Chord image creation failed");
 				e.printStackTrace();
+			}
+		}
+	}
+
+	public void chordRendered(String fields) {
+		for (ChantChordController chord : chantChordControllers) {
+			if (chord.getFields().equals(fields)) {
+				chord.setChordInfoDirectly(renderResultMap.get(fields));
 			}
 		}
 	}

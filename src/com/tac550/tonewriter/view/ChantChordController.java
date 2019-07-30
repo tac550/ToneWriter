@@ -1,21 +1,7 @@
 package com.tac550.tonewriter.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.util.TWUtils;
-
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -32,7 +18,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.apache.commons.io.FilenameUtils;
+
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class ChantChordController implements CommentableView {
 	
@@ -68,11 +61,9 @@ public class ChantChordController implements CommentableView {
 			field.focusedProperty().addListener((ov, old_val, new_val) -> {
 				if (!new_val) { // Re-render when focus switched away from field
 					playButton.setDisable(true);
-					try {
-						constructAndRenderChord();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+
+					refreshChordPreview();
+
 					playButton.setDisable(false);
 				} else { // Select all when focus switched to the field
 					field.selectAll();
@@ -91,28 +82,14 @@ public class ChantChordController implements CommentableView {
 		
 	}
 	
-	void setChantLineController(ChantLineViewController parent) throws IOException {
+	void setChantLineController(ChantLineViewController parent) {
 		chantLineController = parent;
 		
 		if (!MainApp.lilyPondAvailable()) return;
 		
-		// Create the temporary file to hold the lilypond markup
-		lilypondFile = File.createTempFile(MainApp.APP_NAME + "--"
-				+ FilenameUtils.removeExtension(parent.getMainController().getToneFile().getName()) + "-",
-				"-chord.ly");
-		lilypondFile.deleteOnExit();
+		lilypondFile = LilyPondWriter.createTempLYChordFile(chantLineController.getMainController().getToneFile().getName());
 		
-		try {
-			LilyPondWriter.ExportResource("chordTemplate.ly", lilypondFile.getAbsolutePath());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			constructAndRenderChord();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		refreshChordPreview();
 	}
 	void setNumber(int number) {
 		numText.setText(String.valueOf(number));
@@ -132,11 +109,8 @@ public class ChantChordController implements CommentableView {
 	}
 	void setKeySignature(String new_key) {
 		keySignature = new_key;
-		try {
-			constructAndRenderChord();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		refreshChordPreview();
 	}
 	void makePrep() {
 		numText.setText("Prep");
@@ -193,11 +167,8 @@ public class ChantChordController implements CommentableView {
 		AField.setText(values[1].trim());
 		TField.setText(values[2].trim());
 		BField.setText(values[3].trim());
-		try {
-			constructAndRenderChord();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		refreshChordPreview();
 	}
 	public void setComment(String comment) {
 		commentString = comment.replaceAll("/n", "\n");
@@ -212,39 +183,30 @@ public class ChantChordController implements CommentableView {
 		return rootLayout;
 	}
 
-	@FXML public void constructAndRenderChord() throws IOException {
-		if (MainSceneController.LoadingTone) return; // Avoid unnecessary refreshes while loading a tone
-		
+	@FXML private File refreshChordPreview() {
+
+		if (MainSceneController.LoadingTone) return null; // Avoid unnecessary refreshes while loading a tone
+
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
 			chordView.setImage(new Image(getClass().getResource(MainApp.darkModeEnabled() ?
 					"/media/NoLilyPondMessage-Dark.png" : "/media/NoLilyPondMessage.png").toExternalForm()));
-			return;
+			return null;
 		}
-		
-		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		lines.set(10, LilyPondWriter.keySignatureToLilyPond(keySignature));
-		lines.set(18, LilyPondWriter.parseNoteRelative(SField.getText(), LilyPondWriter.ADJUSTMENT_SOPRANO));
-		lines.set(24, "\\with-color #(rgb-color " + (MainApp.darkModeEnabled() ?
-				"0.345 0.361 0.373)" : "0.957 0.957 0.957)"));
-		lines.set(34, LilyPondWriter.parseNoteRelative(AField.getText(), LilyPondWriter.ADJUSTMENT_ALTO));
-		lines.set(40, LilyPondWriter.parseNoteRelative(TField.getText(), LilyPondWriter.ADJUSTMENT_TENOR));
-		lines.set(46, LilyPondWriter.parseNoteRelative(BField.getText(), LilyPondWriter.ADJUSTMENT_BASS));
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+		try {
+			File[] files = LilyPondWriter.renderChord(lilypondFile, getFields(), keySignature, chordView);
+			midiFile = files[1];
+			return files[0];
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-		outputFile.deleteOnExit();
-		midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-				Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-		midiFile.deleteOnExit();
-		// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-		File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-		psFile.deleteOnExit();
-
-		
-		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
-				chordView.setImage(new Image(outputFile.toURI().toString())));
+	void setChordInfoDirectly(File[] files) {
+		chordView.setImage(new Image(files[0].toURI().toString()));
+		midiFile = files[1];
 	}
 	
 	@FXML public void addPrepChord() throws IOException {
@@ -362,5 +324,5 @@ public class ChantChordController implements CommentableView {
 			commentButtonState = image;
 		}
 	}
-	
+
 }

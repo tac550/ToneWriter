@@ -51,7 +51,7 @@ Hear me O Lord!
 
 public class MainSceneController {
 
-	Stage mainStage;
+	private Stage mainStage;
 
 	private File toneFile;
 
@@ -909,15 +909,15 @@ public class MainSceneController {
 		return playMidiMenuItem.isSelected();
 	}
 
-	void setDarkModeEnabled(boolean value) {
+	private void setDarkModeEnabled(boolean value) {
 		if (value) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			verseLine.refreshTextStyle();
-		} for (ChantLineViewController chantLine : chantLineControllers) {
-			chantLine.refreshAllChords();
 		}
+
+		refreshAllChords();
 	}
 
 }
