@@ -78,12 +78,6 @@ public class MainApp extends Application {
 	@Override
 	public void start(Stage main_stage) {
 
-		// Determine whether or not to enable dark mode
-//		if (prefs.getBoolean(MainApp.PREFS_DARK_MODE, getSystemDarkMode())) {
-//			setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
-//		}
-
-
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
