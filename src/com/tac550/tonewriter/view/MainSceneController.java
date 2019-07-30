@@ -290,7 +290,7 @@ public class MainSceneController {
 		mainChantLines.clear();
 
 		for (ChantLineViewController chantLine : chantLineControllers) {
-			if (!chantLineControllers.get(chantLineControllers.size()-1).equals(chantLine)) { // If not the last
+			if (chantLineControllers.get(chantLineControllers.size()-1) != chantLine) { // If not the last
 				chantLine.setName(currentLetter, previousWasPrime, alternateCount);
 				previousWasPrime = false;
 
