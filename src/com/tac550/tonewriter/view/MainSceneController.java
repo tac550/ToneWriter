@@ -466,25 +466,27 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean loadTone() {
-		FileChooser fileChooser = new FileChooser();
-		if (toneFile != null) {
-			fileChooser.setInitialDirectory(toneFile.getParentFile());
-		} else {
-			if (builtInDir.exists()) {
-				fileChooser.setInitialDirectory(builtInDir);
+	private boolean loadTone(File selectedFile) {
+		if (selectedFile == null) {
+			FileChooser fileChooser = new FileChooser();
+			if (toneFile != null) {
+				fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
-				fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+				if (builtInDir.exists()) {
+					fileChooser.setInitialDirectory(builtInDir);
+				} else {
+					fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+				}
 			}
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
+			selectedFile = fileChooser.showOpenDialog(mainStage);
 		}
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
-		File selectedFile = fileChooser.showOpenDialog(mainStage);
-
-		ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
 		if (selectedFile == null) return false;
 
 		if (selectedFile.exists()) {
 			toneFile = selectedFile;
+
+			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
 
 			if (toneReader.loadTone(this, toneFile)) {
 				return true;
@@ -535,9 +537,9 @@ public class MainSceneController {
 			handleSave(); // So that the tone is loadable (will be empty)
 		}
 	}
-	@FXML void handleOpenTone() {
+	void handleOpenTone(File selectedFile) {
 		LoadingTone = true;
-		if (checkSave() && loadTone()) {
+		if (checkSave() && loadTone(selectedFile)) {
 			resetStageTitle();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
@@ -551,6 +553,9 @@ public class MainSceneController {
 		LoadingTone = false;
 
 		refreshAllChords();
+	}
+	@FXML private void handleOpenTone() {
+		handleOpenTone(null);
 	}
 	@FXML void handleSave() {
 		if (toneFile == null || saveDisabled()) return;

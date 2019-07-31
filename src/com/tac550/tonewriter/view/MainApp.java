@@ -26,6 +26,7 @@ import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -137,6 +138,12 @@ public class MainApp extends Application {
 		// TODO: That issue needs a more comprehensive fix.
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
+
+		// Launching with tone loading TODO: Is this Windows-only?
+		List<String> params = getParameters().getRaw();
+		if (params.size() > 0) {
+			mainController.handleOpenTone(new File(params.get(0)));
+		}
 	}
 
 	private void showSplash() {

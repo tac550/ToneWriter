@@ -12,6 +12,8 @@ OutFile "..\win\ToneWriter0.4_Setup.exe"
 
 ; Modern interface settings
 !include "MUI.nsh"
+; File association
+!include "FileAssociation.nsh"
 
 !define MUI_ABORTWARNING
 !define MUI_FINISHPAGE_RUN "$INSTDIR\ToneWriter.exe"
@@ -44,6 +46,8 @@ Section "ToneWriter" Section1
 	CreateDirectory "$SMPROGRAMS\ToneWriter"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\Uninstall ToneWriter.lnk" "$INSTDIR\uninstall.exe"
+
+	${registerExtension} "$INSTDIR\ToneWriter.exe" ".tone" "TONE_File"
 
 SectionEnd
 
@@ -104,6 +108,8 @@ Section Uninstall
 	RMDir "$SMPROGRAMS\ToneWriter"
 	RMDir "$INSTDIR\licenses\"
 	RMDir "$INSTDIR\"
+
+	${unregisterExtension} ".tone" "TONE File"
 
 SectionEnd
 
