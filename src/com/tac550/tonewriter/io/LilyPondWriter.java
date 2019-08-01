@@ -3,10 +3,7 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.ChantLineViewController;
-import com.tac550.tonewriter.view.MainApp;
-import com.tac550.tonewriter.view.SyllableText;
-import com.tac550.tonewriter.view.VerseLineViewController;
+import com.tac550.tonewriter.view.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.commons.io.FilenameUtils;
@@ -718,13 +715,13 @@ public class LilyPondWriter {
 		prExitDetector.start();
 	}
 
-	public static File[] renderChord(File lilypondFile, String fields, String keySignature, ChantLineViewController chantLineView) throws IOException {
-		return renderChord(lilypondFile, fields, keySignature, null, chantLineView);
+	public static File[] renderChord(File lilypondFile, String fields, String keySignature, MainSceneController mainSceneView) throws IOException {
+		return renderChord(lilypondFile, fields, keySignature, null, mainSceneView);
 	}
 	public static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView) throws IOException {
 		return renderChord(lilypondFile, fields, keySignature, chordView, null);
 	}
-	private static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView, ChantLineViewController chantLineView) throws IOException {
+	private static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView, MainSceneController mainSceneView) throws IOException {
 
 		String[] parts = fields.split("-");
 
@@ -753,7 +750,7 @@ public class LilyPondWriter {
 					chordView.setImage(new Image(outputFile.toURI().toString())));
 		} else {
 			LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
-					chantLineView.chordRendered(fields));
+					mainSceneView.chordRendered(fields));
 		}
 
 		return new File[] {outputFile, midiFile};

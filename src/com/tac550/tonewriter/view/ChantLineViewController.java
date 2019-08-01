@@ -1,10 +1,5 @@
 package com.tac550.tonewriter.view;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import com.tac550.tonewriter.io.LilyPondWriter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -22,6 +17,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 public class ChantLineViewController implements CommentableView {
 
@@ -51,8 +53,6 @@ public class ChantLineViewController implements CommentableView {
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
-
-	private Map<String, File[]> renderResultMap = new HashMap<>();
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -323,29 +323,20 @@ public class ChantLineViewController implements CommentableView {
 			chord.setKeySignature(new_key);
 		}
 	}
-	
-	void refreshAllChords() {
+
+	Set<String> getAllFields() {
 		Set<String> fieldSet = new HashSet<>();
 
 		for (ChantChordController chord : chantChordControllers) {
 			fieldSet.add(chord.getFields());
 		}
 
-		for (String fields : fieldSet) {
-			try {
-				renderResultMap.put(fields, LilyPondWriter.renderChord(LilyPondWriter.createTempLYChordFile(getMainController().getToneFile().getName()),
-						fields, mainController.getCurrentKey(), this));
-			} catch (IOException e) {
-				System.out.println("Chord image creation failed");
-				e.printStackTrace();
-			}
-		}
+		return fieldSet;
 	}
-
-	public void chordRendered(String fields) {
+	void chordRendered(String fields, File[] resultFiles) {
 		for (ChantChordController chord : chantChordControllers) {
 			if (chord.getFields().equals(fields)) {
-				chord.setChordInfoDirectly(renderResultMap.get(fields));
+				chord.setChordInfoDirectly(resultFiles);
 			}
 		}
 	}
@@ -432,7 +423,7 @@ public class ChantLineViewController implements CommentableView {
 		});
 	}
 	@FXML private void handlePlay() {
-		Task<Integer> midiTask = new Task<Integer>() {
+		Task<Integer> midiTask = new Task<>() {
 			@Override
 			protected Integer call() throws Exception {
 

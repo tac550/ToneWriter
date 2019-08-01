@@ -107,6 +107,8 @@ public class MainSceneController {
 	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
 	@FXML TextArea verseArea;
 
+	private Map<String, File[]> renderResultMap = new HashMap<>();
+
 	@FXML private void initialize() {
 
 		// Interface icons
@@ -767,9 +769,26 @@ public class MainSceneController {
 			}
 		}
 
+		Set<String> allFieldsSet = new HashSet<>();
+
 		for (ChantLineViewController chantLineController : chantLineControllers) {
-			chantLineController.refreshAllChords(); // TODO: Optimize for whole tone, not just each line individually
+			allFieldsSet.addAll(chantLineController.getAllFields());
 	    }
+
+		for (String fields : allFieldsSet) {
+			try {
+				renderResultMap.put(fields, LilyPondWriter.renderChord(LilyPondWriter.createTempLYChordFile(getToneFile().getName()),
+						fields, getCurrentKey(), this));
+			} catch (IOException e) {
+				System.out.println("Chord image creation failed");
+				e.printStackTrace();
+			}
+		}
+	}
+	public void chordRendered(String fields) {
+		for (ChantLineViewController chantLineController : chantLineControllers) {
+			chantLineController.chordRendered(fields, renderResultMap.get(fields));
+		}
 	}
 
 	void removeChantLine(ChantLineViewController chantLineViewController) {
