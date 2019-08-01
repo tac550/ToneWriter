@@ -194,15 +194,6 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="jfxrt.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jfxrt.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
       <library name="neko-htmlunit-2.31.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/neko-htmlunit-2.31.jar!/" />
@@ -283,5 +274,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>

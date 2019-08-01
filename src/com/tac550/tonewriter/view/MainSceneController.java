@@ -768,7 +768,7 @@ public class MainSceneController {
 		}
 
 		for (ChantLineViewController chantLineController : chantLineControllers) {
-			chantLineController.refreshAllChords();
+			chantLineController.refreshAllChords(); // TODO: Optimize for whole tone, not just each line individually
 	    }
 	}
 

@@ -2,6 +2,8 @@
 /build/mac/
 /build/lin/
 /build/res/ToneWriter.jar
+/build/res/java-runtime
+/build/res/javafx-jmods*
 
 # Mac stuff
 *.DS_Store

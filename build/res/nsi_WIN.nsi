@@ -46,6 +46,11 @@ Section "ToneWriter" Section1
 	CreateDirectory "$SMPROGRAMS\ToneWriter"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\Uninstall ToneWriter.lnk" "$INSTDIR\uninstall.exe"
+	; Delete any existing Java runtime
+    RMDir /r "$INSTDIR\java-runtime\"
+    ; Copy new Java runtime
+    SetOutPath "$INSTDIR\java-runtime\"
+    File /nonfatal /a /r "..\win\java-runtime\"
 
 	${registerExtension} "$INSTDIR\ToneWriter.exe" ".tone" "TONE_File"
 
@@ -103,6 +108,8 @@ Section Uninstall
 
 	; Clean up Built-in Tones
 	RMDir /r "$INSTDIR\Built-in Tones\"
+	; Clean up Java runtime
+	RMDir /r "$INSTDIR\java-runtime\"
 
 	; Remove remaining directories
 	RMDir "$SMPROGRAMS\ToneWriter"
