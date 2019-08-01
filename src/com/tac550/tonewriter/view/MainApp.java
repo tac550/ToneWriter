@@ -142,7 +142,8 @@ public class MainApp extends Application {
 		// Launching with tone loading TODO: Is this Windows-only?
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
-			mainController.handleOpenTone(new File(params.get(0)));
+			File openFile = new File(params.get(0));
+			if (openFile.isFile()) mainController.handleOpenTone(new File(params.get(0)));
 		}
 	}
 
