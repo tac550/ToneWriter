@@ -1,5 +1,5 @@
 rmdir /s /q java-runtime & ^
-jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods-12.0.2 --add-modules java.xml,java.scripting,java.desktop,jdk.unsupported,javafx.controls,javafx.fxml --output java-runtime && ^
+jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods-12.0.2 --add-modules java.xml,java.scripting,java.desktop,jdk.unsupported,javafx.controls,javafx.fxml,java.naming,jdk.charsets,jdk.crypto.ec,java.sql --output java-runtime && ^
 launch4jc TWBuild_WIN.xml && ^
 rd /s /q "..\win\Built-in Tones" & ^
 rd /s /q "..\win\licenses" & ^
