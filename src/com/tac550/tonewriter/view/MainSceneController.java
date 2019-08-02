@@ -842,7 +842,7 @@ public class MainSceneController {
 		if (askToOverwrite) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Overwrite");
-			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to create new file)");
+			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to create a new file)");
 			alert.initOwner(mainStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {

@@ -52,7 +52,7 @@ Section "ToneWriter" Section1
     SetOutPath "$INSTDIR\java-runtime\"
     File /nonfatal /a /r "..\win\java-runtime\"
 
-	${registerExtension} "$INSTDIR\ToneWriter.exe" ".tone" "TONE_File"
+	${registerExtension} "$INSTDIR\ToneWriter.exe" ".tone" "TONE File"
 
 SectionEnd
 
