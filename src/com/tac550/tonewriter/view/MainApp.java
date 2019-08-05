@@ -54,7 +54,7 @@ public class MainApp extends Application {
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
-	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.DODGERBLUE, Color.DARKORANGE,
+	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
 			Color.DEEPSKYBLUE, Color.BURLYWOOD, Color.AQUA, Color.GOLD};
 	static final Color endChordColor = Color.DARKMAGENTA;
 
