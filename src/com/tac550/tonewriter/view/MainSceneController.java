@@ -540,7 +540,7 @@ public class MainSceneController {
 		}
 	}
 	void handleOpenTone(File selectedFile) {
-		LoadingTone = true;
+		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if (checkSave() && loadTone(selectedFile)) {
 			resetStageTitle();
 			editMenu.setDisable(false);
@@ -758,6 +758,7 @@ public class MainSceneController {
 	    }
 	}
 	private void refreshAllChords() {
+		if (!MainApp.lilyPondAvailable()) return;
 
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		File[] files = tempDir.listFiles();
@@ -945,6 +946,8 @@ public class MainSceneController {
 	}
 
 	private void setDarkModeEnabled(boolean value) {
+		MainApp.setDarkMode(value);
+
 		if (value) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 

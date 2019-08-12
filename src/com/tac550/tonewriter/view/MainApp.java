@@ -61,6 +61,8 @@ public class MainApp extends Application {
 	// How tall to make note buttons in the verse view.
 	static final int NOTE_BUTTON_HEIGHT = 15;
 
+	private static boolean darkModeEnabled = false;
+
 	// LilyPond connection stuff.
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
@@ -78,9 +80,11 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage main_stage) {
-
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
+
+		// Initialize dark mode state
+		darkModeEnabled = prefs.getBoolean(MainApp.PREFS_DARK_MODE, getSystemDarkMode());
 
 		// Print saved LilyPond directory if any, otherwise print null.
 		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
@@ -139,7 +143,7 @@ public class MainApp extends Application {
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
 
-		// Launching with tone loading TODO: Is this Windows-only?
+		// Launching with tone loading TODO: Implement Mac support for this
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
@@ -280,7 +284,10 @@ public class MainApp extends Application {
 	}
 
 	public static boolean darkModeEnabled() {
-		return MainApp.prefs.getBoolean(MainApp.PREFS_DARK_MODE, MainApp.getSystemDarkMode());
+		return darkModeEnabled;
+	}
+	public static void setDarkMode(boolean dark_mode) {
+		darkModeEnabled = dark_mode;
 	}
 
 	private static boolean getSystemDarkMode() {
