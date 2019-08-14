@@ -58,7 +58,8 @@ public class QuickVerseController {
 	    
 	    // Verse list setup
 	    verseList = new ListView<>(filteredData);
-	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) -> resultField.setText(newVal));
+	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
+			    resultField.setText(newVal));
 	    verseList.setOnMouseClicked((me) -> {
 	    	if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2) {
 	    		handleOK();
@@ -159,9 +160,16 @@ public class QuickVerseController {
 	
 	@FXML private void handleAddToList() {
 		try {
-			QuickVerseIO.addCustomVerse(resultField.getText());
-			
-			verses.add(resultField.getText());
+			if (!verses.contains(resultField.getText())) {
+				QuickVerseIO.addCustomVerse(resultField.getText());
+
+				verses.add(resultField.getText());
+			} else {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setHeaderText("That verse is already in the list!");
+				alert.showAndWait();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);

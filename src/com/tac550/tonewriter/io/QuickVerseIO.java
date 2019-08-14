@@ -65,8 +65,14 @@ public class QuickVerseIO {
 		if (verseFile == null) throw new IOException("Failed to get verse storage file!");
 
 		// Create custom verse file if it doesn't already exist.
+		if (!verseFile.getParentFile().exists()) {
+			if (!(verseFile.getParentFile().mkdirs())) {
+				throw new IOException("Failed to create directory for new verse storage file!");
+			}
+		}
+
 		if (!verseFile.exists()) {
-			if (!(verseFile.getParentFile().mkdirs() && verseFile.createNewFile())) {
+			if (!verseFile.createNewFile()) {
 				throw new IOException("Failed to create new verse storage file!");
 			}
 		}
@@ -91,7 +97,7 @@ public class QuickVerseIO {
 		String currentLine;
 		boolean removed = false;
 		while ((currentLine = reader.readLine()) != null) {
-		    if (currentLine.trim().equals(verse) && !removed) {
+		    if (currentLine.trim().equals(verse.trim()) && !removed) {
 		    	removed = true;
 		    	continue; // Skips the following writer.write() line for the item to be removed (removes only one line)
 		    }
