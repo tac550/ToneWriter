@@ -1,7 +1,7 @@
 /build/win/
 /build/mac/
 /build/lin/
-/build/res/ToneWriter.jar
+/build/res/[tT]one[wW]riter.jar
 /build/res/java-runtime
 /build/res/javafx-jmods*
 
