@@ -286,7 +286,7 @@ public class MainApp extends Application {
 	public static boolean darkModeEnabled() {
 		return darkModeEnabled;
 	}
-	public static void setDarkMode(boolean dark_mode) {
+	static void setDarkMode(boolean dark_mode) {
 		darkModeEnabled = dark_mode;
 	}
 
