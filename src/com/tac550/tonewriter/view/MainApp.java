@@ -33,7 +33,7 @@ import java.util.prefs.Preferences;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.4";
+	public static final String APP_VERSION = "0.5";
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
 	static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
