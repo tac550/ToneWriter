@@ -269,8 +269,11 @@ public class ChantChordController implements CommentableView {
 				// Thread to close midi after it's had long enough to finish playing.
 				// This fixes the application not closing correctly if the user played midi.
 				Thread stopThread = new Thread(() -> {
+					playButton.setStyle("-fx-base: #fffa61");
 					try {
-						Thread.sleep(3000);
+						Thread.sleep(1000);
+						playButton.setStyle("");
+						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
