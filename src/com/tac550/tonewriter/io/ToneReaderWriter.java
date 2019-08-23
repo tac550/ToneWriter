@@ -38,8 +38,9 @@ public class ToneReaderWriter {
 	public boolean saveTone(File toneFile) {
 		try {
 			// Clear out old save data.
-			// TODO: Causing error if file doesn't exist (should just make a new one)
-			if (!(toneFile.delete() && toneFile.createNewFile())) {
+			// noinspection ResultOfMethodCallIgnored
+			toneFile.delete();
+			if (!toneFile.createNewFile()) {
 				return false;
 			}
 
