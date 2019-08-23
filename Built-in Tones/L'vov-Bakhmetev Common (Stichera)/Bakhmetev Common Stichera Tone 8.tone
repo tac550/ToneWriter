@@ -4,9 +4,10 @@ Composer Text: L'vov/Bakhmetev - Obikhod Tone 8
 
 
 A
-1: g-e-c-c
+Comment: The first two chords of this phrase are only/nto be used on the first line of the sticheron.
+1: g-e-c-c: Skipped on all but the first line of the sticheron.
 2: g-e-c-c
-	Prep: a-f-c-f
+	Prep: a-f-c-f: Skipped on all but the first line of the sticheron.
 3: a-f-c-f
 	Post: g-e-c-c
 END: f-d-a,-d
@@ -26,27 +27,6 @@ C
 	Prep: g-e-c-g
 END: e-c-g,-c
 
-D
-1: g-e-c-c
-2: a-f-c-f
-	Post: g-e-c-c
-END: f-d-a,-d
-
-E
-1: a-f-c-f
-END: g-e-c-c
-	Prep: bf-g-c-e
-	Prep: a-f-c-f
-
-F
-1: a-f-c-f
-	Post: f-d-c-c
-	Post: g-e-c-c
-2: f-d-b,-<g g,>
-	Prep: a-f-c-f
-	Prep: g-e-c-g
-END: e-c-g,-c
-
 Cadence
 1: bf-g-d-<g g,>
 2: a-f-d-<a a,>
@@ -54,4 +34,4 @@ Cadence
 END: f-d-a,-d
 
 
-First Repeated: D
+First Repeated: 
