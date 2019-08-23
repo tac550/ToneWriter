@@ -168,10 +168,6 @@ public class ToneReaderWriter {
 		main_scene.recalcCLNames();
 		main_scene.setFirstRepeated(firstRepeated);
 		
-		// This was already done by recalcCLNames() above, but this updates the listing with the firstRepeated info.
-		// TODO: Also done by setFirstRepeated() above; check whether below call is necessary.
-		main_scene.syncCVLMapping();
-		
 		return true;
 	}
 
