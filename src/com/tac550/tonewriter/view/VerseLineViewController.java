@@ -344,7 +344,7 @@ public class VerseLineViewController {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				chord.playMidi();
 			}
-		});
+		}); // TODO: Highlight chord in above pane on hover
 
 		// context menu for changing chord duration
 		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote);

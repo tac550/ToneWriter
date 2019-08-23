@@ -292,7 +292,6 @@ public class ChantChordController implements CommentableView {
 				loader.setLocation(MainApp.class.getResource("commentView.fxml"));
 				BorderPane rootLayout = loader.load();
 				CommentViewController controller = loader.getController();
-				controller.setParentView(this);
 				controller.setCommentText(commentString);
 				controller.setTargetText(String.format(Locale.US, "Chord: %s (%s)", getName(), getFields()));
 				
@@ -303,6 +302,7 @@ public class ChantChordController implements CommentableView {
 				commentStage.initModality(Modality.APPLICATION_MODAL);
 				commentStage.setResizable(false);
 				commentStage.show();
+				controller.setParentView(this);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
