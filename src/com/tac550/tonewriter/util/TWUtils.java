@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 public class TWUtils {
 	
@@ -13,10 +14,11 @@ public class TWUtils {
 	
 	// For converting Color objects to strings used to style UI elements.
     public static String toRGBCode(Color color) {
-        return String.format("#%02X%02X%02X",
-            (int) (color.getRed() * 255),
-            (int) (color.getGreen() * 255),
-            (int) (color.getBlue() * 255));
+        return String.format(Locale.US,
+		        "#%02X%02X%02X",
+		        (int) (color.getRed() * 255),
+		        (int) (color.getGreen() * 255),
+		        (int) (color.getBlue() * 255));
     }
 
 	// Strings

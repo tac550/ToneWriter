@@ -136,7 +136,8 @@ public class ChantChordController implements CommentableView {
 		return numText.getText();
 	}
 	public String getFields() {
-		return String.format("%s-%s-%s-%s",
+		return String.format(Locale.US,
+				"%s-%s-%s-%s",
 				SField.getText().isEmpty() ? " " : SField.getText(),
 				AField.getText().isEmpty() ? " " : AField.getText(),
 				TField.getText().isEmpty() ? " " : TField.getText(),
