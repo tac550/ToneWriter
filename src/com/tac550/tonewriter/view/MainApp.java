@@ -48,10 +48,11 @@ public class MainApp extends Application {
 	// Preferences object and key strings.
 	public static Preferences prefs;
 	static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";
-	public static final String PREFS_THOU_THY_ENABLED = "Thou-Thy-Enabled";
+	public static final String PREFS_THOU_THY = "Thou-Thy-Enabled";
 	public static final String PREFS_SAVE_LILYPOND_FILE = "Save-LP-File";
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
+	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,

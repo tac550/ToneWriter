@@ -93,12 +93,11 @@ public class ChantChordController implements CommentableView {
 	}
 	void setColor(Color color) {
 		chordColor = color;
-		for (Node node : new Node[] {preButton, posButton, SField, AField, TField, BField}) {
-			node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
-		}
+
+		setElementColor(chordColor);
 		
 		for (ChantChordController chord : prepsAndPosts) {
-			chord.setColor(color);
+			chord.setColor(chordColor);
 		}
 	}
 	Color getColor() {
@@ -325,6 +324,16 @@ public class ChantChordController implements CommentableView {
 		if (image != hoveredBubbleImage) {
 			commentButtonState = image;
 		}
+	}
+
+	private void setElementColor(Color color) {
+		for (Node node : new Node[] {preButton, posButton, SField, AField, TField, BField}) {
+			node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
+		}
+	}
+
+	void setHighlighted(boolean value) {
+		setElementColor(value ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
 	}
 
 }

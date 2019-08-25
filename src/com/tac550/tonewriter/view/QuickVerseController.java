@@ -41,7 +41,7 @@ public class QuickVerseController {
 	@FXML private void initialize() {
 
 		// Set text for youThouSwitch button.
-		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY_ENABLED, false)) {
+		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false)) {
 			youThouSwitch.setText("Switch to You/Your");
 		}
 		
@@ -147,12 +147,12 @@ public class QuickVerseController {
 	}
 	
 	@FXML private void handleSwitchYouThou() {
-		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY_ENABLED, false)) {
+		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false)) {
 			youThouSwitch.setText("Switch to Thou/Thy");
-			MainApp.prefs.putBoolean(MainApp.PREFS_THOU_THY_ENABLED, false);
+			MainApp.prefs.putBoolean(MainApp.PREFS_THOU_THY, false);
 		} else {
 			youThouSwitch.setText("Switch to You/Your");
-			MainApp.prefs.putBoolean(MainApp.PREFS_THOU_THY_ENABLED, true);
+			MainApp.prefs.putBoolean(MainApp.PREFS_THOU_THY, true);
 		}
 		
 		refreshVerses();

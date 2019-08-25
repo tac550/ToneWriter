@@ -13,7 +13,7 @@ public class QuickVerseIO {
 	public static ArrayList<String> getBuiltinVerses() throws IOException {
 		ArrayList<String> finalList = new ArrayList<>();
 
-		InputStream stream = LilyPondWriter.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY_ENABLED, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
+		InputStream stream = LilyPondWriter.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
 		InputStreamReader inputReader = new InputStreamReader(stream);
 		BufferedReader bufferedReader = new BufferedReader(inputReader);
 
@@ -117,7 +117,7 @@ public class QuickVerseIO {
 
 	private static File getPlatformSpecificVerseFile() {
 		String fileNameString = File.separator + MainApp.APP_NAME + File.separator +
-				(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY_ENABLED, false) ? "CustomVersesTT.txt" : "CustomVersesYY.txt");
+				(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "CustomVersesTT.txt" : "CustomVersesYY.txt");
 
 		if (MainApp.OS_NAME.startsWith("win")) {
 			return new File(System.getenv("APPDATA") + fileNameString);

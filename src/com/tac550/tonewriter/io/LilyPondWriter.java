@@ -462,8 +462,8 @@ public class LilyPondWriter {
 
 					// Delete the lilypond file if the option to save it isn't set
 					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
-						if (lilypondFile.delete()) {
-							System.out.println("Failed to delete LilyPond file!");
+						if (!lilypondFile.delete()) {
+							System.out.println("Failed to delete LilyPond file, continuing...");
 						}
 					}
 
@@ -545,7 +545,8 @@ public class LilyPondWriter {
 
 			for (String tNote : tiedNotes) {
 				// Make recursive calls if there are multiple notes combined with a tie or ties.
-				totalDuration += getBeatDuration(tNote);
+				System.out.println("Recursing!! (probably bad news)");
+				totalDuration += getBeatDuration(tNote); // TODO: Investigate this, seems to always StackOverFlow
 			}
 
 			return totalDuration;

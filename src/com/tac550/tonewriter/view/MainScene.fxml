@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -21,7 +22,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <center>
@@ -150,9 +153,11 @@
           </Menu>
           <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit">
             <items>
-              <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Line" />
+              <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
                   <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
                   <MenuItem fx:id="setComposerMenuItem" mnemonicParsing="false" onAction="#handleSetComposerText" text="Set Composer Text..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#syncCVLMapping" text="Assign Phrases Manually" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Tools">
@@ -162,13 +167,54 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Options">
                <items>
-                  <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
-                  <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#syncCVLMapping" text="Manually Assign Chant Lines" />
-                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File" />
+                  <CustomMenuItem mnemonicParsing="false" text="Output Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Output" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File With PDF" />
                   <MenuItem mnemonicParsing="false" onAction="#handleSetPaperSize" text="Set Paper Size..." />
-                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CustomMenuItem mnemonicParsing="false" text="LilyPond Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="LilyPond" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
                   <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
                   <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use default)" />
+                  <CustomMenuItem mnemonicParsing="false" text="Interface Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Interface" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
+                  <CheckMenuItem fx:id="hoverHighlightMenuItem" mnemonicParsing="false" selected="true" text="Hover Highlighting" />
                   <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                </items>
             </Menu>

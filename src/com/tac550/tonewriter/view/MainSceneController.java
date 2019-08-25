@@ -70,8 +70,9 @@ public class MainSceneController {
 	@FXML private MenuItem setComposerMenuItem;
 
 	@FXML private Menu editMenu;
-	@FXML private CheckMenuItem playMidiMenuItem;
 	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
+	@FXML private CheckMenuItem playMidiMenuItem;
+	@FXML private CheckMenuItem hoverHighlightMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
@@ -159,6 +160,11 @@ public class MainSceneController {
 		composerIcon.setFitWidth(iconSize);
 		setComposerMenuItem.setGraphic(composerIcon);
 
+		ImageView manualAssignIcon = new ImageView(getClass().getResource("/media/tag-alt.png").toExternalForm());
+		manualAssignIcon.setFitHeight(iconSize);
+		manualAssignIcon.setFitWidth(iconSize);
+		manualCLAssignmentMenuItem.setGraphic(manualAssignIcon);
+
 		ImageView pdfIcon = new ImageView(getClass().getResource("/media/file-pdf.png").toExternalForm());
 		pdfIcon.setFitHeight(iconSize);
 		pdfIcon.setFitWidth(iconSize);
@@ -185,11 +191,16 @@ public class MainSceneController {
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 
+		// Hover Highlight menu item behavior and initial state
+		hoverHighlightMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, true));
+		hoverHighlightMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, newVal));
+
 		// Dark Mode menu item behavior and initial state
 		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
 		setDarkModeEnabled(MainApp.darkModeEnabled());
 		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
-			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, darkModeMenuItem.isSelected());
+			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
 			setDarkModeEnabled(newVal);
 		});
 
@@ -943,6 +954,9 @@ public class MainSceneController {
 
 	boolean playMidiAsAssigned() {
 		return playMidiMenuItem.isSelected();
+	}
+	boolean hoverHighlightEnabled() {
+		return hoverHighlightMenuItem.isSelected();
 	}
 
 	private void setDarkModeEnabled(boolean value) {
