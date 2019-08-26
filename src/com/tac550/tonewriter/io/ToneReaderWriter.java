@@ -6,6 +6,7 @@ import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.CheckMenuItem;
 import org.apache.commons.text.TextStringBuilder;
 
 import java.io.File;
@@ -14,25 +15,31 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class ToneReaderWriter {
 
 	private ArrayList<ChantLineViewController> chantLines;
 
 	private String composerText;
-
 	private String keySig;
+	private CheckMenuItem manualCLAssignmentMenuItem;
 
 	private MainSceneController mainScene;
 
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, String key, String composer) {
+	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment,
+	                        String key, String composer) {
 		chantLines = lines;
+		manualCLAssignmentMenuItem = manual_assignment;
 		keySig = key;
 		composerText = composer;
 	}
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines) {
+	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment) {
 		chantLines = lines;
+		manualCLAssignmentMenuItem = manual_assignment;
 	}
 
 	public boolean saveTone(File toneFile) {
@@ -53,6 +60,7 @@ public class ToneReaderWriter {
 			printWriter.println("Key Signature: " +
 					keySig.replace("♯", "s").replace("♭", "f"));
 			printWriter.println("Composer Text: " + composerText);
+			printWriter.println("Manually Assign Phrases: " + manualCLAssignmentMenuItem.isSelected());
 			printWriter.println();
 			printWriter.println();
 
@@ -130,14 +138,21 @@ public class ToneReaderWriter {
 			// Load entire tone file and split it as necessary
 			TextStringBuilder fileStringBuilder = new TextStringBuilder();
 			Files.lines(toneFile.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
+			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
-			String[] headerAndFooter = String.join("\n", sections[0], sections[2]).split("\\r?\\n");
+			String[] header = sections[0].split("\\r?\\n");
+			// Double newlines delimit chant lines
 			String[] chantLines = sections[1].split("\\r?\\n\\r?\\n");
+			String[] footer = sections[2].split("\\r?\\n");
 
-			versionSaved = Float.parseFloat(headerAndFooter[0].split(":")[1].trim());
-			keySig = headerAndFooter[1].split(":")[1].trim().replace("s", "♯").replace("f", "♭");
-			composerText = headerAndFooter[2].split(":")[1].trim();
-			firstRepeated = headerAndFooter[3].split(":")[1].trim();
+			versionSaved = Float.parseFloat(tryReadingLine(header, 0, "0"));
+			keySig = tryReadingLine(header, 1, "C major")
+					.replace("s", "♯").replace("f", "♭");
+			composerText = tryReadingLine(header, 2, "");
+			manualCLAssignmentMenuItem.setSelected(
+					Boolean.parseBoolean(tryReadingLine(header, 3, "false")));
+
+			firstRepeated = tryReadingLine(footer, 0, "");
 
 			// Version checking
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
@@ -148,6 +163,13 @@ public class ToneReaderWriter {
 						MainApp.APP_NAME));
 				
 				alert.showAndWait();
+			} else if (versionSaved == 0) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setHeaderText("Error loading tone file; it appears to be corrupted");
+
+				alert.showAndWait();
+				return false;
 			}
 			
 			// Loading chant lines
@@ -169,6 +191,18 @@ public class ToneReaderWriter {
 		main_scene.setFirstRepeated(firstRepeated);
 		
 		return true;
+	}
+
+	private String tryReadingLine(String[] section, int line_index, String default_value) {
+
+		if (line_index < section.length && section[line_index].contains(":")) {
+			String[] elements = section[line_index].split(":");
+
+			// Always return the last element or empty string if there is nothing after the only ":" in the line.
+			return elements[elements.length - 1].trim();
+		}
+
+		return default_value;
 	}
 
 	private void readChantLine(String chantLine) throws IOException {

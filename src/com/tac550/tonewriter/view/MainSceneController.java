@@ -499,7 +499,7 @@ public class MainSceneController {
 		if (selectedFile.exists()) {
 			toneFile = selectedFile;
 
-			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers);
+			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem);
 
 			if (toneReader.loadTone(this, toneFile)) {
 				return true;
@@ -573,7 +573,8 @@ public class MainSceneController {
 	@FXML void handleSave() {
 		if (toneFile == null || saveDisabled()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, currentKey, composerText);
+		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
+				composerText);
 		if (!toneWriter.saveTone(toneFile)) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
