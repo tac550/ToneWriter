@@ -581,7 +581,7 @@ public class LilyPondWriter {
 		// This pattern looks for note names in the note_data.
 		Pattern p = Pattern.compile("[abcdefg]");
 		Matcher m = p.matcher(note_data);
-		// Set until we encounter the first match.
+		// Set until we encounter the first match (first note letter).
 		boolean first = true;
 		// Set when we encounter the end of the note group (if that's what we were given)
 		boolean closeGroupFlag;
@@ -590,52 +590,61 @@ public class LilyPondWriter {
 			closeGroupFlag = false;
 			int position = m.start();
 
-			// Continue to the next match if this is an add-on character after a the note name
-			// such as an "f" to indicate flat.
+			/*
+			 * Continue to the next match if this is an add-on character after a note name,
+			 * such as an "f" to indicate flat.
+			 */
 			if (!first && note_data.substring(position - 1, position).matches("[abcdefg]")) {
 				continue;
 			}
 			first = false;
 
 			String workingOctave = octave_data;
-			String workingSection;
+			StringBuilder workingSection;
 			// If the note data contains its first space after the position of the match...
-			if (note_data.contains(" ") && note_data.indexOf(" ") > position) {
+			if (note_data.contains(" ")
+					&& note_data.indexOf(" ") > position) {
 				// The working section goes from the match to the next space.
-				workingSection = note_data.substring(position - 1, note_data.indexOf(" "));
+				workingSection = new StringBuilder(note_data.substring(position - 1, note_data.indexOf(" ")));
 				// If the note data contains no spaces but does contain a note group ending...
 			} else if (note_data.contains(">")) {
 				// Working section ends before end of group.
-				workingSection = note_data.substring(position, note_data.indexOf(">"));
+				workingSection = new StringBuilder(note_data.substring(position, note_data.indexOf(">")));
 				closeGroupFlag = true;
 				// Otherwise...
 			} else {
 				// Working section goes to the end.
-				workingSection = note_data.substring(position);
+				workingSection = new StringBuilder(note_data.substring(position));
 			}
 
-			int commaCount = TWUtils.countOccurrences(workingSection, ",");
-			int apostropheCount = TWUtils.countOccurrences(workingSection, "'");
+			int commaCount = TWUtils.countOccurrences(workingSection.toString(), ",");
+			int apostropheCount = TWUtils.countOccurrences(workingSection.toString(), "'");
 			boolean octave_up = workingOctave.contains("'");
 			boolean octave_down = workingOctave.contains(",");
 
-			// For each comma found...
-			for (int i = 0; i < commaCount; i++) {
-				// If we're transposing up...
-				if (octave_up) {
-					// Remove a comma from the note and a quote from the octave.
-					workingSection = workingSection.replaceFirst(",", "");
-					workingOctave = workingOctave.replaceFirst("'", "");
+			// For each quote in the octave data...
+			while (workingOctave.contains("'")) {
+				// Remove one quote.
+				workingOctave = workingOctave.replaceFirst("'", "");
+				if (workingSection.toString().contains(",")) { // If we've got comma(s) in the note data...
+					// Remove a comma from the note.
+					workingSection = new StringBuilder(workingSection.toString().replaceFirst(",", ""));
+				} else { // If we don't have commas in the note data...
+					// Add a quote to the note.
+					workingSection.append("'");
 				}
 			}
 
-			// for each quote found...
-			for (int i = 0; i < apostropheCount; i++) {
-				// If we're transposing down...
-				if (octave_down) {
-					// Remove a quote from the note and a comma from the octave.
-					workingSection = workingSection.replaceFirst("'", "");
-					workingOctave = workingOctave.replaceFirst(",", "");
+			// for each comma in the octave data...
+			while (workingOctave.contains(",")) {
+				// Remove one comma.
+				workingOctave = workingOctave.replaceFirst(",", "");
+				if (workingSection.toString().contains("'")) { // If we've got quote(s) in the note data...
+					// Remove a quote from the note.
+					workingSection = new StringBuilder(workingSection.toString().replaceFirst("'", ""));
+				} else { // If we don't have quotes in the note data...
+					// Add a comma to the note.
+					workingSection.append(",");
 				}
 			}
 
