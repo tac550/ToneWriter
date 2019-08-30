@@ -1,0 +1,28 @@
+VERSION: 0.5
+Key Signature: G major
+Composer Text: 
+Manually Assign Phrases: false
+
+
+A
+1: g-d-b,-g
+2: b-g-d-g
+	Prep: a-fs-d-d
+3: c'-g-e-c
+	Post: c'-g-e-e
+4: b-g-d-g
+5: a-fs-c-d
+END: g-d-b,-g
+
+Cadence
+1: g-d-b,-g
+2: b-g-d-g
+	Prep: a-fs-d-d
+3: c'-g-e-c
+	Post: c'-g-e-e
+4: b-g-d-g
+5: a-fs-c-d
+END: g-d-b,-<g g,>
+
+
+First Repeated: 

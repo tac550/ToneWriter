@@ -329,7 +329,7 @@ public class MainSceneController {
 					currentLetter++;
 				}
 			} else {
-				chantLine.makeCadence();
+				chantLine.makeCadence(); // TODO: Investigate why this isn't working if the cadence line was removed
 				// If this is not the only chant line...
 				if (prevMainLine != null) {
 					prevMainLine.setNumAlts(alternateCount - 1);
