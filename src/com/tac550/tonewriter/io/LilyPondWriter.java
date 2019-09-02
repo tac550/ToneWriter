@@ -2,8 +2,10 @@ package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
-import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.*;
+import com.tac550.tonewriter.view.MainApp;
+import com.tac550.tonewriter.view.MainSceneController;
+import com.tac550.tonewriter.view.SyllableText;
+import com.tac550.tonewriter.view.VerseLineViewController;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.apache.commons.io.FilenameUtils;
@@ -616,11 +618,6 @@ public class LilyPondWriter {
 				// Working section goes to the end.
 				workingSection = new StringBuilder(note_data.substring(position));
 			}
-
-			int commaCount = TWUtils.countOccurrences(workingSection.toString(), ",");
-			int apostropheCount = TWUtils.countOccurrences(workingSection.toString(), "'");
-			boolean octave_up = workingOctave.contains("'");
-			boolean octave_down = workingOctave.contains(",");
 
 			// For each quote in the octave data...
 			while (workingOctave.contains("'")) {
