@@ -20,25 +20,25 @@ noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \
 soprano = {
   \global
   c''4
-  
+
 }
 
 alto = {
   \global
   c'4
-  
+
 }
 
 tenor = {
   \global
   c'4
-  
+
 }
 
 bass = {
   \global
   c4
-  
+
 }
 
 verse = \lyricmode {
@@ -63,7 +63,7 @@ verse = \lyricmode {
     \new Lyrics \with {
       \override VerticalAxisGroup #'staff-affinity = #CENTER
     } \lyricsto "soprano" \verse
-    
+
     \new Staff \with {
       \once \override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves
       midiInstrument = #"choir aahs"
@@ -73,7 +73,7 @@ verse = \lyricmode {
       \new Voice { \voiceTwo \bass }
     >>
   >>
-  
+
   \layout {
     \context {
       \Score
@@ -81,9 +81,9 @@ verse = \lyricmode {
       \remove "Bar_number_engraver" % removes the bar numbers at the start of each system
     }
   }
-  
+
 }
 
 
-  
+
 
