@@ -46,11 +46,11 @@ verse = \lyricmode {
 
 
 }
-
-
-  
-
-
+\paper {
+    oddHeaderMarkup = \markup {
+        \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:subtitle " "} }
+        evenHeaderMarkup = \oddHeaderMarkup
+}
 \score {
   \new ChoirStaff <<
     \new Staff \with {
