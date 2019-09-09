@@ -70,10 +70,12 @@ public class LilyPondWriter {
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7, "  subtitle = \"" + title + "\"");
 		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
-		lines.set(9, "  composer = \"" + composer + "\"");
+		String[] headerParts = composer.split("-", 2);
+		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
+		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : headerParts[0].trim()) + "\"");
 
 		// Adding key signature info.
-		lines.set(13, keySignatureToLilyPond(keySignature));
+		lines.set(14, keySignatureToLilyPond(keySignature));
 
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
@@ -426,7 +428,7 @@ public class LilyPondWriter {
 			} else {
 				// If it's the first line, put its time signature in the header instead.
 				verseText.append(verseLine);
-				lines.set(13, String.format(Locale.US, "  \\time %d/4", finalBeats));
+				lines.set(15, String.format(Locale.US, "  \\time %d/4", finalBeats));
 			}
 
 			// Add a barline after each verse line
@@ -438,21 +440,21 @@ public class LilyPondWriter {
 		// WRITING LINES OUT TO FINAL BUFFER
 
 		// Add a double barline at the end of the page.
-		lines.set(21, parts[PART_SOPRANO] + " \\bar \"||\"");
-		lines.set(27, parts[PART_ALTO]);
-		lines.set(33, parts[PART_TENOR]);
-		lines.set(39, parts[PART_BASS]);
-		lines.set(45, verseText.toString());
+		lines.set(22, parts[PART_SOPRANO] + " \\bar \"||\"");
+		lines.set(28, parts[PART_ALTO]);
+		lines.set(34, parts[PART_TENOR]);
+		lines.set(40, parts[PART_BASS]);
+		lines.set(46, verseText.toString());
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(49, "\\markup {");
-			lines.set(50, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
-			lines.set(51, "}");
+			lines.set(50, "\\markup {");
+			lines.set(51, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(52, "}");
 		}
 		if (!bottomReader.isEmpty()) {
-			lines.set(86, "\\markup {");
-			lines.set(87, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
-			lines.set(88, "}");
+			lines.set(87, "\\markup {");
+			lines.set(88, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(89, "}");
 		}
 
 		// Write the file back out.

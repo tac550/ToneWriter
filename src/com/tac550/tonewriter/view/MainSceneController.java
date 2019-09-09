@@ -67,7 +67,7 @@ public class MainSceneController {
 
 	@FXML private MenuItem addCLMenuItem;
 	@FXML private MenuItem setKeyMenuItem;
-	@FXML private MenuItem setComposerMenuItem;
+	@FXML private MenuItem editHeaderInfoMenuItem;
 
 	@FXML private Menu editMenu;
 	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
@@ -159,7 +159,7 @@ public class MainSceneController {
 		ImageView composerIcon = new ImageView(getClass().getResource("/media/profile.png").toExternalForm());
 		composerIcon.setFitHeight(iconSize);
 		composerIcon.setFitWidth(iconSize);
-		setComposerMenuItem.setGraphic(composerIcon);
+		editHeaderInfoMenuItem.setGraphic(composerIcon);
 
 		ImageView manualAssignIcon = new ImageView(getClass().getResource("/media/tag-alt.png").toExternalForm());
 		manualAssignIcon.setFitHeight(iconSize);
@@ -653,11 +653,11 @@ public class MainSceneController {
 		result.ifPresent(this::setCurrentKey);
 	}
 
-	@FXML private void handleSetComposerText() {
+	@FXML private void handleEditHeaderInfo() {
 
 		TextInputDialog dialog = new TextInputDialog(composerText); // Initial text is existing composer text, if any.
-		dialog.setTitle("Composer Text");
-		dialog.setHeaderText("Set composer text (usually tone number and name of the system)");
+		dialog.setTitle("Header Info");
+		dialog.setHeaderText("Input header info (formatted \"Tone # - Composer/System\")");
 		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 

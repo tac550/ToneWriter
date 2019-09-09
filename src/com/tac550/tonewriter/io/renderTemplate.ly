@@ -7,6 +7,7 @@
 \header {
   subtitle = ""
   subsubtitle = ""
+  poet = ""
   composer = ""
 }
 
