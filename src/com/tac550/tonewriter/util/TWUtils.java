@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 public class TWUtils {
-	
+
 	// Color
-	
+
 	// For converting Color objects to strings used to style UI elements.
     public static String toRGBCode(Color color) {
         return String.format(Locale.US,
@@ -22,15 +22,15 @@ public class TWUtils {
     }
 
 	// Strings
-	public static int countOccurrences(String string, String single_character) {
-		return string.length() - string.replace(single_character, "").length();
-	}
-	
+//	public static int countOccurrences(String string, String single_character) {
+//		return string.length() - string.replace(single_character, "").length();
+//	}
+
 	// I/O
 	public static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		
+
 		return new String(encoded, encoding);
 	}
-	
+
 }

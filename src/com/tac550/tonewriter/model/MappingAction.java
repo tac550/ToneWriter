@@ -12,5 +12,5 @@ public class MappingAction {
 	public int previousLastSyllableAssigned;
 	public ArrayList<Button> buttons = new ArrayList<>();
 	public ArrayList<SyllableText> syllableTexts = new ArrayList<>();
-	
+
 }

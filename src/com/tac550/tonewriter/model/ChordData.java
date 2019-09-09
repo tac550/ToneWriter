@@ -8,13 +8,13 @@ public class ChordData {
 	private String syllable;
 	private ChantChordController chord;
 	private String duration;
-	
+
 	public ChordData(String syllable_data, ChantChordController chord_data) {
 		syllable = syllable_data;
 		chord = chord_data;
 		duration = "4";
 	}
-	
+
 	public String getSyllable() {
 		return syllable;
 	}
@@ -25,7 +25,7 @@ public class ChordData {
 	public void setDuration(String new_duration) {
 		duration = new_duration;
 	}
-	
+
 	public String getPart(int part_index) {
 		switch (part_index) {
 
@@ -44,9 +44,9 @@ public class ChordData {
 		default:
 			return "";
 		}
-		
+
 	}
-	
+
 	private String getSoprano() {
 		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[0],
 				LilyPondWriter.ADJUSTMENT_SOPRANO) + duration;
@@ -63,5 +63,5 @@ public class ChordData {
 		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[3],
 				LilyPondWriter.ADJUSTMENT_BASS) + duration;
 	}
-	
+
 }
