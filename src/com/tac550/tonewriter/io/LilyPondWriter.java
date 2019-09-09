@@ -37,7 +37,8 @@ public class LilyPondWriter {
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      String title, String composer, String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
+	                                      String title, String subtitle, String composer,
+	                                      String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
@@ -68,10 +69,11 @@ public class LilyPondWriter {
 		// Adding paper size, title, and composer info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7, "  subtitle = \"" + title + "\"");
-		lines.set(8, "  composer = \"" + composer + "\"");
+		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
+		lines.set(9, "  composer = \"" + composer + "\"");
 
 		// Adding key signature info.
-		lines.set(12, keySignatureToLilyPond(keySignature));
+		lines.set(13, keySignatureToLilyPond(keySignature));
 
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
@@ -436,21 +438,21 @@ public class LilyPondWriter {
 		// WRITING LINES OUT TO FINAL BUFFER
 
 		// Add a double barline at the end of the page.
-		lines.set(20, parts[PART_SOPRANO] + " \\bar \"||\"");
-		lines.set(26, parts[PART_ALTO]);
-		lines.set(32, parts[PART_TENOR]);
-		lines.set(38, parts[PART_BASS]);
-		lines.set(44, verseText.toString());
+		lines.set(21, parts[PART_SOPRANO] + " \\bar \"||\"");
+		lines.set(27, parts[PART_ALTO]);
+		lines.set(33, parts[PART_TENOR]);
+		lines.set(39, parts[PART_BASS]);
+		lines.set(45, verseText.toString());
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(48, "\\markup {");
-			lines.set(49, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
-			lines.set(50, "}");
+			lines.set(49, "\\markup {");
+			lines.set(50, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(51, "}");
 		}
 		if (!bottomReader.isEmpty()) {
-			lines.set(85, "\\markup {");
-			lines.set(86, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
-			lines.set(87, "}");
+			lines.set(86, "\\markup {");
+			lines.set(87, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(88, "}");
 		}
 
 		// Write the file back out.

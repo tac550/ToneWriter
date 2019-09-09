@@ -55,9 +55,10 @@
                            <children>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <HBox>
+                                    <HBox spacing="5.0">
                                        <children>
                                           <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="subtitleTextField" alignment="CENTER" promptText="Subtitle" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                     <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">

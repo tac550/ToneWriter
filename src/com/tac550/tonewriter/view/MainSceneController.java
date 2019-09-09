@@ -86,6 +86,7 @@ public class MainSceneController {
 	@FXML private TextField verseTopField;
 	@FXML private Button verseTopButton;
 	@FXML private TextField titleTextField;
+	@FXML private TextField subtitleTextField;
 	@FXML private ChoiceBox<String> verseBottomChoice;
 	@FXML private TextField verseBottomField;
 	@FXML private Button verseBottomButton;
@@ -882,8 +883,8 @@ public class MainSceneController {
 
 		try {
 			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					titleTextField.getText(), composerText, verseTopChoice.getValue(), verseTopField.getText(),
-					verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
+					titleTextField.getText(), subtitleTextField.getText(), composerText, verseTopChoice.getValue(),
+					verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
 				alert.setHeaderText("An error occurred while saving!");
