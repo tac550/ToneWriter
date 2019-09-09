@@ -56,7 +56,7 @@ public class MainSceneController {
 	private File toneFile;
 
 	private String currentKey = "C major";
-	private String composerText = "";
+	private String headerText = "";
 	private String paperSize = "";
 
 	@FXML private MenuItem newToneMenuItem;
@@ -242,8 +242,8 @@ public class MainSceneController {
 		currentKey = key;
 		refreshChordKeySignatures(currentKey);
 	}
-	public void setComposerText(String text) {
-		composerText = text;
+	public void setHeaderText(String text) {
+		headerText = text;
 	}
 
 	private void setPaperSize(String size) {
@@ -546,7 +546,7 @@ public class MainSceneController {
 			saveToneAsMenuItem.setDisable(false);
 
 			// Reset settings pertaining to any previously-loaded tone
-			composerText = "";
+			headerText = "";
 			currentKey = "C major";
 			manualCLAssignmentMenuItem.setSelected(false);
 
@@ -580,7 +580,7 @@ public class MainSceneController {
 		if (toneFile == null || saveDisabled()) return;
 
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
-				composerText);
+				headerText);
 		if (!toneWriter.saveTone(toneFile)) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -655,13 +655,13 @@ public class MainSceneController {
 
 	@FXML private void handleEditHeaderInfo() {
 
-		TextInputDialog dialog = new TextInputDialog(composerText); // Initial text is existing composer text, if any.
+		TextInputDialog dialog = new TextInputDialog(headerText); // Initial text is existing composer text, if any.
 		dialog.setTitle("Header Info");
 		dialog.setHeaderText("Input header info (formatted \"Tone # - Composer/System\")");
 		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(text -> composerText = text);
+		result.ifPresent(text -> headerText = text);
 	}
 
 	/*
@@ -883,7 +883,7 @@ public class MainSceneController {
 
 		try {
 			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					titleTextField.getText(), subtitleTextField.getText(), composerText, verseTopChoice.getValue(),
+					titleTextField.getText(), subtitleTextField.getText(), headerText, verseTopChoice.getValue(),
 					verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");

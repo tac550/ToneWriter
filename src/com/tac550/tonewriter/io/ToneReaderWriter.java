@@ -186,7 +186,7 @@ public class ToneReaderWriter {
 		}
 
 		main_scene.setCurrentKey(keySig);
-		main_scene.setComposerText(composerText);
+		main_scene.setHeaderText(composerText);
 		main_scene.recalcCLNames();
 		main_scene.setFirstRepeated(firstRepeated);
 		

@@ -37,7 +37,7 @@ public class LilyPondWriter {
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      String title, String subtitle, String composer,
+	                                      String title, String subtitle, String header,
 	                                      String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
@@ -66,13 +66,13 @@ public class LilyPondWriter {
 		// The buffer in which we'll store the output file as we build it.
 		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		// Adding paper size, title, and composer info.
+		// Adding paper size, title, and header info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7, "  subtitle = \"" + title + "\"");
 		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
-		String[] headerParts = composer.split("-", 2);
+		String[] headerParts = header.split("-", 2);
 		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
-		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
+		lines.set(10, "  header = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
 
 		// Adding key signature info.
 		lines.set(14, keySignatureToLilyPond(keySignature));
