@@ -57,7 +57,7 @@ public class LilyPondWriter {
 
 		// Copy the chord template file, the basis for all our LilyPond output files, to the output path.
 		try {
-			ExportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			exportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -447,14 +447,14 @@ public class LilyPondWriter {
 		lines.set(46, verseText.toString());
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(50, "\\markup {");
-			lines.set(51, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
-			lines.set(52, "}");
+			lines.set(55, "\\markup {");
+			lines.set(56, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(57, "}");
 		}
 		if (!bottomReader.isEmpty()) {
-			lines.set(87, "\\markup {");
-			lines.set(88, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
-			lines.set(89, "}");
+			lines.set(92, "\\markup {");
+			lines.set(93, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(94, "}");
 		}
 
 		// Write the file back out.
@@ -662,7 +662,7 @@ public class LilyPondWriter {
 	}
 
 	// Copies internal file on the classpath to an external location.
-	public static void ExportResource(String resourceName, String outFilePath) throws Exception {
+	public static void exportResource(String resourceName, String outFilePath) throws Exception {
 		InputStream stream = null;
 		OutputStream resStreamOut = null;
 		try {
@@ -776,7 +776,7 @@ public class LilyPondWriter {
 					"-chord.ly");
 			tempFile.deleteOnExit();
 
-			LilyPondWriter.ExportResource("chordTemplate.ly", tempFile.getAbsolutePath());
+			LilyPondWriter.exportResource("chordTemplate.ly", tempFile.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

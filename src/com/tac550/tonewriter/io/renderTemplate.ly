@@ -52,6 +52,11 @@ verse = \lyricmode {
         \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:subtitle " "} }
         evenHeaderMarkup = \oddHeaderMarkup
 }
+
+%{
+This area reserved for top reader text
+%}
+
 \score {
   \new ChoirStaff <<
     \new Staff \with {
@@ -85,6 +90,6 @@ verse = \lyricmode {
 
 }
 
-
-
-
+%{
+This area reserved for bottom reader text
+%}

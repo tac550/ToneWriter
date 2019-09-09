@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -199,7 +198,7 @@ public class MainApp extends Application {
 		outputFile.deleteOnExit();
 
 		try {
-			LilyPondWriter.ExportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			LilyPondWriter.exportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
