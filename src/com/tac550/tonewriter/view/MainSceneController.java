@@ -544,6 +544,11 @@ public class MainSceneController {
 			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
 
+			// Reset settings pertaining to any previously-loaded tone
+			composerText = "";
+			currentKey = "C major";
+			manualCLAssignmentMenuItem.setSelected(false);
+
 			createChantLine(false);
 			createChantLine(true);
 			updateStageTitle();
