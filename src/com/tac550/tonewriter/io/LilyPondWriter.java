@@ -74,8 +74,10 @@ public class LilyPondWriter {
 		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
 		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
 
+		lines.set(12, lines.get(12).replace("$VERSION", MainApp.APP_VERSION));
+
 		// Adding key signature info.
-		lines.set(14, keySignatureToLilyPond(keySignature));
+		lines.set(16, keySignatureToLilyPond(keySignature));
 
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
@@ -428,7 +430,7 @@ public class LilyPondWriter {
 			} else {
 				// If it's the first line, put its time signature in the header instead.
 				verseText.append(verseLine);
-				lines.set(15, String.format(Locale.US, "  \\time %d/4", finalBeats));
+				lines.set(17, String.format(Locale.US, "  \\time %d/4", finalBeats));
 			}
 
 			// Add a barline after each verse line
@@ -440,21 +442,21 @@ public class LilyPondWriter {
 		// WRITING LINES OUT TO FINAL BUFFER
 
 		// Add a double barline at the end of the page.
-		lines.set(22, parts[PART_SOPRANO] + " \\bar \"||\"");
-		lines.set(28, parts[PART_ALTO]);
-		lines.set(34, parts[PART_TENOR]);
-		lines.set(40, parts[PART_BASS]);
-		lines.set(46, verseText.toString());
+		lines.set(24, parts[PART_SOPRANO] + " \\bar \"||\"");
+		lines.set(30, parts[PART_ALTO]);
+		lines.set(36, parts[PART_TENOR]);
+		lines.set(42, parts[PART_BASS]);
+		lines.set(48, verseText.toString());
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(55, "\\markup {");
-			lines.set(56, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
-			lines.set(57, "}");
+			lines.set(57, "\\markup {");
+			lines.set(58, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(59, "}");
 		}
 		if (!bottomReader.isEmpty()) {
-			lines.set(92, "\\markup {");
-			lines.set(93, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
-			lines.set(94, "}");
+			lines.set(94, "\\markup {");
+			lines.set(95, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(96, "}");
 		}
 
 		// Write the file back out.
@@ -474,8 +476,9 @@ public class LilyPondWriter {
 					}
 
 				} catch (Exception e) {
-					// If the final rendered PDF can't be opened, open the folder instead.
-					e.printStackTrace();
+					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
+					// if it's not set to be saved).
+//					e.printStackTrace();
 					try {
 						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
 					} catch (IOException e1) {
