@@ -72,7 +72,7 @@ public class LilyPondWriter {
 		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
 		String[] headerParts = composer.split("-", 2);
 		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
-		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : headerParts[0].trim()) + "\"");
+		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
 
 		// Adding key signature info.
 		lines.set(14, keySignatureToLilyPond(keySignature));
