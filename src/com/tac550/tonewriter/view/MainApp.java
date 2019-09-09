@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -40,7 +41,7 @@ public class MainApp extends Application {
 
 	// Splash screen stuff
 	private static final Effect frostEffect =
-			new BoxBlur(10, 10, 3);
+			new GaussianBlur(40);
 	private static final Stage splashStage = new Stage();
 	private static final ImageView splashBackground = new ImageView();
 	private static final StackPane splashPane = new StackPane();
