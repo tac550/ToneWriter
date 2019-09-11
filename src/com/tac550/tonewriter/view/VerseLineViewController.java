@@ -198,6 +198,7 @@ public class VerseLineViewController {
 
 		for (SyllableText text : action.syllableTexts) {
 			text.removeLastChord();
+			text.reactivate();
 		}
 
 		lastSyllableAssigned = action.previousLastSyllableAssigned;
