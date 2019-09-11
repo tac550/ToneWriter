@@ -53,8 +53,12 @@ public class SyllableText extends Text {
 		setOnMouseClicked((event) -> {
 			if (active) {
 				if (event.getButton() == MouseButton.PRIMARY) {
+					parentController.syllableUnHovered();
+
 					clicked = true;
 					parentController.syllableClicked(this);
+
+					parentController.syllableHovered();
 				} else {
 					parentController.syllableAltClicked();
 				}
