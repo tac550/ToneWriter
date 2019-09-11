@@ -24,10 +24,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.*;
 
 /*
@@ -908,19 +908,14 @@ public class MainSceneController {
 	}
 
 	private boolean getNewRenderFilename() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setInitialDirectory(currentSavingDirectory);
-		File savingDirectory = directoryChooser.showDialog(mainStage);
-		if (savingDirectory == null) return false;
-		else currentSavingDirectory = savingDirectory;
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(currentSavingDirectory);
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf"));
+		File PDFFile = fileChooser.showSaveDialog(mainStage);
+		if (PDFFile == null) return false;
+		else currentSavingDirectory = PDFFile.getParentFile();
 
-		TextInputDialog dialog = new TextInputDialog();
-		dialog.setTitle("Name Output");
-		dialog.setHeaderText("Name the output file(s)");
-		dialog.initOwner(mainStage);
-		Optional<String> result = dialog.showAndWait();
-
-		currentRenderFileName = result.orElse(MainApp.APP_NAME + "-OUTPUT-" + new Timestamp(System.currentTimeMillis()).toString());
+		currentRenderFileName = FilenameUtils.removeExtension(PDFFile.getName());
 
 		return true;
 	}
