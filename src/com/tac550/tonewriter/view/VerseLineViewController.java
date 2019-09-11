@@ -260,6 +260,8 @@ public class VerseLineViewController {
 	}
 
 	void syllableClicked(SyllableText clicked_text) {
+		if (currentChord ==  null) return;
+
 		// First, play the chord if chord playing is on.
 		if (parentController.playMidiAsAssigned()) {
 			currentChord.playMidi();
@@ -308,15 +310,18 @@ public class VerseLineViewController {
 		undoActions.push(undoFrame);
 	}
 	void syllableAltClicked() {
+		if (currentChord ==  null) return;
 		currentChord.playMidi();
 	}
 
 	void syllableHovered() {
+		if (currentChord ==  null) return;
 		if (parentController.hoverHighlightEnabled()) {
 			currentChord.setHighlighted(true);
 		}
 	}
 	void syllableUnHovered() {
+		if (currentChord ==  null) return;
 		currentChord.setHighlighted(false);
 	}
 
