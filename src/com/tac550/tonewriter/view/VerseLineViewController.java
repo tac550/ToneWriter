@@ -306,6 +306,18 @@ public class VerseLineViewController {
 
 		undoActions.push(undoFrame);
 	}
+	void syllableAltClicked() {
+		currentChord.playMidi();
+	}
+
+	void syllableHovered() {
+		if (parentController.hoverHighlightEnabled()) {
+			currentChord.setHighlighted(true);
+		}
+	}
+	void syllableUnHovered() {
+		currentChord.setHighlighted(false);
+	}
 
 	@FXML private void skipChord() {
 		// Set up an undo action frame to store what happens.
@@ -350,9 +362,7 @@ public class VerseLineViewController {
 				chord.setHighlighted(true);
 			}
 		});
-		noteButton.setOnMouseExited((me) -> {
-			chord.setHighlighted(false);
-		});
+		noteButton.setOnMouseExited((me) -> chord.setHighlighted(false));
 
 		// context menu for changing chord duration
 		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote);

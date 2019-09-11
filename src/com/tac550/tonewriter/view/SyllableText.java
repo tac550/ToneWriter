@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.tac550.tonewriter.model.ChordData;
 
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -41,16 +42,22 @@ public class SyllableText extends Text {
 			if (active) {
 				if (new_val) {
 					setFill(highlightColor);
+					parentController.syllableHovered();
 				} else {
 					setFill(defaultColor);
-				}	
+					parentController.syllableUnHovered();
+				}
 			}
 		});
 		
 		setOnMouseClicked((event) -> {
 			if (active) {
-				clicked = true;
-				parentController.syllableClicked(this);	
+				if (event.getButton() == MouseButton.PRIMARY) {
+					clicked = true;
+					parentController.syllableClicked(this);
+				} else {
+					parentController.syllableAltClicked();
+				}
 			}
 		});
 	}
