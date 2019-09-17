@@ -11,7 +11,6 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -437,7 +436,7 @@ public class VerseLineViewController {
 
 				Stage syllableStage = new Stage();
 				syllableStage.setTitle("Edit Line");
-				syllableStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+				syllableStage.getIcons().add(MainApp.APP_ICON);
 				syllableStage.setScene(new Scene(rootLayout));
 				syllableStage.initModality(Modality.APPLICATION_MODAL);
 				syllableStage.setResizable(false);

@@ -34,6 +34,7 @@ public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
 	public static final String APP_VERSION = "0.5";
+	static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
 	static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
@@ -124,7 +125,7 @@ public class MainApp extends Application {
 	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
 		mainStage.setTitle(APP_NAME);
-		mainStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+		mainStage.getIcons().add(APP_ICON);
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
@@ -165,13 +166,14 @@ public class MainApp extends Application {
 
 		splashStage.initStyle(StageStyle.TRANSPARENT);
 		splashStage.setScene(scene);
+		splashStage.getIcons().add(APP_ICON);
 		splashStage.show();
 
 		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
 		splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
 
-		splashBackground.setImage(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+		splashBackground.setImage(APP_ICON);
 		splashBackground.setEffect(frostEffect);
 	}
 

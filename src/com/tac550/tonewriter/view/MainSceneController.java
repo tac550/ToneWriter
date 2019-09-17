@@ -14,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -207,13 +206,13 @@ public class MainSceneController {
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> {
-			String result = showVerseBox();
+			String result = showQuickVerseStage();
 			if (!result.isEmpty()) {
 				verseTopField.setText(result);
 			}
 		});
 		verseBottomButton.setOnAction((ae) -> {
-			String result = showVerseBox();
+			String result = showQuickVerseStage();
 			if (!result.isEmpty()) {
 				verseBottomField.setText(result);
 			}
@@ -678,7 +677,7 @@ public class MainSceneController {
 
 			Stage pdfStage = new Stage();
 			pdfStage.setTitle("Combine PDFs");
-			pdfStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+			pdfStage.getIcons().add(MainApp.APP_ICON);
 			pdfStage.setScene(new Scene(rootLayout));
 			pdfStage.setResizable(false);
 			pdfStage.show();
@@ -761,7 +760,7 @@ public class MainSceneController {
 				aboutStage.setResizable(false);
 				aboutStage.initOwner(mainStage);
 				aboutStage.initModality(Modality.APPLICATION_MODAL);
-				aboutStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+				aboutStage.getIcons().add(MainApp.APP_ICON);
 				aboutStage.show();
 
 			} catch (IOException e) {
@@ -928,7 +927,7 @@ public class MainSceneController {
         return pdfFile.delete() || lyFile.delete();
 	}
 
-	private String showVerseBox() {
+	private String showQuickVerseStage() {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
@@ -938,7 +937,7 @@ public class MainSceneController {
 
 			Stage syllableStage = new Stage();
 			syllableStage.setTitle("Verse Finder");
-			syllableStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+			syllableStage.getIcons().add(MainApp.APP_ICON);
 			syllableStage.setScene(new Scene(rootLayout));
 			syllableStage.initModality(Modality.APPLICATION_MODAL);
 			syllableStage.setResizable(false);

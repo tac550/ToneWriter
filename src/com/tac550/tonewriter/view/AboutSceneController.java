@@ -1,19 +1,17 @@
 package com.tac550.tonewriter.view;
 
-import java.awt.Desktop;
+import com.tac550.tonewriter.util.TWUtils;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-
-import com.tac550.tonewriter.util.TWUtils;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
 
 public class AboutSceneController {
 
@@ -35,7 +33,7 @@ public class AboutSceneController {
 		
 		appVersionText.setText(appVersionText.getText().replaceAll("%VERSION%", MainApp.APP_VERSION));
 		
-		appIconView.setImage(new Image(getClass().getResourceAsStream("/media/AppIcon.png"), 100, 100, true, true));
+		appIconView.setImage(MainApp.APP_ICON);
 		
 	}
 	

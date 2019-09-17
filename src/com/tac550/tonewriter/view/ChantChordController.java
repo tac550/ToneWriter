@@ -300,7 +300,7 @@ public class ChantChordController implements CommentableView {
 				
 				Stage commentStage = new Stage();
 				commentStage.setTitle("Comment");
-				commentStage.getIcons().add(new Image(getClass().getResourceAsStream("/media/AppIcon.png")));
+				commentStage.getIcons().add(MainApp.APP_ICON);
 				commentStage.setScene(new Scene(rootLayout));
 				commentStage.initModality(Modality.APPLICATION_MODAL);
 				commentStage.setResizable(false);
