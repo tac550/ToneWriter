@@ -18,7 +18,7 @@ Please feel free to fork this repo and send in pull requests! I'm happy to accep
 
 You need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. On Windows the latest stable version (2.18.x at time of writing) should be fine. On MacOS, however, you need at least a recent version of 2.19 because older versions have bugs rendering PNG files for our chord previews.
 
-I'm building ToneWriter against Java 12 on Windows and Java 11 on macOS and Linux. This repo contains project files for both Eclipse and Idea, so importing the project into either of those IDEs should be easy. I use Gluon SceneBuilder to edit the .fxml interface files. You alse need to download the JavaFX SDK from Gluon and point to it properly in your VM options in order to debug/run the application. My VM options look like this: "--module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml".
+I'm building ToneWriter against Java 12 on Windows and Java 11 on macOS and Linux. This repo contains project files for both Eclipse and Idea, so importing the project into either of those IDEs should be easy. I use Gluon SceneBuilder to edit the .fxml interface files. You also need to download the JavaFX SDK from Gluon and point to it properly in your VM options in order to debug/run the application. My VM options look like this: "--module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml".
 
 ### Windows
 
