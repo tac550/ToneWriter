@@ -419,14 +419,14 @@ public class MainSceneController {
 
 		if (verseArea.getText().isEmpty()) return;
 
-		verseSet = true;
-
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
 		String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
 
 		for (String line : lines) {
 			createVerseLine(line);
 		}
+
+		verseSet = true;
 
 		syncCVLMapping();
 	}
