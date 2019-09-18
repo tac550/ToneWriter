@@ -97,6 +97,7 @@ local.properties
 
 # User-specific stuff
 .idea/**/workspace.xml
+.idea/**/$PRODUCT_WORKSPACE_FILE$
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
