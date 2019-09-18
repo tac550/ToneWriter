@@ -7,6 +7,7 @@ import com.tac550.tonewriter.view.MainSceneController;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckMenuItem;
+import javafx.stage.Stage;
 import org.apache.commons.text.TextStringBuilder;
 
 import java.io.File;
@@ -161,7 +162,8 @@ public class ToneReaderWriter {
 				alert.setHeaderText(String.format(Locale.US,
 						"This tone was created with a newer version of %s. Be advised there may be issues.",
 						MainApp.APP_NAME));
-				
+				((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+
 				alert.showAndWait();
 			} else if (versionSaved == 0) {
 				Alert alert = new Alert(AlertType.ERROR);
