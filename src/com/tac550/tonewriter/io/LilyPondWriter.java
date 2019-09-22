@@ -74,7 +74,8 @@ public class LilyPondWriter {
 		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
 		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
 
-		lines.set(12, lines.get(12).replace("$VERSION", MainApp.APP_VERSION));
+		lines.set(12, lines.get(12).replace("$VERSION", MainApp.APP_VERSION)
+				.replace("$APPNAME", MainApp.APP_NAME));
 
 		// Adding key signature info.
 		lines.set(16, keySignatureToLilyPond(keySignature));
