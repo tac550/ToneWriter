@@ -908,7 +908,7 @@ public class MainSceneController {
 
 	private boolean getNewRenderFilename() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(titleTextField.getText()); // TODO: TEST
+		fileChooser.setInitialFileName(titleTextField.getText());
 		fileChooser.setInitialDirectory(currentSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf"));
 		File PDFFile = fileChooser.showSaveDialog(mainStage);

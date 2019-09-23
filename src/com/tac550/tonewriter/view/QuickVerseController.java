@@ -54,6 +54,12 @@ public class QuickVerseController {
 	        } else {
 	            filteredData.setPredicate(s -> s.toLowerCase().contains(filter.toLowerCase()));
 	        }
+
+	        // Automatically place top filter result in result field
+	        if (filteredData.size() > 0) {
+	        	resultField.setText(filteredData.get(0));
+	        }
+
 	    });
 	    
 	    // Verse list setup
