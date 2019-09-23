@@ -423,17 +423,16 @@ public class ChantLineViewController implements CommentableView {
 		});
 	}
 	@FXML private void handlePlay() {
-		Task<Integer> midiTask = new Task<>() {
+		Task<Void> midiTask = new Task<>() {
 			@Override
-			protected Integer call() throws Exception {
+			protected Void call() throws Exception {
 
 				for (ChantChordController controller : chantChordControllers) {
 					controller.playMidi();
 
 					Thread.sleep(1000);
 				}
-
-				return 0;
+				return null;
 			}
 		};
 		

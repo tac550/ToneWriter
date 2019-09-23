@@ -252,9 +252,9 @@ public class ChantChordController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		Task<Integer> midiTask = new Task<>() {
+		Task<Void> midiTask = new Task<>() {
 			@Override
-			protected Integer call() throws Exception {
+			protected Void call() throws Exception {
 				// From file
 				Sequence sequence = MidiSystem.getSequence(midiFile);
 
@@ -281,7 +281,7 @@ public class ChantChordController implements CommentableView {
 				});
 				stopThread.start();
 
-				return 0;
+				return null;
 			}
 		};
 		
