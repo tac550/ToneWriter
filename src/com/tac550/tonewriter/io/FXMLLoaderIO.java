@@ -34,8 +34,6 @@ public class FXMLLoaderIO {
 
 	public interface AdditionalActions {
 
-		FXMLLoader loader = null;
-
 		void run(FXMLLoader loader);
 
 	}

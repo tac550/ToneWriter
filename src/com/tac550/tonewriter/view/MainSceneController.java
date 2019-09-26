@@ -19,7 +19,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -30,6 +29,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /*
  * TEST VERSES:
@@ -253,23 +253,20 @@ public class MainSceneController {
 		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
 	}
 
-	private void createVerseLine(String line) {
-		try {
-			// Load layout from fxml file
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("verseLineView.fxml"));
-			StackPane verseLineLayout = loader.load();
+	private Task<FXMLLoader> createVerseLine(String line) {
+
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", (loader) -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentController(this);
 
 			controller.setVerseLine(line);
 
-			verseLineControllers.add(controller);
-			verseLineBox.getChildren().add(verseLineLayout);
+		});
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
+
+		return loaderTask;
 	}
 	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
@@ -277,7 +274,6 @@ public class MainSceneController {
 
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
-			System.out.println("Setting main controller");
 			controller.setMainController(this);
 
 			chantLineControllers.add(controller);
@@ -421,9 +417,22 @@ public class MainSceneController {
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
 		String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
 
+		ArrayList<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
+
 		for (String line : lines) {
-			createVerseLine(line);
+			lineLoaders.add(createVerseLine(line));
 		}
+
+		Platform.runLater(() -> {
+			for (Task<FXMLLoader> loader : lineLoaders) {
+				try {
+					verseLineControllers.add(loader.get().getController());
+					verseLineBox.getChildren().add(loader.get().getRoot());
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		verseSet = true;
 

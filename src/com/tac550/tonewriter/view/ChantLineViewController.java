@@ -227,7 +227,6 @@ public class ChantLineViewController implements CommentableView {
 		chordBox.getChildren().add(position, chordLayout);
 
 		controller.setChantLineController(this);
-		System.out.println(mainController.getCurrentKey());
 		controller.setKeySignature(mainController.getCurrentKey());
 		recalcCHNames();
 
