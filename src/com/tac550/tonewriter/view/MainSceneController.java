@@ -473,7 +473,7 @@ public class MainSceneController {
 		} else {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
-			alert.setHeaderText("That tone already exists!");
+			alert.setHeaderText("An error occurred creating the tone!");
 			alert.initOwner(mainStage);
 			alert.showAndWait();
 			return false;

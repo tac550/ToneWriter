@@ -263,6 +263,10 @@ public class ToneReaderWriter {
 	public static boolean createToneFile(File file_to_create) {
 		if (file_to_create.getParentFile().mkdirs() || file_to_create.getParentFile().exists()) {
 			try {
+				// If the file already exists, delete it first (User already selected to overwrite)
+				if (file_to_create.exists()) {
+					if (!file_to_create.delete()) return false;
+				}
 				return file_to_create.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
