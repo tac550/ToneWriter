@@ -726,7 +726,7 @@ public class LilyPondWriter {
 		}
 
 		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
-		prExitDetector.addProcessListener((process) -> exitingActions.run());
+		prExitDetector.addProcessListener((process) -> exitingActions.run()); // TODO: Wrap in a Thread!
 		prExitDetector.start();
 	}
 

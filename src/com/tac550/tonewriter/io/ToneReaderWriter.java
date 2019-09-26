@@ -4,6 +4,8 @@ import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
+import javafx.concurrent.Task;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckMenuItem;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 
 public class ToneReaderWriter {
 
@@ -209,7 +212,14 @@ public class ToneReaderWriter {
 
 	private void readChantLine(String chantLine) throws IOException {
 
-		ChantLineViewController currentChantLine = mainScene.createChantLine(false);
+		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(false);
+		ChantLineViewController currentChantLine = null;
+		try {
+			currentChantLine = currentChantLineLoader.get().getController();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+
 		Scanner chantLineScanner = new Scanner(chantLine);
 		String chantLineLine;
 

@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
@@ -7,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -269,30 +271,27 @@ public class MainSceneController {
 			e.printStackTrace();
 		}
 	}
-	public ChantLineViewController createChantLine(boolean recalculateNames) {
-		ChantLineViewController controller;
+	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
-		try {
-			// Load layout from fxml file
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("chantLineView.fxml"));
-			GridPane chantLineLayout = loader.load();
-			controller = loader.getController();
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", (loader) -> {
+
+			ChantLineViewController controller = loader.getController();
+			GridPane chantLineLayout = loader.getRoot();
+			System.out.println("Setting main controller");
 			controller.setMainController(this);
 
 			chantLineControllers.add(controller);
-			chantLineBox.getChildren().add(chantLineLayout);
+			Platform.runLater(() -> chantLineBox.getChildren().add(chantLineLayout));
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+			if (recalculateNames) {
+				Platform.runLater(this::recalcCLNames);
+			}
+		});
 
-		if (recalculateNames) {
-			recalcCLNames();
-		}
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 
-		return controller;
+		return loaderTask;
 	}
 
 	public void recalcCLNames() {

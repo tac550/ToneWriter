@@ -284,8 +284,8 @@ public class ChantChordController implements CommentableView {
 				return null;
 			}
 		};
-		
-		midiTask.run();
+
+		midiTask.run(); // TODO: Wrap in a Thread!
 	}
 	@FXML private void editComment() {
 		Platform.runLater(() -> {
