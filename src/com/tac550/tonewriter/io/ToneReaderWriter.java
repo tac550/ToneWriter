@@ -134,7 +134,7 @@ public class ToneReaderWriter {
 	public boolean loadTone(MainSceneController main_scene, File toneFile) {
 		this.mainScene = main_scene;
 
-		String firstRepeated;
+		String firstRepeated = "";
 		float versionSaved;
 
 		try {
@@ -144,10 +144,19 @@ public class ToneReaderWriter {
 			Files.lines(toneFile.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
 			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
-			String[] header = sections[0].split("\\r?\\n");
-			// Double newlines delimit chant lines
-			String[] chantLines = sections[1].split("\\r?\\n\\r?\\n");
-			String[] footer = sections[2].split("\\r?\\n");
+			String[] header;
+			String[] chantLines;
+			String[] footer;
+			if (sections.length == 3) {
+				header = sections[0].split("\\r?\\n");
+				// Double newlines delimit chant lines
+				chantLines = sections[1].split("\\r?\\n\\r?\\n");
+				footer = sections[2].split("\\r?\\n");
+			} else {
+				header = sections[0].split("\\r?\\n");
+				chantLines = null;
+				footer = null;
+			}
 
 			versionSaved = Float.parseFloat(tryReadingLine(header, 0, "0"));
 			keySig = tryReadingLine(header, 1, "C major")
@@ -156,7 +165,9 @@ public class ToneReaderWriter {
 			manualCLAssignmentMenuItem.setSelected(
 					Boolean.parseBoolean(tryReadingLine(header, 3, "false")));
 
-			firstRepeated = tryReadingLine(footer, 0, "");
+			if (footer != null) {
+				firstRepeated = tryReadingLine(footer, 0, "");
+			}
 
 			// Version checking
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
@@ -180,8 +191,10 @@ public class ToneReaderWriter {
 			// Loading chant lines
 			main_scene.clearChantLines();
 
-			for (String chantLine : chantLines) {
-				readChantLine(chantLine);
+			if (chantLines != null) {
+				for (String chantLine : chantLines) {
+					readChantLine(chantLine);
+				}
 			}
 
 		} catch (IOException e) {
