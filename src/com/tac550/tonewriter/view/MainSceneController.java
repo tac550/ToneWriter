@@ -405,27 +405,38 @@ public class MainSceneController {
 		if (verseArea.getText().isEmpty()) return;
 
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
-		String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
+		Task<Void> syllabificationTask = new Task<>() {
 
-		ArrayList<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
+			@Override
+			protected Void call() {
+				String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
 
-		for (String line : lines) {
-			lineLoaders.add(createVerseLine(line));
-		}
+				ArrayList<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
 
-		Platform.runLater(() -> {
-			for (Task<FXMLLoader> loader : lineLoaders) {
-				try {
-					verseLineControllers.add(loader.get().getController());
-					verseLineBox.getChildren().add(loader.get().getRoot());
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
+				for (String line : lines) {
+					lineLoaders.add(createVerseLine(line));
 				}
-			}
 
-			verseSet = true;
-			syncCVLMapping();
-		});
+				Platform.runLater(() -> {
+					for (Task<FXMLLoader> loader : lineLoaders) {
+						try {
+							verseLineControllers.add(loader.get().getController());
+							verseLineBox.getChildren().add(loader.get().getRoot());
+						} catch (InterruptedException | ExecutionException e) {
+							e.printStackTrace();
+						}
+					}
+
+					verseSet = true;
+					syncCVLMapping();
+				});
+				return null;
+			}
+		};
+
+		Thread syllableThread = new Thread(syllabificationTask);
+		syllableThread.start();
+
 	}
 
 
