@@ -432,11 +432,10 @@ public class MainSceneController {
 					e.printStackTrace();
 				}
 			}
+
+			verseSet = true;
+			syncCVLMapping();
 		});
-
-		verseSet = true;
-
-		syncCVLMapping();
 	}
 
 
