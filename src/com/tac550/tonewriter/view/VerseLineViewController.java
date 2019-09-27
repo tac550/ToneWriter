@@ -1,9 +1,11 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.model.MappingAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -22,7 +24,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Stack;
@@ -357,7 +358,7 @@ public class VerseLineViewController {
 		else quarterNote.setSelected(true);
 
 		// Right click functionality plays chord associated with button
-		noteButton.setOnMouseClicked((e) -> {
+		noteButton.setOnMouseClicked(e -> {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				chord.playMidi();
 			}
@@ -424,16 +425,15 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void editSyllables() {
-		Platform.runLater(() -> {
-			try {
-				// Load layout from fxml file
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(MainApp.class.getResource("syllableEditView.fxml"));
-				BorderPane rootLayout = loader.load();
-				SyllableEditViewController controller = loader.getController();
-				controller.setParentController(this);
-				controller.setSyllableText(verseLine.getLine());
 
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("syllableEditView.fxml", loader -> {
+			BorderPane rootLayout = loader.getRoot();
+			SyllableEditViewController controller = loader.getController();
+
+			controller.setParentController(this);
+			controller.setSyllableText(verseLine.getLine());
+
+			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
 				syllableStage.setTitle("Edit Line");
 				syllableStage.getIcons().add(MainApp.APP_ICON);
@@ -441,11 +441,11 @@ public class VerseLineViewController {
 				syllableStage.initModality(Modality.APPLICATION_MODAL);
 				syllableStage.setResizable(false);
 				syllableStage.show();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			});
 		});
+
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 	}
 
 	public SyllableText[] getSyllables() {

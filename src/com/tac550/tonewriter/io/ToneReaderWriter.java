@@ -219,6 +219,7 @@ public class ToneReaderWriter {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
+		assert currentChantLine != null;
 
 		Scanner chantLineScanner = new Scanner(chantLine);
 		String chantLineLine;

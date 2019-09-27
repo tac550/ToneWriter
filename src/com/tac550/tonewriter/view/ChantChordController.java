@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -289,16 +290,15 @@ public class ChantChordController implements CommentableView {
 		midiThread.start();
 	}
 	@FXML private void editComment() {
-		Platform.runLater(() -> {
-			try {
-				// Load layout from fxml file
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(MainApp.class.getResource("commentView.fxml"));
-				BorderPane rootLayout = loader.load();
-				CommentViewController controller = loader.getController();
-				controller.setCommentText(commentString);
-				controller.setTargetText(String.format(Locale.US, "Chord: %s (%s)", getName(), getFields()));
-				
+
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("commentView.fxml", loader -> {
+			BorderPane rootLayout = loader.getRoot();
+			CommentViewController controller = loader.getController();
+
+			controller.setCommentText(commentString);
+			controller.setTargetText(String.format(Locale.US, "Chord: %s (%s)", getName(), getFields()));
+
+			Platform.runLater(() -> {
 				Stage commentStage = new Stage();
 				commentStage.setTitle("Comment");
 				commentStage.getIcons().add(MainApp.APP_ICON);
@@ -307,11 +307,11 @@ public class ChantChordController implements CommentableView {
 				commentStage.setResizable(false);
 				commentStage.show();
 				controller.setParentView(this);
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}	
+			});
 		});
+
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 	}
 	
 	public void applyCommentGraphic(Image image) {

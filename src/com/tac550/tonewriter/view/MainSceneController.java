@@ -207,18 +207,8 @@ public class MainSceneController {
 		});
 
 		// Set up behavior for reader verse text completion buttons and fields
-		verseTopButton.setOnAction((ae) -> {
-			String result = showQuickVerseStage();
-			if (!result.isEmpty()) {
-				verseTopField.setText(result);
-			}
-		});
-		verseBottomButton.setOnAction((ae) -> {
-			String result = showQuickVerseStage();
-			if (!result.isEmpty()) {
-				verseBottomField.setText(result);
-			}
-		});
+		verseTopButton.setOnAction((ae) -> showQuickVerseStage(verseTopField));
+		verseBottomButton.setOnAction((ae) -> showQuickVerseStage(verseBottomField));
 
 		ArrayList<ChoiceBox<String>> verseChoices = new ArrayList<>();
 		verseChoices.add(verseTopChoice);
@@ -255,7 +245,7 @@ public class MainSceneController {
 
 	private Task<FXMLLoader> createVerseLine(String line) {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", (loader) -> {
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentController(this);
 
@@ -270,7 +260,7 @@ public class MainSceneController {
 	}
 	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", (loader) -> {
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
 
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
@@ -661,37 +651,40 @@ public class MainSceneController {
 
 	@FXML private void handleEditHeaderInfo() {
 
-		TextInputDialog dialog = new TextInputDialog(headerText); // Initial text is existing composer text, if any.
-		dialog.setTitle("Header Info");
-		dialog.setHeaderText("Input header info (formatted \"Tone # - Composer/System\")");
-		dialog.initOwner(mainStage);
-		Optional<String> result = dialog.showAndWait();
+		new Thread(() -> Platform.runLater(() -> {
+			TextInputDialog dialog = new TextInputDialog(headerText); // Initial text is existing composer text, if any.
+			dialog.setTitle("Header Info");
+			dialog.setHeaderText("Input header info (formatted \"Tone # - Composer/System\")");
+			dialog.initOwner(mainStage);
+			Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(text -> headerText = text);
+			result.ifPresent(text -> headerText = text);
+		})).start();
+
 	}
 
 	/*
 	 * Tools Menu Actions
 	 */
 	@FXML private void handleCombinePDFs() {
-		try {
-			// Load layout from fxml file
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("pdfCombineView.fxml"));
-			BorderPane rootLayout = loader.load();
+		// Load layout from fxml file
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("pdfCombineView.fxml", loader -> {
+			BorderPane rootLayout = loader.getRoot();
 			PDFCombineViewController controller = loader.getController();
 			controller.setDefaultDirectory(currentSavingDirectory);
 
-			Stage pdfStage = new Stage();
-			pdfStage.setTitle("Combine PDFs");
-			pdfStage.getIcons().add(MainApp.APP_ICON);
-			pdfStage.setScene(new Scene(rootLayout));
-			pdfStage.setResizable(false);
-			pdfStage.show();
+			Platform.runLater(() -> {
+				Stage pdfStage = new Stage();
+				pdfStage.setTitle("Combine PDFs");
+				pdfStage.getIcons().add(MainApp.APP_ICON);
+				pdfStage.setScene(new Scene(rootLayout));
+				pdfStage.setResizable(false);
+				pdfStage.show();
+			});
+		});
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 	}
 
 	/*
@@ -753,13 +746,11 @@ public class MainSceneController {
 	 * Help Menu Actions
 	 */
 	@FXML private void handleAbout() {
-		Platform.runLater(() -> {
-			try {
-				// Load layout from fxml file
-				FXMLLoader loader = new FXMLLoader();
-				loader.setLocation(MainApp.class.getResource("AboutScene.fxml"));
-				BorderPane aboutLayout = loader.load();
 
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("AboutScene.fxml", loader -> {
+			BorderPane aboutLayout = loader.getRoot();
+
+			Platform.runLater(() -> {
 				Stage aboutStage = new Stage();
 				aboutStage.setScene(new Scene(aboutLayout));
 
@@ -769,11 +760,11 @@ public class MainSceneController {
 				aboutStage.initModality(Modality.APPLICATION_MODAL);
 				aboutStage.getIcons().add(MainApp.APP_ICON);
 				aboutStage.show();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			});
 		});
+
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 	}
 
 	private void refreshChordKeySignatures(String key) {
@@ -935,30 +926,30 @@ public class MainSceneController {
         return pdfFile.delete() || lyFile.delete();
 	}
 
-	private String showQuickVerseStage() {
-		try {
-			// Load layout from fxml file
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("quickVerseView.fxml"));
-			BorderPane rootLayout = loader.load();
+	private void showQuickVerseStage(TextField targetField) {
+
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("quickVerseView.fxml", loader -> {
+			BorderPane rootLayout = loader.getRoot();
 			QuickVerseController controller = loader.getController();
 
-			Stage syllableStage = new Stage();
-			syllableStage.setTitle("Verse Finder");
-			syllableStage.getIcons().add(MainApp.APP_ICON);
-			syllableStage.setScene(new Scene(rootLayout));
-			syllableStage.initModality(Modality.APPLICATION_MODAL);
-			syllableStage.setResizable(false);
-			syllableStage.initOwner(mainStage);
-			syllableStage.showAndWait();
+			controller.setTargetField(targetField);
 
-			return controller.getSelectedVerse();
+			Platform.runLater(() -> {
+				Stage syllableStage = new Stage();
+				syllableStage.setTitle("Verse Finder");
+				syllableStage.getIcons().add(MainApp.APP_ICON);
+				syllableStage.setScene(new Scene(rootLayout));
+				syllableStage.initModality(Modality.APPLICATION_MODAL);
+				syllableStage.setResizable(false);
+				syllableStage.initOwner(mainStage);
+				syllableStage.show();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+				controller.focusFilterField();
+			});
+		});
 
-		return "";
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
 	}
 
 	boolean playMidiAsAssigned() {

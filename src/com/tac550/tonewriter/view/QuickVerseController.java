@@ -33,6 +33,8 @@ public class QuickVerseController {
 	
 	@FXML private TextField filterInput;
 	@FXML private TextField resultField;
+
+	private TextField targetField;
 	
 	private ListView<String> verseList;
 	
@@ -135,7 +137,7 @@ public class QuickVerseController {
 	    
 		Platform.runLater(() -> {
 			// Set escape, enter, and up key behavior for scene and list view
-			mainPane.getScene().setOnKeyPressed(keyHandler);
+			mainPane.setOnKeyPressed(keyHandler);
 			verseList.setOnKeyPressed(keyHandler);
 			// Set down arrow key behavior for filter field (focuses list view)
 			filterInput.setOnKeyPressed((ke) -> {
@@ -144,12 +146,15 @@ public class QuickVerseController {
 					verseList.getSelectionModel().select(0);
 				}
 			});
-			
-			// Request focus for filter field
-			filterInput.requestFocus();
 		});
 		
 		refreshVerses();
+	}
+	void setTargetField(TextField target) {
+		targetField = target;
+	}
+	void focusFilterField() {
+		filterInput.requestFocus();
 	}
 	
 	@FXML private void handleSwitchYouThou() {
@@ -186,6 +191,10 @@ public class QuickVerseController {
 	}
 	
 	@FXML private void handleOK() {
+		if (!resultField.getText().isEmpty()) {
+			targetField.setText(resultField.getText());
+		}
+
 		closeStage();
 	}
 	
@@ -218,10 +227,6 @@ public class QuickVerseController {
 	private void closeStage() {
 		Stage stage = (Stage) mainPane.getScene().getWindow();
 		stage.close();
-	}
-	
-	String getSelectedVerse() {
-		return resultField.getText();
 	}
 	
 }
