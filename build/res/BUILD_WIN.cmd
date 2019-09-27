@@ -9,3 +9,4 @@ xcopy /s /i /y "..\..\Built-in Tones" "..\win\Built-in Tones" && ^
 xcopy /s /i /y "..\..\licenses" "..\win\licenses" && ^
 xcopy /s /i /y "java-runtime" "..\win\java-runtime" && ^
 makensis nsi_WIN.nsi
+pause
