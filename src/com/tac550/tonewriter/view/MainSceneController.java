@@ -450,16 +450,16 @@ public class MainSceneController {
 		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
 		alert.initOwner(mainStage);
 		ButtonType saveButton = new ButtonType("Save");
-		ButtonType noSaveButton = new ButtonType("Don't Save");
+		ButtonType dontSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-		alert.getButtonTypes().setAll(saveButton, noSaveButton, cancelButton);
+		alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
 				handleSave();
 				return true;
-			} else return result.get() == noSaveButton;
+			} else return result.get() == dontSaveButton;
 		} else return false;
 	}
 	private boolean createNewTone() {

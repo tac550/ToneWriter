@@ -117,11 +117,6 @@ public class MainApp extends Application {
 		}
 	}
 
-	@Override
-	public void stop() {
-		mainController.checkSave();
-	}
-
 	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
 		mainStage.setTitle(APP_NAME);
@@ -129,7 +124,11 @@ public class MainApp extends Application {
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest((ev) -> Platform.exit());
+		mainStage.setOnCloseRequest(ev -> {
+			if (!mainController.checkSave()) {
+				ev.consume();
+			}
+		});
 
 		// Show the stage (required for the next operation to work)
 		this.mainStage.show();
