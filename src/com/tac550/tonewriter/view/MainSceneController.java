@@ -91,6 +91,8 @@ public class MainSceneController {
 	@FXML private ChoiceBox<String> verseBottomChoice;
 	@FXML private TextField verseBottomField;
 	@FXML private Button verseBottomButton;
+	@FXML private Button setVerseButton;
+	@FXML private ProgressBar setVerseProgressBar;
 
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
@@ -400,6 +402,9 @@ public class MainSceneController {
 			else askToOverwrite = false;
 		}
 
+		setVerseButton.setVisible(false);
+		setVerseProgressBar.setVisible(true);
+
 		clearVerseLines();
 
 		if (verseArea.getText().isEmpty()) return;
@@ -429,6 +434,9 @@ public class MainSceneController {
 
 					verseSet = true;
 					syncCVLMapping();
+
+					setVerseButton.setVisible(true);
+					setVerseProgressBar.setVisible(false);
 				});
 				return null;
 			}

@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
@@ -21,6 +22,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
@@ -125,7 +127,16 @@
                                           <ChoiceBox fx:id="verseBottomChoice" />
                                        </children>
                                     </GridPane>
-                                    <Button mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
+                                    <StackPane>
+                                       <children>
+                                          <AnchorPane>
+                                             <children>
+                                                <ProgressBar fx:id="setVerseProgressBar" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                             </children>
+                                          </AnchorPane>
+                                          <Button fx:id="setVerseButton" mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
+                                       </children>
+                                    </StackPane>
                                  </children>
                               </VBox>
                            </children>
