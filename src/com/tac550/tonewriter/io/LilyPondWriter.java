@@ -726,7 +726,7 @@ public class LilyPondWriter {
 		}
 
 		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
-		prExitDetector.addProcessListener((process) -> new Thread(exitingActions).start());
+		prExitDetector.addProcessListener(process -> new Thread(exitingActions).start());
 		prExitDetector.start();
 	}
 
@@ -742,13 +742,13 @@ public class LilyPondWriter {
 
 		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		lines.set(10, LilyPondWriter.keySignatureToLilyPond(keySignature));
-		lines.set(18, LilyPondWriter.parseNoteRelative(parts[PART_SOPRANO], LilyPondWriter.ADJUSTMENT_SOPRANO));
+		lines.set(10, keySignatureToLilyPond(keySignature));
+		lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
 		lines.set(24, "\\with-color #(rgb-color " + (MainApp.darkModeEnabled() ?
 				"0.345 0.361 0.373)" : "0.957 0.957 0.957)"));
-		lines.set(34, LilyPondWriter.parseNoteRelative(parts[PART_ALTO], LilyPondWriter.ADJUSTMENT_ALTO));
-		lines.set(40, LilyPondWriter.parseNoteRelative(parts[PART_TENOR], LilyPondWriter.ADJUSTMENT_TENOR));
-		lines.set(46, LilyPondWriter.parseNoteRelative(parts[PART_BASS], LilyPondWriter.ADJUSTMENT_BASS));
+		lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
+		lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
+		lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
 		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
@@ -761,10 +761,10 @@ public class LilyPondWriter {
 		psFile.deleteOnExit();
 
 		if (chordView != null) {
-			LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
+			executePlatformSpecificLPRender(lilypondFile, true, () ->
 					chordView.setImage(new Image(outputFile.toURI().toString())));
 		} else {
-			LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, true, () ->
+			executePlatformSpecificLPRender(lilypondFile, true, () ->
 					mainSceneView.chordRendered(fields));
 		}
 
@@ -780,7 +780,7 @@ public class LilyPondWriter {
 					"-chord.ly");
 			tempFile.deleteOnExit();
 
-			LilyPondWriter.exportResource("chordTemplate.ly", tempFile.getAbsolutePath());
+			exportResource("chordTemplate.ly", tempFile.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
