@@ -17,6 +17,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -224,6 +227,9 @@ public class MainSceneController {
 	}
 	void setStage(Stage stage) {
 		mainStage = stage;
+
+		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN),
+				this::handleFinalRender);
 	}
 	File getToneFile() {
 		return toneFile;
@@ -928,6 +934,7 @@ public class MainSceneController {
 		fileChooser.setInitialFileName(titleTextField.getText());
 		fileChooser.setInitialDirectory(currentSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf"));
+		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(mainStage);
 		if (PDFFile == null) return false;
 		else currentSavingDirectory = PDFFile.getParentFile();
