@@ -28,7 +28,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <center>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
         <items>
@@ -59,7 +59,7 @@
                            <bottom>
                               <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button mnemonicParsing="false" onAction="#handleFinalRender" style="-fx-base: #00ff00;" text="Export PDF" />
+                                    <Button onAction="#handleFinalRender" style="-fx-base: #00ff00;" text="E_xport PDF" />
                                  </children>
                               </HBox>
                            </bottom>
@@ -153,7 +153,7 @@
          <children>
             <MenuBar HBox.hgrow="ALWAYS">
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu text="_File">
                   <items>
                     <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone...">
                            <accelerator>
@@ -179,7 +179,7 @@
                         <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
                   </items>
                 </Menu>
-                <Menu fx:id="editMenu" disable="true" mnemonicParsing="false" text="Edit">
+                <Menu fx:id="editMenu" disable="true" text="_Edit">
                   <items>
                     <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
                         <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
@@ -188,12 +188,12 @@
                         <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#syncCVLMapping" text="Assign Phrases Manually" />
                   </items>
                 </Menu>
-                  <Menu mnemonicParsing="false" text="Tools">
+                  <Menu text="_Tools">
                     <items>
                       <MenuItem fx:id="combinePDFsMenuItem" mnemonicParsing="false" onAction="#handleCombinePDFs" text="Combine PDFs..." />
                     </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Options">
+                  <Menu text="_Options">
                      <items>
                         <CustomMenuItem mnemonicParsing="false" text="Output Separator">
                            <content>
@@ -246,7 +246,7 @@
                         <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                      </items>
                   </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu text="_Help">
                   <items>
                     <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
                   </items>
