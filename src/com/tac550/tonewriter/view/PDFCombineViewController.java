@@ -4,11 +4,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -34,8 +34,7 @@ public class PDFCombineViewController {
 	
 	@FXML Text dragInstructions;
 	@FXML private VBox fileBox;
-	@FXML private TextField fileNameBox;
-	
+
 	private static final String TAB_DRAG_KEY = "pdfPane";
 	private ObjectProperty<GridPane> draggingPane = new SimpleObjectProperty<>();
 	
@@ -99,25 +98,17 @@ public class PDFCombineViewController {
 			alert.setHeaderText("No PDF files selected!");
 			alert.showAndWait();
 			return;
-		} if (fileNameBox.getText().isEmpty()) {
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Warning");
-			alert.setHeaderText("Please enter a filename!");
-			alert.showAndWait();
-			return;
 		}
 		
-		DirectoryChooser DirChooser = new DirectoryChooser();
-		DirChooser.setInitialDirectory(defaultDirectory);
-		DirChooser.setTitle("Choose Where to Save Combined PDF");
+		FileChooser saveFileChooser = new FileChooser();
+		saveFileChooser.setInitialDirectory(defaultDirectory);
+		saveFileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
+		saveFileChooser.setTitle("Save Combined PDF");
 		
-		File outFolder = DirChooser.showDialog(fileBox.getScene().getWindow());
-		
-		String destinationFileName = outFolder.getAbsolutePath() +
-				File.separator + fileNameBox.getText().replace(".pdf", "") + ".pdf";
+		File outFile = saveFileChooser.showSaveDialog(fileBox.getScene().getWindow());
 		
 		PDFMergerUtility pdfMerger = new PDFMergerUtility();
-		pdfMerger.setDestinationFileName(destinationFileName);
+		pdfMerger.setDestinationFileName(outFile.getAbsolutePath());
 		
 		for (Node node : fileBox.getChildren()) {
 			GridPane pane = (GridPane) node;
@@ -148,7 +139,7 @@ public class PDFCombineViewController {
 		}
 		
 		try {
-			Desktop.getDesktop().open(new File(destinationFileName));
+			Desktop.getDesktop().open(outFile);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

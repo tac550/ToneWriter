@@ -484,7 +484,7 @@ public class MainSceneController {
 		} else {
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		}
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(mainStage);
 		if (saveFile == null) return false;
 
@@ -513,7 +513,7 @@ public class MainSceneController {
 					fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 				}
 			}
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE files (*.tone)", "*.tone"));
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 			selectedFile = fileChooser.showOpenDialog(mainStage);
 		}
 		if (selectedFile == null) return false;
@@ -933,7 +933,7 @@ public class MainSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(titleTextField.getText());
 		fileChooser.setInitialDirectory(currentSavingDirectory);
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf"));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(mainStage);
 		if (PDFFile == null) return false;
