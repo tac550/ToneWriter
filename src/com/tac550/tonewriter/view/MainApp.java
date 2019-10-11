@@ -58,7 +58,7 @@ public class MainApp extends Application {
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
 			Color.DEEPSKYBLUE, Color.BURLYWOOD, Color.AQUA, Color.GOLD};
-	static final Color endChordColor = Color.DARKMAGENTA;
+	static final Color END_CHORD_COLOR = Color.DARKMAGENTA;
 
 	// How tall to make note buttons in the verse view.
 	static final int NOTE_BUTTON_HEIGHT = 15;
