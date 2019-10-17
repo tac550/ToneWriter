@@ -4,10 +4,9 @@ import javafx.scene.image.Image;
 
 public interface CommentableView {
 	
-	static final Image bubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble.png"));
-	static final Image hoveredBubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble-hovered.png"));
-	static final Image activeBubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble-active.png"));
-	Image commentButtonState = bubbleImage;
+	Image bubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble.png"));
+	Image hoveredBubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble-hovered.png"));
+	Image activeBubbleImage = new Image(ChantChordController.class.getResourceAsStream("/media/bubble-active.png"));
 	
 	String getComment();
 	void setComment(String comment);
