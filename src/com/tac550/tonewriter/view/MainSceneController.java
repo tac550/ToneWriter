@@ -408,12 +408,13 @@ public class MainSceneController {
 			else askToOverwrite = false;
 		}
 
-		setVerseButton.setVisible(false);
-		setVerseProgressBar.setVisible(true);
-
 		clearVerseLines();
 
 		if (verseArea.getText().isEmpty()) return;
+
+		// Show working indicator
+		setVerseButton.setVisible(false);
+		setVerseProgressBar.setVisible(true);
 
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
 		Task<Void> syllabificationTask = new Task<>() {
@@ -441,6 +442,7 @@ public class MainSceneController {
 					verseSet = true;
 					syncCVLMapping();
 
+					// Show working indicator
 					setVerseButton.setVisible(true);
 					setVerseProgressBar.setVisible(false);
 				});
