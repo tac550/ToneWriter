@@ -134,7 +134,7 @@
                                                 <ProgressBar fx:id="setVerseProgressBar" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
-                                          <Button fx:id="setVerseButton" mnemonicParsing="false" onAction="#handleSetVerse" text="Set Verse" />
+                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set _Verse" />
                                        </children>
                                     </StackPane>
                                  </children>

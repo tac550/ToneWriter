@@ -442,7 +442,7 @@ public class MainSceneController {
 					verseSet = true;
 					syncCVLMapping();
 
-					// Show working indicator
+					// Hide working indicator
 					setVerseButton.setVisible(true);
 					setVerseProgressBar.setVisible(false);
 				});
