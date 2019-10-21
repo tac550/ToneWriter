@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="rootLayout" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ChantLineViewController">
+<GridPane fx:id="rootLayout" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ChantLineViewController">
   <columnConstraints>
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" />
     <ColumnConstraints hgrow="SOMETIMES" />
@@ -40,7 +40,7 @@
                <tooltip>
                   <Tooltip text="Move Down" />
                </tooltip></Button>
-            <Button fx:id="firstRepeatedButton" layoutX="39.0" layoutY="32.0" mnemonicParsing="false" onAction="#makeFirstRepeated" text="First Repeated" />
+            <Button fx:id="firstRepeatedButton" layoutX="39.0" layoutY="32.0" mnemonicParsing="false" onAction="#toggleFirstRepeated" text="First Repeated" />
             <Button fx:id="commentButton" mnemonicParsing="false" onAction="#editComment" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0">
                <tooltip>
                   <Tooltip text="Comments" />

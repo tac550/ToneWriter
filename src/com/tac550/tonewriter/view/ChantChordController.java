@@ -58,6 +58,13 @@ public class ChantChordController implements CommentableView {
 	@FXML private void initialize() {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
+			// Listening for user-generated edits to the part fields.
+			field.setOnKeyPressed(keyEvent -> {
+				if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() ||
+						keyEvent.getCode().isWhitespaceKey()) && !keyEvent.isShortcutDown()) {
+					chantLineController.edited();
+				}
+			});
 			field.focusedProperty().addListener((ov, old_val, new_val) -> {
 				if (!new_val) { // Re-render when focus switched away from field
 					playButton.setDisable(true);
@@ -169,6 +176,7 @@ public class ChantChordController implements CommentableView {
 		refreshChordPreview();
 	}
 	public void setComment(String comment) {
+		chantLineController.edited();
 		commentString = comment.replaceAll("/n", "\n");
 		if (!comment.isEmpty()) {
 			applyCommentGraphic(activeBubbleImage);
@@ -210,6 +218,7 @@ public class ChantChordController implements CommentableView {
 	}
 	
 	@FXML public void addPrepChord() throws IOException {
+		chantLineController.edited();
 		addPrepChord("");
 	}
 	public ChantChordController addPrepChord(String values) throws IOException {
@@ -221,6 +230,7 @@ public class ChantChordController implements CommentableView {
 		return prepChordController;
 	}
 	@FXML public void addPostChord() throws IOException {
+		chantLineController.edited();
 		if (getType() == -3) {
 			ChantChordController endChord = chantLineController.addEndChord();
 			prepsAndPosts.add(endChord);
@@ -238,6 +248,7 @@ public class ChantChordController implements CommentableView {
 		return postChordController;
 	}
 	@FXML public void deleteAll() { // Deletes this chord and its associated preps and posts.
+		chantLineController.edited();
 		for (ChantChordController chord : prepsAndPosts) {
 			chord.deleteAll();
 		}
@@ -250,6 +261,7 @@ public class ChantChordController implements CommentableView {
 		MainSceneController.copiedChord = getFields();
 	}
 	@FXML private void paste() {
+		chantLineController.edited();
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
@@ -267,7 +279,7 @@ public class ChantChordController implements CommentableView {
 				// Start playing
 				sequencer.start();
 
-				// Thread to close midi after it's had long enough to finish playing.
+				// Thread to close midi after it's had long enough to finish playing. Also highlights the play button.
 				// This fixes the application not closing correctly if the user played midi.
 				Thread stopThread = new Thread(() -> {
 					playButton.setStyle("-fx-base: #fffa61");

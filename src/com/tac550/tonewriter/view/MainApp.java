@@ -119,7 +119,6 @@ public class MainApp extends Application {
 
 	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
-		mainStage.setTitle(APP_NAME);
 		mainStage.getIcons().add(APP_ICON);
 		loadMainLayout();
 

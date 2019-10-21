@@ -57,12 +57,6 @@ public class MainSceneController {
 
 	private Stage mainStage;
 
-	private File toneFile;
-
-	private String currentKey = "C major";
-	private String headerText = "";
-	private String paperSize = "";
-
 	@FXML private MenuItem newToneMenuItem;
 	@FXML private MenuItem openToneMenuItem;
 	@FXML private MenuItem saveToneMenuItem;
@@ -97,11 +91,18 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private ProgressBar setVerseProgressBar;
 
+	private File toneFile;
+
+	private String currentKey = "C major";
+	private String headerText = "";
+	private String paperSize = "";
+
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
 
 	private boolean verseSet = false;
-	private boolean askToOverwrite = false;
+	private boolean askToOverwriteOutput = false; // If false, save dialog always appears for final output.
+	private boolean askToSaveTone = false;
 	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 	private File currentSavingDirectory = new File(System.getProperty("user.home"));
@@ -228,6 +229,8 @@ public class MainSceneController {
 	void setStage(Stage stage) {
 		mainStage = stage;
 
+		resetStageTitle();
+
 		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN),
 				this::handleFinalRender);
 	}
@@ -329,10 +332,12 @@ public class MainSceneController {
 				}
 			}
 		}
+
+		toneEdited();
 		syncCVLMapping();
 	}
 
-	@FXML public void syncCVLMapping() {
+	void syncCVLMapping() {
 		if (toneFile == null) return; // No tone is loaded; don't do anything
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
@@ -405,7 +410,7 @@ public class MainSceneController {
 			alert.initOwner(mainStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
-			else askToOverwrite = false;
+			else askToOverwriteOutput = false;
 		}
 
 		clearVerseLines();
@@ -455,12 +460,16 @@ public class MainSceneController {
 
 	}
 
-
+	/*
+	 * Returns false if the user chooses cancel or closes. This should halt any impending file related functions.
+	 */
 	boolean checkSave() {
 		if (toneFile == null ||
+				!askToSaveTone ||
 				(toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode)) {
 			return true;
 		}
+
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Save Confirmation");
 		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
@@ -476,7 +485,10 @@ public class MainSceneController {
 				handleSave();
 				return true;
 			} else return result.get() == dontSaveButton;
-		} else return false;
+		} else {
+			// Not returning true, so no save will occur and the prompt will appear again next time.
+			return false;
+		}
 	}
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
@@ -554,7 +566,12 @@ public class MainSceneController {
 		mainStage.setTitle(MainApp.APP_NAME);
 	}
 	private void updateStageTitle() {
-		mainStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
+		if (toneFile != null) {
+			mainStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
+		} else {
+			resetStageTitle();
+		}
+
 	}
 
 	/*
@@ -562,7 +579,6 @@ public class MainSceneController {
 	 */
 	@FXML void handleNewTone() {
 		if (checkSave() && createNewTone()) {
-			resetStageTitle();
 			clearChantLines();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
@@ -575,22 +591,21 @@ public class MainSceneController {
 
 			createChantLine(false);
 			createChantLine(true);
-			updateStageTitle();
+			resetToneEditedStatus();
 			handleSave(); // So that the tone is loadable (will be empty)
 		}
 	}
 	void handleOpenTone(File selectedFile) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if (checkSave() && loadTone(selectedFile)) {
-			resetStageTitle();
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
-			updateStageTitle();
+			resetToneEditedStatus();
 
 			saveToneMenuItem.setDisable(saveDisabled());
 
-			askToOverwrite = false;
+			askToOverwriteOutput = false;
 		}
 		LoadingTone = false;
 
@@ -610,17 +625,13 @@ public class MainSceneController {
 			alert.setHeaderText("Saving error!");
 			alert.initOwner(mainStage);
 			alert.showAndWait();
-		} else {
-			saveToneMenuItem.setDisable(false);
+		} else { // Save successful
+			resetToneEditedStatus();
 		}
 
 	}
 	@FXML private void handleSaveAs() {
-		if (createNewTone()) {
-			handleSave();
-			updateStageTitle();
-		}
-
+		if (createNewTone()) handleSave();
 	}
 	@FXML private void handleExit() {
 		Platform.exit();
@@ -673,9 +684,11 @@ public class MainSceneController {
 		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(this::setCurrentKey);
+		result.ifPresent(key -> {
+			toneEdited();
+			setCurrentKey(key);
+		});
 	}
-
 	@FXML private void handleEditHeaderInfo() {
 
 		new Thread(() -> Platform.runLater(() -> {
@@ -685,9 +698,16 @@ public class MainSceneController {
 			dialog.initOwner(mainStage);
 			Optional<String> result = dialog.showAndWait();
 
-			result.ifPresent(text -> headerText = text);
+			result.ifPresent(text -> {
+				toneEdited();
+				headerText = text;
+			});
 		})).start();
 
+	}
+	@FXML private void handleToggleManualCLAssignment() {
+		toneEdited();
+		syncCVLMapping();
 	}
 
 	/*
@@ -875,14 +895,14 @@ public class MainSceneController {
 	public void setFirstRepeated(String chant_line) {
 		for (ChantLineViewController chantLine : chantLineControllers) {
 			if (chantLine.getName().equals(chant_line)) {
-				chantLine.makeFirstRepeated();
+				chantLine.toggleFirstRepeated();
 			}
 		}
 	}
 
 	@FXML private void handleFinalRender() { // TODO: Needs improvement, especially in error reporting!
 
-		if (askToOverwrite) {
+		if (askToOverwriteOutput) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Overwrite");
 			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to create a new file)");
@@ -899,7 +919,7 @@ public class MainSceneController {
 			}
 		} else {
 			if (getNewRenderFilename()) {
-				askToOverwrite = true;
+				askToOverwriteOutput = true;
 			} else {
 				return;
 			}
@@ -998,6 +1018,18 @@ public class MainSceneController {
 		}
 
 		refreshAllChords();
+	}
+
+	void toneEdited() {
+		if (!askToSaveTone) {
+			askToSaveTone = true;
+			mainStage.setTitle("*" + mainStage.getTitle());
+		}
+	}
+
+	private void resetToneEditedStatus() {
+		askToSaveTone = false;
+		updateStageTitle();
 	}
 
 }

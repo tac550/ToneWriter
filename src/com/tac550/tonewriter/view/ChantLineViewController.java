@@ -342,8 +342,8 @@ public class ChantLineViewController implements CommentableView {
 		}
 	}
 
-	// Make sure ending context menu can be opened by left-clicking the button
 	@FXML public void setCadenceAction() {
+		edited();
 		removeEndingChords();
 		try {
 			addEndChord();
@@ -361,7 +361,8 @@ public class ChantLineViewController implements CommentableView {
 	@FXML public void moveDown() {
 		mainController.chantLineDown(this);
 	}
-	@FXML public void makeFirstRepeated() {
+	@FXML public void toggleFirstRepeated() {
+		edited();
 		if (!firstRepeated) {
 			mainController.clearFirstRepeated();
 			firstRepeated = true;
@@ -396,6 +397,7 @@ public class ChantLineViewController implements CommentableView {
 		return numAlternates;
 	}
 	@FXML public void addRecitingTone() throws IOException {
+		edited();
 		addRecitingChord();
 	}
 	@FXML private void editComment() {
@@ -445,6 +447,7 @@ public class ChantLineViewController implements CommentableView {
 		return commentString.replaceAll("\n", "/n");
 	}
 	public void setComment(String comment) {
+		mainController.toneEdited();
 		commentString = comment.replaceAll("/n", "\n");
 		if (!comment.isEmpty()) {
 			applyCommentGraphic(activeBubbleImage);
@@ -487,6 +490,10 @@ public class ChantLineViewController implements CommentableView {
 
 		return true;
 
+	}
+
+	void edited() {
+		mainController.toneEdited();
 	}
 
 }

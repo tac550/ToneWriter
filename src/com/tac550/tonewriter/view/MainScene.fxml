@@ -185,7 +185,7 @@
                         <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
                         <MenuItem fx:id="editHeaderInfoMenuItem" mnemonicParsing="false" onAction="#handleEditHeaderInfo" text="Edit Header Info..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#syncCVLMapping" text="Assign Phrases Manually" />
+                        <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
                   </items>
                 </Menu>
                   <Menu text="_Tools">
