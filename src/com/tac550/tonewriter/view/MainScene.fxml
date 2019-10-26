@@ -59,7 +59,7 @@
                            <bottom>
                               <HBox alignment="CENTER" BorderPane.alignment="CENTER">
                                  <children>
-                                    <Button onAction="#handleFinalRender" style="-fx-base: #00ff00;" text="E_xport PDF" />
+                                    <Button onAction="#handleFinalRender" style="-fx-base: #00ff00;" text="_Export PDF" />
                                  </children>
                               </HBox>
                            </bottom>

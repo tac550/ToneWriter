@@ -231,7 +231,7 @@ public class MainSceneController {
 
 		resetStageTitle();
 
-		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN),
+		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN),
 				this::handleFinalRender);
 	}
 	File getToneFile() {
