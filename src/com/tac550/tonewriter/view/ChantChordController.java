@@ -39,6 +39,9 @@ public class ChantChordController implements CommentableView {
 	
 	private String commentString = "";
 	private Image commentButtonState;
+
+	private TextField lastFocusedField;
+	private String lastFocusedContents;
 	
 	@FXML private AnchorPane rootLayout;
 	
@@ -66,13 +69,14 @@ public class ChantChordController implements CommentableView {
 				}
 			});
 			field.focusedProperty().addListener((ov, old_val, new_val) -> {
-				if (!new_val) { // Re-render when focus switched away from field
-					playButton.setDisable(true);
+				if (!new_val) { // Re-render when focus switched away only if the contents of this field changed
+					if (lastFocusedField == field && !field.getText().equals(lastFocusedContents)) {
+						refreshChordPreview();
+					}
+				} else { // When focus switched to the field
+					lastFocusedField = field;
+					lastFocusedContents = field.getText();
 
-					refreshChordPreview();
-
-					playButton.setDisable(false);
-				} else { // Select all when focus switched to the field
 					field.selectAll();
 				}
 			});
