@@ -1,29 +1,21 @@
 package com.tac550.tonewriter.view;
 
-import java.io.IOException;
-
 import com.tac550.tonewriter.io.QuickVerseIO;
-
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class QuickVerseController {
 
@@ -135,19 +127,18 @@ public class QuickVerseController {
 			}
 		};
 	    
-		Platform.runLater(() -> {
-			// Set escape, enter, and up key behavior for scene and list view
-			mainPane.setOnKeyPressed(keyHandler);
-			verseList.setOnKeyPressed(keyHandler);
-			// Set down arrow key behavior for filter field (focuses list view)
-			filterInput.setOnKeyPressed((ke) -> {
-				if (ke.getCode() == KeyCode.DOWN) {
-					verseList.requestFocus();
-					verseList.getSelectionModel().select(0);
-				}
-			});
+		// Set escape, enter, and up key behavior for scene and list view
+		mainPane.setOnKeyPressed(keyHandler);
+		verseList.setOnKeyPressed(keyHandler);
+		// Set down arrow key behavior for filter field (focuses list view)
+		filterInput.setOnKeyPressed((ke) -> {
+			if (ke.getCode() == KeyCode.DOWN) {
+				verseList.requestFocus();
+				verseList.getSelectionModel().select(0);
+				verseList.scrollTo(0);
+			}
 		});
-		
+
 		refreshVerses();
 	}
 	void setTargetField(TextField target) {
