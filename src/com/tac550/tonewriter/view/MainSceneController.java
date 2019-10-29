@@ -269,7 +269,7 @@ public class MainSceneController {
 
 		return loaderTask;
 	}
-	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
+	public Task<FXMLLoader> createChantLine() {
 
 		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
 
@@ -278,11 +278,11 @@ public class MainSceneController {
 			controller.setMainController(this);
 
 			chantLineControllers.add(controller);
-			Platform.runLater(() -> chantLineBox.getChildren().add(chantLineLayout));
+			Platform.runLater(() -> {
+				chantLineBox.getChildren().add(chantLineLayout);
+				recalcCLNames();
+			});
 
-			if (recalculateNames) {
-				Platform.runLater(this::recalcCLNames);
-			}
 		});
 
 		Thread loaderThread = new Thread(loaderTask);
@@ -589,8 +589,8 @@ public class MainSceneController {
 			currentKey = "C major";
 			manualCLAssignmentMenuItem.setSelected(false);
 
-			createChantLine(false);
-			createChantLine(true);
+			createChantLine();
+			createChantLine();
 			resetToneEditedStatus();
 			handleSave(); // So that the tone is loadable (will be empty)
 		}
@@ -641,7 +641,7 @@ public class MainSceneController {
 	 * Edit Menu Actions
 	 */
 	@FXML private void handleCreateChantLine() {
-		createChantLine(true);
+		createChantLine();
 	}
 	@FXML private void handleSetKeySignature() {
 		List<String> choices = new ArrayList<>();
