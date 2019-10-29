@@ -466,7 +466,7 @@ public class MainSceneController {
 	boolean checkSave() {
 		if (toneFile == null ||
 				!askToSaveTone ||
-				(toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode)) {
+				toneNotSavable()) {
 			return true;
 		}
 
@@ -490,6 +490,10 @@ public class MainSceneController {
 			return false;
 		}
 	}
+	private boolean toneNotSavable() {
+		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode;
+	}
+
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
@@ -1020,8 +1024,8 @@ public class MainSceneController {
 		refreshAllChords();
 	}
 
-	void toneEdited() {
-		if (!askToSaveTone) {
+	void toneEdited() { // TODO: This is happening when loading savable tones because of calls to recalcCLNames()
+		if (!askToSaveTone && !toneNotSavable()) {
 			askToSaveTone = true;
 			mainStage.setTitle("*" + mainStage.getTitle());
 		}
