@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+mkdir ../mac/ & \
 rm -rf ../mac/ToneWriter.app & \
 rm -rf ../mac/ToneWriter.app.zip & \
 rm -rf java-runtime & \
