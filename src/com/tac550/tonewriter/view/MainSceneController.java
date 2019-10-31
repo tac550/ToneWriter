@@ -269,7 +269,7 @@ public class MainSceneController {
 
 		return loaderTask;
 	}
-	public Task<FXMLLoader> createChantLine() {
+	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
 		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
 
@@ -280,7 +280,7 @@ public class MainSceneController {
 			chantLineControllers.add(controller);
 			Platform.runLater(() -> {
 				chantLineBox.getChildren().add(chantLineLayout);
-				recalcCLNames();
+				if (recalculateNames) recalcCLNames();
 			});
 
 		});
@@ -325,7 +325,7 @@ public class MainSceneController {
 					currentLetter++;
 				}
 			} else {
-				chantLine.makeCadence(); // TODO: Investigate why this isn't working if the cadence line was removed
+				chantLine.makeCadence();
 				// If this is not the only chant line...
 				if (prevMainLine != null) {
 					prevMainLine.setNumAlts(alternateCount - 1);
@@ -593,8 +593,8 @@ public class MainSceneController {
 			currentKey = "C major";
 			manualCLAssignmentMenuItem.setSelected(false);
 
-			createChantLine();
-			createChantLine();
+			createChantLine(false);
+			createChantLine(true);
 			resetToneEditedStatus();
 			handleSave(); // So that the tone is loadable (will be empty)
 		}
@@ -645,7 +645,7 @@ public class MainSceneController {
 	 * Edit Menu Actions
 	 */
 	@FXML private void handleCreateChantLine() {
-		createChantLine();
+		createChantLine(true);
 	}
 	@FXML private void handleSetKeySignature() {
 		List<String> choices = new ArrayList<>();
@@ -1024,7 +1024,7 @@ public class MainSceneController {
 		refreshAllChords();
 	}
 
-	void toneEdited() { // TODO: This is happening when loading savable tones because of calls to recalcCLNames()
+	void toneEdited() {
 		if (!askToSaveTone && !toneNotSavable()) {
 			askToSaveTone = true;
 			mainStage.setTitle("*" + mainStage.getTitle());

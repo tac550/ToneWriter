@@ -225,7 +225,7 @@ public class ToneReaderWriter {
 
 	private void readChantLine(String chantLine) throws IOException {
 
-		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine();
+		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(false);
 		ChantLineViewController currentChantLine = null;
 		try {
 			currentChantLine = currentChantLineLoader.get().getController();
