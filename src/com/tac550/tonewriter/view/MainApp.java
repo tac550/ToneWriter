@@ -77,6 +77,8 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
+		System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
+
 		launch(args);
 	}
 
