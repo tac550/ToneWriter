@@ -24,9 +24,12 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -93,16 +96,23 @@ public class MainApp extends Application {
 		// Print saved LilyPond directory if any, otherwise print null.
 		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
 
+		showSplash();
+
 		// Check for LilyPond installation - from prefs first
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
 		if (new File(lilyPondDirectory.getAbsolutePath() + getPlatformSpecificLPExecutable()).exists()) {
 			lilyPondAvailable = true;
 			System.out.println("LilyPond Found!");
+
+			// See if first-time setup is needed if using built-in LilyPond
+			if (lilyPondDirectory.getAbsolutePath().endsWith(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))) {
+				platformSpecificInitialization(); // First-time setup processes
+			}
+
 		} else {
 			System.out.println("LilyPond Missing!");
 		}
 
-		showSplash();
 		if (lilyPondAvailable()) {
 			try {
 				runLilyPondStartup(main_stage);
@@ -258,7 +268,7 @@ public class MainApp extends Application {
 
 	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows
+		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows and Linux
 			return "lilypond/bin";
 		} if (OS_NAME.startsWith("mac")) {
 			return "lilypond/opt/local/bin";
@@ -288,7 +298,7 @@ public class MainApp extends Application {
 	private static boolean getSystemDarkMode() {
 		if (OS_NAME.startsWith("win")) {
 
-			// Not sure how to determine light/dark theme on Windows
+			// TODO: Not sure how to determine light/dark theme on Windows
 
 			return false;
 		} if (OS_NAME.startsWith("mac")) {
@@ -298,10 +308,56 @@ public class MainApp extends Application {
 				process.waitFor(100, TimeUnit.MILLISECONDS);
 				return process.exitValue() == 0;
 			} catch (IOException | InterruptedException | IllegalThreadStateException ex) {
-				// IllegalThreadStateException thrown by process.exitValue(), if process didn't terminate
+				// IllegalThreadStateException thrown by process.exitValue() if process didn't terminate
 				return false;
 			}
 		} else return false;
+	}
+
+	private static void platformSpecificInitialization() {
+		if (OS_NAME.startsWith("win")) {
+			// TODO: implement
+		} if (OS_NAME.startsWith("mac")) {
+
+			if (new File("/opt/local/share/lilypond").exists()) {
+				// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
+				File localLPVerDir = new File(new File("lilypond/opt/local/share/lilypond").getAbsolutePath());
+				String LPVersion = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
+				for (File file : Objects.requireNonNull(new File("/opt/local/share/lilypond").listFiles())) {
+					if (file.getName().equals(LPVersion)) return;
+				}
+			}
+
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("First Time Setup");
+			alert.setHeaderText(String.format("Welcome to %s! Please enter your password when prompted to complete setup.", MainApp.APP_NAME));
+			alert.showAndWait();
+
+			try {
+				String[] command = {
+						"osascript",
+						"-e",
+						String.format("do shell script \"cp -Rf %s /opt/\" with administrator privileges",
+								new File("lilypond/opt/local").getAbsolutePath()) };
+				Process process = Runtime.getRuntime().exec(command);
+				process.waitFor();
+				BufferedReader bufferedReader = new BufferedReader(
+						new InputStreamReader(process.getErrorStream()));
+				String line;
+				while ((line = bufferedReader.readLine()) != null)
+					System.out.println(line);
+
+				System.out.println("SETUP EXIT CODE: " + process.exitValue());
+				if (process.exitValue() != 0) {
+					Platform.exit();
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} if (OS_NAME.startsWith("lin")) {
+			// TODO: implement
+		}
 	}
 
 }
