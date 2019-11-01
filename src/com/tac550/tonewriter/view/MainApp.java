@@ -229,15 +229,6 @@ public class MainApp extends Application {
 
 			mainStage.setScene(scene);
 
-			// Workaround for Mac bug where resizing is impossible after exiting full screen
-			// https://stackoverflow.com/questions/47476328/how-to-make-main-javafx-window-still-resizable-coming-back-from-full-screen-mode
-			mainStage.fullScreenProperty().addListener((v, o, n) -> {
-				if (!mainStage.isFullScreen()) {
-					mainStage.setResizable(false);
-					mainStage.setResizable(true);
-				}
-			});
-
 			mainController.setStage(mainStage);
 
 		} catch (IOException e) {
