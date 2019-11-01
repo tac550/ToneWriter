@@ -9,6 +9,6 @@ java.naming,jdk.charsets,jdk.crypto.ec,java.sql --output java-runtime/Contents/H
 jar2app ToneWriter.jar -n "ToneWriter" -d "ToneWriter" -i TWIcon.icns -b com.tac550.tonewriter \
 -v 0.5 -s 0.5 ../mac/ToneWriter.app -r java-runtime && \
 cp -a '../../Built-in Tones' '../mac/ToneWriter.app/Contents/Built-in Tones' && \
-cp -a '../../licenses' '../mac/ToneWriter.app/Contents/licenses' && \⌈
+cp -a '../../licenses' '../mac/ToneWriter.app/Contents/licenses' && \
 cd ../mac/ && \
 zip -r ToneWriter.app.zip ToneWriter.app
