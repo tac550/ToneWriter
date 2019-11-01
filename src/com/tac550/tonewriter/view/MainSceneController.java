@@ -181,7 +181,7 @@ public class MainSceneController {
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
 			setLilyPondLocationItem.setText("Locate LilyPond.app");
-			resetLilyPondLocationItem.setText("Reset LilyPond.app Location (use /Applications)");
+			resetLilyPondLocationItem.setText("Reset LilyPond Location (use built-in LilyPond)");
 		}
 
 		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
@@ -743,7 +743,7 @@ public class MainSceneController {
 	 */
 	@FXML private void handleSetLilyPondDir() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Please select the folder which contains lilypond.exe");
+		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
 		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, System.getProperty("user.home"))));
 		File savingDirectory = directoryChooser.showDialog(mainStage);
 		if (savingDirectory == null) return;

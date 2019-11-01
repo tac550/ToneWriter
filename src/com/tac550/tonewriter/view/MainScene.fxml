@@ -226,7 +226,7 @@
                            </content>
                         </CustomMenuItem>
                         <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
-                        <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use default)" />
+                        <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Directory (use built-in LilyPond)" />
                         <CustomMenuItem mnemonicParsing="false" text="Interface Separator">
                            <content>
                               <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
