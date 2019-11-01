@@ -638,7 +638,9 @@ public class MainSceneController {
 		if (createNewTone()) handleSave();
 	}
 	@FXML private void handleExit() {
-		Platform.exit();
+		if (checkSave()) {
+			Platform.exit();
+		}
 	}
 
 	/*
