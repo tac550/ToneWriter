@@ -748,14 +748,21 @@ public class MainSceneController {
 		File savingDirectory = directoryChooser.showDialog(mainStage);
 		if (savingDirectory == null) return;
 
+		String previousLocation = MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, null);
+		MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
 		if (new File(savingDirectory.getAbsolutePath() + File.separator + MainApp.getPlatformSpecificLPExecutable()).exists()) {
-			MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Restart");
 			alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
 			alert.initOwner(mainStage);
 			alert.showAndWait();
 		} else {
+			if (previousLocation == null) {
+				MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
+			} else {
+				MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, previousLocation);
+			}
+
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
 			alert.setHeaderText("That directory does not contain a valid LilyPond executable.");

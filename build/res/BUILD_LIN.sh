@@ -7,5 +7,6 @@ jdk.charsets,jdk.crypto.ec,java.sql --output ../lin/java-runtime && \
 cp tonewriter.jar ../lin/jar/tonewriter.jar && \
 cp -r "../../Built-in Tones" "../lin/Built-in Tones" && \
 cp -r ../../licenses ../lin/licenses && \
+cp -r ../../lilypond ../lin/lilypond && \
 cp ToneWriter.sh ../lin && \
 zip -r ../lin/ToneWriter0.5-Linux.zip ../lin/*

@@ -141,7 +141,7 @@ public class MainApp extends Application {
 
 		// Start the application maximized.
 		// This also mitigates an issue with UI widgets disappearing when hovered (assuming the user keeps it maximized).
-		// TODO: That issue needs a more comprehensive fix.
+		// TODO: This issue needs a more comprehensive fix.
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
 
@@ -249,20 +249,21 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win")) {
 			return "\\lilypond.exe";
 		} if (OS_NAME.startsWith("mac")) {
-			return "/LilyPond.app/Contents/Resources/bin/lilypond";
+			return (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) ? "/lilypond"
+					: "/LilyPond.app/Contents/Resources/bin/lilypond";
 		} if (OS_NAME.startsWith("lin")) {
 			return "/lilypond";
 		} else return null;
 	}
 
-	// Returns the default directory where LilyPond is installed.
+	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		if (OS_NAME.startsWith("win")) {
-			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
+		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows
+			return "lilypond/bin";
 		} if (OS_NAME.startsWith("mac")) {
-			return "/Applications";
+			return "lilypond/opt/local/bin";
 		} if (OS_NAME.startsWith("lin")) {
-			return "/usr/bin";
+			return "lilypond/opt/local/bin";
 		} else return null;
 	}
 

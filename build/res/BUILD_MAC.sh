@@ -10,5 +10,6 @@ jar2app ToneWriter.jar -n "ToneWriter" -d "ToneWriter" -i TWIcon.icns -b com.tac
 -v 0.5 -s 0.5 ../mac/ToneWriter.app -r java-runtime && \
 cp -a '../../Built-in Tones' '../mac/ToneWriter.app/Contents/Built-in Tones' && \
 cp -a '../../licenses' '../mac/ToneWriter.app/Contents/licenses' && \
+cp -a '../../lilypond' '../mac/ToneWriter.app/Contents/lilypond' && \
 cd ../mac/ && \
 zip -r ToneWriter.app.zip ToneWriter.app
