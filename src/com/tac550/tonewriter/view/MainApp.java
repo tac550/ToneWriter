@@ -270,11 +270,11 @@ public class MainApp extends Application {
 
 	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows and Linux
+		if (OS_NAME.startsWith("win")) {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		} if (OS_NAME.startsWith("mac")) {
 			return "/opt/local/bin";
-		} if (OS_NAME.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) { // TODO: Finish implementing this for Linux
 			return "lilypond/opt/local/bin";
 		} else return null;
 	}
