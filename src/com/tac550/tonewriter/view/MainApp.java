@@ -273,7 +273,7 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows and Linux
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		} if (OS_NAME.startsWith("mac")) {
-			return "lilypond/opt/local/bin";
+			return "/opt/local/bin";
 		} if (OS_NAME.startsWith("lin")) {
 			return "lilypond/opt/local/bin";
 		} else return null;
