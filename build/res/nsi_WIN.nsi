@@ -42,6 +42,8 @@ Section "ToneWriter" Section1
 	File "..\win\ToneWriter.exe"
 	SetOutPath "$INSTDIR\licenses\"
 	File "..\win\licenses\third-party-licenses.txt"
+	SetOutPath "$INSTDIR\lilypond\"
+	File /r "lilypond\"
 	CreateShortCut "$DESKTOP\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
 	CreateDirectory "$SMPROGRAMS\ToneWriter"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
@@ -114,6 +116,7 @@ Section Uninstall
 	; Remove remaining directories
 	RMDir "$SMPROGRAMS\ToneWriter"
 	RMDir "$INSTDIR\licenses\"
+	RMDir "$INSTDIR\lilypond\"
 	RMDir "$INSTDIR\"
 
 	${unregisterExtension} ".tone" "TONE File"

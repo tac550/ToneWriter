@@ -80,7 +80,9 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
+		if (OS_NAME.startsWith("mac")) {
+			System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
+		}
 
 		launch(args);
 	}
@@ -98,16 +100,16 @@ public class MainApp extends Application {
 
 		showSplash();
 
+		// See if first-time setup is needed if using built-in LilyPond
+		if (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) {
+			platformSpecificInitialization(); // First-time setup processes
+		}
+
 		// Check for LilyPond installation - from prefs first
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
 		if (new File(lilyPondDirectory.getAbsolutePath() + getPlatformSpecificLPExecutable()).exists()) {
 			lilyPondAvailable = true;
 			System.out.println("LilyPond Found!");
-
-			// See if first-time setup is needed if using built-in LilyPond
-			if (lilyPondDirectory.getAbsolutePath().endsWith(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))) {
-				platformSpecificInitialization(); // First-time setup processes
-			}
 
 		} else {
 			System.out.println("LilyPond Missing!");
@@ -269,7 +271,7 @@ public class MainApp extends Application {
 	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
 		if (OS_NAME.startsWith("win")) { // TODO: Finish implementing this for Windows and Linux
-			return "lilypond/bin";
+			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		} if (OS_NAME.startsWith("mac")) {
 			return "lilypond/opt/local/bin";
 		} if (OS_NAME.startsWith("lin")) {
@@ -316,7 +318,27 @@ public class MainApp extends Application {
 
 	private static void platformSpecificInitialization() {
 		if (OS_NAME.startsWith("win")) {
-			// TODO: implement
+			if (!new File(System.getenv("ProgramFiles(X86)") + "\\LilyPond").exists()) {
+
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("First Time Setup");
+				alert.setHeaderText(String.format("Welcome to %s!" +
+						" Please click through the following LilyPond installer to complete setup.", MainApp.APP_NAME));
+				alert.showAndWait();
+
+				try {
+					System.out.println("TRIBLE");
+					Process process = Runtime.getRuntime().exec(String.format("cmd /c lilypond\\%s",
+							Objects.requireNonNull(new File("lilypond\\").listFiles(
+									file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
+					process.waitFor();
+					if (process.exitValue() != 0) {
+						Platform.exit();
+					}
+				} catch (IOException | InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		} if (OS_NAME.startsWith("mac")) {
 
 			if (new File("/opt/local/share/lilypond").exists()) {
