@@ -380,7 +380,7 @@ public class ChantLineViewController implements CommentableView {
 	void setHasPrime(boolean has_prime) {
 		hasPrime = has_prime;
 	}
-	boolean hasPrime() {
+	boolean getHasPrime() {
 		return hasPrime;
 	}
 	public void makeAlternate() {

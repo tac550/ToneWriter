@@ -366,7 +366,7 @@ public class MainSceneController {
 				VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
 				continue;
 			// If it's the second-to-last line before the end or a separator, it gets prime, if any.
-			} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.hasPrime()) {
+			} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.getHasPrime()) {
 				verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
 				continue;
 			}
