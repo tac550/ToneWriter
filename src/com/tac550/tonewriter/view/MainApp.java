@@ -274,8 +274,8 @@ public class MainApp extends Application {
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		} if (OS_NAME.startsWith("mac")) {
 			return "/opt/local/bin";
-		} if (OS_NAME.startsWith("lin")) { // TODO: Finish implementing this for Linux
-			return "lilypond/opt/local/bin";
+		} if (OS_NAME.startsWith("lin")) {
+			return "/usr/bin";
 		} else return null;
 	}
 
@@ -318,7 +318,7 @@ public class MainApp extends Application {
 
 	private static void platformSpecificInitialization() {
 		if (OS_NAME.startsWith("win")) {
-			if (!new File(System.getenv("ProgramFiles(X86)") + "\\LilyPond").exists()) {
+			if (!new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir())).exists()) {
 
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("First Time Setup");
@@ -341,7 +341,7 @@ public class MainApp extends Application {
 			}
 		} if (OS_NAME.startsWith("mac")) {
 
-			if (new File("/opt/local/share/lilypond").exists()) {
+			if (new File("/opt/local/share/lilypond").exists()) { // TODO: Why does this path differ from the one above?
 				// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
 				File localLPVerDir = new File(new File("lilypond/opt/local/share/lilypond").getAbsolutePath());
 				String LPVersion = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
@@ -378,7 +378,13 @@ public class MainApp extends Application {
 			}
 
 		} if (OS_NAME.startsWith("lin")) {
-			// TODO: implement
+			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("First Time Setup");
+				alert.setHeaderText(String.format("Welcome to %s! Please either install LilyPond from your " +
+						"distro's repositories or locate your copy from the Options menu.", MainApp.APP_NAME));
+				alert.showAndWait();
+			}
 		}
 	}
 

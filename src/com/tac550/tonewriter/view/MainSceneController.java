@@ -181,7 +181,8 @@ public class MainSceneController {
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
 			setLilyPondLocationItem.setText("Locate LilyPond.app");
-			resetLilyPondLocationItem.setText("Reset LilyPond Location (use built-in LilyPond)");
+		} if (MainApp.OS_NAME.startsWith("lin")) {
+			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
 		}
 
 		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
