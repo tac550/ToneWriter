@@ -318,7 +318,7 @@ public class MainApp extends Application {
 
 	private static void platformSpecificInitialization() {
 		if (OS_NAME.startsWith("win")) {
-			if (!new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir())).exists()) {
+			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("First Time Setup");
