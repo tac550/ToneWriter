@@ -340,8 +340,8 @@ public class MainApp extends Application {
 				}
 			}
 		} if (OS_NAME.startsWith("mac")) {
-
-			if (new File("/opt/local/share/lilypond").exists()) { // TODO: Why does this path differ from the one above?
+			
+			if (new File("/opt/local/share/lilypond").exists()) {
 				// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
 				File localLPVerDir = new File(new File("lilypond/opt/local/share/lilypond").getAbsolutePath());
 				String LPVersion = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
