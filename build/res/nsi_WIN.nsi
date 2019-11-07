@@ -43,7 +43,7 @@ Section "ToneWriter" Section1
 	SetOutPath "$INSTDIR\licenses\"
 	File "..\win\licenses\third-party-licenses.txt"
 	SetOutPath "$INSTDIR\lilypond\"
-	File /r "lilypond\"
+	File /r "..\..\lilypond\"
 	CreateShortCut "$DESKTOP\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
 	CreateDirectory "$SMPROGRAMS\ToneWriter"
 	CreateShortCut "$SMPROGRAMS\ToneWriter\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"

@@ -327,7 +327,6 @@ public class MainApp extends Application {
 				alert.showAndWait();
 
 				try {
-					System.out.println("TRIBLE");
 					Process process = Runtime.getRuntime().exec(String.format("cmd /c lilypond\\%s",
 							Objects.requireNonNull(new File("lilypond\\").listFiles(
 									file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
