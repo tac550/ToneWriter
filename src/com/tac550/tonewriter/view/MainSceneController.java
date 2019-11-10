@@ -510,6 +510,8 @@ public class MainSceneController {
 		if (ToneReaderWriter.createToneFile(saveFile)) {
 			toneFile = saveFile;
 
+			saveToneMenuItem.setDisable(false);
+
 			return true;
 		} else {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -586,7 +588,6 @@ public class MainSceneController {
 		if (checkSave() && createNewTone()) {
 			clearChantLines();
 			editMenu.setDisable(false);
-			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
 
 			// Reset settings pertaining to any previously-loaded tone
