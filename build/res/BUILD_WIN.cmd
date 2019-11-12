@@ -1,5 +1,5 @@
 rmdir /s /q java-runtime & ^
-jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods-13 ^
+jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods* ^
 --add-modules java.xml,java.scripting,java.desktop,jdk.unsupported,javafx.controls,javafx.fxml,^
 java.naming,jdk.charsets,jdk.crypto.ec,java.sql --output java-runtime && ^
 launch4jc TWBuild_WIN.xml && ^
