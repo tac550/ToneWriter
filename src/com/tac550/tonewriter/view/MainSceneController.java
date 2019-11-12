@@ -526,7 +526,8 @@ public class MainSceneController {
 		if (selectedFile == null) {
 			FileChooser fileChooser = new FileChooser();
 			if (toneFile != null) {
-				fileChooser.setInitialDirectory(toneFile.getParentFile());
+				if (builtInToneLoaded()) fileChooser.setInitialDirectory(builtInDir);
+				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
 				if (builtInDir.exists()) {
 					fileChooser.setInitialDirectory(builtInDir);
@@ -961,9 +962,12 @@ public class MainSceneController {
 
 	}
 
+	private boolean builtInToneLoaded() {
+		return toneFile.getAbsolutePath().contains(builtInDir.getAbsolutePath());
+	}
+
 	private boolean saveDisabled() {
-		return toneFile.getAbsolutePath().contains(builtInDir.getAbsolutePath())
-				&& !MainApp.developerMode;
+		return builtInToneLoaded() && !MainApp.developerMode;
 	}
 
 	private boolean getNewRenderFilename() {
