@@ -239,7 +239,7 @@ public class MainSceneController {
 		resetStageTitle();
 
 		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN),
-				this::handleFinalRender);
+				this::handleExport);
 	}
 	File getToneFile() {
 		return toneFile;
@@ -962,7 +962,7 @@ public class MainSceneController {
 		}
 	}
 
-	@FXML private void handleFinalRender() { // TODO: Needs improvement, especially in error reporting! (rename export)
+	@FXML private void handleExport() { // TODO: Needs improvement, especially in error reporting!
 
 		if (askToOverwriteOutput) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
