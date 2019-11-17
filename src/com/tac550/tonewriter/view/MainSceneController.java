@@ -94,6 +94,7 @@ public class MainSceneController {
 	@FXML private ProgressBar setVerseProgressBar;
 
 	private String composerIconPath = getClass().getResource("/media/profile.png").toExternalForm();
+	private String keyIconPath = getClass().getResource("/media/key.png").toExternalForm();
 
 	private File toneFile;
 
@@ -163,7 +164,7 @@ public class MainSceneController {
 		addIcon.setFitWidth(iconSize);
 		addCLMenuItem.setGraphic(addIcon);
 
-		ImageView keyIcon = new ImageView(getClass().getResource("/media/key.png").toExternalForm());
+		ImageView keyIcon = new ImageView(keyIconPath);
 		keyIcon.setFitHeight(iconSize);
 		keyIcon.setFitWidth(iconSize);
 		setKeyMenuItem.setGraphic(keyIcon);
@@ -697,6 +698,10 @@ public class MainSceneController {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
+		ImageView keyIcon = new ImageView(keyIconPath);
+		keyIcon.setFitHeight(50);
+		keyIcon.setFitWidth(50);
+		dialog.setGraphic(keyIcon);
 		dialog.initOwner(mainStage);
 		Optional<String> result = dialog.showAndWait();
 
