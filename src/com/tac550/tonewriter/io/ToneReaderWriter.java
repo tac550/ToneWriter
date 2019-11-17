@@ -28,6 +28,7 @@ public class ToneReaderWriter {
 
 	private ArrayList<ChantLineViewController> chantLines;
 
+	private String poetText;
 	private String composerText;
 	private String keySig;
 	private CheckMenuItem manualCLAssignmentMenuItem;
@@ -35,10 +36,11 @@ public class ToneReaderWriter {
 	private MainSceneController mainScene;
 
 	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment,
-	                        String key, String composer) {
+	                        String key, String poet, String composer) {
 		chantLines = lines;
 		manualCLAssignmentMenuItem = manual_assignment;
 		keySig = key;
+		poetText = poet;
 		composerText = composer;
 	}
 	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment) {
@@ -63,7 +65,8 @@ public class ToneReaderWriter {
 			printWriter.println("VERSION: " + MainApp.APP_VERSION);
 			printWriter.println("Key Signature: " +
 					keySig.replace("♯", "s").replace("♭", "f"));
-			printWriter.println("Composer Text: " + composerText);
+			printWriter.println("Tone: " + poetText);
+			printWriter.println("Composer: " + composerText);
 			printWriter.println("Manually Assign Phrases: " + manualCLAssignmentMenuItem.isSelected());
 			printWriter.println();
 			printWriter.println();
@@ -161,15 +164,20 @@ public class ToneReaderWriter {
 			versionSaved = Float.parseFloat(tryReadingLine(header, 0, "0"));
 			keySig = tryReadingLine(header, 1, "C major")
 					.replace("s", "♯").replace("f", "♭");
-			composerText = tryReadingLine(header, 2, "");
+			if (versionSaved < 0.6) {
+				composerText = tryReadingLine(header, 2, "");
+			} else {
+				poetText = tryReadingLine(header, 2, "");
+				composerText = tryReadingLine(header, 3, "");
+			}
 			manualCLAssignmentMenuItem.setSelected(
-					Boolean.parseBoolean(tryReadingLine(header, 3, "false")));
+					Boolean.parseBoolean(tryReadingLine(header, versionSaved < 0.6 ? 3 : 4, "false")));
 
 			if (footer != null) {
 				firstRepeated = tryReadingLine(footer, 0, "");
 			}
 
-			// Version checking
+			// Version warning
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Warning");
@@ -204,7 +212,13 @@ public class ToneReaderWriter {
 		}
 
 		main_scene.setCurrentKey(keySig);
-		main_scene.setHeaderText(composerText);
+		if (versionSaved < 0.6) {
+			String[] headerParts = composerText.split("-", 2);
+			main_scene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
+		} else {
+			main_scene.setHeaderText(poetText, composerText);
+		}
+
 		main_scene.recalcCLNames();
 		main_scene.setFirstRepeated(firstRepeated);
 		

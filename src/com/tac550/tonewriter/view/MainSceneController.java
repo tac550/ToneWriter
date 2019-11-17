@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -27,6 +28,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -91,10 +93,13 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private ProgressBar setVerseProgressBar;
 
+	private String composerIconPath = getClass().getResource("/media/profile.png").toExternalForm();
+
 	private File toneFile;
 
 	private String currentKey = "C major";
-	private String headerText = "";
+	private String poetText = "";
+	private String composerText = "";
 	private String paperSize = "";
 
 	static boolean LoadingTone = false;
@@ -163,7 +168,7 @@ public class MainSceneController {
 		keyIcon.setFitWidth(iconSize);
 		setKeyMenuItem.setGraphic(keyIcon);
 
-		ImageView composerIcon = new ImageView(getClass().getResource("/media/profile.png").toExternalForm());
+		ImageView composerIcon = new ImageView(composerIconPath);
 		composerIcon.setFitHeight(iconSize);
 		composerIcon.setFitWidth(iconSize);
 		editHeaderInfoMenuItem.setGraphic(composerIcon);
@@ -245,8 +250,9 @@ public class MainSceneController {
 		currentKey = key;
 		refreshChordKeySignatures(currentKey);
 	}
-	public void setHeaderText(String text) {
-		headerText = text;
+	public void setHeaderText(String poet, String composer) {
+		poetText = poet;
+		composerText = composer;
 	}
 
 	private void setPaperSize(String size) {
@@ -592,7 +598,8 @@ public class MainSceneController {
 			saveToneAsMenuItem.setDisable(false);
 
 			// Reset settings pertaining to any previously-loaded tone
-			headerText = "";
+			poetText = "";
+			composerText = "";
 			currentKey = "C major";
 			manualCLAssignmentMenuItem.setSelected(false);
 
@@ -625,7 +632,7 @@ public class MainSceneController {
 		if (toneFile == null || saveDisabled()) return;
 
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
-				headerText);
+				poetText, composerText);
 		if (!toneWriter.saveTone(toneFile)) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Error");
@@ -701,15 +708,49 @@ public class MainSceneController {
 	@FXML private void handleEditHeaderInfo() {
 
 		new Thread(() -> Platform.runLater(() -> {
-			TextInputDialog dialog = new TextInputDialog(headerText); // Initial text is existing composer text, if any.
+			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
-			dialog.setHeaderText("Input header info (formatted \"Tone # - Composer/System\")");
+			dialog.setHeaderText("Input header info for first page");
+			ImageView composerIcon = new ImageView(composerIconPath);
+			composerIcon.setFitHeight(50);
+			composerIcon.setFitWidth(50);
+			dialog.setGraphic(composerIcon);
 			dialog.initOwner(mainStage);
-			Optional<String> result = dialog.showAndWait();
 
-			result.ifPresent(text -> {
-				toneEdited();
-				headerText = text;
+			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			grid.setPadding(new Insets(20, 20, 10, 10));
+
+			TextField poetField = new TextField(poetText);
+			poetField.setPromptText("Tone #");
+			TextField composerField = new TextField(composerText);
+			composerField.setPromptText("Composer - System");
+			composerField.setPrefWidth(200);
+
+			grid.add(new Label("Left side:"), 0, 0);
+			grid.add(poetField, 1, 0);
+			grid.add(new Label("Right side:"), 2, 0);
+			grid.add(composerField, 3, 0);
+
+			dialog.getDialogPane().setContent(grid);
+
+			dialog.setResultConverter(dialogButton -> {
+				if (dialogButton == ButtonType.OK) {
+					return new Pair<>(poetField.getText(), composerField.getText());
+				}
+				return null;
+			});
+
+			Optional<Pair<String, String>> result = dialog.showAndWait();
+
+			result.ifPresent(poetComposer -> {
+				if (poetComposer.getKey().matches("[0-9]")) poetText = "Tone " + poetComposer.getKey();
+				else poetText = poetComposer.getKey();
+
+				composerText = poetComposer.getValue();
 			});
 		})).start();
 
@@ -916,7 +957,7 @@ public class MainSceneController {
 		}
 	}
 
-	@FXML private void handleFinalRender() { // TODO: Needs improvement, especially in error reporting!
+	@FXML private void handleFinalRender() { // TODO: Needs improvement, especially in error reporting! (rename export)
 
 		if (askToOverwriteOutput) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -943,7 +984,7 @@ public class MainSceneController {
 
 		try {
 			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					titleTextField.getText(), subtitleTextField.getText(), headerText, verseTopChoice.getValue(),
+					titleTextField.getText(), subtitleTextField.getText(), poetText, composerText, verseTopChoice.getValue(),
 					verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");

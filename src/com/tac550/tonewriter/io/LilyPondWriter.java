@@ -37,7 +37,7 @@ public class LilyPondWriter {
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      String title, String subtitle, String header,
+	                                      String title, String subtitle, String poet, String composer,
 	                                      String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
@@ -70,9 +70,8 @@ public class LilyPondWriter {
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7, "  subtitle = \"" + title + "\"");
 		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
-		String[] headerParts = header.split("-", 2);
-		lines.set(9, "  poet = \"" + headerParts[0].trim() + "\"");
-		lines.set(10, "  composer = \"" + (headerParts.length > 1 ? headerParts[1].trim() : "") + "\"");
+		lines.set(9, "  poet = \"" + poet.trim() + "\"");
+		lines.set(10, "  composer = \"" + composer.trim() + "\"");
 
 		lines.set(12, lines.get(12).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
