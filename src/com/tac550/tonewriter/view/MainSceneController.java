@@ -85,6 +85,7 @@ public class MainSceneController {
 	@FXML private ChoiceBox<String> verseTopChoice;
 	@FXML private TextField verseTopField;
 	@FXML private Button verseTopButton;
+	@FXML private CheckBox largeTitleCheckBox;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
 	@FXML private ChoiceBox<String> verseBottomChoice;
@@ -962,7 +963,7 @@ public class MainSceneController {
 		}
 	}
 
-	@FXML private void handleExport() { // TODO: Needs improvement, especially in error reporting!
+	@FXML private void handleExport() {
 
 		if (askToOverwriteOutput) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -989,8 +990,8 @@ public class MainSceneController {
 
 		try {
 			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					titleTextField.getText(), subtitleTextField.getText(), poetText, composerText, verseTopChoice.getValue(),
-					verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
+					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
+					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
 				alert.setHeaderText("An error occurred while saving!");

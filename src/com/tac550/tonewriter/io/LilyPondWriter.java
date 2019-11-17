@@ -37,7 +37,7 @@ public class LilyPondWriter {
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      String title, String subtitle, String poet, String composer,
+	                                      Boolean largeTitle, String title, String subtitle, String poet, String composer,
 	                                      String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
@@ -68,7 +68,7 @@ public class LilyPondWriter {
 
 		// Adding paper size, title, and header info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		lines.set(7, "  subtitle = \"" + title + "\"");
+		lines.set(7, (largeTitle ? "  title = \"" : "  subtitle = \"") + title + "\"");
 		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
 		lines.set(9, "  poet = \"" + poet.trim() + "\"");
 		lines.set(10, "  composer = \"" + composer.trim() + "\"");
@@ -447,6 +447,8 @@ public class LilyPondWriter {
 		lines.set(36, parts[PART_TENOR]);
 		lines.set(42, parts[PART_BASS]);
 		lines.set(48, verseText.toString());
+		// If using title instead of subtitle, make sure it repeats on each page.
+		if (largeTitle) lines.set(53, lines.get(53).replace("subtitle", "title"));
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
 			lines.set(57, "\\markup {");
