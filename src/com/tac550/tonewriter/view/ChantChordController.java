@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -20,9 +21,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -269,41 +267,7 @@ public class ChantChordController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		Task<Void> midiTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				// From file
-				Sequence sequence = MidiSystem.getSequence(midiFile);
-
-				// Create a sequencer for the sequence
-				Sequencer sequencer = MidiSystem.getSequencer();
-				sequencer.open();
-				sequencer.setSequence(sequence);
-
-				// Start playing
-				sequencer.start();
-
-				// Thread to close midi after it's had long enough to finish playing. Also highlights the play button.
-				// This fixes the application not closing correctly if the user played midi.
-				Thread stopThread = new Thread(() -> {
-					playButton.setStyle("-fx-base: #fffa61");
-					try {
-						Thread.sleep(1000);
-						playButton.setStyle("");
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					sequencer.close();
-				});
-				stopThread.start();
-
-				return null;
-			}
-		};
-
-		Thread midiThread = new Thread(midiTask);
-		midiThread.start();
+		MidiInterface.playMidi(midiFile, playButton);
 	}
 	@FXML private void editComment() {
 

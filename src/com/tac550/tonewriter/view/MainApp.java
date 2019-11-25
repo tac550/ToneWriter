@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.MidiInterface;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -110,6 +111,7 @@ public class MainApp extends Application {
 		if (new File(lilyPondDirectory.getAbsolutePath() + getPlatformSpecificLPExecutable()).exists()) {
 			lilyPondAvailable = true;
 			System.out.println("LilyPond Found!");
+			MidiInterface.setUpMidiSystem(); // Set up the midi playback system only if lilypond is present.
 
 		} else {
 			System.out.println("LilyPond Missing!");
@@ -129,6 +131,11 @@ public class MainApp extends Application {
 			splashStage.close();
 			loadMainStage(main_stage);
 		}
+	}
+
+	@Override
+	public void stop() {
+		MidiInterface.closeMidiSystem();
 	}
 
 	private void loadMainStage(Stage main_stage) {
