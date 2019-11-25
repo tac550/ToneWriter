@@ -16,7 +16,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<StackPane fx:id="rootLayout" minHeight="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.VerseLineViewController">
+<StackPane fx:id="rootLayout" minHeight="-Infinity" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.VerseLineViewController">
    <children>
       <GridPane fx:id="mainContentPane" minHeight="105.0" prefHeight="105.0">
          <columnConstraints>
@@ -47,7 +47,7 @@
                      </rowConstraints>
                      <children>
                         <TextFlow fx:id="lineTextFlow" GridPane.hgrow="ALWAYS" />
-                        <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                        <ScrollPane hbarPolicy="NEVER" pannable="true" prefHeight="200.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                            <content>
                               <Pane fx:id="chordButtonPane" />
                            </content>
