@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.tac550.tonewriter.model.ChordData;
 
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseButton;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -26,8 +26,8 @@ public class SyllableText extends Text {
 	private boolean clicked = false;
 	private int nextNoteButtonYPos = 0;
 	
-	private Color defaultColor = MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK;
-	private Color highlightColor = Color.DARKCYAN;
+	Color defaultColor = MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK;
+	private static final Color highlightColor = Color.DARKCYAN;
 	
 	void setParent(VerseLineViewController controller) {
 		parentController = controller;
@@ -50,7 +50,7 @@ public class SyllableText extends Text {
 			}
 		});
 		
-		setOnMouseClicked((event) -> {
+		setOnMouseClicked(event -> {
 			if (active) {
 				if (event.getButton() == MouseButton.PRIMARY) {
 					parentController.syllableUnHovered();
@@ -64,15 +64,31 @@ public class SyllableText extends Text {
 				}
 			}
 		});
+
+		// Drag assignment events
+		setOnMouseDragReleased(event -> {
+			if (active) parentController.syllableDragCompleted(this);
+		});
+		setOnDragDetected(event -> {
+			if (active) {
+				parentController.syllableDragStarted(this);
+				startFullDrag();
+			}
+		});
+		setOnMouseDragEntered(event -> {
+			if (active) parentController.syllableDragEntered(this);
+		});
+		setOnMouseDragExited(event -> parentController.syllableDragExited());
+		setOnMouseReleased(event -> parentController.syllableDragReleased());
+
 	}
 	
 	void select(ChantChordController chord, Button note_button) {
-		if (clicked) {
-			nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
-			clicked = false;
-		} else {
+		if (!clicked) {
 			active = false;
 		}
+
+		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
 		
 		associatedChords.add(new ChordData(getText(), chord));
 		associatedButtons.add(note_button);

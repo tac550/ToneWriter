@@ -1,7 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.model.MappingAction;
+import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -40,7 +40,7 @@ public class VerseLineViewController {
 	private boolean isSeparatorLine = false;
 	@FXML private VBox separatorIndicatorBox;
 
-	private Stack<MappingAction> undoActions = new Stack<>();
+	private Stack<AssignmentAction> undoActions = new Stack<>();
 
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
@@ -63,8 +63,11 @@ public class VerseLineViewController {
 	private boolean changingAssignments = false;
 
 	private int currentChordIndex = 0; // Index of the chord currently being assigned
-	private int lastSyllableAssigned = -1; // Index of the last syllable to be clicked
+	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
 	private ChantChordController currentChord; // The chord currently being assigned
+
+	private int dragStartIndex = -1;
+	private boolean dragEnteredSinceExited = false;
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -190,7 +193,7 @@ public class VerseLineViewController {
 		if (undoActions.empty()) {
 			return;
 		}
-		MappingAction action = undoActions.pop();
+		AssignmentAction action = undoActions.pop();
 
 		for (Button button : action.buttons) {
 			chordButtonPane.getChildren().remove(button);
@@ -216,6 +219,7 @@ public class VerseLineViewController {
 	}
 
 	private void nextChordAssignment() {
+		if (associatedChantLines == null) return;
 		// If we have not placed or skipped the last chord...
 		if (currentChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
 			currentChord = associatedChantLines[selectedChantLine].getChords().get(currentChordIndex);
@@ -225,22 +229,20 @@ public class VerseLineViewController {
 			currentChordIndex++;
 
 			// Special disabling based on prep/post/normal
-			if (currentChord.getType() < 0) {
-				if (lastSyllableAssigned == -1) {
-					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate the first one.
-					for (int i = 1; i < lineTextFlow.getChildren().size(); i++) { // If the first chord is a prep/post, do the special case.
-						((SyllableText) lineTextFlow.getChildren().get(i)).deactivate();
-					}
+			deactivateAll();
+
+			if (currentChord.getType() < 0) { // If current chord is a Prep, Post, or End (limit assignment)
+				if (currentChordIndex == 1) { // If no chords have been assigned yet...
+					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
+					// Activate current syllable.
+					((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned)).reactivate();
 					if (lastSyllableAssigned < lineTextFlow.getChildren().size() - 1) { // Avoid error if there is no next SyllableText
-						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned)).reactivate(); // Reactivate current one, in case of undoing P/P from next syllable.
-						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).reactivate(); // Reactivate next one, in case first chord P/P case was activated before.
-						for (int i = lastSyllableAssigned+2; i < lineTextFlow.getChildren().size(); i++) {
-							((SyllableText) lineTextFlow.getChildren().get(i)).deactivate();
-						}
+						// Activate next syllable.
+						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).reactivate();
 					}
 				}
-			} else {
+			} else { // If current chord is a reciting (numbered) chord
 				for (int i = lastSyllableAssigned; i < lineTextFlow.getChildren().size(); i++) {
 					if (i < 0) continue; // In case we haven't assigned anything yet (lastSyllableAssigned is -1)
 					((SyllableText) lineTextFlow.getChildren().get(i)).reactivate();
@@ -259,55 +261,26 @@ public class VerseLineViewController {
 		}
 	}
 
+	void deactivateAll() {
+		for (Node syllNode : lineTextFlow.getChildren()) {
+			((SyllableText) syllNode).deactivate();
+		}
+	}
+
 	void syllableClicked(SyllableText clicked_text) {
 		if (currentChord ==  null) return;
 
-		// First, play the chord if chord playing is on.
-		if (parentController.playMidiAsAssigned()) {
-			currentChord.playMidi();
-		}
-
-		// Set up an undo action frame to store what happens.
-		MappingAction undoFrame = new MappingAction();
-		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
-		undoFrame.previousChordIndex = currentChordIndex - 1;
-
 		final int indexClicked = lineTextFlow.getChildren().indexOf(clicked_text);
 
-		if (lastSyllableAssigned == indexClicked) {
-			lastSyllableAssigned--;
-		} else if (lastSyllableAssigned >= 0) {
-			// Deactivate the previous syllable which may still have been active from last time
-			((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned)).deactivate();
+		if (lastSyllableAssigned == -1) {
+			assignChord(0, indexClicked);
+		} else if (lastSyllableAssigned == indexClicked) {
+			// If the clicked syllable already has a chord, this keeps it activated for further chord assignments.
+			assignChord(lastSyllableAssigned, indexClicked);
+		} else {
+			assignChord(lastSyllableAssigned + 1, indexClicked);
 		}
 
-
-		for (int i = lastSyllableAssigned+1; i <= indexClicked; i++) {
-			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
-			undoFrame.syllableTexts.add(currentText);
-
-			Button noteButton;
-
-			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
-					&& i == indexClicked) { // If placing the final instance of the last chord in the chant line, make it a half note.
-				noteButton = createNoteButton(currentText, true, currentChord);
-
-				undoFrame.buttons.add(noteButton);
-				currentText.select(currentChord, noteButton);
-				currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
-			} else {
-				noteButton = createNoteButton(currentText, false, currentChord);
-
-				undoFrame.buttons.add(noteButton);
-				currentText.select(currentChord, noteButton);
-			}
-
-		}
-
-		lastSyllableAssigned = indexClicked;
-		nextChordAssignment();
-
-		undoActions.push(undoFrame);
 	}
 	void syllableAltClicked() {
 		if (currentChord ==  null) return;
@@ -325,14 +298,102 @@ public class VerseLineViewController {
 		currentChord.setHighlighted(false);
 	}
 
+	void syllableDragStarted(SyllableText dragged_text) {
+		dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
+	}
+	void syllableDragEntered(SyllableText entered_text) {
+		if (currentChord == null) return;
+
+		dragEnteredSinceExited = true;
+
+		int dragEnteredIndex = lineTextFlow.getChildren().indexOf(entered_text);
+		int smaller = Math.min(dragStartIndex, dragEnteredIndex);
+		int larger = Math.max(dragStartIndex, dragEnteredIndex);
+		int i = 0;
+		for (Node syllNode : lineTextFlow.getChildren()) {
+			if (i >= smaller && i <= larger) {
+				((SyllableText) syllNode).setFill(currentChord.getColor());
+			} else {
+				((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
+			}
+
+			i++;
+		}
+	}
+	void syllableDragExited() {
+		dragEnteredSinceExited = false;
+		syllableDragFailed();
+	}
+	void syllableDragReleased() {
+		if (!dragEnteredSinceExited) {
+			syllableDragFailed();
+		}
+	}
+	void syllableDragCompleted(SyllableText released_text) {
+		int dragEndIndex = lineTextFlow.getChildren().indexOf(released_text);
+
+		if (currentChord == null || dragStartIndex == dragEndIndex) return;
+
+		int smaller = Math.min(dragStartIndex, dragEndIndex);
+		int larger = Math.max(dragStartIndex, dragEndIndex);
+
+		// TODO: Fix being able to double preps/posts/ends.
+		assignChord(smaller, larger); // TODO: fix drags working between syllables from different lines
+
+	}
+	private void syllableDragFailed() {
+		for (Node syllNode : lineTextFlow.getChildren()) {
+			((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
+		}
+	}
+
 	@FXML private void skipChord() {
 		// Set up an undo action frame to store what happens.
-		MappingAction undoFrame = new MappingAction();
+		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = currentChordIndex - 1;
 		undoActions.push(undoFrame);
 
 		nextChordAssignment();
+	}
+
+	private void assignChord(int firstSyllable, int lastSyllable) {
+		// First, play the chord if chord playing is on.
+		if (parentController.playMidiAsAssigned()) {
+			currentChord.playMidi();
+		}
+
+		// Set up an undo action frame to store what happens.
+		AssignmentAction undoFrame = new AssignmentAction();
+		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
+		undoFrame.previousChordIndex = currentChordIndex - 1;
+
+		for (int i = firstSyllable; i <= lastSyllable; i++) {
+			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
+			undoFrame.syllableTexts.add(currentText);
+
+			Button noteButton;
+
+			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
+					&& i == lastSyllable) { // If placing the final instance of the last chord in the chant line, make it a half note.
+				noteButton = createNoteButton(currentText, true, currentChord);
+
+				undoFrame.buttons.add(noteButton);
+				currentText.select(currentChord, noteButton);
+				currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
+			} else {
+				noteButton = createNoteButton(currentText, false, currentChord);
+
+				undoFrame.buttons.add(noteButton);
+				currentText.select(currentChord, noteButton);
+			}
+
+		}
+
+		lastSyllableAssigned = lastSyllable; // TODO: Potentially need to move outside this method
+		nextChordAssignment();
+
+		undoActions.push(undoFrame);
 	}
 
 	private Button createNoteButton(SyllableText syllable, boolean finalNote, ChantChordController chord) {

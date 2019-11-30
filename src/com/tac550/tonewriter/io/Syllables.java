@@ -10,6 +10,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -33,11 +34,15 @@ public class Syllables {
 	        		Arrays.asList(resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n")));
 
 		} catch (FailingHttpStatusCodeException | IOException e) {
-	    	Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Internet connection failure! Use Edit buttons to break up syllables.");
 
-			alert.showAndWait();
+			Platform.runLater(() -> {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Error");
+				alert.setHeaderText("Internet connection failure! Use Edit buttons to break up syllables.");
+
+				alert.showAndWait();
+			});
+
 			// Return the provided text without modification if there's a failure.
 			return full_verse.split("\\r?\\n");
 		}

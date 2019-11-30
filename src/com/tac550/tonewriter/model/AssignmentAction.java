@@ -6,7 +6,7 @@ import com.tac550.tonewriter.view.SyllableText;
 
 import javafx.scene.control.Button;
 
-public class MappingAction {
+public class AssignmentAction {
 
 	public int previousChordIndex;
 	public int previousLastSyllableAssigned;
