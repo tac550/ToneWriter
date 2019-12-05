@@ -299,7 +299,11 @@ public class VerseLineViewController {
 	}
 
 	void syllableDragStarted(SyllableText dragged_text) {
-		dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
+		if (currentChord.getType() == 1) { // Only allow drag operation to continue if not assigning a prep/post/end.
+			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
+			dragged_text.startFullDrag();
+		}
+
 	}
 	void syllableDragEntered(SyllableText entered_text) {
 		if (currentChord == null) return;
@@ -337,7 +341,6 @@ public class VerseLineViewController {
 		int smaller = Math.min(dragStartIndex, dragEndIndex);
 		int larger = Math.max(dragStartIndex, dragEndIndex);
 
-		// TODO: Fix being able to double preps/posts/ends.
 		assignChord(smaller, larger); // TODO: fix drags working between syllables from different lines
 
 	}
@@ -390,7 +393,7 @@ public class VerseLineViewController {
 
 		}
 
-		lastSyllableAssigned = lastSyllable; // TODO: Potentially need to move outside this method
+		lastSyllableAssigned = lastSyllable;
 		nextChordAssignment();
 
 		undoActions.push(undoFrame);

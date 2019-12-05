@@ -70,10 +70,7 @@ public class SyllableText extends Text {
 			if (active) parentController.syllableDragCompleted(this);
 		});
 		setOnDragDetected(event -> {
-			if (active) {
-				parentController.syllableDragStarted(this);
-				startFullDrag();
-			}
+			if (active) parentController.syllableDragStarted(this);
 		});
 		setOnMouseDragEntered(event -> {
 			if (active) parentController.syllableDragEntered(this);
@@ -84,9 +81,7 @@ public class SyllableText extends Text {
 	}
 	
 	void select(ChantChordController chord, Button note_button) {
-		if (!clicked) {
-			active = false;
-		}
+		if (!clicked) active = false;
 
 		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
 		
