@@ -67,7 +67,7 @@ public class VerseLineViewController {
 	private ChantChordController currentChord; // The chord currently being assigned
 
 	private int dragStartIndex = -1;
-	private boolean dragEnteredSinceExited = false;
+	private boolean dragStartedWithinLine = false;
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -299,16 +299,17 @@ public class VerseLineViewController {
 	}
 
 	void syllableDragStarted(SyllableText dragged_text) {
+		if (currentChord == null) return;
+
 		if (currentChord.getType() == 1) { // Only allow drag operation to continue if not assigning a prep/post/end.
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
-		}
 
+			dragStartedWithinLine = true;
+		}
 	}
 	void syllableDragEntered(SyllableText entered_text) {
-		if (currentChord == null) return;
-
-		dragEnteredSinceExited = true;
+		if (currentChord == null || !dragStartedWithinLine) return;
 
 		int dragEnteredIndex = lineTextFlow.getChildren().indexOf(entered_text);
 		int smaller = Math.min(dragStartIndex, dragEnteredIndex);
@@ -325,15 +326,16 @@ public class VerseLineViewController {
 		}
 	}
 	void syllableDragExited() {
-		dragEnteredSinceExited = false;
-		syllableDragFailed();
+		defaultSyllableColors();
 	}
 	void syllableDragReleased() {
-		if (!dragEnteredSinceExited) {
-			syllableDragFailed();
-		}
+		defaultSyllableColors();
+
+		dragStartedWithinLine = false;
 	}
 	void syllableDragCompleted(SyllableText released_text) {
+		if (!dragStartedWithinLine) return; // Drag did not start on this line - don't proceed.
+
 		int dragEndIndex = lineTextFlow.getChildren().indexOf(released_text);
 
 		if (currentChord == null || dragStartIndex == dragEndIndex) return;
@@ -341,13 +343,15 @@ public class VerseLineViewController {
 		int smaller = Math.min(dragStartIndex, dragEndIndex);
 		int larger = Math.max(dragStartIndex, dragEndIndex);
 
-		assignChord(smaller, larger); // TODO: fix drags working between syllables from different lines
+		assignChord(smaller, larger);
 
+		dragStartedWithinLine = false;
 	}
-	private void syllableDragFailed() {
+	private void defaultSyllableColors() {
 		for (Node syllNode : lineTextFlow.getChildren()) {
 			((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
 		}
+
 	}
 
 	@FXML private void skipChord() {
