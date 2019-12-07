@@ -236,9 +236,9 @@ public class VerseLineViewController {
 					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
 					// Activate current syllable.
-					((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned)).reactivate();
+					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).reactivate();
 					if (lastSyllableAssigned < lineTextFlow.getChildren().size() - 1) { // Avoid error if there is no next SyllableText
-						// Activate next syllable.
+						// Activate next syllable. (repeats above operation if lastSyllableAssigned is -1)
 						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).reactivate();
 					}
 				}
