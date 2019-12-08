@@ -38,7 +38,7 @@ public class ChantLineViewController implements CommentableView {
 	private String commentString = "";
 	private Image commentButtonState;
 	
-	@FXML GridPane rootLayout;
+	@FXML GridPane mainPane;
 	
 	@FXML Button upButton;
 	@FXML Button downButton;
@@ -197,8 +197,8 @@ public class ChantLineViewController implements CommentableView {
 		return result;
 	}
 	
-	GridPane getRootLayout() {
-		return rootLayout;
+	GridPane getMainPane() {
+		return mainPane;
 	}
 
 	MainSceneController getMainController() {

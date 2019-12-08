@@ -918,7 +918,7 @@ public class MainSceneController {
 	}
 
 	void removeChantLine(ChantLineViewController chantLineViewController) {
-		chantLineBox.getChildren().remove(chantLineViewController.getRootLayout());
+		chantLineBox.getChildren().remove(chantLineViewController.getMainPane());
 		chantLineControllers.remove(chantLineViewController);
 		recalcCLNames();
 	}
