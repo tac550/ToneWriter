@@ -388,7 +388,7 @@ public class MainApp extends Application {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("First Time Setup");
 				alert.setHeaderText(String.format("Welcome to %s! Please either install \"lilypond\" from your " +
-						"distribuition's repositories or locate your copy from the Options menu.", MainApp.APP_NAME));
+						"distribution's repositories or locate your copy from the Options menu.", MainApp.APP_NAME));
 				alert.showAndWait();
 			}
 		}
