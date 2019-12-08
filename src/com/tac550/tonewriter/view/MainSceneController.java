@@ -923,7 +923,7 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 	void removeVerseLine(VerseLineViewController verseLineViewController) {
-		verseLineBox.getChildren().remove(verseLineViewController.getRootLayout());
+		verseLineBox.getChildren().remove(verseLineViewController.getMainPane());
 		verseLineControllers.remove(verseLineViewController);
 		syncCVLMapping();
 	}

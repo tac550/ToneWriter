@@ -292,7 +292,7 @@ public class ChantLineViewController implements CommentableView {
 		return controller;
 	}
 	void removeChord(ChantChordController chord) {
-		chordBox.getChildren().remove(chord.getRootLayout());
+		chordBox.getChildren().remove(chord.getMainPane());
 		chantChordControllers.remove(chord);
 		recalcCHNames();
 	}

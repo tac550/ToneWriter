@@ -41,7 +41,7 @@ public class ChantChordController implements CommentableView {
 	private TextField lastFocusedField;
 	private String lastFocusedContents;
 	
-	@FXML private AnchorPane rootLayout;
+	@FXML private AnchorPane mainPane;
 	
 	@FXML private Text numText;
 	@FXML private ImageView chordView;
@@ -187,8 +187,8 @@ public class ChantChordController implements CommentableView {
 		}
 	}
 
-	AnchorPane getRootLayout() {
-		return rootLayout;
+	AnchorPane getMainPane() {
+		return mainPane;
 	}
 
 	@FXML private File refreshChordPreview() {

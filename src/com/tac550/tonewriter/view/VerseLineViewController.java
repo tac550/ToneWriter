@@ -34,7 +34,7 @@ public class VerseLineViewController {
 
 	private VerseLine verseLine;
 
-	@FXML private StackPane rootLayout;
+	@FXML private StackPane mainPane;
 	@FXML private GridPane mainContentPane;
 
 	private boolean isSeparatorLine = false;
@@ -214,8 +214,8 @@ public class VerseLineViewController {
 		parentController.removeVerseLine(this);
 	}
 
-	StackPane getRootLayout() {
-		return rootLayout;
+	StackPane getMainPane() {
+		return mainPane;
 	}
 
 	private void nextChordAssignment() {
@@ -508,6 +508,7 @@ public class VerseLineViewController {
 				syllableStage.setScene(new Scene(rootLayout));
 				syllableStage.initModality(Modality.APPLICATION_MODAL);
 				syllableStage.setResizable(false);
+				syllableStage.initOwner(mainPane.getScene().getWindow());
 				syllableStage.show();
 			});
 		});
