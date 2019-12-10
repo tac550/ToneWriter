@@ -44,7 +44,11 @@ public class AboutSceneController {
 	
 	@FXML private void handleGitHubLink() {
 		try {
-			Desktop.getDesktop().browse(new URL("https://github.com/tac550/ToneWriter/").toURI());
+			if (MainApp.OS_NAME.startsWith("lin")) {
+				Runtime.getRuntime().exec("xdg-open https://github.com/tac550/ToneWriter/");
+			} else {
+				Desktop.getDesktop().browse(new URL("https://github.com/tac550/ToneWriter/").toURI());
+			}
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
