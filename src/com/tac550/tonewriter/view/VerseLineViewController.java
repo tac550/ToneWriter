@@ -66,8 +66,7 @@ public class VerseLineViewController {
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
 	private ChantChordController currentChord; // The chord currently being assigned
 
-	private int dragStartIndex = -1;
-	private boolean dragStartedWithinLine = false;
+	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -305,11 +304,10 @@ public class VerseLineViewController {
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
 
-			dragStartedWithinLine = true;
 		}
 	}
 	void syllableDragEntered(SyllableText entered_text) {
-		if (currentChord == null || !dragStartedWithinLine) return;
+		if (currentChord == null || dragStartIndex == -1) return;
 
 		int dragEnteredIndex = lineTextFlow.getChildren().indexOf(entered_text);
 		int smaller = Math.min(dragStartIndex, dragEnteredIndex);
@@ -331,10 +329,10 @@ public class VerseLineViewController {
 	void syllableDragReleased() {
 		defaultSyllableColors();
 
-		dragStartedWithinLine = false;
+		dragStartIndex = -1;
 	}
 	void syllableDragCompleted(SyllableText released_text) {
-		if (!dragStartedWithinLine) return; // Drag did not start on this line - don't proceed.
+		if (dragStartIndex == -1) return; // Drag did not start on this line - don't proceed.
 
 		int dragEndIndex = lineTextFlow.getChildren().indexOf(released_text);
 
@@ -345,7 +343,7 @@ public class VerseLineViewController {
 
 		assignChord(smaller, larger);
 
-		dragStartedWithinLine = false;
+		dragStartIndex = -1;
 	}
 	private void defaultSyllableColors() {
 		for (Node syllNode : lineTextFlow.getChildren()) {
