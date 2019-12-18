@@ -107,7 +107,6 @@ public class ChantLineViewController implements CommentableView {
 			
 			setFirstRepeatedAvailable(false);
 			upButton.setDisable(true);
-			downButton.setDisable(false);
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
 				    String.valueOf(new_letter), --new_letter + "'",
@@ -116,9 +115,9 @@ public class ChantLineViewController implements CommentableView {
 			
 			setFirstRepeatedAvailable(true);
 			upButton.setDisable(false);
-			downButton.setDisable(false);
 		}
-		
+		downButton.setDisable(false);
+
 		decideSelection(previousSelection);
 	}
 	void makeCadence() {
@@ -205,88 +204,67 @@ public class ChantLineViewController implements CommentableView {
 		return mainController;
 	}
 
-	private FXMLLoader loadChord() {
+	private ChantChordController addChord(int position) throws IOException {
 		// Load layout from fxml file
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainApp.class.getResource("chantChordView.fxml"));
 
-		return loader;
-	}
-
-	public ChantChordController addRecitingChord() throws IOException {
-		if (countMainChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
-			return null;
-		}
-		FXMLLoader loader = loadChord();
-
 		AnchorPane chordLayout = loader.load();
 		ChantChordController controller = loader.getController();
 
-		// Add to end of lists but before any ending chords
-		int position = chantChordControllers.size() - countEndChords();
 		chantChordControllers.add(position, controller);
 		chordBox.getChildren().add(position, chordLayout);
 
 		controller.setChantLineController(this);
 		controller.setKeySignature(mainController.getCurrentKey());
+
+		return controller;
+	}
+	public ChantChordController addRecitingChord() throws IOException {
+		if (countMainChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
+			return null;
+		}
+		// Add to end of lists but before any ending chords
+		int position = chantChordControllers.size() - countEndChords();
+
+		ChantChordController controller = addChord(position);
+
 		recalcCHNames();
 
 		return controller;
 	}
 	ChantChordController addPrepChord(ChantChordController caller_chord, Color chord_color) throws IOException {
-		FXMLLoader loader = loadChord();
-
-		AnchorPane chordLayout = loader.load();
-		ChantChordController controller = loader.getController();
 
 		int before_reciting_chord = chantChordControllers.indexOf(caller_chord);
-		
-		chantChordControllers.add(before_reciting_chord, controller);
-		chordBox.getChildren().add(before_reciting_chord, chordLayout);
+
+		ChantChordController controller = addChord(before_reciting_chord);
 
 		controller.setColor(chord_color);
-		controller.setChantLineController(this);
 		controller.makePrep();
-		controller.setKeySignature(mainController.getCurrentKey());
 		recalcCHNames();
 		
 		return controller;
 	}
 	ChantChordController addPostChord(ChantChordController caller_chord, Color chord_color) throws IOException {
-		FXMLLoader loader = loadChord();
 
-		AnchorPane chordLayout = loader.load();
-		ChantChordController controller = loader.getController();
-		
 		int after_reciting_chord = chantChordControllers.indexOf(caller_chord) + 1;
 
-		chantChordControllers.add(after_reciting_chord, controller);
-		chordBox.getChildren().add(after_reciting_chord, chordLayout);
+		ChantChordController controller = addChord(after_reciting_chord);
 
 		controller.setColor(chord_color);
-		controller.setChantLineController(this);
 		controller.makePost();
-		controller.setKeySignature(mainController.getCurrentKey());
 		recalcCHNames();
 		
 		return controller;
 	}
 	public ChantChordController addEndChord() throws IOException {
 
-		FXMLLoader loader = loadChord();
+		int last_position = chantChordControllers.size();
 
-		AnchorPane chordLayout = loader.load();
-		ChantChordController controller = loader.getController();
-
-		// Add to end of lists
-		chantChordControllers.add(controller);
-		chordBox.getChildren().add(chordLayout);
+		ChantChordController controller = addChord(last_position);
 
 		controller.setColor(MainApp.END_CHORD_COLOR);
-		controller.setChantLineController(this);
 		controller.makeFinalChord();
-		
-		controller.setKeySignature(mainController.getCurrentKey());
 		recalcCHNames();
 		
 		return controller;
