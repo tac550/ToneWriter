@@ -221,7 +221,7 @@ public class ChantLineViewController implements CommentableView {
 		chordBox.getChildren().add(position, chordPane);
 
 		// Drag-reordering behavior
-		chordPane.setOnDragDetected(event -> {
+		controller.moveHandleImage.setOnDragDetected(event -> {
 			Dragboard dragboard = chordPane.startDragAndDrop(TransferMode.MOVE);
 			ClipboardContent clipboardContent = new ClipboardContent();
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields());
@@ -267,6 +267,7 @@ public class ChantLineViewController implements CommentableView {
 				chantChordControllers.addAll(controllers);
 
 				recalcCHNames();
+				edited();
 				success = true;
 			}
 
@@ -274,6 +275,7 @@ public class ChantLineViewController implements CommentableView {
 			event.consume();
 		});
 		chordPane.setOnDragDone(event -> {
+			System.out.println("Called!");
 			draggingChord.set(null);
 			draggingController.set(null);
 		});

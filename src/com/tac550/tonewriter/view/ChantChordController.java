@@ -6,6 +6,7 @@ import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
@@ -52,6 +54,7 @@ public class ChantChordController implements CommentableView {
 	@FXML private Button pasteButton;
 	@FXML private Button playButton;
 	@FXML private Button commentButton;
+	@FXML ImageView moveHandleImage;
 	
 	private ArrayList<ChantChordController> prepsAndPosts = new ArrayList<>();
 	private ChantChordController associatedRecitingChord; // Only populated if this is a prep or post chord
@@ -81,14 +84,28 @@ public class ChantChordController implements CommentableView {
 		}
 
 		// Buttons
-		copyButton.setText("\u2398");
-		pasteButton.setText("\u2399");
+		ImageView copyIcon = new ImageView(getClass().getResource("/media/copy.png").toExternalForm());
+		copyIcon.setFitHeight(20);
+		copyIcon.setFitWidth(20);
+		copyButton.setGraphic(copyIcon);
+
+		ImageView pasteIcon = new ImageView(getClass().getResource("/media/paste.png").toExternalForm());
+		pasteIcon.setFitHeight(20);
+		pasteIcon.setFitWidth(20);
+		pasteButton.setGraphic(pasteIcon);
+
+		copyButton.setText("");
+		pasteButton.setText("");
 		playButton.setText("\u25B6");
+
 		// Comment button behavior
 		applyCommentGraphic(bubbleImage); // Initial state - No comments
 		commentButton.setOnMouseEntered((me) -> applyCommentGraphic(hoveredBubbleImage));
 		commentButton.setOnMouseExited((me) -> applyCommentGraphic(commentButtonState));
-		
+
+		// Consume mouse click events so that move handle will not pan the scroll pane.
+		moveHandleImage.addEventFilter(MouseEvent.MOUSE_DRAGGED, Event::consume);
+
 	}
 	
 	void setChantLineController(ChantLineViewController parent) {
@@ -300,6 +317,7 @@ public class ChantChordController implements CommentableView {
 		imageView.setFitWidth(15);
 		
 		commentButton.setGraphic(imageView);
+		commentButton.setText("");
 		
 		// Set the applied image as the default one (the one returned to when the mouse exits the comment button)
 		// if it is not the hovered image.

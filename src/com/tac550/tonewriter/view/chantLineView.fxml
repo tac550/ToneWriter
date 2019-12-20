@@ -89,7 +89,7 @@
             </GridPane>
          </left>
          <center>
-            <ScrollPane fitToHeight="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" vmax="0.0" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" pannable="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" vmax="0.0" BorderPane.alignment="CENTER">
                <content>
                   <HBox fx:id="chordBox" prefHeight="100.0" />
                </content></ScrollPane>
