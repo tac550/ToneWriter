@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -10,10 +11,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -226,6 +229,13 @@ public class ChantLineViewController implements CommentableView {
 			ClipboardContent clipboardContent = new ClipboardContent();
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
+
+			WritableImage writableImage = new WritableImage((int) chordPane.getWidth(), (int) chordPane.getHeight());
+			SnapshotParameters parameters = new SnapshotParameters();
+			parameters.setFill(TWUtils.getUIBaseColor());
+			WritableImage snapshot = chordPane.snapshot(parameters, writableImage);
+			dragboard.setDragView(snapshot, chordPane.getWidth() / 2, chordPane.getHeight() / 2);
+
 			draggingChord.set(chordPane);
 			draggingController.set(controller);
 
@@ -250,25 +260,27 @@ public class ChantLineViewController implements CommentableView {
 				int targetIndex = chordBox.getChildren().indexOf(chordPane);
 				List<Node> nodes = new ArrayList<>(chordBox.getChildren());
 				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
-				if (sourceIndex < targetIndex) {
-					Collections.rotate(
-							nodes.subList(sourceIndex, targetIndex + 1), -1);
-					Collections.rotate(
-							controllers.subList(sourceIndex, targetIndex + 1), -1);
-				} else {
-					Collections.rotate(
-							nodes.subList(targetIndex, sourceIndex + 1), 1);
-					Collections.rotate(
-							controllers.subList(targetIndex, sourceIndex + 1), 1);
-				}
-				chordBox.getChildren().clear();
-				chordBox.getChildren().addAll(nodes);
-				chantChordControllers.clear();
-				chantChordControllers.addAll(controllers);
+				if (sourceIndex != targetIndex) {
+					if (sourceIndex < targetIndex) {
+						Collections.rotate(
+								nodes.subList(sourceIndex, targetIndex + 1), -1);
+						Collections.rotate(
+								controllers.subList(sourceIndex, targetIndex + 1), -1);
+					} else {
+						Collections.rotate(
+								nodes.subList(targetIndex, sourceIndex + 1), 1);
+						Collections.rotate(
+								controllers.subList(targetIndex, sourceIndex + 1), 1);
+					}
+					chordBox.getChildren().clear();
+					chordBox.getChildren().addAll(nodes);
+					chantChordControllers.clear();
+					chantChordControllers.addAll(controllers);
 
-				recalcCHNames();
-				edited();
-				success = true;
+					recalcCHNames();
+					edited();
+					success = true;
+				}
 			}
 
 			event.setDropCompleted(success);

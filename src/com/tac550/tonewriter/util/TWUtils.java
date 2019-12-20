@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.util;
 
+import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
@@ -19,6 +20,18 @@ public class TWUtils {
 		        (int) (color.getRed() * 255),
 		        (int) (color.getGreen() * 255),
 		        (int) (color.getBlue() * 255));
+    }
+	public static String toNormalizedRGBCode(Color color) {
+		return String.format(Locale.US,
+				"%f %f %f",
+				color.getRed(),
+				color.getGreen(),
+				color.getBlue());
+	}
+
+    public static Color getUIBaseColor() {
+    	return MainApp.darkModeEnabled() ? new Color(0.345, 0.361, 0.373, 1)
+			    : new Color(0.957, 0.957, 0.957, 1);
     }
 
 	// Strings

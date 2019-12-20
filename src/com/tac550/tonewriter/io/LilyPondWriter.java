@@ -2,6 +2,7 @@ package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
+import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
 import com.tac550.tonewriter.view.SyllableText;
@@ -745,8 +746,7 @@ public class LilyPondWriter {
 
 		lines.set(10, keySignatureToLilyPond(keySignature));
 		lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-		lines.set(24, "\\with-color #(rgb-color " + (MainApp.darkModeEnabled() ?
-				"0.345 0.361 0.373)" : "0.957 0.957 0.957)"));
+		lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
 		lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
 		lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
 		lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
