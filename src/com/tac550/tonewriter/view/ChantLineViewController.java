@@ -2,29 +2,29 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class ChantLineViewController implements CommentableView {
 
@@ -54,6 +54,11 @@ public class ChantLineViewController implements CommentableView {
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
+
+	// Fields related to drag reordering of chords
+	private static final String CHORD_DRAG_KEY = "ToneWriter chord: ";
+	private ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
+	private ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -209,11 +214,69 @@ public class ChantLineViewController implements CommentableView {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(MainApp.class.getResource("chantChordView.fxml"));
 
-		AnchorPane chordLayout = loader.load();
+		AnchorPane chordPane = loader.load();
 		ChantChordController controller = loader.getController();
 
 		chantChordControllers.add(position, controller);
-		chordBox.getChildren().add(position, chordLayout);
+		chordBox.getChildren().add(position, chordPane);
+
+		// Drag-reordering behavior
+		chordPane.setOnDragDetected(event -> {
+			Dragboard dragboard = chordPane.startDragAndDrop(TransferMode.MOVE);
+			ClipboardContent clipboardContent = new ClipboardContent();
+			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields());
+			dragboard.setContent(clipboardContent);
+			draggingChord.set(chordPane);
+			draggingController.set(controller);
+
+			event.consume();
+		});
+		chordPane.setOnDragOver(event -> {
+			final Dragboard dragboard = event.getDragboard();
+			if (dragboard.hasString()
+					&& dragboard.getString().startsWith(CHORD_DRAG_KEY)
+					&& draggingChord.get() != null && draggingController.get() != null) {
+
+				event.acceptTransferModes(TransferMode.MOVE);
+				event.consume();
+			}
+		});
+		chordPane.setOnDragDropped(event -> {
+			Dragboard db = event.getDragboard();
+			boolean success = false;
+			if (db.hasString()) {
+				Node source = (Node) event.getGestureSource();
+				int sourceIndex = chordBox.getChildren().indexOf(source);
+				int targetIndex = chordBox.getChildren().indexOf(chordPane);
+				List<Node> nodes = new ArrayList<>(chordBox.getChildren());
+				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
+				if (sourceIndex < targetIndex) {
+					Collections.rotate(
+							nodes.subList(sourceIndex, targetIndex + 1), -1);
+					Collections.rotate(
+							controllers.subList(sourceIndex, targetIndex + 1), -1);
+				} else {
+					Collections.rotate(
+							nodes.subList(targetIndex, sourceIndex + 1), 1);
+					Collections.rotate(
+							controllers.subList(targetIndex, sourceIndex + 1), 1);
+				}
+				chordBox.getChildren().clear();
+				chordBox.getChildren().addAll(nodes);
+				chantChordControllers.clear();
+				chantChordControllers.addAll(controllers);
+
+				recalcCHNames();
+				success = true;
+			}
+
+			event.setDropCompleted(success);
+			event.consume();
+		});
+		chordPane.setOnDragDone(event -> {
+			draggingChord.set(null);
+			draggingController.set(null);
+		});
 
 		controller.setChantLineController(this);
 		controller.setKeySignature(mainController.getCurrentKey());
