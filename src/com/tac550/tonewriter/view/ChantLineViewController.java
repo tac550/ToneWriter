@@ -224,7 +224,7 @@ public class ChantLineViewController implements CommentableView {
 		controller.moveHandleImage.setOnDragDetected(event -> {
 			Dragboard dragboard = chordPane.startDragAndDrop(TransferMode.MOVE);
 			ClipboardContent clipboardContent = new ClipboardContent();
-			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields());
+			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 			draggingChord.set(chordPane);
 			draggingController.set(controller);
@@ -275,7 +275,6 @@ public class ChantLineViewController implements CommentableView {
 			event.consume();
 		});
 		chordPane.setOnDragDone(event -> {
-			System.out.println("Called!");
 			draggingChord.set(null);
 			draggingController.set(null);
 		});
