@@ -336,4 +336,9 @@ public class ChantChordController implements CommentableView {
 		setElementColor(value ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
 	}
 
+	void insertIndicator(boolean enable) {
+		preButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(
+				enable ? Color.RED : chordColor)));
+	}
+
 }

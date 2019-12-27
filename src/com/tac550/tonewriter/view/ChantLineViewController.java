@@ -10,7 +10,6 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -22,7 +21,10 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Transform;
 import javafx.stage.Modality;
@@ -255,14 +257,25 @@ public class ChantLineViewController implements CommentableView {
 			event.consume();
 		});
 		chordPane.setOnDragOver(event -> {
+			if (draggingChord.get() == null || draggingController.get() == null) return;
+
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
-					&& dragboard.getString().startsWith(CHORD_DRAG_KEY)
-					&& draggingChord.get() != null && draggingController.get() != null) {
+					&& dragboard.getString().startsWith(CHORD_DRAG_KEY)) {
 
 				event.acceptTransferModes(TransferMode.MOVE);
+
+				ChantChordController hoveredChord = chantChordControllers.get(chordBox.getChildren().indexOf(chordPane));
+				hoveredChord.insertIndicator(true);
+
 				event.consume();
 			}
+		});
+		chordPane.setOnDragExited(event -> {
+			if (draggingChord.get() == null || draggingController.get() == null) return;
+
+			ChantChordController exitedChord = chantChordControllers.get(chordBox.getChildren().indexOf(chordPane));
+			exitedChord.insertIndicator(false);
 		});
 		chordPane.setOnDragDropped(event -> {
 			Dragboard db = event.getDragboard();
