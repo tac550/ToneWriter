@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -22,7 +24,9 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Transform;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -230,11 +234,20 @@ public class ChantLineViewController implements CommentableView {
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 
-			WritableImage writableImage = new WritableImage((int) chordPane.getWidth(), (int) chordPane.getHeight());
-			SnapshotParameters parameters = new SnapshotParameters();
+			// Dragging image creation
+			Screen screen = Screen.getScreensForRectangle(event.getX(), event.getY(), 1, 1).get(0);
+			double scaleX = screen.getOutputScaleX();
+			double scaleY = screen.getOutputScaleY();
+
+			final Bounds bounds = chordPane.getLayoutBounds();
+			final WritableImage writableImage = new WritableImage(
+					(int) Math.round(bounds.getWidth() * scaleX),
+					(int) Math.round(bounds.getHeight() * scaleY));
+			final SnapshotParameters parameters = new SnapshotParameters();
+			parameters.setTransform(Transform.scale(scaleX, scaleY));
 			parameters.setFill(TWUtils.getUIBaseColor());
 			WritableImage snapshot = chordPane.snapshot(parameters, writableImage);
-			dragboard.setDragView(snapshot, chordPane.getWidth() / 2, chordPane.getHeight() / 2);
+			dragboard.setDragView(snapshot, chordPane.getWidth() / 2 * scaleX, chordPane.getHeight() / 2 * scaleY);
 
 			draggingChord.set(chordPane);
 			draggingController.set(controller);
