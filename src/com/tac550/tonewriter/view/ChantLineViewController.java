@@ -237,7 +237,12 @@ public class ChantLineViewController implements CommentableView {
 			dragboard.setContent(clipboardContent);
 
 			// Dragging image creation
-			Screen screen = Screen.getScreensForRectangle(event.getX(), event.getY(), 1, 1).get(0);
+			Screen screen;
+			try {
+				screen = Screen.getScreensForRectangle(event.getX(), event.getY(), 0, 0).get(0);
+			} catch (IndexOutOfBoundsException e) {
+				screen = Screen.getScreens().get(0);
+			}
 			double scaleX = screen.getOutputScaleX();
 			double scaleY = screen.getOutputScaleY();
 
@@ -263,11 +268,48 @@ public class ChantLineViewController implements CommentableView {
 			if (dragboard.hasString()
 					&& dragboard.getString().startsWith(CHORD_DRAG_KEY)) {
 
+				int sourceIndex = chordBox.getChildren().indexOf(draggingChord.get());
+				int hoveredIndex = chordBox.getChildren().indexOf(chordPane);
+				ChantChordController hoveredChord = chantChordControllers.get(hoveredIndex);
+				ChantChordController otherChord = null;
+				if (sourceIndex < hoveredIndex && hoveredIndex < chantChordControllers.size() - 1) {
+					otherChord = chantChordControllers.get(hoveredIndex + 1);
+				} else if (sourceIndex > hoveredIndex && hoveredIndex > 0) {
+					otherChord = chantChordControllers.get(hoveredIndex - 1);
+				}
+
+				// Move validation
+				if (draggingController.get().getType() == 1) { // If chord being dragged is a reciting chord...
+					// Disallow any move that would place it (and its preps/posts) in the middle of any other reciting chord's preps/posts.
+					if (otherChord != null) {
+						if (otherChord.getAssociatedRecitingChord() == hoveredChord.getAssociatedRecitingChord()
+								|| otherChord.getAssociatedRecitingChord() == draggingController.get()
+								|| hoveredChord.getAssociatedRecitingChord() == draggingController.get()) {
+							event.consume();
+							return;
+						}
+					} else {
+						if (hoveredChord.getType() == -3) {
+							event.consume();
+							return;
+						}
+					}
+				} else if (draggingController.get().getType() == -3) { // If chord being dragged is an End chord...
+					// Disallow all moves.
+					event.consume();
+					return;
+				} else { // If chord being dragged is any other type (prep or post)...
+					// Disallow any move outside its own group of preps or posts.
+					if (hoveredChord.getType() != draggingController.get().getType()
+							|| hoveredChord.getAssociatedRecitingChord() != draggingController.get().getAssociatedRecitingChord()) {
+						event.consume();
+						return;
+					}
+				}
+
+				// Success
 				event.acceptTransferModes(TransferMode.MOVE);
-
-				ChantChordController hoveredChord = chantChordControllers.get(chordBox.getChildren().indexOf(chordPane));
 				hoveredChord.insertIndicator(true);
-
 				event.consume();
 			}
 		});

@@ -182,6 +182,13 @@ public class ChantChordController implements CommentableView {
 	private void setAssociatedRecitingChord(ChantChordController chord) {
 		associatedRecitingChord = chord;
 	}
+	ChantChordController getAssociatedRecitingChord() {
+		if (getType() == 1 || getType() == -3) {
+			return this;
+		} else {
+			return associatedRecitingChord;
+		}
+	}
 	public void setFields(String data) {
 		if (data == null || !data.contains("-")) {
 			return;
@@ -266,7 +273,7 @@ public class ChantChordController implements CommentableView {
 		
 		return postChordController;
 	}
-	@FXML public void deleteAll() { // Deletes this chord and its associated preps and posts.
+	@FXML public void deleteAll() { // Deletes this chord and its associated preps and posts. // TODO: Needs cleanup!
 		chantLineController.edited();
 		for (ChantChordController chord : prepsAndPosts) {
 			chord.deleteAll();
@@ -337,8 +344,7 @@ public class ChantChordController implements CommentableView {
 	}
 
 	void insertIndicator(boolean enable) {
-		preButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(
-				enable ? Color.RED : chordColor)));
+		setElementColor(enable ? Color.RED : chordColor);
 	}
 
 }
