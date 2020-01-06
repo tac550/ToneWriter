@@ -276,6 +276,9 @@ public class ChantLineViewController implements CommentableView {
 					otherChord = chantChordControllers.get(hoveredIndex + 1);
 				} else if (sourceIndex > hoveredIndex && hoveredIndex > 0) {
 					otherChord = chantChordControllers.get(hoveredIndex - 1);
+				} else if (sourceIndex == hoveredIndex) { // Don't accept moves with equal source and target
+					event.consume();
+					return;
 				}
 
 				// Move validation
@@ -309,7 +312,10 @@ public class ChantLineViewController implements CommentableView {
 
 				// Success
 				event.acceptTransferModes(TransferMode.MOVE);
-				hoveredChord.insertIndicator(true);
+
+				if (sourceIndex < hoveredIndex) hoveredChord.indicateInsertionRight();
+				else hoveredChord.indicateInsertionLeft();
+
 				event.consume();
 			}
 		});
@@ -317,7 +323,7 @@ public class ChantLineViewController implements CommentableView {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
 
 			ChantChordController exitedChord = chantChordControllers.get(chordBox.getChildren().indexOf(chordPane));
-			exitedChord.insertIndicator(false);
+			exitedChord.clearInsertionIndication();
 		});
 		chordPane.setOnDragDropped(event -> {
 			Dragboard db = event.getDragboard();

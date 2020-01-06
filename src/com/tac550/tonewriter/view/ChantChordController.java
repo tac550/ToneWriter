@@ -121,7 +121,7 @@ public class ChantChordController implements CommentableView {
 	void setColor(Color color) {
 		chordColor = color;
 
-		setElementColor(chordColor);
+		setMainElementsColor(chordColor);
 		
 		for (ChantChordController chord : prepsAndPosts) {
 			chord.setColor(chordColor);
@@ -178,6 +178,26 @@ public class ChantChordController implements CommentableView {
 	}
 	public ArrayList<ChantChordController> getPrepsAndPosts() {
 		return prepsAndPosts;
+	}
+	int numPreps() {
+		int n = 0;
+		for (ChantChordController chord : prepsAndPosts) {
+			if (chord.getType() == -1) {
+				n++;
+			}
+		}
+
+		return n;
+	}
+	int numPosts() {
+		int n = 0;
+		for (ChantChordController chord : prepsAndPosts) {
+			if (chord.getType() == -2) {
+				n++;
+			}
+		}
+
+		return n;
 	}
 	private void setAssociatedRecitingChord(ChantChordController chord) {
 		associatedRecitingChord = chord;
@@ -333,18 +353,27 @@ public class ChantChordController implements CommentableView {
 		}
 	}
 
-	private void setElementColor(Color color) {
+	private void setMainElementsColor(Color color) {
 		for (Node node : new Node[] {preButton, posButton, SField, AField, TField, BField}) {
-			node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
+			setElementColor(node, color);
 		}
+	}
+	private void setElementColor(Node node, Color color) {
+		node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
 	}
 
 	void setHighlighted(boolean value) {
-		setElementColor(value ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
+		setMainElementsColor(value ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
 	}
 
-	void insertIndicator(boolean enable) {
-		setElementColor(enable ? Color.RED : chordColor);
+	void indicateInsertionLeft() {
+		setElementColor(preButton, Color.RED);
+	}
+	void indicateInsertionRight() {
+		setElementColor(posButton, Color.RED);
+	}
+	void clearInsertionIndication() {
+		setMainElementsColor(chordColor);
 	}
 
 }
