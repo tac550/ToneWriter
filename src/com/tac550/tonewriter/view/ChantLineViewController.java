@@ -335,17 +335,24 @@ public class ChantLineViewController implements CommentableView {
 				List<Node> nodes = new ArrayList<>(chordBox.getChildren());
 				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
 				if (sourceIndex != targetIndex) {
+
+					int distance = draggingController.get().numPreps() + draggingController.get().numPosts() + 1;
+
 					if (sourceIndex < targetIndex) {
+						int fromIndex = sourceIndex - draggingController.get().numPreps();
+						int toIndex = targetIndex + 1;
 						Collections.rotate(
-								nodes.subList(sourceIndex, targetIndex + 1), -1);
+								nodes.subList(fromIndex, toIndex), -distance);
 						Collections.rotate(
-								controllers.subList(sourceIndex, targetIndex + 1), -1);
+								controllers.subList(fromIndex, toIndex), -distance);
 					} else {
+						int toIndex = sourceIndex + draggingController.get().numPosts() + 1;
 						Collections.rotate(
-								nodes.subList(targetIndex, sourceIndex + 1), 1);
+								nodes.subList(targetIndex, toIndex), distance);
 						Collections.rotate(
-								controllers.subList(targetIndex, sourceIndex + 1), 1);
+								controllers.subList(targetIndex, toIndex), distance);
 					}
+
 					chordBox.getChildren().clear();
 					chordBox.getChildren().addAll(nodes);
 					chantChordControllers.clear();
