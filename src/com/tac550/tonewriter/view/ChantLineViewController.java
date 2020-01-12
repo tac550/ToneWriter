@@ -336,7 +336,7 @@ public class ChantLineViewController implements CommentableView {
 				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
 				if (sourceIndex != targetIndex) {
 
-					int distance = draggingController.get().numPreps() + draggingController.get().numPosts() + 1;
+					int distance = 1 + draggingController.get().numPreps() + draggingController.get().numPosts();
 
 					if (sourceIndex < targetIndex) {
 						int fromIndex = sourceIndex - draggingController.get().numPreps();
