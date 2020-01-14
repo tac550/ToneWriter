@@ -39,10 +39,6 @@ public class TWUtils {
 //		return string.length() - string.replace(single_character, "").length();
 //	}
 
-	public static String replaceLast(String text, String regex, String replacement) {
-		return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
-	}
-
 	// I/O
 	public static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));

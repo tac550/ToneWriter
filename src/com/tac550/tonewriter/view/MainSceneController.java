@@ -4,7 +4,6 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
-import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -16,7 +15,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -34,10 +40,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -246,20 +256,25 @@ public class MainSceneController {
 		int index = bottomRightBox.getChildren().indexOf(verseArea);
 		verseArea = new TextArea() {
 			@Override
-			public void paste() {
-				String beforePaste = getText();
+			public void paste() { // Intercept paste actions.
+				String pastingText = null;
+				try {
+					pastingText = (String) Toolkit.getDefaultToolkit()
+							.getSystemClipboard().getData(DataFlavor.stringFlavor);
+				} catch (UnsupportedFlavorException | IOException e) {
+					e.printStackTrace();
+				}
+
+				// Replace each tabbed-in newline in pasted text with a single space.
+				if (pastingText == null || !Pattern.compile("\n\t+").matcher(pastingText).find()) { super.paste(); return; }
+				String editedText = pastingText.replaceAll("\n\t+", " ").replaceAll(" +", " ");
+				Toolkit.getDefaultToolkit().getSystemClipboard()
+						.setContents(new StringSelection(editedText), null);
+
 				super.paste();
 
-				// Actually includes everything below the pasted text as well.
-				String pastedText = StringUtils.difference(beforePaste, getText());
-
-				// Replace each tabbed-in newline in pasted text with a single space and move the cursor.
-				if (!Pattern.compile("\n\t+").matcher(pastedText).find()) return;
-				String editedText = pastedText.replaceAll("\n\t+", " ").replaceAll(" +", " ");
-				int futureCursorPos = getText().lastIndexOf(pastedText) + editedText.length();
-				System.out.println(futureCursorPos); // TODO: Cursor not going in right place
-				setText(TWUtils.replaceLast(getText(), pastedText, editedText));
-				positionCaret(futureCursorPos);
+				Toolkit.getDefaultToolkit().getSystemClipboard()
+						.setContents(new StringSelection(pastingText), null);
 			}
 		};
 		// Replace all typed tabs with spaces.
