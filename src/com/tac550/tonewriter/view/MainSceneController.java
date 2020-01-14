@@ -4,6 +4,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,20 +22,25 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.robot.Robot;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 /*
  * TEST VERSES:
@@ -82,17 +88,21 @@ public class MainSceneController {
 
 	@FXML private MenuItem aboutMenuItem;
 
+	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
 	@FXML private TextField verseTopField;
 	@FXML private Button verseTopButton;
 	@FXML private CheckBox largeTitleCheckBox;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
+	@FXML TextArea verseArea;
 	@FXML private ChoiceBox<String> verseBottomChoice;
 	@FXML private TextField verseBottomField;
 	@FXML private Button verseBottomButton;
 	@FXML private Button setVerseButton;
 	@FXML private ProgressBar setVerseProgressBar;
+
+	private Robot robot = new Robot();
 
 	private String composerIconPath = getClass().getResource("/media/profile.png").toExternalForm();
 	private String keyIconPath = getClass().getResource("/media/key.png").toExternalForm();
@@ -121,7 +131,6 @@ public class MainSceneController {
 
 	@FXML VBox verseLineBox;
 	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
-	@FXML TextArea verseArea;
 
 	private Map<String, File[]> renderResultMap = new HashMap<>();
 
@@ -233,6 +242,37 @@ public class MainSceneController {
 			box.getSelectionModel().select(0);
 		}
 
+		// Replace text area with a custom one.
+		int index = bottomRightBox.getChildren().indexOf(verseArea);
+		verseArea = new TextArea() {
+			@Override
+			public void paste() {
+				String beforePaste = getText();
+				super.paste();
+
+				// Actually includes everything below the pasted text as well.
+				String pastedText = StringUtils.difference(beforePaste, getText());
+
+				// Replace each tabbed-in newline in pasted text with a single space and move the cursor.
+				if (!Pattern.compile("\n\t+").matcher(pastedText).find()) return;
+				String editedText = pastedText.replaceAll("\n\t+", " ").replaceAll(" +", " ");
+				int futureCursorPos = getText().lastIndexOf(pastedText) + editedText.length();
+				System.out.println(futureCursorPos); // TODO: Cursor not going in right place
+				setText(TWUtils.replaceLast(getText(), pastedText, editedText));
+				positionCaret(futureCursorPos);
+			}
+		};
+		// Replace all typed tabs with spaces.
+		verseArea.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+			if (event.getCode() == KeyCode.TAB) {
+				robot.keyType(KeyCode.SPACE);
+				event.consume();
+			}
+		});
+		VBox.setVgrow(verseArea, Priority.ALWAYS);
+		bottomRightBox.getChildren().remove(index);
+		bottomRightBox.getChildren().add(index, verseArea);
+
 	}
 	void setStage(Stage stage) {
 		mainStage = stage;
@@ -242,9 +282,11 @@ public class MainSceneController {
 		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN),
 				this::handleExport);
 	}
+
 	File getToneFile() {
 		return toneFile;
 	}
+
 	String getCurrentKey() {
 		return currentKey;
 	}
@@ -252,6 +294,7 @@ public class MainSceneController {
 		currentKey = key;
 		refreshChordKeySignatures(currentKey);
 	}
+
 	public void setHeaderText(String poet, String composer) {
 		poetText = poet;
 		composerText = composer;

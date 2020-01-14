@@ -67,14 +67,14 @@
                         </BorderPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox fx:id="bottomRightBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <HBox alignment="CENTER" spacing="5.0">
                                        <children>
                                           <CheckBox fx:id="largeTitleCheckBox" minWidth="-Infinity" mnemonicParsing="false" text="Large Title" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS">
                                              <tooltip>
-                                                <Tooltip text="Shown on every page" />
+                                                <Tooltip text="Appears on every page" />
                                              </tooltip></TextField>
                                           <TextField fx:id="subtitleTextField" alignment="CENTER" promptText="Subtitle" HBox.hgrow="ALWAYS">
                                              <tooltip>
@@ -108,7 +108,7 @@
                                           <ChoiceBox fx:id="verseTopChoice" />
                                        </children>
                                     </GridPane>
-                                    <TextArea fx:id="verseArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                    <TextArea fx:id="verseArea" VBox.vgrow="ALWAYS" />
                                     <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
                                        <columnConstraints>
                                           <ColumnConstraints hgrow="NEVER" />
