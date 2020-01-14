@@ -34,4 +34,4 @@ To build a .app as you see in release binaries, export a runnable JAR file named
 
 ### Linux
 
-Export a runnable JAR and make sure the Built-in Tones and licenses folders are present in the same directory. Remember that Linux support is experimental at the moment; contributions greatly appreciated.
+Export a runnable JAR and make sure the Built-in Tones and licenses folders are present in the same directory. Linux support is experimental at the moment; contributions greatly appreciated.
