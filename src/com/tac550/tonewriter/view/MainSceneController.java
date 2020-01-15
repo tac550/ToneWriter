@@ -38,6 +38,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -129,7 +130,7 @@ public class MainSceneController {
 	private boolean askToSaveTone = false;
 	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
-	private File currentSavingDirectory = new File(System.getProperty("user.home"));
+	private File currentSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	@FXML VBox chantLineBox;
 	private ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
@@ -579,7 +580,7 @@ public class MainSceneController {
 		if (toneFile != null && !saveDisabled()) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
-			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
 		}
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(mainStage);
@@ -610,7 +611,7 @@ public class MainSceneController {
 				if (builtInDir.exists()) {
 					fileChooser.setInitialDirectory(builtInDir);
 				} else {
-					fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+					fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
 				}
 			}
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
@@ -866,7 +867,7 @@ public class MainSceneController {
 	@FXML private void handleSetLilyPondDir() {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
-		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, System.getProperty("user.home"))));
+		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, MainApp.getPlatformSpecificRootDir())));
 		File savingDirectory = directoryChooser.showDialog(mainStage);
 		if (savingDirectory == null) return;
 

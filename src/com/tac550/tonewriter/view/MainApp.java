@@ -298,6 +298,17 @@ public class MainApp extends Application {
 		} else return null;
 	}
 
+	public static String getPlatformSpecificRootDir() {
+		if (OS_NAME.startsWith("win")) {
+			System.out.println(System.getenv("SystemDrive"));
+			return System.getenv("SystemDrive") + "\\";
+		} if (OS_NAME.startsWith("mac")) {
+			return "/";
+		} if (OS_NAME.startsWith("lin")) {
+			return "/";
+		} else return null;
+	}
+
 	public static boolean darkModeEnabled() {
 		return darkModeEnabled;
 	}
