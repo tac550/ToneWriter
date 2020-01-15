@@ -25,6 +25,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -62,7 +63,7 @@ public class VerseLineViewController {
 
 	private boolean changingAssignments = false;
 
-	private int currentChordIndex = 0; // Index of the chord currently being assigned
+	private int nextChordIndex = 0; // Index of the next chord to be assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
 	private ChantChordController currentChord; // The chord currently being assigned
 
@@ -141,6 +142,10 @@ public class VerseLineViewController {
 	}
 
 	void setChantLines(ChantLineViewController[] chant_lines) {
+		setChantLines(chant_lines, -1);
+	}
+
+	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
 		// Remember previous chant line selection, if any.
 		ChantLineViewController previousChantLine = null;
@@ -148,16 +153,25 @@ public class VerseLineViewController {
 			previousChantLine = associatedChantLines[selectedChantLine];
 		}
 
-		// Show the proper chant line on the left
+		// Load in new chant line choices
 		associatedChantLines = chant_lines;
-		selectedChantLine = 0;
 		chantLineChoice.getItems().clear();
-
 		for (ChantLineViewController chantLine : associatedChantLines) {
 			chantLineChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
 		}
 
-		chantLineChoice.getSelectionModel().select(0);
+		// Keep chant line selection and chord assignments (if any) if previous selection is still available.
+		int index;
+		if (initial_choice != -1) {
+			selectedChantLine = initial_choice;
+			chantLineChoice.getSelectionModel().select(initial_choice);
+		} else if (nextChordIndex > 1 && (index = Arrays.asList(chant_lines).indexOf(previousChantLine)) != -1) {
+			selectedChantLine = index;
+			chantLineChoice.getSelectionModel().select(index);
+		} else {
+			selectedChantLine = 0;
+			chantLineChoice.getSelectionModel().select(0);
+		}
 
 		// ChoiceBox highlighting if choices are available
 		if (chantLineChoice.getItems().size() > 1) {
@@ -182,7 +196,7 @@ public class VerseLineViewController {
 		}
 		chordButtonPane.getChildren().clear();
 
-		currentChordIndex = 0;
+		nextChordIndex = 0;
 		lastSyllableAssigned = -1;
 		nextChordAssignment();
 
@@ -204,7 +218,7 @@ public class VerseLineViewController {
 		}
 
 		lastSyllableAssigned = action.previousLastSyllableAssigned;
-		currentChordIndex = action.previousChordIndex;
+		nextChordIndex = action.previousChordIndex;
 		nextChordAssignment();
 
 	}
@@ -220,18 +234,18 @@ public class VerseLineViewController {
 	private void nextChordAssignment() {
 		if (associatedChantLines == null) return;
 		// If we have not placed or skipped the last chord...
-		if (currentChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
-			currentChord = associatedChantLines[selectedChantLine].getChords().get(currentChordIndex);
+		if (nextChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
+			currentChord = associatedChantLines[selectedChantLine].getChords().get(nextChordIndex);
 			chordEntryText.setText(String.valueOf(currentChord.getName()));
 			chordEntryText.setFill(currentChord.getColor());
 			skipChordButton.setDisable(false);
-			currentChordIndex++;
+			nextChordIndex++;
 
 			// Special disabling based on prep/post/normal
 			deactivateAll();
 
 			if (currentChord.getType() < 0) { // If current chord is a Prep, Post, or End (limit assignment)
-				if (currentChordIndex == 1) { // If no chords have been assigned yet...
+				if (nextChordIndex == 1) { // If no chords have been assigned yet...
 					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
 					// Activate current syllable.
@@ -356,7 +370,7 @@ public class VerseLineViewController {
 		// Set up an undo action frame to store what happens.
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
-		undoFrame.previousChordIndex = currentChordIndex - 1;
+		undoFrame.previousChordIndex = nextChordIndex - 1;
 		undoActions.push(undoFrame);
 
 		nextChordAssignment();
@@ -371,7 +385,7 @@ public class VerseLineViewController {
 		// Set up an undo action frame to store what happens.
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
-		undoFrame.previousChordIndex = currentChordIndex - 1;
+		undoFrame.previousChordIndex = nextChordIndex - 1;
 
 		for (int i = firstSyllable; i <= lastSyllable; i++) {
 			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
@@ -379,7 +393,7 @@ public class VerseLineViewController {
 
 			Button noteButton;
 
-			if (currentChordIndex == associatedChantLines[selectedChantLine].getChords().size()
+			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == lastSyllable) { // If placing the final instance of the last chord in the chant line, make it a half note.
 				noteButton = createNoteButton(currentText, true, currentChord);
 

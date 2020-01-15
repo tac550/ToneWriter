@@ -410,7 +410,13 @@ public class MainSceneController {
 		// If manual mode is selected, allow user to choose all chant line assignments.
 		if (manualCLAssignmentMenuItem.isSelected()) {
 			for (VerseLineViewController verseLine : verseLineControllers) {
-				verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]));
+				// Default last chant line selection to Cadence line.
+				if (verseLineControllers.indexOf(verseLine) == verseLineControllers.size() - 1) {
+					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]),
+							chantLineControllers.size() - 1);
+				} else {
+					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]));
+				}
 			}
 			return;
 		}
