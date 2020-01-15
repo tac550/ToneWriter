@@ -29,10 +29,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.robot.Robot;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -110,7 +107,7 @@ public class MainSceneController {
 	@FXML private TextField verseBottomField;
 	@FXML private Button verseBottomButton;
 	@FXML private Button setVerseButton;
-	@FXML private ProgressBar setVerseProgressBar;
+	@FXML private HBox setVerseProgressBox;
 
 	private Robot robot = new Robot();
 
@@ -141,6 +138,8 @@ public class MainSceneController {
 
 	@FXML VBox verseLineBox;
 	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
+
+	private boolean setVerseCancelled = false;
 
 	private Map<String, File[]> renderResultMap = new HashMap<>();
 
@@ -486,14 +485,20 @@ public class MainSceneController {
 
 		// Show working indicator
 		setVerseButton.setVisible(false);
-		setVerseProgressBar.setVisible(true);
+		setVerseProgressBox.setVisible(true);
 
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
 		Task<Void> syllabificationTask = new Task<>() {
 
 			@Override
 			protected Void call() {
+
 				String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
+
+				if (setVerseCancelled) {
+					setVerseCancelled = false;
+					return null;
+				}
 
 				ArrayList<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
 
@@ -516,7 +521,7 @@ public class MainSceneController {
 
 					// Hide working indicator
 					setVerseButton.setVisible(true);
-					setVerseProgressBar.setVisible(false);
+					setVerseProgressBox.setVisible(false);
 				});
 				return null;
 			}
@@ -525,6 +530,13 @@ public class MainSceneController {
 		Thread syllableThread = new Thread(syllabificationTask);
 		syllableThread.start();
 
+	}
+
+	@FXML private void handleCancelSetVerse() {
+		setVerseCancelled = true;
+
+		setVerseButton.setVisible(true);
+		setVerseProgressBox.setVisible(false);
 	}
 
 	/*

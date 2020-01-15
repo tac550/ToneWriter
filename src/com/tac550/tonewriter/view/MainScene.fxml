@@ -137,11 +137,16 @@
                                     </GridPane>
                                     <StackPane>
                                        <children>
-                                          <AnchorPane>
+                                          <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
                                              <children>
-                                                <ProgressBar fx:id="setVerseProgressBar" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <Button mnemonicParsing="false" onAction="#handleCancelSetVerse" text="Cancel" />
+                                                <ProgressBar HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </ProgressBar>
                                              </children>
-                                          </AnchorPane>
+                                          </HBox>
                                           <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set _Verse" />
                                        </children>
                                     </StackPane>
