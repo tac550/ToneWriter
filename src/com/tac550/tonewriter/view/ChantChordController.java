@@ -222,6 +222,8 @@ public class ChantChordController implements CommentableView {
 		refreshChordPreview();
 	}
 	public void setComment(String comment) {
+		if (commentString.equals(comment)) return;
+
 		chantLineController.edited();
 		commentString = comment.replaceAll("/n", "\n");
 		if (!comment.isEmpty()) {
