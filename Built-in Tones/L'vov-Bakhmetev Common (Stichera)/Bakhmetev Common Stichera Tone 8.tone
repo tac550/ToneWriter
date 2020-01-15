@@ -6,8 +6,8 @@ Manually Assign Phrases: false
 
 
 A
-Comment: The first two chords of this phrase are only/nto be used on the first line of the sticheron.
-1: g-e-c-c: Skipped on all but the first line of the sticheron.
+Comment: The first two chords of this phrase are only/nused on the first line of the sticheron.
+1: g-e-c-c: Skipped on all but the first line of the sticheron./nAlso skipped on the first line if the first syllable is stressed.
 2: g-e-c-c
 	Prep: a-f-c-f: Skipped on all but the first line of the sticheron.
 3: a-f-c-f
