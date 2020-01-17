@@ -5,10 +5,11 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class FXMLLoaderIO {
 
-	public static Task<FXMLLoader> loadFXMLLayout(String filename, AdditionalActions additionalActions) {
+	public static Task<FXMLLoader> loadFXMLLayout(String filename, Consumer<FXMLLoader> additionalActions) {
 		Task<FXMLLoader> loaderTask = new Task<>() {
 
 			@Override
@@ -19,7 +20,7 @@ public class FXMLLoaderIO {
 				loader.setLocation(MainApp.class.getResource(filename));
 				loader.load();
 
-				additionalActions.run(loader);
+				additionalActions.accept(loader);
 
 				return loader;
 			}
@@ -29,12 +30,6 @@ public class FXMLLoaderIO {
 		loaderTask.setOnFailed(e -> loaderTask.getException().printStackTrace());
 
 		return loaderTask;
-
-	}
-
-	public interface AdditionalActions {
-
-		void run(FXMLLoader loader);
 
 	}
 
