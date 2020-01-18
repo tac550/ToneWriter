@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -48,7 +49,8 @@ public class ChantLineViewController implements CommentableView {
 	private Image commentButtonState;
 	
 	@FXML GridPane mainPane;
-	
+	@FXML ScrollPane chordScroller;
+
 	@FXML Button upButton;
 	@FXML Button downButton;
 	@FXML Button firstRepeatedButton;
@@ -263,6 +265,12 @@ public class ChantLineViewController implements CommentableView {
 		});
 		chordPane.setOnDragOver(event -> {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
+
+			// Handle drag scrolling
+			System.out.println("X: " + event.getX() + "; Y: " + event.getY());
+			System.out.println(chordPane.getLocalToSceneTransform().getTx());
+//			chordScroller.setHvalue(chordScroller.getHvalue() + chordPane.getLocalToSceneTransform().getTx() + event.getX()
+//					- chordScroller.getHmax());
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
