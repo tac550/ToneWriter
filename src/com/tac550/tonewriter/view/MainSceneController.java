@@ -1000,7 +1000,7 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 	void removeVerseLine(VerseLineViewController verseLineViewController) {
-		verseLineBox.getChildren().remove(verseLineViewController.getMainPane());
+		verseLineBox.getChildren().remove(verseLineViewController.getRootPane());
 		verseLineControllers.remove(verseLineViewController);
 		syncCVLMapping();
 	}

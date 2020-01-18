@@ -5,10 +5,13 @@ import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -35,7 +38,7 @@ public class VerseLineViewController {
 
 	private VerseLine verseLine;
 
-	@FXML private StackPane mainPane;
+	@FXML private StackPane rootPane;
 	@FXML private GridPane mainContentPane;
 
 	private boolean isSeparatorLine = false;
@@ -49,6 +52,10 @@ public class VerseLineViewController {
 	@FXML private ChoiceBox<String> chantLineChoice;
 	@FXML private TextFlow lineTextFlow;
 	@FXML private RowConstraints textRow;
+
+	@FXML private ScrollPane syllableScrollPane;
+	private ScrollBar scrollBar;
+	private double scrollBarHeight = 0;
 
 	@FXML private Pane chordButtonPane;
 
@@ -91,10 +98,56 @@ public class VerseLineViewController {
 		// Button's initial state
 		expandButton.setGraphic(plusIcon);
 
+		// Default height used when toggling Expand off.
 		defaultHeight = mainContentPane.getPrefHeight();
 
 		refreshTextStyle();
 
+		// Prepare scroll pane to be set up at the appropriate time.
+		if (syllableScrollPane.getSkin() == null) {
+			// Skin is not yet attached, wait until skin is attached to access the scroll bars
+			syllableScrollPane.skinProperty().addListener(new ChangeListener<>() {
+				@Override
+				public void changed(ObservableValue<? extends Skin<?>> obs, Skin<?> oldValue, Skin<?> newValue) {
+					syllableScrollPane.skinProperty().removeListener(this);
+					setUpScrollPane();
+				}
+			});
+		} else {
+			// Skin is already attached, just access the scroll bars
+			setUpScrollPane();
+		}
+
+	}
+
+	// Sets up scroll bar behavior (makes sure scroll bar does not block view)
+	private void setUpScrollPane() {
+
+		for (Node node : syllableScrollPane.lookupAll(".scroll-bar")) {
+			if (node instanceof ScrollBar) {
+				scrollBar = (ScrollBar) node;
+				if (scrollBar.getOrientation() == Orientation.HORIZONTAL && scrollBar.getParent() == syllableScrollPane) {
+					scrollBar.heightProperty().addListener((obs, oldVal, newVal) -> {
+						scrollBarHeight = newVal.doubleValue();
+						Platform.runLater(this::adjustViewportAreaForScrollbar);
+					});
+
+					// Example 2: Listen to visibility changes
+					scrollBar.visibleProperty().addListener((obs, oldValue, newValue) ->
+							adjustViewportAreaForScrollbar());
+				}
+			}
+		}
+	}
+
+	private void adjustViewportAreaForScrollbar() {
+		if (scrollBar.isVisible()) {
+			mainContentPane.setPrefHeight(mainContentPane.getPrefHeight() + scrollBarHeight);
+		} else {
+			mainContentPane.setPrefHeight(mainContentPane.getPrefHeight() - scrollBarHeight);
+		}
+
+		rootPane.requestLayout();
 	}
 
 	void setParentController(MainSceneController parent) {
@@ -126,7 +179,8 @@ public class VerseLineViewController {
 				lineTextFlow.getChildren().add(text);
 			}
 
-			lineTextFlow.autosize(); // Fixes additional syllables not being visible because the text flow didn't resize.
+			// Fixes additional syllables not being visible because the text flow didn't resize.
+			lineTextFlow.autosize();
 
 		} else {
 
@@ -227,8 +281,8 @@ public class VerseLineViewController {
 		parentController.removeVerseLine(this);
 	}
 
-	StackPane getMainPane() {
-		return mainPane;
+	StackPane getRootPane() {
+		return rootPane;
 	}
 
 	private void nextChordAssignment() {
@@ -483,8 +537,11 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void toggleExpand() {
+
+		double scrollBarPadding = scrollBar.isVisible() ? scrollBarHeight : 0;
+
 		if (view_expanded) {
-			mainContentPane.setPrefHeight(defaultHeight);
+			mainContentPane.setPrefHeight(defaultHeight + scrollBarPadding);
 			expandButton.setGraphic(plusIcon);
 
 			view_expanded = false;
@@ -497,7 +554,7 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT + scrollBarPadding);
 			expandButton.setGraphic(minusIcon);
 
 			view_expanded = true;
@@ -520,7 +577,7 @@ public class VerseLineViewController {
 				syllableStage.setScene(new Scene(rootLayout));
 				syllableStage.initModality(Modality.APPLICATION_MODAL);
 				syllableStage.setResizable(false);
-				syllableStage.initOwner(mainPane.getScene().getWindow());
+				syllableStage.initOwner(rootPane.getScene().getWindow());
 				syllableStage.show();
 			});
 		});
