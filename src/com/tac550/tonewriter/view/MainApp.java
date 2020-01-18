@@ -120,7 +120,10 @@ public class MainApp extends Application {
 
 		if (lilyPondAvailable()) {
 			try {
-				runLilyPondStartup(main_stage);
+				runLilyPondStartup(() -> {
+					splashStage.close();
+					loadMainStage(main_stage);
+				});
 			} catch (IOException e) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Error");
@@ -212,7 +215,7 @@ public class MainApp extends Application {
 		return new Node[]{splashBackground, box};
 	}
 
-	private void runLilyPondStartup(Stage main_stage) throws IOException {
+	private void runLilyPondStartup(Runnable final_actions) throws IOException {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
@@ -229,10 +232,7 @@ public class MainApp extends Application {
 			if (!(lilypondFile.delete() && outputFile.delete())) {
 				System.out.println("Warning: Could not delete temporary file(s)");
 			}
-			Platform.runLater(() -> {
-				splashStage.close();
-				loadMainStage(main_stage);
-			});
+			Platform.runLater(final_actions);
 		});
 	}
 
