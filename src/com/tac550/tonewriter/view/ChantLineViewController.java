@@ -70,6 +70,8 @@ public class ChantLineViewController implements CommentableView {
 	private static final String CHORD_DRAG_KEY = "ToneWriter chord: ";
 	private ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
 	private ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
+	private double dragStartPosition = .5;
+	private double dragPreviousVector = 0;
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -238,6 +240,10 @@ public class ChantLineViewController implements CommentableView {
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 
+			dragStartPosition = ((controller.moveHandleImage.getLocalToSceneTransform().getTx() + event.getX()
+					- chordScroller.getLocalToSceneTransform().getTx())
+					/ chordScroller.getWidth());
+
 			// Dragging image creation
 			Screen screen;
 			try {
@@ -267,10 +273,14 @@ public class ChantLineViewController implements CommentableView {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
 
 			// Handle drag scrolling
-			System.out.println("X: " + event.getX() + "; Y: " + event.getY());
-			System.out.println(chordPane.getLocalToSceneTransform().getTx());
-//			chordScroller.setHvalue(chordScroller.getHvalue() + chordPane.getLocalToSceneTransform().getTx() + event.getX()
-//					- chordScroller.getHmax());
+			double vector = ((chordPane.getLocalToSceneTransform().getTx() + event.getX()
+					- chordScroller.getLocalToSceneTransform().getTx())
+					/ chordScroller.getWidth()) - dragStartPosition;
+			double speed = 0.05;
+			if (Math.abs(dragPreviousVector) < Math.abs(vector)) {
+				chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector));
+			}
+			dragPreviousVector = vector;
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
