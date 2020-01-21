@@ -552,7 +552,7 @@ public class MainSceneController {
 	boolean checkSave() {
 		if (toneFile == null ||
 				!askToSaveTone ||
-				toneNotSavable()) {
+				!isToneSaveable()) {
 			return true;
 		}
 
@@ -576,8 +576,8 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean toneNotSavable() {
-		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath()) && !MainApp.developerMode;
+	private boolean isToneSaveable() {
+		return !builtInToneLoaded() || MainApp.developerMode;
 	}
 
 	private boolean createNewTone() {
@@ -1164,7 +1164,7 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
-		if (!askToSaveTone && !toneNotSavable()) {
+		if (!askToSaveTone && isToneSaveable()) {
 			askToSaveTone = true;
 			mainStage.setTitle("*" + mainStage.getTitle());
 		}
