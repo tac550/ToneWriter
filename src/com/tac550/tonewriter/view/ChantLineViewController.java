@@ -19,9 +19,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -72,6 +70,8 @@ public class ChantLineViewController implements CommentableView {
 	private ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
 	private double dragStartPosition = .5;
 	private double dragPreviousVector = 0;
+	private double prevTime;
+	private boolean mouseReversed = false;
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -240,9 +240,7 @@ public class ChantLineViewController implements CommentableView {
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 
-			dragStartPosition = ((controller.moveHandleImage.getLocalToSceneTransform().getTx() + event.getX()
-					- chordScroller.getLocalToSceneTransform().getTx())
-					/ chordScroller.getWidth());
+			dragStartPosition = getCursorLocationFraction(controller.moveHandleImage, event.getX());
 
 			// Dragging image creation
 			Screen screen;
@@ -273,14 +271,25 @@ public class ChantLineViewController implements CommentableView {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
 
 			// Handle drag scrolling
-			double vector = ((chordPane.getLocalToSceneTransform().getTx() + event.getX()
-					- chordScroller.getLocalToSceneTransform().getTx())
-					/ chordScroller.getWidth()) - dragStartPosition;
-			double speed = 0.05;
-			if (Math.abs(dragPreviousVector) < Math.abs(vector)) {
-				chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector));
+			double cursorLocation = getCursorLocationFraction(chordPane, event.getX());
+			double vector = cursorLocation - dragStartPosition;
+			double threshold = 0.2;
+			double speed = 5;
+			double timeDelta = (System.nanoTime() - prevTime) / 1000000000; // In seconds
+
+			// Only proceed if cursor is within scrolling threshold
+			if (cursorLocation < threshold || cursorLocation > 1 - threshold) {
+				if (Math.abs(vector) > Math.abs(dragPreviousVector)) {
+					chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector * timeDelta));
+					if (mouseReversed) mouseReversed = false;
+				} else if (Math.abs(vector) == Math.abs(dragPreviousVector) && !mouseReversed) {
+					chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector * timeDelta));
+				} else if (Math.abs(vector) < Math.abs(dragPreviousVector)) {
+					mouseReversed = true;
+				}
 			}
 			dragPreviousVector = vector;
+			prevTime = System.nanoTime();
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
@@ -459,6 +468,12 @@ public class ChantLineViewController implements CommentableView {
 		for (ChantChordController chord : chordsToDelete) {
 			chord.deleteAll();
 		}
+	}
+
+	private double getCursorLocationFraction(Node caller, double mouse_position) {
+		return ((caller.getLocalToSceneTransform().getTx() + mouse_position
+				- chordScroller.getLocalToSceneTransform().getTx())
+				/ chordScroller.getWidth());
 	}
 	
 	private void recalcCHNames() {
