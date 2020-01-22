@@ -1045,7 +1045,7 @@ public class MainSceneController {
 		if (askToOverwriteOutput) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Overwrite");
-			alert.setHeaderText("Do you want to overwrite the previous render? (Choose cancel to create a new file)");
+			alert.setHeaderText("Do you want to overwrite the previous output? (Choose cancel to create a new file)");
 			alert.initOwner(mainStage);
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
@@ -1053,7 +1053,7 @@ public class MainSceneController {
 			} else if (!deletePreviousRender()) {
 				Alert alert2 = new Alert(AlertType.ERROR);
 				alert2.setTitle("Error");
-				alert2.setHeaderText("An error occurred while overwriting the previous files, attempting to render anyway...");
+				alert2.setHeaderText("An error occurred while overwriting the previous files, attempting to output anyway...");
 				alert2.initOwner(mainStage);
 				alert2.showAndWait();
 			}
