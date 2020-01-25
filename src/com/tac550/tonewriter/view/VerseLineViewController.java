@@ -563,7 +563,7 @@ public class VerseLineViewController {
 
 	@FXML private void editSyllables() {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("syllableEditView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayout("syllableEditView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			SyllableEditViewController controller = loader.getController();
 
@@ -582,8 +582,6 @@ public class VerseLineViewController {
 			});
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
 	}
 
 	public SyllableText[] getSyllables() {

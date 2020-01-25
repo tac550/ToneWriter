@@ -323,7 +323,7 @@ public class MainSceneController {
 
 	private Task<FXMLLoader> createVerseLine(String line) {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentController(this);
 
@@ -331,14 +331,10 @@ public class MainSceneController {
 
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
-
-		return loaderTask;
 	}
 	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
 
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
@@ -352,10 +348,6 @@ public class MainSceneController {
 
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
-
-		return loaderTask;
 	}
 
 	public void recalcCLNames() {
@@ -847,8 +839,8 @@ public class MainSceneController {
 	 * Tools Menu Actions
 	 */
 	@FXML private void handleCombinePDFs() {
-		// Load layout from fxml file
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("pdfCombineView.fxml", loader -> {
+
+		FXMLLoaderIO.loadFXMLLayout("pdfCombineView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			PDFCombineViewController controller = loader.getController();
 			controller.setDefaultDirectory(currentSavingDirectory);
@@ -863,8 +855,6 @@ public class MainSceneController {
 			});
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
 	}
 
 	/*
@@ -934,7 +924,7 @@ public class MainSceneController {
 	 */
 	@FXML private void handleAbout() {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("AboutScene.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayout("AboutScene.fxml", loader -> {
 			BorderPane aboutLayout = loader.getRoot();
 
 			Platform.runLater(() -> {
@@ -950,8 +940,6 @@ public class MainSceneController {
 			});
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
 	}
 
 	private void refreshChordKeySignatures(String key) {
@@ -1119,7 +1107,7 @@ public class MainSceneController {
 
 	private void showQuickVerseStage(TextField targetField) {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("quickVerseView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayout("quickVerseView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			QuickVerseController controller = loader.getController();
 
@@ -1139,8 +1127,6 @@ public class MainSceneController {
 			});
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
 	}
 
 	boolean playMidiAsAssigned() {

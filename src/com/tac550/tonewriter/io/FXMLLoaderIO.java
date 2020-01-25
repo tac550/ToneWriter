@@ -29,6 +29,9 @@ public class FXMLLoaderIO {
 		//noinspection ThrowableNotThrown
 		loaderTask.setOnFailed(e -> loaderTask.getException().printStackTrace());
 
+		Thread loaderThread = new Thread(loaderTask);
+		loaderThread.start();
+
 		return loaderTask;
 
 	}

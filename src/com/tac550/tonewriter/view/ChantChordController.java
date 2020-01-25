@@ -317,7 +317,7 @@ public class ChantChordController implements CommentableView {
 	}
 	@FXML private void editComment() {
 
-		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayout("commentView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayout("commentView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			CommentViewController controller = loader.getController();
 
@@ -336,8 +336,6 @@ public class ChantChordController implements CommentableView {
 			});
 		});
 
-		Thread loaderThread = new Thread(loaderTask);
-		loaderThread.start();
 	}
 	
 	public void applyCommentGraphic(Image image) {
