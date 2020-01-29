@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.util.TWUtils;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -47,7 +48,7 @@ public class ChantLineViewController implements CommentableView {
 	private Image commentButtonState;
 	
 	@FXML GridPane mainPane;
-	@FXML ScrollPane chordScroller;
+	@FXML ScrollPane chordScrollPane;
 
 	@FXML Button upButton;
 	@FXML Button downButton;
@@ -68,10 +69,17 @@ public class ChantLineViewController implements CommentableView {
 	private static final String CHORD_DRAG_KEY = "ToneWriter chord: ";
 	private ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
 	private ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
+
+	// Fields for automatic drag-scrolling
+	AnimationTimer autoScroller;
 	private double dragStartPosition = .5;
 	private double dragPreviousVector = 0;
-	private double prevTime;
+	private double prevTime = -1;
 	private boolean mouseReversed = false;
+	private final double scrollThreshold = 0.2;
+	private final double scrollSpeed = 2;
+	private double cursorLocation;
+	private double mouseVector;
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -240,7 +248,7 @@ public class ChantLineViewController implements CommentableView {
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 
-			dragStartPosition = getCursorLocationFraction(controller.moveHandleImage, event.getX());
+			dragStartPosition = getCursorPositionFraction(controller.moveHandleImage, event.getX());
 
 			// Dragging image creation
 			Screen screen;
@@ -265,31 +273,48 @@ public class ChantLineViewController implements CommentableView {
 			draggingChord.set(chordPane);
 			draggingController.set(controller);
 
+			// Begin automatic scrolling task
+			if (autoScroller == null) {
+
+				autoScroller = new AnimationTimer() {
+					@Override
+					public void handle(long now) {
+						if (draggingChord.get() == null || draggingController.get() == null) return;
+
+						if (prevTime == -1) prevTime = now;
+
+						double timeDelta = (now - prevTime) / 1000000000; // In seconds
+						double dragPreviousVectorAbs = Math.abs(dragPreviousVector);
+						double mouseVectorAbs = Math.abs(mouseVector);
+
+						// Only proceed if cursor is within scrolling threshold
+						if (cursorLocation < scrollThreshold || cursorLocation > 1 - scrollThreshold) {
+							if (mouseVectorAbs > dragPreviousVectorAbs) {
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + (scrollSpeed * mouseVector * timeDelta));
+								if (mouseReversed) mouseReversed = false;
+							} else if (mouseVectorAbs == dragPreviousVectorAbs && !mouseReversed) {
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + (scrollSpeed * mouseVector * timeDelta));
+							} else if (mouseVectorAbs < dragPreviousVectorAbs
+									&& dragPreviousVectorAbs - mouseVectorAbs > 5) {
+								mouseReversed = true;
+							}
+						}
+						dragPreviousVector = mouseVector;
+						prevTime = now;
+					}
+				};
+				autoScroller.start();
+
+			}
+
 			event.consume();
 		});
 		chordPane.setOnDragOver(event -> {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
 
-			// Handle drag scrolling
-			double cursorLocation = getCursorLocationFraction(chordPane, event.getX());
-			double vector = cursorLocation - dragStartPosition;
-			double threshold = 0.2;
-			double speed = 5;
-			double timeDelta = (System.nanoTime() - prevTime) / 1000000000; // In seconds
-
-			// Only proceed if cursor is within scrolling threshold
-			if (cursorLocation < threshold || cursorLocation > 1 - threshold) {
-				if (Math.abs(vector) > Math.abs(dragPreviousVector)) {
-					chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector * timeDelta));
-					if (mouseReversed) mouseReversed = false;
-				} else if (Math.abs(vector) == Math.abs(dragPreviousVector) && !mouseReversed) {
-					chordScroller.setHvalue(chordScroller.getHvalue() + (speed * vector * timeDelta));
-				} else if (Math.abs(vector) < Math.abs(dragPreviousVector)) {
-					mouseReversed = true;
-				}
-			}
-			dragPreviousVector = vector;
-			prevTime = System.nanoTime();
+			// Update auto scrolling values
+			cursorLocation = getCursorPositionFraction(chordPane, event.getX());
+			mouseVector = cursorLocation - Math.max(scrollThreshold, Math.min(dragStartPosition, 1 - scrollThreshold));
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
@@ -470,10 +495,10 @@ public class ChantLineViewController implements CommentableView {
 		}
 	}
 
-	private double getCursorLocationFraction(Node caller, double mouse_position) {
+	private double getCursorPositionFraction(Node caller, double mouse_position) {
 		return ((caller.getLocalToSceneTransform().getTx() + mouse_position
-				- chordScroller.getLocalToSceneTransform().getTx())
-				/ chordScroller.getWidth());
+				- chordScrollPane.getLocalToSceneTransform().getTx())
+				/ chordScrollPane.getWidth());
 	}
 	
 	private void recalcCHNames() {
@@ -605,7 +630,6 @@ public class ChantLineViewController implements CommentableView {
 		};
 		
 		Thread th = new Thread(midiTask);
-		
 		th.start();
 	}
 	
