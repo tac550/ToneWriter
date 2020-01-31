@@ -2,6 +2,7 @@
 /build/mac/
 /build/lin/
 /build/res/[tT]one[wW]riter.jar
+/build/res/path.txt
 /build/res/java-runtime
 /build/res/javafx-jmods*
 /lilypond/

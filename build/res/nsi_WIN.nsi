@@ -1,4 +1,5 @@
 ; Script generated with the Venis Install Wizard
+Unicode True
 
 ; Define your application name
 !define APPNAME "ToneWriter"
@@ -108,16 +109,10 @@ Section Uninstall
 	Delete "$INSTDIR\ToneWriter.exe"
 	Delete "$INSTDIR\licenses\third-party-licenses.txt"
 
-	; Clean up Built-in Tones
-	RMDir /r "$INSTDIR\Built-in Tones\"
-	; Clean up Java runtime
-	RMDir /r "$INSTDIR\java-runtime\"
-
-	; Remove remaining directories
+	; Remove start menu entry
 	RMDir "$SMPROGRAMS\ToneWriter"
-	RMDir "$INSTDIR\licenses\"
-	RMDir "$INSTDIR\lilypond\"
-	RMDir "$INSTDIR\"
+    ; Remove install directory
+	RMDir /r "$INSTDIR\"
 
 	${unregisterExtension} ".tone" "TONE File"
 

@@ -22,7 +22,7 @@ I'm building ToneWriter against Java 13 on Windows and Linux and Java 11 on macO
 
 ### Windows
 
-dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sure launch4jc.exe is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure makensis.exe is on the PATH). Your JDK 13 bin directory must also be on the PATH. The JavaFX SDK 13 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
+dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sure its install directory is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure its install directory is on the PATH). Your JDK 13 bin directory must also be on the PATH. The JavaFX SDK 13 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
 To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_WIN.cmd. The installer will be placed in build/win.
 
