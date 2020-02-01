@@ -72,13 +72,12 @@ public class ChantLineViewController implements CommentableView {
 
 	// Fields for automatic drag-scrolling
 	AnimationTimer autoScroller;
-	private double dragStartPosition = .5;
-	private double dragPreviousVector = 0;
 	private double prevTime = -1;
 	private boolean mouseReversed = false;
 	private final double scrollThreshold = 0.2;
-	private final double scrollSpeed = 2;
+	private final double scrollSpeed = 1.5;
 	private double cursorLocation;
+	private double previousMouseVector = 0;
 	private double mouseVector;
 
 	@FXML private void initialize() {
@@ -248,8 +247,6 @@ public class ChantLineViewController implements CommentableView {
 			clipboardContent.putString(CHORD_DRAG_KEY + controller.getFields() + " ");
 			dragboard.setContent(clipboardContent);
 
-			dragStartPosition = getCursorPositionFraction(controller.moveHandleImage, event.getX());
-
 			// Dragging image creation
 			Screen screen;
 			try {
@@ -279,12 +276,15 @@ public class ChantLineViewController implements CommentableView {
 				autoScroller = new AnimationTimer() {
 					@Override
 					public void handle(long now) {
-						if (draggingChord.get() == null || draggingController.get() == null) return;
+						if (draggingChord.get() == null || draggingController.get() == null) {
+							prevTime = now;
+							return;
+						}
 
 						if (prevTime == -1) prevTime = now;
 
 						double timeDelta = (now - prevTime) / 1000000000; // In seconds
-						double dragPreviousVectorAbs = Math.abs(dragPreviousVector);
+						double dragPreviousVectorAbs = Math.abs(previousMouseVector);
 						double mouseVectorAbs = Math.abs(mouseVector);
 
 						// Only proceed if cursor is within scrolling threshold
@@ -299,7 +299,7 @@ public class ChantLineViewController implements CommentableView {
 								mouseReversed = true;
 							}
 						}
-						dragPreviousVector = mouseVector;
+						previousMouseVector = mouseVector;
 						prevTime = now;
 					}
 				};
@@ -314,7 +314,7 @@ public class ChantLineViewController implements CommentableView {
 
 			// Update auto scrolling values
 			cursorLocation = getCursorPositionFraction(chordPane, event.getX());
-			mouseVector = cursorLocation - Math.max(scrollThreshold, Math.min(dragStartPosition, 1 - scrollThreshold));
+			mouseVector = cursorLocation - 0.5;
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
