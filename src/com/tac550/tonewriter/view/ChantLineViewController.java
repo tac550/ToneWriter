@@ -75,7 +75,7 @@ public class ChantLineViewController implements CommentableView {
 	private double prevTime = -1;
 	private boolean mouseReversed = false;
 	private final double scrollThreshold = 0.2;
-	private final double scrollSpeed = 1.5;
+	private final double scrollSpeed = 10;
 	private double cursorLocation;
 	private double previousMouseVector = 0;
 	private double mouseVector;
@@ -284,18 +284,19 @@ public class ChantLineViewController implements CommentableView {
 						if (prevTime == -1) prevTime = now;
 
 						double timeDelta = (now - prevTime) / 1000000000; // In seconds
-						double dragPreviousVectorAbs = Math.abs(previousMouseVector);
+						double previousVectorAbs = Math.abs(previousMouseVector);
 						double mouseVectorAbs = Math.abs(mouseVector);
 
 						// Only proceed if cursor is within scrolling threshold
 						if (cursorLocation < scrollThreshold || cursorLocation > 1 - scrollThreshold) {
-							if (mouseVectorAbs > dragPreviousVectorAbs) {
-								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + (scrollSpeed * mouseVector * timeDelta));
+							if (mouseVectorAbs > previousVectorAbs) {
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseVector * timeDelta)
+										* (chordScrollPane.getWidth() / (2 * chordBox.getWidth()))));
 								if (mouseReversed) mouseReversed = false;
-							} else if (mouseVectorAbs == dragPreviousVectorAbs && !mouseReversed) {
-								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + (scrollSpeed * mouseVector * timeDelta));
-							} else if (mouseVectorAbs < dragPreviousVectorAbs
-									&& dragPreviousVectorAbs - mouseVectorAbs > 5) {
+							} else if (mouseVectorAbs == previousVectorAbs && !mouseReversed) {
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseVector * timeDelta)
+										* (chordScrollPane.getWidth() / (2 * chordBox.getWidth()))));
+							} else if (mouseVectorAbs < previousVectorAbs) {
 								mouseReversed = true;
 							}
 						}
