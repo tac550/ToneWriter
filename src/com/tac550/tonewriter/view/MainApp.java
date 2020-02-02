@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -80,6 +81,8 @@ public class MainApp extends Application {
 	public static void main(String[] args) {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
+
+		AutoUpdater.AutoUpdate();
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
