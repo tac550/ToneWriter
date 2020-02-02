@@ -1,8 +1,8 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.MidiInterface;
-import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -82,8 +82,6 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		AutoUpdater.AutoUpdate();
-
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
 			System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
@@ -109,6 +107,9 @@ public class MainApp extends Application {
 		if (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) {
 			platformSpecificInitialization(); // First-time setup processes
 		}
+
+		// Run auto update check
+		AutoUpdater.AutoUpdate();
 
 		// Check for LilyPond installation - from prefs first
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));

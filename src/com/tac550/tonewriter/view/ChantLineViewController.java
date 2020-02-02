@@ -596,7 +596,7 @@ public class ChantLineViewController implements CommentableView {
 	}
 	@FXML private void editComment() {
 
-		FXMLLoaderIO.loadFXMLLayout("commentView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("commentView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			CommentViewController controller = loader.getController();
 

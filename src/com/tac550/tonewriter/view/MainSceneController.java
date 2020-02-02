@@ -324,7 +324,7 @@ public class MainSceneController {
 
 	private Task<FXMLLoader> createVerseLine(String line) {
 
-		return FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentController(this);
 
@@ -335,7 +335,7 @@ public class MainSceneController {
 	}
 	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
-		return FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayoutAsync("chantLineView.fxml", loader -> {
 
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
@@ -826,7 +826,7 @@ public class MainSceneController {
 	 */
 	@FXML private void handleCombinePDFs() {
 
-		FXMLLoaderIO.loadFXMLLayout("pdfCombineView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("pdfCombineView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			PDFCombineViewController controller = loader.getController();
 			controller.setDefaultDirectory(currentSavingDirectory);
@@ -903,7 +903,7 @@ public class MainSceneController {
 	 */
 	@FXML private void handleAbout() {
 
-		FXMLLoaderIO.loadFXMLLayout("AboutScene.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("AboutScene.fxml", loader -> {
 			BorderPane aboutLayout = loader.getRoot();
 
 			Platform.runLater(() -> {
@@ -1076,7 +1076,7 @@ public class MainSceneController {
 
 	private void showQuickVerseStage(TextField targetField) {
 
-		FXMLLoaderIO.loadFXMLLayout("quickVerseView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("quickVerseView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			QuickVerseController controller = loader.getController();
 
