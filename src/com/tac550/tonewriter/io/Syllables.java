@@ -22,7 +22,9 @@ public class Syllables {
 		ArrayList<String> lines;
 		
 		try (final WebClient webClient = new WebClient()) {
-			
+
+			webClient.setIncorrectnessListener((a0, a1) -> {});
+
 	        final HtmlPage page = webClient.getPage("http://www.juiciobrennan.com/syllables/");
 
 	        final HtmlTextArea textField = page.getHtmlElementById("inputText");
