@@ -1,15 +1,14 @@
 package com.tac550.tonewriter.io;
 
+import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.MainSceneController;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.CheckMenuItem;
-import javafx.stage.Stage;
 import org.apache.commons.text.TextStringBuilder;
 
 import java.io.File;
@@ -179,20 +178,15 @@ public class ToneReaderWriter {
 
 			// Version warning
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Warning");
-				alert.setHeaderText(String.format(Locale.US,
+
+				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
 						"This tone was created with a newer version of %s. Be advised there may be issues.",
-						MainApp.APP_NAME));
-				((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+						MainApp.APP_NAME), true);
 
-				alert.showAndWait();
 			} else if (versionSaved == 0) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("Error loading tone file; it appears to be corrupted");
 
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone file; it appears to be corrupted", true);
+
 				return false;
 			}
 			

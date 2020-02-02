@@ -1,8 +1,9 @@
 package com.tac550.tonewriter.io;
 
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
 import javax.sound.midi.MidiUnavailableException;
@@ -54,11 +55,7 @@ public class MidiInterface {
 				sequencer.open();
 			} catch (MidiUnavailableException e) {
 				e.printStackTrace();
-				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("MIDI system unavailable!");
-
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "MIDI system unavailable!", true);
 			}
 		}
 	}

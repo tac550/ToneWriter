@@ -1,10 +1,10 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,7 +31,7 @@ import java.util.List;
 public class PDFCombineViewController {
 
 	private File defaultDirectory;
-	
+
 	@FXML Text dragInstructions;
 	@FXML private VBox fileBox;
 
@@ -93,10 +93,7 @@ public class PDFCombineViewController {
 	@FXML private void handleCombine() {
 		
 		if (fileBox.getChildren().isEmpty()) {
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Warning");
-			alert.setHeaderText("No PDF files selected!");
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.WARNING, "Warning", "No PDF files selected!", true, getStage());
 			return;
 		}
 		
@@ -119,10 +116,9 @@ public class PDFCombineViewController {
 				pdfMerger.addSource(pdfFile);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("Error reading file \"" + ((Label)pane.getChildren().get(0)).getText() + "\"");
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error",
+						"Error reading file \"" + ((Label)pane.getChildren().get(0)).getText() + "\"",
+						true, getStage());
 				return;
 			}
 		}
@@ -131,17 +127,13 @@ public class PDFCombineViewController {
 			pdfMerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 		} catch (IOException e) {
 			e.printStackTrace();
-			e.printStackTrace();
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Error combining files!");
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Error combining files!", true, getStage());
 		}
 		
 		try {
 			Desktop.getDesktop().open(outFile);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		closeStage();
@@ -211,8 +203,11 @@ public class PDFCombineViewController {
 	}
 	
 	private void closeStage() {
-		Stage stage = (Stage) fileBox.getScene().getWindow();
-		stage.close();
+		getStage().close();
+	}
+
+	private Stage getStage() {
+		return (Stage) fileBox.getScene().getWindow();
 	}
 	
 	void setDefaultDirectory(File directory) {

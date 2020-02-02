@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.QuickVerseIO;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -81,18 +82,13 @@ public class QuickVerseController {
 					if (QuickVerseIO.removeCustomVerse(cell.itemProperty().get())) {
 						verses.remove(cell.itemProperty().get());	
 					} else {
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Deletion");
-						alert.setHeaderText("Can't delete this verse because it's built-in.");
-						alert.initOwner(mainPane.getScene().getWindow());
-						alert.showAndWait();
+						TWUtils.showAlert(AlertType.INFORMATION, "Deletion",
+								"Can't delete this verse because it's built-in.", true, getStage());
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Error");
-					alert.setHeaderText("IO Error deleting verse!");
-					alert.showAndWait();
+					TWUtils.showAlert(AlertType.ERROR, "Error", "IO Error while deleting verse!",
+							true, getStage());
 				}
             });
             contextMenu.getItems().add(deleteItem);
@@ -167,17 +163,12 @@ public class QuickVerseController {
 
 				verses.add(resultField.getText());
 			} else {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("That verse is already in the list!");
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "That verse is already in the list!",
+						true, getStage());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("IO Error saving verse!");
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "IO Error saving verse!", true, getStage());
 		}
 	}
 	
@@ -216,8 +207,11 @@ public class QuickVerseController {
 	}
 	
 	private void closeStage() {
-		Stage stage = (Stage) mainPane.getScene().getWindow();
-		stage.close();
+		getStage().close();
+	}
+
+	private Stage getStage() {
+		return (Stage) mainPane.getScene().getWindow();
 	}
 	
 }

@@ -4,6 +4,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -469,11 +470,8 @@ public class MainSceneController {
 	@FXML private void handleSetVerse() {
 
 		if (verseSet) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Set Verse Confirmation");
-			alert.setHeaderText("Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)");
-			alert.initOwner(mainStage);
-			Optional<ButtonType> result = alert.showAndWait();
+			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Set Verse Confirmation",
+					"Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)", true);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
 			else askToOverwriteOutput = false;
 		}
@@ -492,7 +490,7 @@ public class MainSceneController {
 			@Override
 			protected Void call() {
 
-				String[] lines = Syllables.getSyllabificationLines(verseArea.getText());
+				String[] lines = Syllables.getSyllabificationLines(verseArea.getText(), mainStage);
 
 				if (setVerseCancelled) {
 					setVerseCancelled = false;
@@ -548,16 +546,14 @@ public class MainSceneController {
 			return true;
 		}
 
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Save Confirmation");
-		alert.setHeaderText("Do you want to save tone \"" + toneFile.getName() + "\"?");
-		alert.initOwner(mainStage);
 		ButtonType saveButton = new ButtonType("Save");
 		ButtonType dontSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-		alert.getButtonTypes().setAll(saveButton, dontSaveButton, cancelButton);
 
-		Optional<ButtonType> result = alert.showAndWait();
+		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
+				"Do you want to save tone \"" + toneFile.getName() + "\"?", true, mainStage,
+				new ButtonType[] {saveButton, dontSaveButton, cancelButton});
+
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
 				handleSave();
@@ -591,11 +587,10 @@ public class MainSceneController {
 
 			return true;
 		} else {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("An error occurred creating the tone!");
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+
+			TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while creating the tone!",
+					true, mainStage);
+
 			return false;
 		}
 	}
@@ -625,11 +620,8 @@ public class MainSceneController {
 			if (toneReader.loadTone(this, toneFile)) {
 				return true;
 			} else {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("");
-				alert.setHeaderText("Error loading tone!");
-				alert.initOwner(mainStage);
-				alert.showAndWait();
+
+				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, mainStage);
 
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
@@ -638,11 +630,9 @@ public class MainSceneController {
 			}
 
 		} else {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("That file doesn't exist!");
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+
+			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, mainStage);
+
 			return false;
 		}
 	}
@@ -705,11 +695,7 @@ public class MainSceneController {
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
 				poetText, composerText);
 		if (!toneWriter.saveTone(toneFile)) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Saving error!");
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, mainStage);
 		} else { // Save successful
 			resetToneEditedStatus();
 		}
@@ -870,11 +856,8 @@ public class MainSceneController {
 		String previousLocation = MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, null);
 		MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
 		if (new File(savingDirectory.getAbsolutePath() + File.separator + MainApp.getPlatformSpecificLPExecutable()).exists()) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Restart");
-			alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.INFORMATION, "Restart",
+					String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true, mainStage);
 		} else {
 			if (previousLocation == null) {
 				MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
@@ -882,21 +865,17 @@ public class MainSceneController {
 				MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, previousLocation);
 			}
 
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("That directory does not contain a valid LilyPond executable.");
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.ERROR, "Error",
+					"That directory does not contain a valid LilyPond executable.", true, mainStage);
+
 		}
 
 	}
 	@FXML private void handleResetLilyPondDir() {
 		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Restart");
-		alert.setHeaderText(String.format(Locale.US, "This change will take effect the next time you restart %s.", MainApp.APP_NAME));
-		alert.initOwner(mainStage);
-		alert.showAndWait();
+		TWUtils.showAlert(AlertType.INFORMATION, "Restart",
+				String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true,
+				mainStage);
 	}
 	@FXML private void handleSetPaperSize() {
 		List<String> choices = new ArrayList<>();
@@ -1031,19 +1010,15 @@ public class MainSceneController {
 	@FXML private void handleExport() {
 
 		if (askToOverwriteOutput) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Overwrite");
-			alert.setHeaderText("Do you want to overwrite the previous output? (Choose cancel to create a new file)");
-			alert.initOwner(mainStage);
-			Optional<ButtonType> result = alert.showAndWait();
+			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Overwrite",
+					"Do you want to overwrite the previous output? (Choose cancel to create a new file)", true,
+					mainStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 				if (!getNewRenderFilename()) return;
 			} else if (!deletePreviousRender()) {
-				Alert alert2 = new Alert(AlertType.ERROR);
-				alert2.setTitle("Error");
-				alert2.setHeaderText("An error occurred while overwriting the previous files, attempting to output anyway...");
-				alert2.initOwner(mainStage);
-				alert2.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error",
+						"An error occurred while overwriting the previous files, attempting to output anyway...",
+						true, mainStage);
 			}
 		} else {
 			if (getNewRenderFilename()) {
@@ -1057,19 +1032,13 @@ public class MainSceneController {
 			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
 					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
 					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("An error occurred while saving!");
-				alert.initOwner(mainStage);
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while saving!",
+						true, mainStage);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("There was an IO error while saving!");
-			alert.initOwner(mainStage);
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
+					true, mainStage);
 		}
 
 	}

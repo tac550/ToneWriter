@@ -492,8 +492,8 @@ public class LilyPondWriter {
 		} else {
 			try {
 				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 

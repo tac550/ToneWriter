@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
@@ -125,11 +125,7 @@ public class MainApp extends Application {
 					loadMainStage(main_stage);
 				});
 			} catch (IOException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("Failed to run LilyPond!");
-
-				alert.show();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "Failed to run LilyPond!", false);
 			}
 		} else {
 			splashStage.close();
@@ -339,11 +335,8 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win")) {
 			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("First Time Setup");
-				alert.setHeaderText(String.format("Welcome to %s!" +
-						" Please click through the following LilyPond installer to complete setup.", MainApp.APP_NAME));
-				alert.showAndWait();
+				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s!" +
+						" Please click through the following LilyPond installer to complete setup.", MainApp.APP_NAME), true);
 
 				try {
 					Process process = Runtime.getRuntime().exec(String.format("cmd /c lilypond\\%s",
@@ -368,10 +361,8 @@ public class MainApp extends Application {
 				}
 			}
 
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("First Time Setup");
-			alert.setHeaderText(String.format("Welcome to %s! Please enter your password when prompted to complete setup.", MainApp.APP_NAME));
-			alert.showAndWait();
+			TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
+					String.format("Welcome to %s! Please enter your password when prompted to complete setup.", MainApp.APP_NAME), true);
 
 			try {
 				String[] command = {
@@ -397,11 +388,10 @@ public class MainApp extends Application {
 
 		} if (OS_NAME.startsWith("lin")) {
 			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("First Time Setup");
-				alert.setHeaderText(String.format("Welcome to %s! Please either install \"lilypond\" from your " +
-						"distribution's repositories or locate your copy from the Options menu.", MainApp.APP_NAME));
-				alert.showAndWait();
+
+				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
+						"distribution's repositories or locate your copy from the Options menu.", MainApp.APP_NAME), true);
+
 			}
 		}
 	}

@@ -1,30 +1,30 @@
 package com.tac550.tonewriter.io;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextArea;
-
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Syllables {
 
 	// Sends text off to the syllabification engine and returns the resulting lines as an array of strings.
-	public static String[] getSyllabificationLines(String full_verse) {
+	public static String[] getSyllabificationLines(String full_verse, Stage main_stage) {
 		
 		ArrayList<String> lines;
 		
 		try (final WebClient webClient = new WebClient()) {
 			
 	        final HtmlPage page = webClient.getPage("http://www.juiciobrennan.com/syllables/");
-	        
+
 	        final HtmlTextArea textField = page.getHtmlElementById("inputText");
 	        final HtmlSubmitInput submitButton = page.getHtmlElementById("inputTextButton");
 	        
@@ -35,13 +35,8 @@ public class Syllables {
 
 		} catch (FailingHttpStatusCodeException | IOException e) {
 
-			Platform.runLater(() -> {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Error");
-				alert.setHeaderText("Internet connection failure! Use Edit buttons to break up syllables.");
-
-				alert.showAndWait();
-			});
+			Platform.runLater(() -> TWUtils.showAlert(AlertType.ERROR, "Error",
+					"Internet connection failure! Use Edit buttons to break words up into syllables.", true, main_stage));
 
 			// Return the provided text without modification if there's a failure.
 			return full_verse.split("\\r?\\n");
