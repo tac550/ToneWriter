@@ -8,7 +8,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
@@ -22,7 +21,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -59,6 +57,7 @@ public class MainApp extends Application {
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
+	static final String PREFS_CHECK_UPDATE_APPSTARTUP = "Check-Update-Appstart";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
@@ -109,9 +108,6 @@ public class MainApp extends Application {
 			platformSpecificInitialization(); // First-time setup processes
 		}
 
-		// Run auto update check
-		AutoUpdater.AutoUpdate(true);
-
 		// Check for LilyPond installation - from prefs first
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
 		if (new File(lilyPondDirectory.getAbsolutePath() + getPlatformSpecificLPExecutable()).exists()) {
@@ -158,6 +154,9 @@ public class MainApp extends Application {
 		// Show the stage (required for the next operation to work)
 		this.mainStage.show();
 
+		// Run auto update check
+		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.AutoUpdate(true);
+
 		// Makes sure the stage can't be made too small.
 		// The stage opens showing the scene at its pref size. This makes that initial size the minimum.
 		mainStage.setMinWidth(mainStage.getWidth());
@@ -191,14 +190,15 @@ public class MainApp extends Application {
 		splashStage.initStyle(StageStyle.TRANSPARENT);
 		splashStage.setScene(scene);
 		splashStage.getIcons().add(APP_ICON);
-		splashStage.show();
-
-		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-		splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
-		splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
 
 		splashBackground.setImage(APP_ICON);
 		splashBackground.setEffect(frostEffect);
+
+		splashStage.centerOnScreen();
+
+		splashStage.show();
+		splashStage.requestFocus();
+
 	}
 
 	private Node[] createSplashContent() {

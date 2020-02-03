@@ -9,6 +9,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.UpdaterViewController;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -23,13 +25,30 @@ import java.util.Locale;
 
 public class AutoUpdater {
 
+	private static WebClient webClient;
+
 	private static Stage updaterStage = new Stage();
 
 	public static void AutoUpdate(boolean startup) {
 
-		String fileName = "C:\\Users\\Thomas\\Downloads\\Test.zip";
+		Task<Void> updateTask = new Task<>() {
+			@Override
+			protected Void call() {
+				updateCheck(startup);
+				return null;
+			}
+		};
 
-		try (final WebClient webClient = new WebClient()) {
+		Thread updateThread = new Thread(updateTask);
+		updateThread.start();
+
+	}
+
+	private static void updateCheck(boolean startup) {
+
+		try {
+			webClient = new WebClient();
+
 			webClient.setCssErrorHandler(new SilentCssErrorHandler());
 
 			// Get the GitHub Releases page
@@ -74,30 +93,24 @@ public class AutoUpdater {
 				return;
 			}
 
-			FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
-			UpdaterViewController updaterController = loader.getController();
+			Platform.runLater(() -> {
+				FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
+				UpdaterViewController updaterController = loader.getController();
 
-			updaterStage.setTitle("Automatic Updater");
-			updaterStage.getIcons().add(MainApp.APP_ICON);
-			updaterStage.setScene(new Scene(loader.getRoot()));
-			updaterStage.setOnShown(event -> {
-				updaterStage.setMinWidth(updaterStage.getWidth());
-				updaterStage.setMinHeight(updaterStage.getHeight());
+				updaterStage.setTitle("Automatic Updater");
+				updaterStage.getIcons().add(MainApp.APP_ICON);
+				updaterStage.setScene(new Scene(loader.getRoot()));
+				updaterStage.setOnShown(event -> {
+					updaterStage.setMinWidth(updaterStage.getWidth());
+					updaterStage.setMinHeight(updaterStage.getHeight());
+				});
+
+				updaterController.setWebViewContent(finalHTMLString.toString());
+				updaterController.setVersionChoices(releaseNumbers);
+
+				updaterStage.show();
 			});
 
-			updaterController.setWebViewContent(finalHTMLString.toString());
-			updaterController.setVersionChoices(releaseNumbers);
-
-			updaterStage.showAndWait();
-
-			String result = updaterController.getResult();
-
-			if (!result.isEmpty()) {
-				final WebResponse response = webClient.getPage(String.format(Locale.US,
-						"https://github.com/tac550/ToneWriter/releases/download/%s/ToneWriter.app.zip", result)).getWebResponse();
-
-				IOUtils.copy(response.getContentAsStream(), new FileOutputStream(fileName));
-			}
 
 		} catch (FailingHttpStatusCodeException | IOException e) {
 
@@ -105,7 +118,23 @@ public class AutoUpdater {
 					"Internet connection failure! Unable to check for updates.", true);
 
 		}
+	}
 
+	public static void performUpdate(String version) {
+
+		TWUtils.showAlert(Alert.AlertType.INFORMATION, "Downloading",
+				"Downloading version " + version + ". This may take some time.", false);
+
+		try {
+			final WebResponse response = webClient.getPage(String.format(Locale.US,
+					"https://github.com/tac550/ToneWriter/releases/download/%s/ToneWriter.app.zip", version)).getWebResponse();
+			String fileName = "C:\\Users\\Thomas\\Downloads\\Test.zip";
+			IOUtils.copy(response.getContentAsStream(), new FileOutputStream(fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+					"Internet connection failure! Unable to download update.", true);
+		}
 	}
 
 }

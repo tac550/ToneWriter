@@ -1,7 +1,9 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.AutoUpdater;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
@@ -19,15 +21,21 @@ public class UpdaterViewController {
 	@FXML private Button updateButton;
 	@FXML private Button laterButton;
 
+	@FXML private CheckBox updateOnStartupBox;
+
 	private String result = "";
 
 	@FXML private void initialize() {
-
+		// Checkbox initial state and behavior
+		updateOnStartupBox.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, true));
+		updateOnStartupBox.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, newVal));
 	}
 
 	@FXML private void handleUpdate() {
 		result = versionChoiceBox.getSelectionModel().getSelectedItem().toString();
 		getStage().close();
+		AutoUpdater.performUpdate(result);
 	}
 
 	@FXML private void handleLater() {
