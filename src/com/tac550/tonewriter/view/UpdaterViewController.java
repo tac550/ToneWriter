@@ -5,6 +5,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 import java.util.List;
 
@@ -15,12 +16,23 @@ public class UpdaterViewController {
 	@FXML private Text updateStatusText;
 	@FXML private ChoiceBox<Float> versionChoiceBox;
 
-	@FXML Button updateButton;
-	@FXML Button laterButton;
+	@FXML private Button updateButton;
+	@FXML private Button laterButton;
 
-	@FXML
-	private void initialize() {
+	private String result = "";
 
+	@FXML private void initialize() {
+
+	}
+
+	@FXML private void handleUpdate() {
+		result = versionChoiceBox.getSelectionModel().getSelectedItem().toString();
+		getStage().close();
+	}
+
+	@FXML private void handleLater() {
+		result = "";
+		getStage().close();
 	}
 
 	public void setWebViewContent(String page_text) {
@@ -38,6 +50,14 @@ public class UpdaterViewController {
 			updateButton.setDisable(true);
 			laterButton.setText("Close");
 		}
+	}
+
+	public String getResult() {
+		return result;
+	}
+
+	private Stage getStage() {
+		return (Stage) webView.getScene().getWindow();
 	}
 
 }

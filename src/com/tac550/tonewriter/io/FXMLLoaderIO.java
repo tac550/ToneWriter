@@ -47,7 +47,7 @@ public class FXMLLoaderIO {
 			loader.load();
 		} catch (IOException e) {
 			e.printStackTrace();
-			TWUtils.showAlert(Alert.AlertType.ERROR, "Erorr",
+			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 					"IO Error while loading layout file " + filename, true);
 		}
 

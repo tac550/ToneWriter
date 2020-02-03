@@ -3,6 +3,7 @@ package com.tac550.tonewriter.io;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.tac550.tonewriter.util.TWUtils;
@@ -13,10 +14,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import org.apache.commons.io.IOUtils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AutoUpdater {
 
@@ -87,8 +91,14 @@ public class AutoUpdater {
 
 			updaterStage.showAndWait();
 
-//			final WebResponse response = webClient.getPage("https://github.com/tac550/ToneWriter/releases/download/0.5/ToneWriter.app.zip").getWebResponse();
-//			IOUtils.copy(response.getContentAsStream(), new FileOutputStream(fileName));
+			String result = updaterController.getResult();
+
+			if (!result.isEmpty()) {
+				final WebResponse response = webClient.getPage(String.format(Locale.US,
+						"https://github.com/tac550/ToneWriter/releases/download/%s/ToneWriter.app.zip", result)).getWebResponse();
+
+				IOUtils.copy(response.getContentAsStream(), new FileOutputStream(fileName));
+			}
 
 		} catch (FailingHttpStatusCodeException | IOException e) {
 
