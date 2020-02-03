@@ -14,7 +14,9 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
 import java.io.FileOutputStream;
@@ -29,12 +31,12 @@ public class AutoUpdater {
 
 	private static Stage updaterStage = new Stage();
 
-	public static void AutoUpdate(boolean startup) {
+	public static void AutoUpdate(Window owner, boolean startup) {
 
 		Task<Void> updateTask = new Task<>() {
 			@Override
 			protected Void call() {
-				updateCheck(startup);
+				updateCheck(owner, startup);
 				return null;
 			}
 		};
@@ -44,7 +46,7 @@ public class AutoUpdater {
 
 	}
 
-	private static void updateCheck(boolean startup) {
+	private static void updateCheck(Window owner, boolean startup) {
 
 		try {
 			webClient = new WebClient();
@@ -92,7 +94,7 @@ public class AutoUpdater {
 				FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
 				UpdaterViewController updaterController = loader.getController();
 
-				updaterStage.setTitle("Automatic Updater");
+				updaterStage.setTitle(String.format("%s Automatic Updater", MainApp.APP_NAME));
 				updaterStage.getIcons().add(MainApp.APP_ICON);
 				updaterStage.setScene(new Scene(loader.getRoot()));
 				updaterStage.setOnShown(event -> {
@@ -102,6 +104,11 @@ public class AutoUpdater {
 
 				updaterController.setWebViewContent(finalHTMLString.toString());
 				updaterController.setVersionChoices(releaseNumbers);
+
+				if (updaterStage.getOwner() == null) {
+					updaterStage.initOwner(owner);
+					updaterStage.initModality(Modality.APPLICATION_MODAL);
+				}
 
 				updaterStage.show();
 			});

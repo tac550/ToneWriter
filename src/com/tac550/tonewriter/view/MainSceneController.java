@@ -1,9 +1,6 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondWriter;
-import com.tac550.tonewriter.io.Syllables;
-import com.tac550.tonewriter.io.ToneReaderWriter;
+import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -96,6 +93,7 @@ public class MainSceneController {
 	@FXML private MenuItem combinePDFsMenuItem;
 
 	@FXML private MenuItem aboutMenuItem;
+	@FXML private MenuItem updateMenuitem;
 
 	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
@@ -204,6 +202,11 @@ public class MainSceneController {
 		pdfIcon.setFitHeight(iconSize);
 		pdfIcon.setFitWidth(iconSize);
 		combinePDFsMenuItem.setGraphic(pdfIcon);
+
+		ImageView updateIcon = new ImageView(getClass().getResource("/media/cloud-sync.png").toExternalForm());
+		updateIcon.setFitHeight(iconSize);
+		updateIcon.setFitWidth(iconSize);
+		updateMenuitem.setGraphic(updateIcon);
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
@@ -902,7 +905,6 @@ public class MainSceneController {
 	 * Help Menu Actions
 	 */
 	@FXML private void handleAbout() {
-
 		FXMLLoaderIO.loadFXMLLayoutAsync("AboutScene.fxml", loader -> {
 			BorderPane aboutLayout = loader.getRoot();
 
@@ -918,7 +920,9 @@ public class MainSceneController {
 				aboutStage.show();
 			});
 		});
-
+	}
+	@FXML private void handleUpdateCheck() {
+		AutoUpdater.AutoUpdate(mainStage, false);
 	}
 
 	private void refreshChordKeySignatures(String key) {
