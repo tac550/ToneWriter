@@ -83,12 +83,7 @@ public class AutoUpdater {
 
 			}
 
-
-//			for (HtmlDivision element : releaseNotes) {
-//				System.out.println(element.getElementsByTagName("ul").get(0).getTextContent());
-//			}
-
-			// If there's no update and this is the startup call, stop here.
+			// If there's no update and this is the startup check, stop here.
 			if (startup && releaseNumbers.size() == 0) {
 				return;
 			}

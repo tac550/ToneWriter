@@ -35,7 +35,7 @@
    <top>
       <HBox alignment="CENTER" BorderPane.alignment="CENTER">
          <children>
-            <Text fx:id="updateStatusText" strokeType="OUTSIDE" strokeWidth="0.0" text="Update Status">
+            <Text fx:id="updateStatusText" fill="#35a117" strokeType="OUTSIDE" strokeWidth="0.0" text="Update Status">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
