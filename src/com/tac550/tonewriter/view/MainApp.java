@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
@@ -21,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -194,10 +196,11 @@ public class MainApp extends Application {
 		splashBackground.setImage(APP_ICON);
 		splashBackground.setEffect(frostEffect);
 
-		splashStage.centerOnScreen();
-
 		splashStage.show();
-		splashStage.requestFocus();
+
+		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+		splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
+		splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
 
 	}
 
