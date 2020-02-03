@@ -9,7 +9,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.UpdaterViewController;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -102,8 +101,8 @@ public class AutoUpdater {
 
 		} catch (FailingHttpStatusCodeException | IOException e) {
 
-			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
-					"Internet connection failure! Unable to check for updates.", true));
+			TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+					"Internet connection failure! Unable to check for updates.", true);
 
 		}
 
