@@ -38,7 +38,7 @@ import java.util.prefs.Preferences;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.6";
+	public static final String APP_VERSION = "0.5";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -92,6 +92,9 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage main_stage) {
+
+		showSplash();
+
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
@@ -101,15 +104,13 @@ public class MainApp extends Application {
 		// Print saved LilyPond directory if any, otherwise print null.
 		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
 
-		showSplash();
-
 		// See if first-time setup is needed if using built-in LilyPond
 		if (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) {
 			platformSpecificInitialization(); // First-time setup processes
 		}
 
 		// Run auto update check
-		AutoUpdater.AutoUpdate();
+		AutoUpdater.AutoUpdate(true);
 
 		// Check for LilyPond installation - from prefs first
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));

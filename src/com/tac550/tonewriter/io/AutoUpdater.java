@@ -22,7 +22,7 @@ public class AutoUpdater {
 
 	private static Stage updaterStage = new Stage();
 
-	public static void AutoUpdate() {
+	public static void AutoUpdate(boolean startup) {
 
 		String fileName = "C:\\Users\\Thomas\\Downloads\\Test.zip";
 
@@ -39,18 +39,22 @@ public class AutoUpdater {
 
 			StringBuilder finalHTMLString = new StringBuilder();
 
-			System.out.println(releaseNotes.size());
 			for (int i = 0; i < releaseHeaders.size(); i++) {
 				HtmlDivision header = releaseHeaders.get(i);
-				String body = releaseNotes.get(i).asXml();
-
 				String releaseTitle = header.getElementsByTagName("a").get(0).getTextContent();
-				finalHTMLString.append("<h1>").append(releaseTitle).append("</h1>");
-
-				String result = body.substring(body.indexOf("</h1>") + 5, body.indexOf("<h1>", body.indexOf("</h1>") + 5));
-				finalHTMLString.append(result);
-
 				float releaseNumber = Float.parseFloat(releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", ""));
+
+				if (releaseNumber >= Float.parseFloat(MainApp.APP_VERSION)) {
+					// Add the version heading to the output
+					finalHTMLString.append("<h1>").append(releaseTitle).append("</h1>");
+
+					// Add the associated changelog to the output
+					String body = releaseNotes.get(i).asXml();
+					int afterFirstHeading = body.indexOf("</h1>") + 5;
+					String changelog = body.substring(afterFirstHeading, body.indexOf("<h1>", afterFirstHeading));
+					finalHTMLString.append(changelog);
+				}
+
 				if (releaseNumber > Float.parseFloat(MainApp.APP_VERSION)) {
 					releaseNumbers.add(releaseNumber);
 				}
@@ -61,6 +65,11 @@ public class AutoUpdater {
 //			for (HtmlDivision element : releaseNotes) {
 //				System.out.println(element.getElementsByTagName("ul").get(0).getTextContent());
 //			}
+
+			// If there's no update and this is the startup call, stop here.
+			if (startup && releaseNumbers.size() == 0) {
+				return;
+			}
 
 			FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
 			UpdaterViewController updaterController = loader.getController();
