@@ -113,8 +113,8 @@ public class MainSceneController {
 
 	private Robot robot = new Robot();
 
-	private String composerIconPath = getClass().getResource("/media/profile.png").toExternalForm();
-	private String keyIconPath = getClass().getResource("/media/key.png").toExternalForm();
+	private static final String composerIconPath = "/media/profile.png";
+	private static final String keyIconPath = "/media/key.png";
 
 	private File toneFile;
 
@@ -147,63 +147,18 @@ public class MainSceneController {
 
 	@FXML private void initialize() {
 
-		// Interface icons
-		ImageView newIcon = new ImageView(getClass().getResource("/media/file-text.png").toExternalForm());
-		// Menus
-		double iconSize = 30;
-		newIcon.setFitHeight(iconSize);
-		newIcon.setFitWidth(iconSize);
-		newToneMenuItem.setGraphic(newIcon);
-
-		ImageView openIcon = new ImageView(getClass().getResource("/media/folder.png").toExternalForm());
-		openIcon.setFitHeight(iconSize);
-		openIcon.setFitWidth(iconSize);
-		openToneMenuItem.setGraphic(openIcon);
-
-		ImageView saveIcon = new ImageView(getClass().getResource("/media/floppy.png").toExternalForm());
-		saveIcon.setFitHeight(iconSize);
-		saveIcon.setFitWidth(iconSize);
-		saveToneMenuItem.setGraphic(saveIcon);
-
-		ImageView saveAsNewIcon = new ImageView(getClass().getResource("/media/floppy-add.png").toExternalForm());
-		saveAsNewIcon.setFitHeight(iconSize);
-		saveAsNewIcon.setFitWidth(iconSize);
-		saveToneAsMenuItem.setGraphic(saveAsNewIcon);
-
-		ImageView exitIcon = new ImageView(getClass().getResource("/media/sign-error.png").toExternalForm());
-		exitIcon.setFitHeight(iconSize);
-		exitIcon.setFitWidth(iconSize);
-		exitMenuItem.setGraphic(exitIcon);
-
-		ImageView aboutIcon = new ImageView(getClass().getResource("/media/sign-info.png").toExternalForm());
-		aboutIcon.setFitHeight(iconSize);
-		aboutIcon.setFitWidth(iconSize);
-		aboutMenuItem.setGraphic(aboutIcon);
-
-		ImageView addIcon = new ImageView(getClass().getResource("/media/sign-add.png").toExternalForm());
-		addIcon.setFitHeight(iconSize);
-		addIcon.setFitWidth(iconSize);
-		addCLMenuItem.setGraphic(addIcon);
-
-		ImageView keyIcon = new ImageView(keyIconPath);
-		keyIcon.setFitHeight(iconSize);
-		keyIcon.setFitWidth(iconSize);
-		setKeyMenuItem.setGraphic(keyIcon);
-
-		ImageView composerIcon = new ImageView(composerIconPath);
-		composerIcon.setFitHeight(iconSize);
-		composerIcon.setFitWidth(iconSize);
-		editHeaderInfoMenuItem.setGraphic(composerIcon);
-
-		ImageView manualAssignIcon = new ImageView(getClass().getResource("/media/tag-alt.png").toExternalForm());
-		manualAssignIcon.setFitHeight(iconSize);
-		manualAssignIcon.setFitWidth(iconSize);
-		manualCLAssignmentMenuItem.setGraphic(manualAssignIcon);
-
-		ImageView pdfIcon = new ImageView(getClass().getResource("/media/file-pdf.png").toExternalForm());
-		pdfIcon.setFitHeight(iconSize);
-		pdfIcon.setFitWidth(iconSize);
-		combinePDFsMenuItem.setGraphic(pdfIcon);
+		// Menu icons
+		setMenuIcon(newToneMenuItem, "/media/file-text.png");
+		setMenuIcon(openToneMenuItem, "/media/folder.png");
+		setMenuIcon(saveToneMenuItem, "/media/floppy.png");
+		setMenuIcon(saveToneAsMenuItem, "/media/floppy-add.png");
+		setMenuIcon(exitMenuItem, "/media/sign-error.png");
+		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
+		setMenuIcon(addCLMenuItem, "/media/sign-add.png");
+		setMenuIcon(setKeyMenuItem, keyIconPath);
+		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
+		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
+		setMenuIcon(combinePDFsMenuItem, "/media/file-pdf.png");
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
@@ -290,6 +245,15 @@ public class MainSceneController {
 		bottomRightBox.getChildren().add(index, verseArea);
 
 	}
+
+	private void setMenuIcon(MenuItem menu_item, String imagePath) {
+		ImageView saveIcon = new ImageView(getClass().getResource(imagePath).toExternalForm());
+		double menuIconSize = 30;
+		saveIcon.setFitHeight(menuIconSize);
+		saveIcon.setFitWidth(menuIconSize);
+		menu_item.setGraphic(saveIcon);
+	}
+
 	void setStage(Stage stage) {
 		mainStage = stage;
 
@@ -542,7 +506,7 @@ public class MainSceneController {
 	boolean checkSave() {
 		if (toneFile == null ||
 				!askToSaveTone ||
-				!isToneSaveable()) {
+				!isToneSavable()) {
 			return true;
 		}
 
@@ -564,7 +528,7 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean isToneSaveable() {
+	private boolean isToneSavable() {
 		return !builtInToneLoaded() || MainApp.developerMode;
 	}
 
@@ -754,7 +718,7 @@ public class MainSceneController {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
-		ImageView keyIcon = new ImageView(keyIconPath);
+		ImageView keyIcon = new ImageView(getClass().getResource(keyIconPath).toExternalForm());
 		keyIcon.setFitHeight(50);
 		keyIcon.setFitWidth(50);
 		dialog.setGraphic(keyIcon);
@@ -772,7 +736,7 @@ public class MainSceneController {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
 			dialog.setHeaderText("Input header info for first page");
-			ImageView composerIcon = new ImageView(composerIconPath);
+			ImageView composerIcon = new ImageView(getClass().getResource(composerIconPath).toExternalForm());
 			composerIcon.setFitHeight(50);
 			composerIcon.setFitWidth(50);
 			dialog.setGraphic(composerIcon);
@@ -1119,7 +1083,7 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
-		if (!askToSaveTone && isToneSaveable()) {
+		if (!askToSaveTone && isToneSavable()) {
 			askToSaveTone = true;
 			mainStage.setTitle("*" + mainStage.getTitle());
 		}
