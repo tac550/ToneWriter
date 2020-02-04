@@ -12,4 +12,4 @@ cp -a '../../Built-in Tones' '../mac/ToneWriter.app/Contents/Built-in Tones' && 
 cp -a '../../licenses' '../mac/ToneWriter.app/Contents/licenses' && \
 cp -a '../../lilypond' '../mac/ToneWriter.app/Contents/lilypond' && \
 cd ../mac/ && \
-zip -r ToneWriter.app.zip ToneWriter.app
+zip -r ToneWriter0.5.app.zip ToneWriter.app
