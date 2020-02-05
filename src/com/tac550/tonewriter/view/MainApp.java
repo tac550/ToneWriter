@@ -38,7 +38,7 @@ import java.util.prefs.Preferences;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.4";
+	public static final String APP_VERSION = "0.6";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -156,7 +156,7 @@ public class MainApp extends Application {
 		// Show the stage (required for the next operation to work)
 		this.mainStage.show();
 
-		// Run auto update check
+		// Run auto update check TODO: Move this call further down?
 		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.AutoUpdate(mainStage, true);
 
 		// Makes sure the stage can't be made too small.

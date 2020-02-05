@@ -177,7 +177,23 @@ public class AutoUpdater {
 	}
 
 	private static void executeInstaller(File downloaded_file) {
-		System.out.println("Now installing!");
+
+		if (MainApp.OS_NAME.startsWith("win")) {
+			try {
+				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+				TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"I/O error occurred while running installer!", true);
+			}
+		} if (MainApp.OS_NAME.startsWith("mac")) {
+
+		} if (MainApp.OS_NAME.startsWith("lin")) {
+
+		}
+
+		System.out.println("Now exiting for installation!");
+		Platform.exit();
 	}
 
 }
