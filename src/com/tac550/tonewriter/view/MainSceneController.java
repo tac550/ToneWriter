@@ -933,15 +933,7 @@ public class MainSceneController {
 	private void refreshAllChords() {
 		if (!MainApp.lilyPondAvailable()) return;
 
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] files = tempDir.listFiles();
-		for (File file : Objects.requireNonNull(files)) {
-			if (file.getName().startsWith(MainApp.APP_NAME)) {
-				if (!file.delete()) {
-					System.out.println("Failed to delete temp file " + file.getName());
-				}
-			}
-		}
+		TWUtils.cleanUpTempFiles();
 
 		Set<String> allFieldsSet = new HashSet<>();
 

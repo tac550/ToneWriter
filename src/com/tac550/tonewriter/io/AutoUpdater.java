@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +37,78 @@ public class AutoUpdater {
 		Task<Void> updateTask = new Task<>() {
 			@Override
 			protected Void call() {
-				updateCheck(owner, startup);
+				try {
+					webClient = new WebClient();
+
+					webClient.setCssErrorHandler(new SilentCssErrorHandler());
+
+					// Get the GitHub Releases page
+					final HtmlPage releasesPage = webClient.getPage("https://github.com/tac550/ToneWriter/releases");
+
+					// Generate the changelog display HTML and store version numbers.
+					List<HtmlDivision> releaseHeaders = releasesPage.getByXPath("//div[@class='release-header']");
+					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
+					ArrayList<Float> releaseNumbers = new ArrayList<>();
+
+					StringBuilder finalHTMLString = new StringBuilder();
+
+					for (int i = 0; i < releaseHeaders.size(); i++) {
+						HtmlDivision header = releaseHeaders.get(i);
+						String releaseTitle = header.getElementsByTagName("a").get(0).getTextContent();
+						float releaseNumber = Float.parseFloat(releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", ""));
+
+						if (releaseNumber >= Float.parseFloat(MainApp.APP_VERSION)) {
+							// Add the version heading to the output
+							finalHTMLString.append("<h1>").append(releaseTitle).append("</h1>");
+
+							// Add the associated changelog to the output
+							String body = releaseNotes.get(i).asXml();
+							int afterFirstHeading = body.indexOf("</h1>") + 5;
+							String changelog = body.substring(afterFirstHeading, body.indexOf("<h1>", afterFirstHeading));
+							finalHTMLString.append(changelog);
+						}
+
+						if (releaseNumber > Float.parseFloat(MainApp.APP_VERSION)) {
+							releaseNumbers.add(releaseNumber);
+						}
+
+					}
+
+					// If there's no update and this is the startup check, stop here.
+					if (startup && releaseNumbers.size() == 0) {
+						return null;
+					}
+
+					Platform.runLater(() -> {
+						FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
+						UpdaterViewController updaterController = loader.getController();
+
+						updaterStage.setTitle(String.format("%s Automatic Updater", MainApp.APP_NAME));
+						updaterStage.getIcons().add(MainApp.APP_ICON);
+						updaterStage.setScene(new Scene(loader.getRoot()));
+						updaterStage.setOnShown(event -> {
+							updaterStage.setMinWidth(updaterStage.getWidth());
+							updaterStage.setMinHeight(updaterStage.getHeight());
+						});
+
+						updaterController.setWebViewContent(finalHTMLString.toString());
+						updaterController.setVersionChoices(releaseNumbers);
+
+						if (updaterStage.getOwner() == null) {
+							updaterStage.initOwner(owner);
+							updaterStage.initModality(Modality.APPLICATION_MODAL);
+						}
+
+						updaterStage.show();
+					});
+
+
+				} catch (FailingHttpStatusCodeException | IOException e) {
+
+					TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+							"Internet connection failure! Unable to check for updates.", true);
+
+				}
 				return null;
 			}
 		};
@@ -46,97 +118,66 @@ public class AutoUpdater {
 
 	}
 
-	private static void updateCheck(Window owner, boolean startup) {
-
-		try {
-			webClient = new WebClient();
-
-			webClient.setCssErrorHandler(new SilentCssErrorHandler());
-
-			// Get the GitHub Releases page
-			final HtmlPage releasesPage = webClient.getPage("https://github.com/tac550/ToneWriter/releases");
-
-			// Generate the changelog display HTML and store version numbers.
-			List<HtmlDivision> releaseHeaders = releasesPage.getByXPath("//div[@class='release-header']");
-			List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
-			ArrayList<Float> releaseNumbers = new ArrayList<>();
-
-			StringBuilder finalHTMLString = new StringBuilder();
-
-			for (int i = 0; i < releaseHeaders.size(); i++) {
-				HtmlDivision header = releaseHeaders.get(i);
-				String releaseTitle = header.getElementsByTagName("a").get(0).getTextContent();
-				float releaseNumber = Float.parseFloat(releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", ""));
-
-				if (releaseNumber >= Float.parseFloat(MainApp.APP_VERSION)) {
-					// Add the version heading to the output
-					finalHTMLString.append("<h1>").append(releaseTitle).append("</h1>");
-
-					// Add the associated changelog to the output
-					String body = releaseNotes.get(i).asXml();
-					int afterFirstHeading = body.indexOf("</h1>") + 5;
-					String changelog = body.substring(afterFirstHeading, body.indexOf("<h1>", afterFirstHeading));
-					finalHTMLString.append(changelog);
-				}
-
-				if (releaseNumber > Float.parseFloat(MainApp.APP_VERSION)) {
-					releaseNumbers.add(releaseNumber);
-				}
-
-			}
-
-			// If there's no update and this is the startup check, stop here.
-			if (startup && releaseNumbers.size() == 0) {
-				return;
-			}
-
-			Platform.runLater(() -> {
-				FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
-				UpdaterViewController updaterController = loader.getController();
-
-				updaterStage.setTitle(String.format("%s Automatic Updater", MainApp.APP_NAME));
-				updaterStage.getIcons().add(MainApp.APP_ICON);
-				updaterStage.setScene(new Scene(loader.getRoot()));
-				updaterStage.setOnShown(event -> {
-					updaterStage.setMinWidth(updaterStage.getWidth());
-					updaterStage.setMinHeight(updaterStage.getHeight());
-				});
-
-				updaterController.setWebViewContent(finalHTMLString.toString());
-				updaterController.setVersionChoices(releaseNumbers);
-
-				if (updaterStage.getOwner() == null) {
-					updaterStage.initOwner(owner);
-					updaterStage.initModality(Modality.APPLICATION_MODAL);
-				}
-
-				updaterStage.show();
-			});
-
-
-		} catch (FailingHttpStatusCodeException | IOException e) {
-
-			TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
-					"Internet connection failure! Unable to check for updates.", true);
-
-		}
-	}
-
 	public static void performUpdate(String version) {
 
+		// Show info dialog
 		TWUtils.showAlert(Alert.AlertType.INFORMATION, "Downloading",
 				"Downloading version " + version + ". This may take some time.", false);
 
+		// Create temp download file
+		File downloadFile;
 		try {
-			final WebResponse response = webClient.getPage(String.format(Locale.US,
-					"https://github.com/tac550/ToneWriter/releases/download/%s/ToneWriter.app.zip", version)).getWebResponse();
-			String fileName = "C:\\Users\\Thomas\\Downloads\\Test.zip";
-			IOUtils.copy(response.getContentAsStream(), new FileOutputStream(fileName));
+			downloadFile = TWUtils.createTWTempFile("", MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
 		} catch (IOException e) {
 			e.printStackTrace();
-			TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
-					"Internet connection failure! Unable to download update.", true);
+			TWUtils.showAlert(Alert.AlertType.ERROR, "Error", "Failed to create download file! Update will be cancelled.", true);
+			return;
 		}
+
+		// Copy download stream into temp file
+		String sourceFileName;
+
+		if (MainApp.OS_NAME.startsWith("win")) {
+			sourceFileName = String.format(Locale.US, "ToneWriter%s_Setup.exe", version);
+		} else if (MainApp.OS_NAME.startsWith("mac")) {
+			sourceFileName = String.format(Locale.US, "ToneWriter%s.app.zip", version);
+		} else if (MainApp.OS_NAME.startsWith("lin")) {
+			sourceFileName = String.format(Locale.US, "ToneWriter%s-Linux.zip", version);
+		} else {
+			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"Unknown platform. Unable to download update.", true);
+			return;
+		}
+
+		Task<Void> downloadTask = new Task<>() {
+			@Override
+			protected Void call() {
+				try (FileOutputStream foStream = new FileOutputStream(downloadFile)) {
+					final WebResponse response = webClient.getPage(String.format(Locale.US,
+							"https://github.com/tac550/ToneWriter/releases/download/%s/%s", version, sourceFileName)).getWebResponse();
+					IOUtils.copy(response.getContentAsStream(), foStream);
+				} catch (FailingHttpStatusCodeException e) {
+					e.printStackTrace();
+					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Connection Error",
+							"Internet connection failure! Unable to download update.", true));
+				} catch (IOException e) {
+					e.printStackTrace();
+					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "I/O Error",
+							"An error occurred while processing the download.", true));
+				}
+
+				return null;
+			}
+		};
+
+		downloadTask.setOnSucceeded(wsevent -> executeInstaller(downloadFile));
+		Thread downloadThread = new Thread(downloadTask);
+		downloadThread.start();
+
+	}
+
+	private static void executeInstaller(File downloaded_file) {
+		System.out.println("Now installing!");
 	}
 
 }

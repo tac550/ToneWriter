@@ -6,11 +6,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TWUtils {
@@ -49,6 +51,24 @@ public class TWUtils {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 
 		return new String(encoded, encoding);
+	}
+
+	// Creates and returns a temp file which will be recognized by the automatic temp cleaner
+	public static File createTWTempFile(String prefix, String suffix) throws IOException {
+		return File.createTempFile(MainApp.APP_NAME + "-" +
+				(prefix.isEmpty() ? "" : prefix + "-"),
+				suffix.isEmpty() ? "" : "-" + suffix);
+	}
+	public static void cleanUpTempFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		File[] files = tempDir.listFiles();
+		for (File file : Objects.requireNonNull(files)) {
+			if (file.getName().startsWith(MainApp.APP_NAME)) {
+				if (!file.delete()) {
+					System.out.println("Failed to delete temp file " + file.getName());
+				}
+			}
+		}
 	}
 
 	// UI
