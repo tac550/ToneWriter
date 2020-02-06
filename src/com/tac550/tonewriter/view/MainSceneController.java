@@ -645,10 +645,11 @@ public class MainSceneController {
 			saveToneMenuItem.setDisable(saveDisabled());
 
 			askToOverwriteOutput = false;
-		}
-		LoadingTone = false;
 
-		refreshAllChords();
+			refreshAllChords();
+		}
+
+		LoadingTone = false;
 	}
 	@FXML private void handleOpenTone() {
 		handleOpenTone(null);
