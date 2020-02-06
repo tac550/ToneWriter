@@ -14,6 +14,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -31,6 +32,8 @@ public class AutoUpdater {
 	private static WebClient webClient;
 
 	private static Stage updaterStage = new Stage();
+
+	private static Alert downloadAlert;
 
 	public static void AutoUpdate(Window owner, boolean startup) {
 
@@ -104,9 +107,11 @@ public class AutoUpdater {
 
 
 				} catch (FailingHttpStatusCodeException | IOException e) {
+					e.printStackTrace();
 
-					TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
-							"Internet connection failure! Unable to check for updates.", true);
+					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+							"Internet connection failure! Unable to check for updates.", true));
+
 
 				}
 				return null;
@@ -120,9 +125,7 @@ public class AutoUpdater {
 
 	public static void performUpdate(String version) {
 
-		// Show info dialog
-		TWUtils.showAlert(Alert.AlertType.INFORMATION, "Downloading",
-				"Downloading version " + version + ". This may take some time.", false);
+		showDownloadAlert(version);
 
 		// Create temp download file
 		File downloadFile;
@@ -130,7 +133,8 @@ public class AutoUpdater {
 			downloadFile = TWUtils.createTWTempFile("", MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
 		} catch (IOException e) {
 			e.printStackTrace();
-			TWUtils.showAlert(Alert.AlertType.ERROR, "Error", "Failed to create download file! Update will be cancelled.", true);
+			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"Failed to create download file! Update will be cancelled.", true));
 			return;
 		}
 
@@ -149,28 +153,38 @@ public class AutoUpdater {
 			return;
 		}
 
-		Task<Void> downloadTask = new Task<>() {
+		Task<Boolean> downloadTask = new Task<>() {
 			@Override
-			protected Void call() {
+			protected Boolean call() {
 				try (FileOutputStream foStream = new FileOutputStream(downloadFile)) {
 					final WebResponse response = webClient.getPage(String.format(Locale.US,
 							"https://github.com/tac550/ToneWriter/releases/download/%s/%s", version, sourceFileName)).getWebResponse();
 					IOUtils.copy(response.getContentAsStream(), foStream);
 				} catch (FailingHttpStatusCodeException e) {
 					e.printStackTrace();
-					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Connection Error",
-							"Internet connection failure! Unable to download update.", true));
+					Platform.runLater(() -> {
+						TWUtils.showAlert(Alert.AlertType.WARNING, "Connection Error",
+								"Internet connection failure! Unable to download update.", true);
+						hideDownloadAlert();
+					});
+					return false;
 				} catch (IOException e) {
 					e.printStackTrace();
-					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "I/O Error",
-							"An error occurred while processing the download.", true));
+					Platform.runLater(() -> {
+						TWUtils.showAlert(Alert.AlertType.WARNING, "I/O Error",
+								"An error occurred while processing the download.", true);
+						hideDownloadAlert();
+					});
+					return false;
 				}
 
-				return null;
+				return true;
 			}
 		};
 
-		downloadTask.setOnSucceeded(wsevent -> executeInstaller(downloadFile));
+		downloadTask.setOnSucceeded(wsevent -> {
+			if (downloadTask.getValue()) executeInstaller(downloadFile);
+		});
 		Thread downloadThread = new Thread(downloadTask);
 		downloadThread.start();
 
@@ -183,8 +197,8 @@ public class AutoUpdater {
 				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
-				TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
-						"I/O error occurred while running installer!", true);
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"I/O error occurred while running installer!", true));
 			}
 		} if (MainApp.OS_NAME.startsWith("mac")) {
 
@@ -194,6 +208,24 @@ public class AutoUpdater {
 
 		System.out.println("Now exiting for installation!");
 		Platform.exit();
+	}
+
+	private static void showDownloadAlert(String version) {
+		if (downloadAlert == null) {
+			downloadAlert = new Alert(AlertType.INFORMATION);
+			downloadAlert.setTitle("Download");
+			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time.");
+			((Stage) downloadAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+			downloadAlert.getButtonTypes().clear();
+		}
+
+		downloadAlert.show();
+
+	}
+
+	private static void hideDownloadAlert() {
+		Stage stage = (Stage) downloadAlert.getDialogPane().getScene().getWindow();
+		stage.close();
 	}
 
 }
