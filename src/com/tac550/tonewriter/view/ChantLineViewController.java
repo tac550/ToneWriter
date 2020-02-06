@@ -74,7 +74,7 @@ public class ChantLineViewController implements CommentableView {
 	AnimationTimer autoScroller;
 	private double prevTime = -1;
 	private boolean mouseReversed = false;
-	private final double scrollThreshold = 0.2;
+	private final double scrollThreshold = 0.1;
 	private final double scrollSpeed = 10;
 	private double cursorLocation;
 	private double previousMouseVector = 0;
