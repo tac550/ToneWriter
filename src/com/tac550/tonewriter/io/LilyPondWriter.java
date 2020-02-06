@@ -58,7 +58,7 @@ public class LilyPondWriter {
 
 		// Copy the chord template file, the basis for all our LilyPond output files, to the output path.
 		try {
-			exportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -667,33 +667,6 @@ public class LilyPondWriter {
 		return finalNoteData.toString();
 	}
 
-	// Copies internal file on the classpath to an external location.
-	public static void exportResource(String resourceName, String outFilePath) throws Exception {
-		InputStream stream = null;
-		OutputStream resStreamOut = null;
-		try {
-			stream = LilyPondWriter.class.getResourceAsStream(resourceName);
-			if (stream == null) {
-				throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
-			}
-
-			int readBytes;
-			byte[] buffer = new byte[4096];
-			resStreamOut = new FileOutputStream(outFilePath);
-			while ((readBytes = stream.read(buffer)) > 0) {
-				resStreamOut.write(buffer, 0, readBytes);
-			}
-		} finally {
-			if (stream != null) {
-				stream.close();
-			}
-			if (resStreamOut != null) {
-				resStreamOut.close();
-			}
-		}
-
-	}
-
 	// Converts the UI string for the selected key signature into the format LilyPond expects.
 	private static String keySignatureToLilyPond(String key_sig) {
 		String keySigString = "  \\key ";
@@ -781,7 +754,7 @@ public class LilyPondWriter {
 					"-chord.ly");
 			tempFile.deleteOnExit();
 
-			exportResource("chordTemplate.ly", tempFile.getAbsolutePath());
+			TWUtils.exportIOResource("chordTemplate.ly", tempFile.getAbsolutePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

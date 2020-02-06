@@ -1,13 +1,13 @@
 package com.tac550.tonewriter.util;
 
+import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -69,6 +69,33 @@ public class TWUtils {
 				}
 			}
 		}
+	}
+
+	// Copies file from io package to an external location.
+	public static void exportIOResource(String resourceName, String outFilePath) throws Exception {
+		InputStream stream = null;
+		OutputStream resStreamOut = null;
+		try {
+			stream = LilyPondWriter.class.getResourceAsStream(resourceName);
+			if (stream == null) {
+				throw new Exception("Cannot get resource \"" + resourceName + "\" from Jar file.");
+			}
+
+			int readBytes;
+			byte[] buffer = new byte[4096];
+			resStreamOut = new FileOutputStream(outFilePath);
+			while ((readBytes = stream.read(buffer)) > 0) {
+				resStreamOut.write(buffer, 0, readBytes);
+			}
+		} finally {
+			if (stream != null) {
+				stream.close();
+			}
+			if (resStreamOut != null) {
+				resStreamOut.close();
+			}
+		}
+
 	}
 
 	// UI
