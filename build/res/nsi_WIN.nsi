@@ -1,3 +1,5 @@
+!include x64.nsh
+
 ; Script generated with the Venis Install Wizard
 Unicode True
 
@@ -7,9 +9,18 @@ Unicode True
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
-InstallDir "$PROGRAMFILES\ToneWriter"
+InstallDir "$PROGRAMFILES64\ToneWriter"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
 OutFile "..\win\ToneWriter0.5_Setup.exe"
+
+Function .onInit
+        ${If} ${RunningX64}
+        ${else}
+        MessageBox MB_OK "This application runs only on 64-bit systems."
+        Abort
+        ${EndIf}
+        ${EnableX64FSRedirection}
+FunctionEnd
 
 ; Modern interface settings
 !include "MUI.nsh"
