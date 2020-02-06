@@ -1,3 +1,4 @@
+#!/bin/bash
 rm -rf ../lin & \
 mkdir -p ../lin && \
 mkdir -p ../lin/jar && \
