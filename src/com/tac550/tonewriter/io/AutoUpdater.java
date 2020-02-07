@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
-import java.awt.*;
+import java.awt.Taskbar;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -108,8 +108,9 @@ public class AutoUpdater {
 
 						updaterStage.show();
 
-						if (MainApp.OS_NAME.startsWith("mac")) // TODO: Implement on more platforms
-						Taskbar.getTaskbar().requestUserAttention(true, true);
+						if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION)) {
+							Taskbar.getTaskbar().requestUserAttention(true, true);
+						}
 					});
 
 
