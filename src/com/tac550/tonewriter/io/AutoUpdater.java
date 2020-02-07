@@ -238,7 +238,6 @@ public class AutoUpdater {
 			// Get PID representing this process's JVM.
 			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
 			String pid = bean.getName().split("@")[0];
-			System.out.println("PID  = " + pid);
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
