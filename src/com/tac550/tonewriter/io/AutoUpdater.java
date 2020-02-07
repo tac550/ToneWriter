@@ -138,7 +138,7 @@ public class AutoUpdater {
 		// Create temp download file
 		File downloadFile;
 		try {
-			downloadFile = TWUtils.createTWTempFile("", MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
+			downloadFile = TWUtils.createTWTempFile("Update", MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
 		} catch (IOException e) {
 			e.printStackTrace();
 			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
