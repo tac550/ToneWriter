@@ -749,9 +749,7 @@ public class LilyPondWriter {
 		File tempFile = null;
 		try {
 			// Create the temporary file to hold the lilypond markup
-			tempFile = File.createTempFile(MainApp.APP_NAME + "--"
-							+ FilenameUtils.removeExtension(toneFileName) + "-",
-					"-chord.ly");
+			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
 			tempFile.deleteOnExit();
 
 			TWUtils.exportIOResource("chordTemplate.ly", tempFile.getAbsolutePath());

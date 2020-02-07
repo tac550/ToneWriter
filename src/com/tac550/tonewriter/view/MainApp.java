@@ -221,7 +221,7 @@ public class MainApp extends Application {
 
 	private void runLilyPondStartup(Runnable final_actions) throws IOException {
 		// Create the temporary file to hold the lilypond markup
-		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
+		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
 		lilypondFile.deleteOnExit();
 		outputFile.deleteOnExit();

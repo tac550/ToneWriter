@@ -57,7 +57,7 @@ public class TWUtils {
 	public static File createTWTempFile(String prefix, String suffix) throws IOException {
 		return File.createTempFile(MainApp.APP_NAME + "-" +
 				(prefix.isEmpty() ? "" : prefix + "-"),
-				suffix.isEmpty() ? "" : "-" + suffix);
+				suffix.isEmpty() ? "" : suffix.startsWith(".") ? "" : "-" + suffix);
 	}
 	public static void cleanUpTempFiles() {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
