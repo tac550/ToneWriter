@@ -20,9 +20,12 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -103,6 +106,9 @@ public class AutoUpdater {
 						}
 
 						updaterStage.show();
+
+						if (MainApp.OS_NAME.startsWith("mac")) // TODO: Implement on more platforms
+						Taskbar.getTaskbar().requestUserAttention(true, true);
 					});
 
 
@@ -144,7 +150,8 @@ public class AutoUpdater {
 		if (MainApp.OS_NAME.startsWith("win")) {
 			sourceFileName = String.format(Locale.US, "ToneWriter%s_Setup.exe", version);
 		} else if (MainApp.OS_NAME.startsWith("mac")) {
-			sourceFileName = String.format(Locale.US, "ToneWriter%s.app.zip", version);
+			sourceFileName = "ToneWriter.app.zip";
+//			sourceFileName = String.format(Locale.US, "ToneWriter%s.app.zip", version); // TODO: final version
 		} else if (MainApp.OS_NAME.startsWith("lin")) {
 			sourceFileName = String.format(Locale.US, "ToneWriter%s-Linux.zip", version);
 		} else {
@@ -199,8 +206,51 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while running installer!", true));
+
+				hideDownloadAlert();
+				return;
 			}
 		} if (MainApp.OS_NAME.startsWith("mac")) {
+			File scriptFile;
+			try {
+				scriptFile = TWUtils.createTWTempFile("updateScript",
+						"version" + MainApp.APP_VERSION + ".sh");
+			} catch (IOException e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"I/O error occurred while generating temp files!", true));
+
+				hideDownloadAlert();
+				return;
+			}
+
+			try {
+				TWUtils.exportIOResource("autoupdate-macOS.sh", scriptFile.getAbsolutePath());
+			} catch (Exception e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"Error while exporting installer script!", true));
+
+				hideDownloadAlert();
+				return;
+			}
+
+			// Get PID representing this process's JVM.
+			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+			String pid = bean.getName().split("@")[0];
+			System.out.println("PID  = " + pid);
+
+			try {
+				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath()});
+			} catch (IOException e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"Failed to run installer script!", true));
+
+				hideDownloadAlert();
+				return;
+			}
 
 		} if (MainApp.OS_NAME.startsWith("lin")) {
 
@@ -217,6 +267,7 @@ public class AutoUpdater {
 			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time.");
 			((Stage) downloadAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 			downloadAlert.getButtonTypes().clear();
+			downloadAlert.initModality(Modality.APPLICATION_MODAL);
 		}
 
 		downloadAlert.show();
