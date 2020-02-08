@@ -108,9 +108,12 @@ public class AutoUpdater {
 
 						updaterStage.show();
 
-						if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION)) {
-							Taskbar.getTaskbar().requestUserAttention(true, true);
+						if (Taskbar.isTaskbarSupported()) {
+							if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION)) {
+								Taskbar.getTaskbar().requestUserAttention(true, true);
+							}
 						}
+
 					});
 
 
@@ -256,7 +259,7 @@ public class AutoUpdater {
 			}
 
 		} if (MainApp.OS_NAME.startsWith("lin")) {
-
+			System.out.println(userDir);
 		}
 
 		System.out.println("Now exiting for installation!");
