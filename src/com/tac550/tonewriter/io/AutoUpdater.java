@@ -201,12 +201,12 @@ public class AutoUpdater {
 
 	private static void executeInstaller(File downloaded_file) {
 
-		String installDir = System.getProperty("user.dir");
-		System.out.println("Install directory: " + installDir);
+		File userDir = new File(System.getProperty("user.dir"));
+		System.out.println("User directory: " + userDir.getParentFile().getParent());
 
 		if (MainApp.OS_NAME.startsWith("win")) {
 			try {
-				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath() + " /D=" + installDir);
+				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath() + " /D=" + userDir);
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
@@ -246,7 +246,7 @@ public class AutoUpdater {
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
-				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
