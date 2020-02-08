@@ -227,7 +227,7 @@ public class MainApp extends Application {
 		outputFile.deleteOnExit();
 
 		try {
-			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

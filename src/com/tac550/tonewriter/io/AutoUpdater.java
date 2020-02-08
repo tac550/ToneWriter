@@ -204,9 +204,9 @@ public class AutoUpdater {
 	private static void executeInstaller(File downloaded_file) {
 
 		File userDir = new File(System.getProperty("user.dir"));
-		System.out.println("User directory: " + userDir.getParentFile().getParent());
 
 		if (MainApp.OS_NAME.startsWith("win")) {
+
 			try {
 				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath() + " /D=" + userDir);
 			} catch (IOException e) {
@@ -217,7 +217,9 @@ public class AutoUpdater {
 				hideDownloadAlert();
 				return;
 			}
+
 		} if (MainApp.OS_NAME.startsWith("mac")) {
+
 			File scriptFile;
 			try {
 				scriptFile = TWUtils.createTWTempFile("updateScript",
@@ -232,7 +234,7 @@ public class AutoUpdater {
 			}
 
 			try {
-				TWUtils.exportIOResource("autoupdate-macOS.sh", scriptFile.getAbsolutePath());
+				TWUtils.exportIOResource("autoupdate-macOS.sh", scriptFile);
 			} catch (Exception e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
@@ -259,7 +261,49 @@ public class AutoUpdater {
 			}
 
 		} if (MainApp.OS_NAME.startsWith("lin")) {
-			System.out.println(userDir);
+
+			File scriptFile;
+			try {
+				scriptFile = TWUtils.createTWTempFile("updateScript",
+						"version" + MainApp.APP_VERSION + ".sh");
+			} catch (IOException e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"I/O error occurred while generating temp files!", true));
+
+				hideDownloadAlert();
+				return;
+			}
+
+			try {
+				TWUtils.exportIOResource("autoupdate-Linux.sh", scriptFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"Error while exporting installer script!", true));
+
+				hideDownloadAlert();
+				return;
+			}
+
+			// Get PID representing this process's JVM.
+			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+			String pid = bean.getName().split("@")[0];
+
+			try {
+				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
+			} catch (IOException e) {
+				e.printStackTrace();
+				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+						"Failed to run installer script!", true));
+
+				hideDownloadAlert();
+				return;
+			}
+
+			System.out.println(pid);
+			System.out.println(userDir.getParent());
 		}
 
 		System.out.println("Now exiting for installation!");

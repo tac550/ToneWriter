@@ -58,7 +58,7 @@ public class LilyPondWriter {
 
 		// Copy the chord template file, the basis for all our LilyPond output files, to the output path.
 		try {
-			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -752,7 +752,7 @@ public class LilyPondWriter {
 			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
 			tempFile.deleteOnExit();
 
-			TWUtils.exportIOResource("chordTemplate.ly", tempFile.getAbsolutePath());
+			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
