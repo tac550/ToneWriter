@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
@@ -37,7 +38,7 @@ import java.util.prefs.Preferences;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.6";
+	public static final String APP_VERSION = "0.3";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -58,6 +59,7 @@ public class MainApp extends Application {
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
+	static final String PREFS_CHECK_UPDATE_APPSTARTUP = "Check-Update-Appstart";
 
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
@@ -91,6 +93,9 @@ public class MainApp extends Application {
 
 	@Override
 	public void start(Stage main_stage) {
+
+		showSplash();
+
 		// Set up preferences system
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
@@ -99,8 +104,6 @@ public class MainApp extends Application {
 
 		// Print saved LilyPond directory if any, otherwise print null.
 		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
-
-		showSplash();
 
 		// See if first-time setup is needed if using built-in LilyPond
 		if (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) {
@@ -153,6 +156,9 @@ public class MainApp extends Application {
 		// Show the stage (required for the next operation to work)
 		this.mainStage.show();
 
+		// Run auto update check TODO: Move this call further down?
+		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.AutoUpdate(mainStage, true);
+
 		// Makes sure the stage can't be made too small.
 		// The stage opens showing the scene at its pref size. This makes that initial size the minimum.
 		mainStage.setMinWidth(mainStage.getWidth());
@@ -186,14 +192,16 @@ public class MainApp extends Application {
 		splashStage.initStyle(StageStyle.TRANSPARENT);
 		splashStage.setScene(scene);
 		splashStage.getIcons().add(APP_ICON);
+
+		splashBackground.setImage(APP_ICON);
+		splashBackground.setEffect(frostEffect);
+
 		splashStage.show();
 
 		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
 		splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
 
-		splashBackground.setImage(APP_ICON);
-		splashBackground.setEffect(frostEffect);
 	}
 
 	private Node[] createSplashContent() {
@@ -213,13 +221,13 @@ public class MainApp extends Application {
 
 	private void runLilyPondStartup(Runnable final_actions) throws IOException {
 		// Create the temporary file to hold the lilypond markup
-		File lilypondFile = File.createTempFile(MainApp.APP_NAME + "--", "-STARTUP.ly");
+		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
 		lilypondFile.deleteOnExit();
 		outputFile.deleteOnExit();
 
 		try {
-			LilyPondWriter.exportResource("renderTemplate.ly", lilypondFile.getAbsolutePath());
+			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

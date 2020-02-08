@@ -1,16 +1,18 @@
 package com.tac550.tonewriter.util;
 
+import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TWUtils {
@@ -49,6 +51,51 @@ public class TWUtils {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 
 		return new String(encoded, encoding);
+	}
+
+	// Creates and returns a temp file which will be recognized by the automatic temp cleaner
+	public static File createTWTempFile(String prefix, String suffix) throws IOException {
+		return File.createTempFile(MainApp.APP_NAME + "-" +
+				(prefix.isEmpty() ? "" : prefix + "-"),
+				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix);
+	}
+	public static void cleanUpTempFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		File[] files = tempDir.listFiles();
+		for (File file : Objects.requireNonNull(files)) {
+			if (file.getName().startsWith(MainApp.APP_NAME)) {
+				if (!file.delete()) {
+					System.out.println("Failed to delete temp file " + file.getName());
+				}
+			}
+		}
+	}
+
+	// Copies file from io package to an external location.
+	public static void exportIOResource(String resource_name, File out_file) throws Exception {
+		InputStream stream = null;
+		OutputStream resStreamOut = null;
+		try {
+			stream = LilyPondWriter.class.getResourceAsStream(resource_name);
+			if (stream == null) {
+				throw new Exception("Cannot get resource \"" + resource_name + "\" from Jar file.");
+			}
+
+			int readBytes;
+			byte[] buffer = new byte[4096];
+			resStreamOut = new FileOutputStream(out_file);
+			while ((readBytes = stream.read(buffer)) > 0) {
+				resStreamOut.write(buffer, 0, readBytes);
+			}
+		} finally {
+			if (stream != null) {
+				stream.close();
+			}
+			if (resStreamOut != null) {
+				resStreamOut.close();
+			}
+		}
+
 	}
 
 	// UI

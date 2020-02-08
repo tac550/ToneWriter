@@ -561,7 +561,7 @@ public class VerseLineViewController {
 
 	@FXML private void editSyllables() {
 
-		FXMLLoaderIO.loadFXMLLayout("syllableEditView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("syllableEditView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			SyllableEditViewController controller = loader.getController();
 

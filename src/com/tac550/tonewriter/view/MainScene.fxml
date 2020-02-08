@@ -264,6 +264,8 @@
                   </Menu>
                 <Menu text="_Help">
                   <items>
+                        <MenuItem fx:id="updateMenuitem" mnemonicParsing="false" onAction="#handleUpdateCheck" text="Check for Updates..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
                   </items>
                 </Menu>

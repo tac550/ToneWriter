@@ -99,7 +99,9 @@
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/htmlunit-2.31.jar!/" />
         </CLASSES>
-        <JAVADOC />
+        <JAVADOC>
+          <root url="http://htmlunit.sourceforge.net/apidocs/index.html" />
+        </JAVADOC>
         <SOURCES />
       </library>
     </orderEntry>

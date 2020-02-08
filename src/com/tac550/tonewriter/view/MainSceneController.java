@@ -1,9 +1,6 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondWriter;
-import com.tac550.tonewriter.io.Syllables;
-import com.tac550.tonewriter.io.ToneReaderWriter;
+import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -96,6 +93,7 @@ public class MainSceneController {
 	@FXML private MenuItem combinePDFsMenuItem;
 
 	@FXML private MenuItem aboutMenuItem;
+	@FXML private MenuItem updateMenuitem;
 
 	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
@@ -159,6 +157,11 @@ public class MainSceneController {
 		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(combinePDFsMenuItem, "/media/file-pdf.png");
+
+		ImageView updateIcon = new ImageView(getClass().getResource("/media/cloud-sync.png").toExternalForm());
+		updateIcon.setFitHeight(iconSize);
+		updateIcon.setFitWidth(iconSize);
+		updateMenuitem.setGraphic(updateIcon);
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
@@ -288,7 +291,7 @@ public class MainSceneController {
 
 	private Task<FXMLLoader> createVerseLine(String line) {
 
-		return FXMLLoaderIO.loadFXMLLayout("verseLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentController(this);
 
@@ -299,7 +302,7 @@ public class MainSceneController {
 	}
 	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
 
-		return FXMLLoaderIO.loadFXMLLayout("chantLineView.fxml", loader -> {
+		return FXMLLoaderIO.loadFXMLLayoutAsync("chantLineView.fxml", loader -> {
 
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
@@ -791,7 +794,7 @@ public class MainSceneController {
 	 */
 	@FXML private void handleCombinePDFs() {
 
-		FXMLLoaderIO.loadFXMLLayout("pdfCombineView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("pdfCombineView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			PDFCombineViewController controller = loader.getController();
 			controller.setDefaultDirectory(currentSavingDirectory);
@@ -867,8 +870,7 @@ public class MainSceneController {
 	 * Help Menu Actions
 	 */
 	@FXML private void handleAbout() {
-
-		FXMLLoaderIO.loadFXMLLayout("AboutScene.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("AboutScene.fxml", loader -> {
 			BorderPane aboutLayout = loader.getRoot();
 
 			Platform.runLater(() -> {
@@ -883,7 +885,9 @@ public class MainSceneController {
 				aboutStage.show();
 			});
 		});
-
+	}
+	@FXML private void handleUpdateCheck() {
+		AutoUpdater.AutoUpdate(mainStage, false);
 	}
 
 	private void refreshChordKeySignatures(String key) {
@@ -894,15 +898,7 @@ public class MainSceneController {
 	private void refreshAllChords() {
 		if (!MainApp.lilyPondAvailable()) return;
 
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] files = tempDir.listFiles();
-		for (File file : Objects.requireNonNull(files)) {
-			if (file.getName().startsWith(MainApp.APP_NAME)) {
-				if (!file.delete()) {
-					System.out.println("Failed to delete temp file " + file.getName());
-				}
-			}
-		}
+		TWUtils.cleanUpTempFiles();
 
 		Set<String> allFieldsSet = new HashSet<>();
 
@@ -1041,7 +1037,7 @@ public class MainSceneController {
 
 	private void showQuickVerseStage(TextField targetField) {
 
-		FXMLLoaderIO.loadFXMLLayout("quickVerseView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("quickVerseView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			QuickVerseController controller = loader.getController();
 
