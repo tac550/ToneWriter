@@ -152,8 +152,7 @@ public class AutoUpdater {
 		if (MainApp.OS_NAME.startsWith("win")) {
 			sourceFileName = String.format(Locale.US, "ToneWriter%s_Setup.exe", version);
 		} else if (MainApp.OS_NAME.startsWith("mac")) {
-			sourceFileName = "ToneWriter.app.zip";
-//			sourceFileName = String.format(Locale.US, "ToneWriter%s.app.zip", version); // TODO: final version
+			sourceFileName = String.format(Locale.US, "ToneWriter%s.app.zip", version);
 		} else if (MainApp.OS_NAME.startsWith("lin")) {
 			sourceFileName = String.format(Locale.US, "ToneWriter%s-Linux.zip", version);
 		} else {
