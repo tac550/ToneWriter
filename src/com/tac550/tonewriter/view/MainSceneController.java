@@ -157,11 +157,7 @@ public class MainSceneController {
 		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(combinePDFsMenuItem, "/media/file-pdf.png");
-
-		ImageView updateIcon = new ImageView(getClass().getResource("/media/cloud-sync.png").toExternalForm());
-		updateIcon.setFitHeight(iconSize);
-		updateIcon.setFitWidth(iconSize);
-		updateMenuitem.setGraphic(updateIcon);
+		setMenuIcon(updateMenuitem, "/media/cloud-sync.png");
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
