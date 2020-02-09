@@ -57,7 +57,9 @@ public class AutoUpdater {
 					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
 					ArrayList<Float> releaseNumbers = new ArrayList<>();
 
-					StringBuilder finalHTMLString = new StringBuilder();
+					StringBuilder finalHTMLBuilder = new StringBuilder();
+
+					finalHTMLBuilder.append("<body bgcolor=\"").append(TWUtils.toRGBCode(TWUtils.getUIBaseColor())).append("\">");
 
 					for (int i = 0; i < releaseHeaders.size(); i++) {
 						HtmlDivision header = releaseHeaders.get(i);
@@ -66,13 +68,13 @@ public class AutoUpdater {
 
 						if (releaseNumber >= Float.parseFloat(MainApp.APP_VERSION)) {
 							// Add the version heading to the output
-							finalHTMLString.append("<h1>").append(releaseTitle).append("</h1>");
+							finalHTMLBuilder.append("<h1>").append(releaseTitle).append("</h1>");
 
 							// Add the associated changelog to the output
 							String body = releaseNotes.get(i).asXml();
 							int afterFirstHeading = body.indexOf("</h1>") + 5;
 							String changelog = body.substring(afterFirstHeading, body.indexOf("<h1>", afterFirstHeading));
-							finalHTMLString.append(changelog);
+							finalHTMLBuilder.append(changelog);
 						}
 
 						if (releaseNumber > Float.parseFloat(MainApp.APP_VERSION)) {
@@ -80,6 +82,8 @@ public class AutoUpdater {
 						}
 
 					}
+
+					finalHTMLBuilder.append("</body>");
 
 					// If there's no update and this is the startup check, stop here.
 					if (startup && releaseNumbers.size() == 0) {
@@ -98,7 +102,7 @@ public class AutoUpdater {
 							updaterStage.setMinHeight(updaterStage.getHeight());
 						});
 
-						updaterController.setWebViewContent(finalHTMLString.toString());
+						updaterController.setWebViewContent(finalHTMLBuilder.toString());
 						updaterController.setVersionChoices(releaseNumbers);
 
 						if (updaterStage.getOwner() == null) {
