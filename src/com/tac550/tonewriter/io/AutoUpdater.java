@@ -39,7 +39,7 @@ public class AutoUpdater {
 	private static Alert downloadAlert;
 
 	// TODO: Test publishing update after first check, then checking again
-	public static void AutoUpdate(Window owner, boolean startup) {
+	public static void updateCheck(Window owner, boolean startup) {
 
 		Task<Void> updateTask = new Task<>() {
 			@Override
@@ -134,7 +134,7 @@ public class AutoUpdater {
 
 	}
 
-	public static void performUpdate(String version) {
+	public static void downloadUpdate(String version) {
 
 		showDownloadAlert(version);
 

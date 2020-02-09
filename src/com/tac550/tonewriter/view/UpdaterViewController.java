@@ -35,7 +35,7 @@ public class UpdaterViewController {
 	@FXML private void handleUpdate() {
 		result = versionChoiceBox.getSelectionModel().getSelectedItem().toString();
 		getStage().close();
-		AutoUpdater.performUpdate(result);
+		AutoUpdater.downloadUpdate(result);
 	}
 
 	@FXML private void handleLater() {

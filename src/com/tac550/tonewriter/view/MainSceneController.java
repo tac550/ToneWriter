@@ -883,7 +883,7 @@ public class MainSceneController {
 		});
 	}
 	@FXML private void handleUpdateCheck() {
-		AutoUpdater.AutoUpdate(mainStage, false);
+		AutoUpdater.updateCheck(mainStage, false);
 	}
 
 	private void refreshChordKeySignatures(String key) {

@@ -157,7 +157,7 @@ public class MainApp extends Application {
 		this.mainStage.show();
 
 		// Run auto update check TODO: Move this call further down?
-		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.AutoUpdate(mainStage, true);
+		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
 
 		// Makes sure the stage can't be made too small.
 		// The stage opens showing the scene at its pref size. This makes that initial size the minimum.
