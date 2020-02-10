@@ -109,6 +109,21 @@
                                        </children>
                                     </GridPane>
                                     <TextArea fx:id="verseArea" VBox.vgrow="ALWAYS" />
+                                    <StackPane>
+                                       <children>
+                                          <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#handleCancelSetVerse" text="Cancel" />
+                                                <ProgressBar HBox.hgrow="ALWAYS">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </ProgressBar>
+                                             </children>
+                                          </HBox>
+                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Apply Above _Text" />
+                                       </children>
+                                    </StackPane>
                                     <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
                                        <columnConstraints>
                                           <ColumnConstraints hgrow="NEVER" />
@@ -135,24 +150,9 @@
                                           <ChoiceBox fx:id="verseBottomChoice" />
                                        </children>
                                     </GridPane>
-                                    <StackPane>
-                                       <children>
-                                          <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
-                                             <children>
-                                                <Button mnemonicParsing="false" onAction="#handleCancelSetVerse" text="Cancel" />
-                                                <ProgressBar HBox.hgrow="ALWAYS">
-                                                   <HBox.margin>
-                                                      <Insets />
-                                                   </HBox.margin>
-                                                </ProgressBar>
-                                             </children>
-                                          </HBox>
-                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set _Verse" />
-                                       </children>
-                                    </StackPane>
                                  </children>
                                  <padding>
-                                    <Insets left="5.0" />
+                                    <Insets left="5.0" right="5.0" />
                                  </padding>
                               </VBox>
                            </children>
