@@ -1,7 +1,6 @@
 package com.tac550.tonewriter.io;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
@@ -20,7 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
-import java.awt.Taskbar;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,8 +45,8 @@ public class AutoUpdater {
 			protected Void call() {
 				try {
 					webClient = new WebClient();
-
-					webClient.setCssErrorHandler(new SilentCssErrorHandler());
+					webClient.getOptions().setJavaScriptEnabled(false);
+					webClient.getOptions().setCssEnabled(false);
 
 					// Get the GitHub Releases page
 					final HtmlPage releasesPage = webClient.getPage("https://github.com/tac550/ToneWriter/releases");
