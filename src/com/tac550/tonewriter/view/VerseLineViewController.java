@@ -333,7 +333,7 @@ public class VerseLineViewController {
 	}
 
 	void syllableClicked(SyllableText clicked_text) {
-		if (currentChord ==  null) return;
+		if (currentChord == null) return;
 
 		final int indexClicked = lineTextFlow.getChildren().indexOf(clicked_text);
 
@@ -348,18 +348,18 @@ public class VerseLineViewController {
 
 	}
 	void syllableAltClicked() {
-		if (currentChord ==  null) return;
+		if (currentChord == null) return;
 		currentChord.playMidi();
 	}
 
 	void syllableHovered() {
-		if (currentChord ==  null) return;
+		if (currentChord == null) return;
 		if (parentController.hoverHighlightEnabled()) {
 			currentChord.setHighlighted(true);
 		}
 	}
 	void syllableUnHovered() {
-		if (currentChord ==  null) return;
+		if (currentChord == null) return;
 		currentChord.setHighlighted(false);
 	}
 

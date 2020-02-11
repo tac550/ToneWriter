@@ -20,7 +20,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -47,20 +49,18 @@ public class ChantLineViewController implements CommentableView {
 	private String commentString = "";
 	private Image commentButtonState;
 	
-	@FXML GridPane mainPane;
-	@FXML ScrollPane chordScrollPane;
+	@FXML private GridPane mainPane;
+	@FXML private ScrollPane chordScrollPane;
 
-	@FXML Button upButton;
-	@FXML Button downButton;
-	@FXML Button firstRepeatedButton;
-	@FXML ChoiceBox<String> nameChoice;
-	@FXML Button commentButton;
-	@FXML Button playButton;
+	@FXML private Button upButton;
+	@FXML private Button downButton;
+	@FXML private Button firstRepeatedButton;
+	@FXML private ChoiceBox<String> nameChoice;
+	@FXML private Button commentButton;
+	@FXML private Button playButton;
 	
 	@FXML private HBox chordBox;
 	private ArrayList<ChantChordController> chantChordControllers = new ArrayList<>();
-	
-	@FXML Button endButton;
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
@@ -493,6 +493,23 @@ public class ChantLineViewController implements CommentableView {
 		}
 		for (ChantChordController chord : chordsToDelete) {
 			chord.deleteAll();
+		}
+	}
+
+	void scrollChordIntoView(AnchorPane chordPane) {
+
+		mainController.scrollCLineIntoView(mainPane);
+
+		double viewportWidth = chordScrollPane.getViewportBounds().getWidth();
+		double scrollPaneWidth = chordScrollPane.getContent().getBoundsInLocal().getWidth();
+		double maxX = chordPane.getBoundsInParent().getMaxX();
+
+		if (maxX < (viewportWidth / 2)) { // TODO: Apply also to vertically scrolling the chord view
+			chordScrollPane.setHvalue(0); // TODO: Also separate into own feature, option item independent of highlighting?
+		} else if ((maxX >= (viewportWidth / 2)) & (maxX <= (scrollPaneWidth - viewportWidth / 2))) {
+			chordScrollPane.setHvalue((maxX - (viewportWidth / 2)) / (scrollPaneWidth - viewportWidth));
+		} else if (maxX >= (scrollPaneWidth - (viewportWidth / 2))) {
+			chordScrollPane.setHvalue(1);
 		}
 	}
 

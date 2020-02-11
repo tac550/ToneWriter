@@ -360,8 +360,11 @@ public class ChantChordController implements CommentableView {
 		node.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(color)));
 	}
 
-	void setHighlighted(boolean value) {
-		setMainElementsColor(value ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
+	void setHighlighted(boolean highlighted) {
+		// Set or reset highlight colors
+		setMainElementsColor(highlighted ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
+		// Set scroll position
+		if (highlighted) chantLineController.scrollChordIntoView(mainPane);
 	}
 
 	void indicateInsertionLeft() {

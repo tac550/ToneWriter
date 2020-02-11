@@ -44,7 +44,7 @@ Cadence
 2: a-fs-d-d
 	Prep: b-g-d-g
 	Post: a-fs-c-d
-	Post: b-g-d-d: This chord is typically intended to be skipped./n/nThis chord is only needed for very short cadence lines,/nin which cases the first two chords of the line would be skipped./n/nFor example, the cadence of Lord I Call:/n/nHear _ _ _ me, O _ Lord. _ _ _/n^    ^ ^/n|    | |/n2    | Post/n     |/n     This chord/n
+	Post: b-g-d-d: This chord is typically intended to be skipped./n/nThis chord is only needed for very short cadence lines,/nin which case the first two chords of the line would be skipped./n/nFor example, the cadence of Lord I Call:/n/nHear _ _ _ me, O _ Lord. _ _ _/n^    ^ ^/n|    | |/n2    | Post/n     |/n     This chord/n
 3: a-fs-d-d
 	Prep: g-d-b,-g
 	Prep: b-g-d-g

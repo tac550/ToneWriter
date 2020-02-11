@@ -63,7 +63,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="endButton" maxWidth="10.0" minWidth="10.0" mnemonicParsing="false" onAction="#setCadenceAction" prefHeight="200.0" prefWidth="10.0" style="-fx-base: #ff8989; -fx-focus-color: transparent;">
+                  <Button maxWidth="10.0" minWidth="10.0" mnemonicParsing="false" onAction="#setCadenceAction" prefHeight="200.0" prefWidth="10.0" style="-fx-base: #ff8989; -fx-focus-color: transparent;">
                      <tooltip>
                         <Tooltip text="Add Cadence" />
                      </tooltip>

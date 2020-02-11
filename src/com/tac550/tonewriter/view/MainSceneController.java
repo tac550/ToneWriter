@@ -19,6 +19,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -102,7 +103,7 @@ public class MainSceneController {
 	@FXML private CheckBox largeTitleCheckBox;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
-	@FXML TextArea verseArea;
+	@FXML private TextArea verseArea;
 	@FXML private ChoiceBox<String> verseBottomChoice;
 	@FXML private TextField verseBottomField;
 	@FXML private Button verseBottomButton;
@@ -131,12 +132,13 @@ public class MainSceneController {
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 	private File currentSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
-	@FXML VBox chantLineBox;
+	@FXML private ScrollPane toneScrollPane;
+	@FXML private VBox chantLineBox;
 	private ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
 
 	private List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
-	@FXML VBox verseLineBox;
+	@FXML private VBox verseLineBox;
 	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
 
 	private boolean setVerseCancelled = false;
@@ -961,6 +963,20 @@ public class MainSceneController {
 			if (chantLine.getName().equals(chant_line)) {
 				chantLine.toggleFirstRepeated();
 			}
+		}
+	}
+
+	void scrollCLineIntoView(GridPane cline) {
+		double viewportHeight = toneScrollPane.getViewportBounds().getHeight();
+		double scrollPaneHeight = toneScrollPane.getContent().getBoundsInLocal().getHeight();
+		double maxY = cline.getBoundsInParent().getMaxY();
+
+		if (maxY < (viewportHeight / 2)) { // TODO: Apply also to vertically scrolling the chord view
+			toneScrollPane.setVvalue(0); // TODO: Also separate into own feature, option item independent of highlighting?
+		} else if ((maxY >= (viewportHeight / 2)) & (maxY <= (scrollPaneHeight - viewportHeight / 2))) {
+			toneScrollPane.setVvalue((maxY - (viewportHeight / 2)) / (scrollPaneHeight - viewportHeight));
+		} else if (maxY >= (scrollPaneHeight - (viewportHeight / 2))) {
+			toneScrollPane.setVvalue(1);
 		}
 	}
 
