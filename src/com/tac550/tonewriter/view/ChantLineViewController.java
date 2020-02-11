@@ -504,8 +504,8 @@ public class ChantLineViewController implements CommentableView {
 		double scrollPaneWidth = chordScrollPane.getContent().getBoundsInLocal().getWidth();
 		double maxX = chordPane.getBoundsInParent().getMaxX();
 
-		if (maxX < (viewportWidth / 2)) { // TODO: Apply also to vertically scrolling the chord view
-			chordScrollPane.setHvalue(0); // TODO: Also separate into own feature, option item independent of highlighting?
+		if (maxX < (viewportWidth / 2)) {
+			chordScrollPane.setHvalue(0);
 		} else if ((maxX >= (viewportWidth / 2)) & (maxX <= (scrollPaneWidth - viewportWidth / 2))) {
 			chordScrollPane.setHvalue((maxX - (viewportWidth / 2)) / (scrollPaneWidth - viewportWidth));
 		} else if (maxX >= (scrollPaneWidth - (viewportWidth / 2))) {

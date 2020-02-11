@@ -37,7 +37,6 @@ public class AutoUpdater {
 
 	private static Alert downloadAlert;
 
-	// TODO: Test publishing update after first check, then checking again
 	public static void updateCheck(Window owner, boolean startup) {
 
 		Task<Void> updateTask = new Task<>() {

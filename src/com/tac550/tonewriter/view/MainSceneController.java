@@ -971,8 +971,8 @@ public class MainSceneController {
 		double scrollPaneHeight = toneScrollPane.getContent().getBoundsInLocal().getHeight();
 		double maxY = cline.getBoundsInParent().getMaxY();
 
-		if (maxY < (viewportHeight / 2)) { // TODO: Apply also to vertically scrolling the chord view
-			toneScrollPane.setVvalue(0); // TODO: Also separate into own feature, option item independent of highlighting?
+		if (maxY < (viewportHeight / 2)) {
+			toneScrollPane.setVvalue(0);
 		} else if ((maxY >= (viewportHeight / 2)) & (maxY <= (scrollPaneHeight - viewportHeight / 2))) {
 			toneScrollPane.setVvalue((maxY - (viewportHeight / 2)) / (scrollPaneHeight - viewportHeight));
 		} else if (maxY >= (scrollPaneHeight - (viewportHeight / 2))) {
