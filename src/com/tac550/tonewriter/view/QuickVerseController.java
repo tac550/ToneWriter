@@ -152,6 +152,8 @@ public class QuickVerseController {
 			youThouSwitch.setText("Switch to You/Your");
 			MainApp.prefs.putBoolean(MainApp.PREFS_THOU_THY, true);
 		}
+
+		filterInput.requestFocus();
 		
 		refreshVerses();
 	}
