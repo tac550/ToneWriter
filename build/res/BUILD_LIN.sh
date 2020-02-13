@@ -9,4 +9,4 @@ cp tonewriter.jar ../lin/jar/ && \
 cp -r "../../Built-in Tones" "../lin/Built-in Tones" && \
 cp -r ../../licenses ../lin/licenses && \
 cp ToneWriter.sh ../lin && \
-zip -r ../lin/ToneWriter0.5-Linux.zip ../lin/*
+zip -r ../lin/ToneWriter0.6-Linux.zip ../lin/*
