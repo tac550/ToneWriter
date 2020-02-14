@@ -629,10 +629,8 @@ public class MainSceneController {
 			currentKey = "C major";
 			manualCLAssignmentMenuItem.setSelected(false);
 
-			createChantLine(false);
-			createChantLine(true);
-			resetToneEditedStatus();
-			handleSave(); // So that the tone is loadable (will be empty)
+			Task<FXMLLoader> loaderTask = createChantLine(true);
+			loaderTask.setOnSucceeded(event -> handleSave()); // So that the tone is loadable
 		}
 	}
 	void handleOpenTone(File selectedFile) {
