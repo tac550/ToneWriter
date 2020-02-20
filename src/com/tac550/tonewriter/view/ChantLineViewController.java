@@ -33,9 +33,11 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 public class ChantLineViewController implements CommentableView {
 
@@ -536,20 +538,9 @@ public class ChantLineViewController implements CommentableView {
 		}
 	}
 
-	Set<String> getAllFields() {
-		Set<String> fieldSet = new HashSet<>();
-
+	void refreshAllChordPreviews() {
 		for (ChantChordController chord : chantChordControllers) {
-			fieldSet.add(chord.getFields());
-		}
-
-		return fieldSet;
-	}
-	void chordRendered(String fields, File[] resultFiles) {
-		for (ChantChordController chord : chantChordControllers) {
-			if (chord.getFields().equals(fields)) {
-				chord.setChordInfoDirectly(resultFiles);
-			}
+			chord.refreshChordPreview();
 		}
 	}
 

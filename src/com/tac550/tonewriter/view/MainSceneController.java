@@ -143,8 +143,6 @@ public class MainSceneController {
 
 	private boolean setVerseCancelled = false;
 
-	private Map<String, File[]> renderResultMap = new HashMap<>();
-
 	@FXML private void initialize() {
 
 		// Menu icons
@@ -645,10 +643,10 @@ public class MainSceneController {
 
 			askToOverwriteOutput = false;
 
-			refreshAllChords();
 		}
 
 		LoadingTone = false;
+		refreshAllChordPreviews();
 	}
 	@FXML private void handleOpenTone() {
 		handleOpenTone(null);
@@ -891,31 +889,13 @@ public class MainSceneController {
 	    	chantLineController.setKeySignature(key);
 	    }
 	}
-	private void refreshAllChords() {
+	private void refreshAllChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
-		TWUtils.cleanUpTempFiles();
-
-		Set<String> allFieldsSet = new HashSet<>();
-
 		for (ChantLineViewController chantLineController : chantLineControllers) {
-			allFieldsSet.addAll(chantLineController.getAllFields());
+			chantLineController.refreshAllChordPreviews();
 	    }
 
-		for (String fields : allFieldsSet) {
-			try {
-				renderResultMap.put(fields, LilyPondWriter.renderChord(LilyPondWriter.createTempLYChordFile(getToneFile().getName()),
-						fields, getCurrentKey(), this));
-			} catch (IOException e) {
-				System.out.println("Chord image creation failed");
-				e.printStackTrace();
-			}
-		}
-	}
-	public void chordRendered(String fields) {
-		for (ChantLineViewController chantLineController : chantLineControllers) {
-			chantLineController.chordRendered(fields, renderResultMap.get(fields));
-		}
 	}
 
 	void removeChantLine(ChantLineViewController chantLineViewController) {
@@ -1086,7 +1066,8 @@ public class MainSceneController {
 			verseLine.refreshTextStyle();
 		}
 
-		refreshAllChords();
+		LilyPondWriter.clearAllCachedChordPreviews();
+		refreshAllChordPreviews();
 	}
 
 	void toneEdited() {

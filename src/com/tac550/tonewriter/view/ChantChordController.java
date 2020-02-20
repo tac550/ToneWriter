@@ -235,30 +235,25 @@ public class ChantChordController implements CommentableView {
 		return mainPane;
 	}
 
-	@FXML private File refreshChordPreview() {
+	@FXML void refreshChordPreview() {
 
-		if (MainSceneController.LoadingTone) return null; // Avoid unnecessary refreshes while loading a tone
+		if (MainSceneController.LoadingTone) return; // Avoid unnecessary refreshes while loading a tone
 
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
 			chordView.setImage(new Image(getClass().getResource(MainApp.darkModeEnabled() ?
 					"/media/NoLilyPondMessage-Dark.png" : "/media/NoLilyPondMessage.png").toExternalForm()));
-			return null;
+			return;
 		}
 
-		File lilypondFile = LilyPondWriter.createTempLYChordFile(chantLineController.getMainController().getToneFile().getName());
-
 		try {
-			File[] files = LilyPondWriter.renderChord(lilypondFile, getFields(), keySignature, chordView);
-			midiFile = files[1];
-			return files[0];
+			LilyPondWriter.renderChord(getFields(), keySignature, this);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
 		}
 	}
 
-	void setChordInfoDirectly(File[] files) {
+	public void setChordInfoDirectly(File[] files) {
 		chordView.setImage(new Image(files[0].toURI().toString()));
 		midiFile = files[1];
 	}

@@ -3,16 +3,15 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.model.ChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.MainApp;
-import com.tac550.tonewriter.view.MainSceneController;
 import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.VerseLineViewController;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import org.apache.commons.io.FilenameUtils;
 
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -35,6 +34,10 @@ public class LilyPondWriter {
 	private static final int PART_ALTO = 1;
 	private static final int PART_TENOR = 2;
 	private static final int PART_BASS = 3;
+
+	// Fields for chord preview rendering system
+	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
+	private static final Map<String, ArrayList<ChantChordController>> pendingChordControllers = new HashMap<>();
 
 	// The function that handles final output.
 	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
@@ -705,44 +708,69 @@ public class LilyPondWriter {
 		prExitDetector.start();
 	}
 
-	public static File[] renderChord(File lilypondFile, String fields, String keySignature, MainSceneController mainSceneView) throws IOException {
-		return renderChord(lilypondFile, fields, keySignature, null, mainSceneView);
-	}
-	public static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView) throws IOException {
-		return renderChord(lilypondFile, fields, keySignature, chordView, null);
-	}
-	private static File[] renderChord(File lilypondFile, String fields, String keySignature, ImageView chordView, MainSceneController mainSceneView) throws IOException {
+	public static void renderChord(String fields, String keySignature, ChantChordController chordView) throws IOException {
+		String chordID = fields + keySignature;
+		if (!uniqueChordRenders.containsKey(chordID)) {
+			// First time we're seeing this chord
+			File lilypondFile = LilyPondWriter.createTempLYChordFile(chordID);
 
-		String[] parts = fields.split("-");
+			uniqueChordRenders.put(chordID, null);
 
-		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+			String[] parts = fields.split("-");
 
-		lines.set(10, keySignatureToLilyPond(keySignature));
-		lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-		lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
-		lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
-		lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
-		lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-		outputFile.deleteOnExit();
-		File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-				Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-		midiFile.deleteOnExit();
-		// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-		File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-		psFile.deleteOnExit();
+			lines.set(10, keySignatureToLilyPond(keySignature));
+			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
+			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
+			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
+			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
+			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
+			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
-		if (chordView != null) {
-			executePlatformSpecificLPRender(lilypondFile, true, () ->
-					chordView.setImage(new Image(outputFile.toURI().toString())));
+			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
+			outputFile.deleteOnExit();
+			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
+			midiFile.deleteOnExit();
+			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
+			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
+			psFile.deleteOnExit();
+
+			File[] results = new File[] {outputFile, midiFile};
+			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
+			executePlatformSpecificLPRender(lilypondFile, true, () -> {
+				uniqueChordRenders.put(chordID, results);
+				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
+					controller.setChordInfoDirectly(uniqueChordRenders.get(chordID));
+				}
+			});
+		} else if (uniqueChordRenders.get(chordID) == null) {
+			// Render already started; automatically acquire the render when it's finished.
+			pendingChordControllers.get(chordID).add(chordView);
 		} else {
-			executePlatformSpecificLPRender(lilypondFile, true, () ->
-					mainSceneView.chordRendered(fields));
+			// Chord already rendered; use existing files.
+			chordView.setChordInfoDirectly(uniqueChordRenders.get(chordID));
 		}
 
-		return new File[] {outputFile, midiFile};
+	}
+
+	public static void clearAllCachedChordPreviews() {
+		cleanUpTempChordFiles();
+
+		uniqueChordRenders.clear();
+		pendingChordControllers.clear();
+	}
+	private static void cleanUpTempChordFiles() {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		File[] files = tempDir.listFiles();
+		for (File file : Objects.requireNonNull(files)) {
+			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith("-chord")) {
+				if (!file.delete()) {
+					System.out.println("Failed to delete temp file " + file.getName());
+				}
+			}
+		}
 	}
 
 	public static File createTempLYChordFile(String toneFileName) {

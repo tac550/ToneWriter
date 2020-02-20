@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -58,17 +59,6 @@ public class TWUtils {
 		return File.createTempFile(MainApp.APP_NAME + "-" +
 				(prefix.isEmpty() ? "" : prefix + "-"),
 				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix);
-	}
-	public static void cleanUpTempFiles() {
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] files = tempDir.listFiles();
-		for (File file : Objects.requireNonNull(files)) {
-			if (file.getName().startsWith(MainApp.APP_NAME)) {
-				if (!file.delete()) {
-					System.out.println("Failed to delete temp file " + file.getName());
-				}
-			}
-		}
 	}
 
 	// Copies file from io package to an external location.
