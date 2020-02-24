@@ -125,7 +125,7 @@ public class ChantLineViewController implements CommentableView {
 		
 	}
 	
-	void setName(char new_letter, boolean previous_is_prime, int alternate_count) {
+	void setName(char new_letter, boolean previous_is_prime, int next_alternate) {
 		int previousSelection = nameChoice.getSelectionModel().getSelectedIndex();
 		if (new_letter == 'A' || previous_is_prime) {
 			nameChoice.setItems(FXCollections.observableArrayList(
@@ -137,7 +137,7 @@ public class ChantLineViewController implements CommentableView {
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
 				    String.valueOf(new_letter), --new_letter + "'",
-					new_letter + " alternate " + alternate_count)
+					new_letter + " alternate " + next_alternate)
 				);
 			
 			setFirstRepeatedAvailable(true);

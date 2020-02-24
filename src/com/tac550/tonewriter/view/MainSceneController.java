@@ -312,14 +312,14 @@ public class MainSceneController {
 
 	public void recalcCLNames() {
 		boolean previousWasPrime = false;
-		int alternateCount = 1;
+		int nextAlternate = 1;
 		char currentLetter = 65;
 		ChantLineViewController prevMainLine = null;
 		mainChantLines.clear();
 
 		for (ChantLineViewController chantLine : chantLineControllers) {
 			if (chantLineControllers.get(chantLineControllers.size()-1) != chantLine) { // If not the last
-				chantLine.setName(currentLetter, previousWasPrime, alternateCount);
+				chantLine.setName(currentLetter, previousWasPrime, nextAlternate);
 				previousWasPrime = false;
 
 				chantLine.setNumAlts(0);
@@ -332,22 +332,22 @@ public class MainSceneController {
 
 					previousWasPrime = true;
 				} else if (chantLine.getIsAlternate()) { // Alternate chant line
-					alternateCount++;
+					nextAlternate++;
 				} else { // Normal chant line
 					if (prevMainLine != null) {
-						prevMainLine.setNumAlts(alternateCount - 1);
+						prevMainLine.setNumAlts(nextAlternate - 1);
 					}
 					prevMainLine = chantLine;
 					mainChantLines.add(chantLine);
 
-					alternateCount = 1;
+					nextAlternate = 1;
 					currentLetter++;
 				}
 			} else {
 				chantLine.makeCadence();
 				// If this is not the only chant line...
 				if (prevMainLine != null) {
-					prevMainLine.setNumAlts(alternateCount - 1);
+					prevMainLine.setNumAlts(nextAlternate - 1);
 				}
 			}
 		}
