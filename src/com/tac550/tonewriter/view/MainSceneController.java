@@ -262,10 +262,6 @@ public class MainSceneController {
 				this::handleExport);
 	}
 
-	File getToneFile() {
-		return toneFile;
-	}
-
 	String getCurrentKey() {
 		return currentKey;
 	}
