@@ -361,6 +361,7 @@ public class MainSceneController {
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
 		if (manualCLAssignmentMenuItem.isSelected()) {
+
 			for (VerseLineViewController verseLine : verseLineControllers) {
 				// Default last chant line selection to Cadence line.
 				if (verseLineControllers.indexOf(verseLine) == verseLineControllers.size() - 1) {
@@ -370,50 +371,58 @@ public class MainSceneController {
 					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]));
 				}
 			}
-			return;
-		}
 
-		int firstRepeated = 0;
-		int CLNum = 0; // For retrieving proper chant line
-		for (int VLNum = 0; VLNum < verseLineControllers.size(); VLNum++) {
-			// Correct counter overflow for the chant line list (there will usually be more verse lines than chant lines)
-			if (CLNum == mainChantLines.size()) {
-				CLNum = firstRepeated;
-			}
+		} else {
 
-			ChantLineViewController currentChantLine = mainChantLines.get(CLNum);
+			int firstRepeated = 0;
+			int CLNum = 0; // For retrieving proper chant line
+			for (int VLNum = 0; VLNum < verseLineControllers.size(); VLNum++) {
+				// Correct counter overflow for the chant line list (there will usually be more verse lines than chant lines)
+				if (CLNum == mainChantLines.size()) {
+					CLNum = firstRepeated;
 
-			// If it's the last line before the end or a separator, it gets Cadence.
-			if (VLNum + 1 == verseLineControllers.size() || verseLineControllers.get(VLNum + 1).isSeparator()) {
-				verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
-				CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
-				VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
-				continue;
-			// If it's the second-to-last line before the end or a separator, it gets prime, if any.
-			} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.getHasPrime()) {
-				verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
-				continue;
-			}
-
-			// Save the index of the first-repeated chant line, on the first encounter only.
-			if (firstRepeated == 0 && currentChantLine.getFirstRepeated()) {
-				firstRepeated = CLNum;
-			}
-
-			// For normal cases do this.
-			if (!currentChantLine.getIsPrime() && !currentChantLine.getIsAlternate()) {
-				ChantLineViewController[] associatedControllers = new ChantLineViewController[currentChantLine.getNumAlts() + 1];
-				associatedControllers[0] = currentChantLine;
-				for (int i = 1; i < associatedControllers.length; i++) {
-					associatedControllers[i] = chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + i);
+					// If there are no main chant lines, use the cadence line.
+					if (mainChantLines.isEmpty()) {
+						verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
+						continue;
+					}
 				}
-				verseLineControllers.get(VLNum).setChantLines(associatedControllers);
-			} else {
-				// Do another go-around on the same verse line but with the next chant line.
-				VLNum--;
+
+				ChantLineViewController currentChantLine = mainChantLines.get(CLNum);
+
+				// If it's the last line before the end or a separator, it gets Cadence.
+				if (VLNum + 1 == verseLineControllers.size() || verseLineControllers.get(VLNum + 1).isSeparator()) {
+					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
+					CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
+					VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
+					continue;
+					// If it's the second-to-last line before the end or a separator, it gets prime, if any.
+				} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.getHasPrime()) {
+					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
+					continue;
+				}
+
+				// Save the index of the first-repeated chant line, on the first encounter only.
+				if (firstRepeated == 0 && currentChantLine.getFirstRepeated()) {
+					firstRepeated = CLNum;
+				}
+
+				// For normal cases do this.
+				if (!currentChantLine.getIsPrime() && !currentChantLine.getIsAlternate()) {
+					ChantLineViewController[] associatedControllers = new ChantLineViewController[currentChantLine.getNumAlts() + 1];
+					associatedControllers[0] = currentChantLine;
+					for (int i = 1; i < associatedControllers.length; i++) {
+						associatedControllers[i] = chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + i);
+					}
+					verseLineControllers.get(VLNum).setChantLines(associatedControllers);
+				} else {
+					// Do another go-around on the same verse line but with the next chant line.
+					VLNum--;
+				}
+				CLNum++;
 			}
-			CLNum++;
 		}
+
 	}
 
 	public void clearChantLines() {
