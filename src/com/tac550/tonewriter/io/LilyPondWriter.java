@@ -554,14 +554,13 @@ public class LilyPondWriter {
 
 		// If there is a tie...
 		if (note.contains("~")) {
-			String[] tiedNotes = note.split(" ");
+			String[] tiedNotes = note.split("~ ");
 
 			float totalDuration = 0;
 
 			for (String tNote : tiedNotes) {
-				// Make recursive calls if there are multiple notes combined with a tie or ties.
-				System.out.println("Recursing!! (probably bad news)");
-				totalDuration += getBeatDuration(tNote); // TODO: Investigate this, seems to always StackOverFlow
+				// Make one recursive call for each tied note
+				totalDuration += getBeatDuration(tNote);
 			}
 
 			return totalDuration;
