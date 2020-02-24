@@ -227,10 +227,6 @@ public class ChantLineViewController implements CommentableView {
 		return mainPane;
 	}
 
-	MainSceneController getMainController() {
-		return mainController;
-	}
-
 	private ChantChordController addChord(int position) throws IOException {
 		// Load layout from fxml file
 		FXMLLoader loader = new FXMLLoader();

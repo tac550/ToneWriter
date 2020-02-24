@@ -6,14 +6,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 public class TWUtils {
