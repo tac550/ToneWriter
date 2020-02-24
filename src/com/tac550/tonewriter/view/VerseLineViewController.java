@@ -451,7 +451,7 @@ public class VerseLineViewController {
 
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
-				currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
+				currentText.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
 			} else {
 				noteButton = createNoteButton(currentText, false, currentChord);
 
@@ -484,8 +484,11 @@ public class VerseLineViewController {
 		CheckMenuItem dottedQuarterNote = new CheckMenuItem("dotted quarter note");
 		CheckMenuItem halfNote = new CheckMenuItem("half note");
 		CheckMenuItem eighthNote = new CheckMenuItem("eighth note");
+		CheckMenuItem wholeNote = new CheckMenuItem("whole note");
+
+		// Set initial selection
 		if (finalNote) {
-			halfNote.setSelected(true);
+			wholeNote.setSelected(true);
 		}
 		else quarterNote.setSelected(true);
 
@@ -502,8 +505,8 @@ public class VerseLineViewController {
 		});
 		noteButton.setOnMouseExited((me) -> chord.setHighlighted(false));
 
-		// context menu for changing chord duration
-		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote);
+		// Context menu for changing chord duration
+		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
 		noteMenu.setOnAction(event -> {
 			for (MenuItem item : noteMenu.getItems()) {
 				// Deselect previous item when another is checked
@@ -525,6 +528,8 @@ public class VerseLineViewController {
 				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
 			} else if (event.getTarget().equals(eighthNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_EIGHTH, noteButton);
+			} else if (event.getTarget().equals(wholeNote)) {
+				syllable.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
 			}
 		});
 
