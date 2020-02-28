@@ -931,6 +931,11 @@ Icons on menu items are from the Creative Commons Zero-licensed collection "smal
 http://paomedia.github.io/small-n-flat/
 
 -----------------------------------------------------------------------------
- 
-Automatic syllabification provided by
+
+Draggable tabs implementation by Michael Berry
+https://berry120.blogspot.com/2014/01/draggable-and-detachable-tabs-in-javafx.html
+
+-----------------------------------------------------------------------------
+
+Automatic syllabification system uses
 https://juiciobrennan.com/hyphenator/
