@@ -13,6 +13,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -251,6 +252,7 @@ public class MainApp extends Application {
 
 	private void loadMainLayout() {
 
+		AnchorPane rootPane = new AnchorPane();
 		tabPane = new TabPane();
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
@@ -262,13 +264,27 @@ public class MainApp extends Application {
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable ->
 				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).updateStageTitle());
-		tabPane.setTabMaxHeight(Integer.MIN_VALUE);
 
-		Scene scene = new Scene(tabPane);
+		Button addTabButton = new Button();
+		ImageView addImageView = new ImageView(new Image(getClass().getResource("/media/sign-add.png").toExternalForm(),
+				16, 16, false, true));
+		addTabButton.setGraphic(addImageView);
+		addTabButton.setStyle("-fx-background-color: transparent");
+		addTabButton.setOnAction(event -> addTab("Item " + (tabPane.getTabs().size() + 1)));
+
+		rootPane.getChildren().addAll(tabPane, addTabButton);
+		AnchorPane.setTopAnchor(addTabButton, 3.0);
+		AnchorPane.setRightAnchor(addTabButton, 15.0);
+		AnchorPane.setTopAnchor(tabPane, 0d);
+		AnchorPane.setRightAnchor(tabPane, 0d);
+		AnchorPane.setLeftAnchor(tabPane, 0d);
+		AnchorPane.setBottomAnchor(tabPane, 0d);
+
+		Scene scene = new Scene(rootPane);
 		mainStage.setScene(scene);
 
-		addTab("TAB 1");
-		addTab("TAB 2");
+		addTab("Item 1");
+		addTab("Item 2");
 	}
 
 	static void addTab(String name) {
@@ -295,7 +311,6 @@ public class MainApp extends Application {
 			tabPane.getTabs().add(tab);
 
 			tab.setOnCloseRequest(event -> {
-
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
 				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance
 
@@ -303,10 +318,11 @@ public class MainApp extends Application {
 						"Are you sure you want to remove " + tab.getText() + " from your project?", true, mainStage);
 				if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 					event.consume();
-					Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 				} else {
 					tabControllerMap.remove(tab);
 				}
+
+				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 			});
 
 		} catch (IOException e) {
