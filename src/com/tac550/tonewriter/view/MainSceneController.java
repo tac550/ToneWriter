@@ -19,6 +19,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
@@ -72,6 +73,8 @@ Hear me O Lord!
 public class MainSceneController {
 
 	private Stage mainStage;
+
+	@FXML private MenuBar menuBar;
 
 	@FXML private MenuItem newToneMenuItem;
 	@FXML private MenuItem openToneMenuItem;
@@ -1078,6 +1081,17 @@ public class MainSceneController {
 	}
 	void setTitleText(String title) {
 		titleTextField.setText(title);
+	}
+
+	void handleShortcut(KeyEvent e) {
+		for (Menu menu : menuBar.getMenus()) {
+			for (MenuItem item : menu.getItems()) {
+				if (item.getAccelerator() != null && item.getAccelerator().match(e)) {
+					item.fire();
+					e.consume();
+				}
+			}
+		}
 	}
 
 }

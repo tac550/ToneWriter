@@ -167,7 +167,7 @@
    <top>
       <HBox BorderPane.alignment="CENTER">
          <children>
-            <MenuBar HBox.hgrow="ALWAYS">
+            <MenuBar fx:id="menuBar" HBox.hgrow="ALWAYS">
               <menus>
                 <Menu text="_File">
                   <items>

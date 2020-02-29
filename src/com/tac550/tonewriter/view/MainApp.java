@@ -22,6 +22,7 @@ import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -263,8 +264,10 @@ public class MainApp extends Application {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 			}
 		});
-		tabPane.getSelectionModel().selectedItemProperty().addListener(observable ->
-				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).updateStageTitle());
+		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
+			MainSceneController controller = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+			controller.updateStageTitle();
+		});
 
 		Button addTabButton = new Button();
 		ImageView addImageView = new ImageView(new Image(getClass().getResource("/media/sign-add.png").toExternalForm(),
@@ -286,6 +289,11 @@ public class MainApp extends Application {
 		AnchorPane.setBottomAnchor(tabPane, 0d);
 
 		Scene scene = new Scene(rootPane);
+		// Allows for keyboard shortcuts to be directed to the correct (currently-selected) tab.
+		// TODO: Unnecessary in JDK 14?
+		scene.addEventFilter(KeyEvent.KEY_PRESSED, e ->
+				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleShortcut(e));
+
 		mainStage.setScene(scene);
 
 		addTab("Item 1");
@@ -320,7 +328,7 @@ public class MainApp extends Application {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?), fix menu consistency issues (dark mode, etc)
+				// TODO: Need to check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?), fix menu consistency issues (dark mode, etc)
 
 				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
