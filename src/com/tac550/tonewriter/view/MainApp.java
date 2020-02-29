@@ -12,13 +12,12 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TabPane;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -245,11 +244,24 @@ public class MainApp extends Application {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
-			BorderPane rootLayout = loader.load();
+			BorderPane mainLayout = loader.load();
 			mainController = loader.getController();
 
+			TabPane tabPane = new TabPane();
+			DraggableTab tab = new DraggableTab("<!!Unnamed!!>");
+
+			AnchorPane anchorPane = new AnchorPane();
+			anchorPane.getChildren().add(mainLayout);
+			AnchorPane.setTopAnchor(mainLayout, 0d);
+			AnchorPane.setBottomAnchor(mainLayout, 0d);
+			AnchorPane.setLeftAnchor(mainLayout, 0d);
+			AnchorPane.setRightAnchor(mainLayout, 0d);
+
+			tab.setContent(anchorPane);
+			tabPane.getTabs().add(tab);
+
 			// Apply the layout as the new scene
-			Scene scene = new Scene(rootLayout);
+			Scene scene = new Scene(tabPane);
 
 			mainStage.setScene(scene);
 
