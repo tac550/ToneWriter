@@ -932,10 +932,5 @@ http://paomedia.github.io/small-n-flat/
 
 -----------------------------------------------------------------------------
 
-Draggable tabs implementation by Michael Berry
-https://berry120.blogspot.com/2014/01/draggable-and-detachable-tabs-in-javafx.html
-
------------------------------------------------------------------------------
-
 Automatic syllabification system uses
 https://juiciobrennan.com/hyphenator/

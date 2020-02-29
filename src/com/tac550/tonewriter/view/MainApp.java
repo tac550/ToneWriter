@@ -6,12 +6,14 @@ import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
@@ -248,7 +250,16 @@ public class MainApp extends Application {
 			mainController = loader.getController();
 
 			TabPane tabPane = new TabPane();
-			DraggableTab tab = new DraggableTab("<!!Unnamed!!>");
+			Tab tab = new Tab("<!!Unnamed!!>");
+
+			tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+			tabPane.getTabs().addListener((ListChangeListener<Tab>) changes -> {
+				if (tabPane.getTabs().size() == 1) {
+					tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+				} else {
+					tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+				}
+			});
 
 			AnchorPane anchorPane = new AnchorPane();
 			anchorPane.getChildren().add(mainLayout);
