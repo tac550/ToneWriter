@@ -127,7 +127,7 @@ public class MainSceneController {
 
 	private boolean verseSet = false;
 	private boolean askToOverwriteOutput = false; // If false, save dialog always appears for final output.
-	private boolean askToSaveTone = false;
+	private boolean toneEdited = false;
 	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 	private File currentSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
@@ -255,8 +255,6 @@ public class MainSceneController {
 
 	void setStage(Stage stage) {
 		mainStage = stage;
-
-		resetStageTitle();
 
 		mainStage.getScene().getAccelerators().put(new KeyCodeCombination(KeyCode.E, KeyCombination.SHORTCUT_DOWN),
 				this::handleExport);
@@ -509,7 +507,7 @@ public class MainSceneController {
 	 */
 	boolean checkSave() {
 		if (toneFile == null ||
-				!askToSaveTone ||
+				!toneEdited ||
 				!isToneSavable()) {
 			return true;
 		}
@@ -588,33 +586,20 @@ public class MainSceneController {
 			if (toneReader.loadTone(this, toneFile)) {
 				return true;
 			} else {
-
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, mainStage);
-
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
-
 				return false;
 			}
 
 		} else {
-
 			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, mainStage);
-
 			return false;
 		}
 	}
 
-	private void resetStageTitle() {
-		mainStage.setTitle(MainApp.APP_NAME);
-	}
-	private void updateStageTitle() {
-		if (toneFile != null) {
-			mainStage.setTitle(MainApp.APP_NAME + " - " + toneFile.getName());
-		} else {
-			resetStageTitle();
-		}
-
+	void updateStageTitle() {
+		mainStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
 	}
 
 	/*
@@ -1076,14 +1061,14 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
-		if (!askToSaveTone && isToneSavable()) {
-			askToSaveTone = true;
-			mainStage.setTitle("*" + mainStage.getTitle());
+		if (!toneEdited && isToneSavable()) {
+			toneEdited = true;
+			updateStageTitle();
 		}
 	}
 
 	private void resetToneEditedStatus() {
-		askToSaveTone = false;
+		toneEdited = false;
 		updateStageTitle();
 	}
 

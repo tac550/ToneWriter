@@ -13,13 +13,17 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -31,8 +35,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -76,9 +79,10 @@ public class MainApp extends Application {
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
 
-	// Fields for main stage and controller.
-	private Stage mainStage;
-	private MainSceneController mainController;
+	// Fields for main stage, controller, and main tab pane.
+	private static Stage mainStage;
+	private static final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
+	private static TabPane tabPane;
 
 	public static void main(String[] args) {
 
@@ -144,18 +148,22 @@ public class MainApp extends Application {
 
 	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
+		mainStage.setTitle(APP_NAME);
 		mainStage.getIcons().add(APP_ICON);
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
 		mainStage.setOnCloseRequest(ev -> {
-			if (!mainController.checkSave()) {
-				ev.consume();
+			for (Tab tab : tabPane.getTabs()) {
+				if (!tabControllerMap.get(tab).checkSave()) {
+					ev.consume();
+					break;
+				}
 			}
 		});
 
 		// Show the stage (required for the next operation to work)
-		this.mainStage.show();
+		mainStage.show();
 
 		// Run auto update check TODO: Move this call further down?
 		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
@@ -175,7 +183,7 @@ public class MainApp extends Application {
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
-			if (openFile.isFile()) mainController.handleOpenTone(new File(params.get(0)));
+			if (openFile.isFile()) tabControllerMap.get(tabPane.getTabs().get(0)).handleOpenTone(new File(params.get(0)));
 		}
 	}
 
@@ -242,24 +250,39 @@ public class MainApp extends Application {
 	}
 
 	private void loadMainLayout() {
+
+		tabPane = new TabPane();
+		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
+			if (tabPane.getTabs().size() == 1) {
+				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+			} else {
+				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+			}
+		});
+		tabPane.getSelectionModel().selectedItemProperty().addListener(observable ->
+				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).updateStageTitle());
+		tabPane.setTabMaxHeight(Integer.MIN_VALUE);
+
+		Scene scene = new Scene(tabPane);
+		mainStage.setScene(scene);
+
+		addTab("TAB 1");
+		addTab("TAB 2");
+	}
+
+	static void addTab(String name) {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
 			BorderPane mainLayout = loader.load();
-			mainController = loader.getController();
+			MainSceneController mainController = loader.getController();
+			mainController.setStage(mainStage);
 
-			TabPane tabPane = new TabPane();
-			Tab tab = new Tab("<!!Unnamed!!>");
+			Tab tab = new Tab(name);
 
-			tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
-			tabPane.getTabs().addListener((ListChangeListener<Tab>) changes -> {
-				if (tabPane.getTabs().size() == 1) {
-					tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-				} else {
-					tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-				}
-			});
+			tabControllerMap.put(tab, mainController);
 
 			AnchorPane anchorPane = new AnchorPane();
 			anchorPane.getChildren().add(mainLayout);
@@ -271,12 +294,20 @@ public class MainApp extends Application {
 			tab.setContent(anchorPane);
 			tabPane.getTabs().add(tab);
 
-			// Apply the layout as the new scene
-			Scene scene = new Scene(tabPane);
+			tab.setOnCloseRequest(event -> {
 
-			mainStage.setScene(scene);
+				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
+				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance
 
-			mainController.setStage(mainStage);
+				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
+						"Are you sure you want to remove " + tab.getText() + " from your project?", true, mainStage);
+				if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+					event.consume();
+					Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
+				} else {
+					tabControllerMap.remove(tab);
+				}
+			});
 
 		} catch (IOException e) {
 			e.printStackTrace();
