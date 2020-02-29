@@ -271,7 +271,10 @@ public class MainApp extends Application {
 				16, 16, false, true));
 		addTabButton.setGraphic(addImageView);
 		addTabButton.setStyle("-fx-background-color: transparent");
-		addTabButton.setOnAction(event -> addTab("Item " + (tabPane.getTabs().size() + 1)));
+		addTabButton.setOnAction(event -> {
+			addTab("Item " + (tabPane.getTabs().size() + 1));
+			tabPane.getSelectionModel().selectLast();
+		});
 		addTabButton.setTooltip(new Tooltip("Add item"));
 
 		rootPane.getChildren().addAll(tabPane, addTabButton);
@@ -317,7 +320,7 @@ public class MainApp extends Application {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?)
+				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?), fix menu consistency issues (dark mode, etc)
 
 				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
