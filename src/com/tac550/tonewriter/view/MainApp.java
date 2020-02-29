@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -271,6 +272,7 @@ public class MainApp extends Application {
 		addTabButton.setGraphic(addImageView);
 		addTabButton.setStyle("-fx-background-color: transparent");
 		addTabButton.setOnAction(event -> addTab("Item " + (tabPane.getTabs().size() + 1)));
+		addTabButton.setTooltip(new Tooltip("Add item"));
 
 		rootPane.getChildren().addAll(tabPane, addTabButton);
 		AnchorPane.setTopAnchor(addTabButton, 3.0);
