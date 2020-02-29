@@ -4,6 +4,7 @@ import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -1070,6 +1071,13 @@ public class MainSceneController {
 	private void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
+	}
+
+	ObservableStringValue getTitleTextProperty() {
+		return titleTextField.textProperty();
+	}
+	void setTitleText(String title) {
+		titleTextField.setText(title);
 	}
 
 }

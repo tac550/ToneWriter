@@ -284,10 +284,9 @@ public class MainApp extends Application {
 		mainStage.setScene(scene);
 
 		addTab("Item 1");
-		addTab("Item 2");
 	}
 
-	static void addTab(String name) {
+	static void addTab(String title) {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
@@ -296,7 +295,10 @@ public class MainApp extends Application {
 			MainSceneController mainController = loader.getController();
 			mainController.setStage(mainStage);
 
-			Tab tab = new Tab(name);
+			Tab tab = new Tab();
+
+			tab.textProperty().bind(mainController.getTitleTextProperty());
+			mainController.setTitleText(title);
 
 			tabControllerMap.put(tab, mainController);
 
@@ -311,17 +313,19 @@ public class MainApp extends Application {
 			tabPane.getTabs().add(tab);
 
 			tab.setOnCloseRequest(event -> {
+				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance
+				// TODO: Need to fix keyboard shortcuts, check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?)
 
 				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
-						"Are you sure you want to remove " + tab.getText() + " from your project?", true, mainStage);
+						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
 				if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 					event.consume();
 				} else {
 					tabControllerMap.remove(tab);
 				}
 
+				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 			});
 
