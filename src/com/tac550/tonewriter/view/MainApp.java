@@ -22,6 +22,9 @@ import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -274,10 +277,7 @@ public class MainApp extends Application {
 				16, 16, false, true));
 		addTabButton.setGraphic(addImageView);
 		addTabButton.setStyle("-fx-background-color: transparent");
-		addTabButton.setOnAction(event -> {
-			addTab("Item " + (tabPane.getTabs().size() + 1));
-			tabPane.getSelectionModel().selectLast();
-		});
+		addTabButton.setOnAction(event -> addTab());
 		addTabButton.setTooltip(new Tooltip("Add item"));
 
 		rootPane.getChildren().addAll(tabPane, addTabButton);
@@ -293,13 +293,15 @@ public class MainApp extends Application {
 		// TODO: Unnecessary in JDK 14?
 		scene.addEventFilter(KeyEvent.KEY_PRESSED, e ->
 				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleShortcut(e));
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN),
+				MainApp::addTab);
 
 		mainStage.setScene(scene);
 
-		addTab("Item 1");
+		addTab();
 	}
 
-	static void addTab(String title) {
+	static void addTab() {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
@@ -311,7 +313,7 @@ public class MainApp extends Application {
 			Tab tab = new Tab();
 
 			tab.textProperty().bind(mainController.getTitleTextProperty());
-			mainController.setTitleText(title);
+			mainController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
 
 			tabControllerMap.put(tab, mainController);
 
@@ -328,7 +330,7 @@ public class MainApp extends Application {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to check for tone save if last instance, add shortcut for adding tab (ctrl+shift+N?), fix menu consistency issues (dark mode, etc)
+				// TODO: Need to check for tone save if last instance, fix menu consistency issues (dark mode, etc)
 
 				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
@@ -341,6 +343,8 @@ public class MainApp extends Application {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 			});
+
+			tabPane.getSelectionModel().selectLast();
 
 		} catch (IOException e) {
 			e.printStackTrace();
