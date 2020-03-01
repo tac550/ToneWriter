@@ -653,7 +653,7 @@ public class MainSceneController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, mainStage);
 		} else { // Save successful
 			resetToneEditedStatus();
-			MainApp.toneSaved(toneFile, this);
+			MainApp.refreshToneInstances(toneFile, this);
 		}
 
 	}

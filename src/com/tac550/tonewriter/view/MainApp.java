@@ -161,9 +161,12 @@ public class MainApp extends Application {
 		// Ensure that the process exits when the main window is closed
 		mainStage.setOnCloseRequest(ev -> {
 			for (Tab tab : tabPane.getTabs()) {
-				if (!tabControllerMap.get(tab).checkSave()) {
+				MainSceneController controller = tabControllerMap.get(tab);
+				if (!controller.checkSave()) {
 					ev.consume();
 					break;
+				} else { // "Save" or "Don't Save" selected. Avoids repeat prompts.
+					refreshToneInstances(controller.getToneFile(), controller);
 				}
 			}
 		});
@@ -330,7 +333,7 @@ public class MainApp extends Application {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to check for tone save if last instance, fix menu consistency issues (dark mode, etc)
+				// TODO: Need to fix menu consistency issues (dark mode, etc), and closing save check issues ("first change sticks" if Save selected)
 
 				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
@@ -496,7 +499,7 @@ public class MainApp extends Application {
 	}
 
 	// Notifies other tabs that a tone file was saved to synchronize changes and avoid repeating save requests
-	protected static void toneSaved(File toneFile, MainSceneController caller) {
+	protected static void refreshToneInstances(File toneFile, MainSceneController caller) {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile().equals(toneFile)) {
