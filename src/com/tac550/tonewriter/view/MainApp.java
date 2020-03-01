@@ -189,7 +189,7 @@ public class MainApp extends Application {
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
-			if (openFile.isFile()) tabControllerMap.get(tabPane.getTabs().get(0)).handleOpenTone(new File(params.get(0)));
+			if (openFile.isFile()) tabControllerMap.get(tabPane.getTabs().get(0)).handleOpenTone(new File(params.get(0)), true);
 		}
 	}
 
@@ -491,6 +491,16 @@ public class MainApp extends Application {
 				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
 						"distribution's repositories or locate your copy from the Options menu.", MainApp.APP_NAME), true);
 
+			}
+		}
+	}
+
+	// Notifies other tabs that a tone file was saved to synchronize changes and avoid repeating save requests
+	protected static void toneSaved(File toneFile, MainSceneController caller) {
+		for (Tab tab : tabPane.getTabs()) {
+			MainSceneController controller = tabControllerMap.get(tab);
+			if (controller != caller && controller.getToneFile().equals(toneFile)) {
+				controller.handleOpenTone(toneFile, true);
 			}
 		}
 	}

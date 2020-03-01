@@ -539,7 +539,7 @@ public class MainSceneController {
 
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
-		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
+		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
 		if (toneFile != null && isToneSavable()) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
@@ -624,9 +624,9 @@ public class MainSceneController {
 			loaderTask.setOnSucceeded(event -> handleSave()); // So that the tone is loadable
 		}
 	}
-	void handleOpenTone(File selectedFile) {
+	void handleOpenTone(File selectedFile, boolean auto_load) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if (checkSave() && loadTone(selectedFile)) {
+		if ((auto_load || checkSave()) && loadTone(selectedFile)) {
 			editMenu.setDisable(false);
 			saveToneMenuItem.setDisable(false);
 			saveToneAsMenuItem.setDisable(false);
@@ -642,7 +642,7 @@ public class MainSceneController {
 		refreshAllChordPreviews();
 	}
 	@FXML private void handleOpenTone() {
-		handleOpenTone(null);
+		handleOpenTone(null, false);
 	}
 	@FXML void handleSave() {
 		if (toneFile == null || !isToneSavable()) return;
@@ -653,6 +653,7 @@ public class MainSceneController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, mainStage);
 		} else { // Save successful
 			resetToneEditedStatus();
+			MainApp.toneSaved(toneFile, this);
 		}
 
 	}
@@ -1065,10 +1066,13 @@ public class MainSceneController {
 			updateStageTitle();
 		}
 	}
-
 	private void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
+	}
+
+	protected File getToneFile() {
+		return toneFile;
 	}
 
 	ObservableStringValue getTitleTextProperty() {

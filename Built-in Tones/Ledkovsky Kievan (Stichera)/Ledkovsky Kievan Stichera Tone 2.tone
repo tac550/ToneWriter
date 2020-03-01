@@ -15,9 +15,7 @@ END: a-fs-d-d
 
 B
 1: a-fs-d-d
-	Post: a-fs-c-d
 2: g-d-b,-g
-	Post: b-g-d-g
 	Post: a-d-c-g
 END: a-fs-d-d
 
@@ -28,7 +26,6 @@ C
 	Post: b-g-d-g
 3: a-fs-d-d
 	Post: b-g-d-g
-4: g-d-b,-g
 
 D
 1: g-d-b,-g
