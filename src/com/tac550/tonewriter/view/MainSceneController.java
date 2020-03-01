@@ -602,7 +602,8 @@ public class MainSceneController {
 	}
 
 	void updateStageTitle() {
-		mainStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
+		if (MainApp.isActiveTab(this))
+			mainStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
 	}
 
 	/*
@@ -653,7 +654,7 @@ public class MainSceneController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, mainStage);
 		} else { // Save successful
 			resetToneEditedStatus();
-			MainApp.refreshToneInstances(toneFile, this);
+			MainApp.refreshToneInstances(toneFile, this, false);
 		}
 
 	}
@@ -1066,12 +1067,16 @@ public class MainSceneController {
 			updateStageTitle();
 		}
 	}
-	private void resetToneEditedStatus() {
+	boolean resetToneEditedStatus() {
+		boolean initial = toneEdited;
+
 		toneEdited = false;
 		updateStageTitle();
+
+		return initial;
 	}
 
-	protected File getToneFile() {
+	File getToneFile() {
 		return toneFile;
 	}
 

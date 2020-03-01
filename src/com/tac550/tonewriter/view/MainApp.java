@@ -90,6 +90,8 @@ public class MainApp extends Application {
 	private static final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
 	private static TabPane tabPane;
 
+	private static final ArrayList<MainSceneController> resetStatusIfCloseCanceled = new ArrayList<>();
+
 	public static void main(String[] args) {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
@@ -163,10 +165,15 @@ public class MainApp extends Application {
 			for (Tab tab : tabPane.getTabs()) {
 				MainSceneController controller = tabControllerMap.get(tab);
 				if (!controller.checkSave()) {
+
+					for (MainSceneController controllerToReset : resetStatusIfCloseCanceled) {
+						controllerToReset.toneEdited();
+					}
+
 					ev.consume();
 					break;
 				} else { // "Save" or "Don't Save" selected. Avoids repeat prompts.
-					refreshToneInstances(controller.getToneFile(), controller);
+					refreshToneInstances(controller.getToneFile(), controller, true);
 				}
 			}
 		});
@@ -498,14 +505,24 @@ public class MainApp extends Application {
 		}
 	}
 
-	// Notifies other tabs that a tone file was saved to synchronize changes and avoid repeating save requests
-	protected static void refreshToneInstances(File toneFile, MainSceneController caller) {
+	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
+	protected static void refreshToneInstances(File toneFile, MainSceneController caller, boolean shutdown) {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
-			if (controller != caller && controller.getToneFile().equals(toneFile)) {
-				controller.handleOpenTone(toneFile, true);
+			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
+				if (shutdown) {
+					if (controller.resetToneEditedStatus()) {
+						resetStatusIfCloseCanceled.add(controller);
+					}
+				} else {
+					controller.handleOpenTone(toneFile, true);
+				}
 			}
 		}
+	}
+
+	public static boolean isActiveTab(MainSceneController controller) {
+		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()) == controller;
 	}
 
 }
