@@ -57,13 +57,6 @@
                                  </children>
                               </AnchorPane>
                            </center>
-                           <bottom>
-                              <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <Button onAction="#handleExport" style="-fx-base: #00ff00;" text="_Export PDF" />
-                                 </children>
-                              </HBox>
-                           </bottom>
                         </BorderPane>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
@@ -121,7 +114,7 @@
                                                 </ProgressBar>
                                              </children>
                                           </HBox>
-                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Apply Above _Text" />
+                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="_Apply Above Text" />
                                        </children>
                                     </StackPane>
                                     <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
