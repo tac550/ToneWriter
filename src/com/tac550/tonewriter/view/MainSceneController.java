@@ -13,9 +13,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -24,11 +24,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.robot.Robot;
@@ -46,8 +44,10 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
@@ -540,7 +540,7 @@ public class MainSceneController {
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
 		// The second condition is there to make sure the user can't create a new tone in the built-in tones directory.
-		if (toneFile != null && !saveDisabled()) {
+		if (toneFile != null && isToneSavable()) {
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		} else {
 			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
@@ -632,7 +632,7 @@ public class MainSceneController {
 			saveToneAsMenuItem.setDisable(false);
 			resetToneEditedStatus();
 
-			saveToneMenuItem.setDisable(saveDisabled());
+			saveToneMenuItem.setDisable(!isToneSavable());
 
 			askToOverwriteOutput = false;
 
@@ -645,7 +645,7 @@ public class MainSceneController {
 		handleOpenTone(null);
 	}
 	@FXML void handleSave() {
-		if (toneFile == null || saveDisabled()) return;
+		if (toneFile == null || !isToneSavable()) return;
 
 		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
 				poetText, composerText);
@@ -988,11 +988,7 @@ public class MainSceneController {
 	}
 
 	private boolean builtInToneLoaded() {
-		return toneFile.getAbsolutePath().contains(builtInDir.getAbsolutePath());
-	}
-
-	private boolean saveDisabled() {
-		return builtInToneLoaded() && !MainApp.developerMode;
+		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
 	}
 
 	private boolean getNewRenderFilename() {
