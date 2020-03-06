@@ -355,6 +355,7 @@ public class MainApp extends Application {
 			});
 
 			tabPane.getSelectionModel().selectLast();
+			tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
 
 		} catch (IOException e) {
 			e.printStackTrace();
