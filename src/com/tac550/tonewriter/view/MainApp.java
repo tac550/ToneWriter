@@ -290,7 +290,8 @@ public class MainApp extends Application {
 		addTabButton.setGraphic(addImageView);
 		addTabButton.setStyle("-fx-background-color: transparent");
 		addTabButton.setOnAction(event -> addTab());
-		addTabButton.setTooltip(new Tooltip("Add item"));
+		addTabButton.setTooltip(new Tooltip(String.format(Locale.US,"Add item (%s + T)",
+				OS_NAME.startsWith("mac") ? "\u2318" : "Ctrl")));
 
 		rootPane.getChildren().addAll(tabPane, addTabButton);
 		AnchorPane.setTopAnchor(addTabButton, 3.0);
@@ -305,7 +306,7 @@ public class MainApp extends Application {
 		// TODO: Unnecessary in JDK 14?
 		scene.addEventFilter(KeyEvent.KEY_PRESSED, e ->
 				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleShortcut(e));
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN),
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
 				MainApp::addTab);
 
 		mainStage.setScene(scene);
