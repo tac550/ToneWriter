@@ -27,7 +27,7 @@ public class SyllableText extends Text {
 	private boolean clicked = false;
 	private int nextNoteButtonYPos = 0;
 	
-	Color defaultColor = MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK;
+	Color defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 	private static final Color highlightColor = Color.DARKCYAN;
 	
 	void setParent(VerseLineViewController controller) {
@@ -94,7 +94,7 @@ public class SyllableText extends Text {
 	void clearSelection() {
 		active = true;
 		nextNoteButtonYPos = 0;
-		setColor(MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK);
+		setColor(MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK);
 		
 		associatedChords.clear();
 		associatedButtons.clear();
@@ -144,7 +144,7 @@ public class SyllableText extends Text {
 
 	void refreshStyle() {
 		if (getFill().equals(Color.BLACK) || getFill().equals(Color.WHITE)) {
-			defaultColor = MainApp.darkModeEnabled() ? Color.WHITE : Color.BLACK;
+			defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 			setFill(defaultColor);
 		}
 	}

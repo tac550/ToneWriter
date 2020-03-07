@@ -755,12 +755,6 @@ public class LilyPondWriter {
 	}
 
 	public static void clearAllCachedChordPreviews() {
-		cleanUpTempChordFiles();
-
-		uniqueChordRenders.clear();
-		pendingChordControllers.clear();
-	}
-	private static void cleanUpTempChordFiles() {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		File[] files = tempDir.listFiles();
 		for (File file : Objects.requireNonNull(files)) {
@@ -770,6 +764,9 @@ public class LilyPondWriter {
 				}
 			}
 		}
+
+		uniqueChordRenders.clear();
+		pendingChordControllers.clear();
 	}
 
 	public static File createTempLYChordFile(String toneFileName) {

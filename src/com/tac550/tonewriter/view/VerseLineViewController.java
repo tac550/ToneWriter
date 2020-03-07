@@ -607,7 +607,7 @@ public class VerseLineViewController {
 			text.refreshStyle();
 		}
 
-		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.darkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
+		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
 }

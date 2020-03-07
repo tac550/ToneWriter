@@ -2,7 +2,6 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.util.TWUtils;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;
@@ -193,11 +192,10 @@ public class MainSceneController {
 				MainApp.prefs.putBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, newVal));
 
 		// Dark Mode menu item behavior and initial state
-		darkModeMenuItem.setSelected(MainApp.darkModeEnabled());
-		setDarkModeEnabled(MainApp.darkModeEnabled());
+		darkModeMenuItem.setSelected(MainApp.isDarkModeEnabled());
 		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
 			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
-			setDarkModeEnabled(newVal);
+			MainApp.setDarkModeEnabled(newVal);
 		});
 
 		// Set up behavior for reader verse text completion buttons and fields
@@ -884,7 +882,7 @@ public class MainSceneController {
 	    	chantLineController.setKeySignature(key);
 	    }
 	}
-	private void refreshAllChordPreviews() {
+	void refreshAllChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
 		for (ChantLineViewController chantLineController : chantLineControllers) {
@@ -1047,18 +1045,10 @@ public class MainSceneController {
 		return hoverHighlightMenuItem.isSelected();
 	}
 
-	private void setDarkModeEnabled(boolean value) {
-		MainApp.setDarkMode(value);
-
-		if (value) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
-		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-
+	void refreshVerseTextStyle() {
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			verseLine.refreshTextStyle();
 		}
-
-		LilyPondWriter.clearAllCachedChordPreviews();
-		refreshAllChordPreviews();
 	}
 
 	void toneEdited() {

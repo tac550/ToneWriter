@@ -309,6 +309,8 @@ public class MainApp extends Application {
 		mainStage.setScene(scene);
 
 		addTab();
+
+		setDarkModeEnabled(darkModeEnabled);
 	}
 
 	static void addTab() {
@@ -415,11 +417,23 @@ public class MainApp extends Application {
 		} else return null;
 	}
 
-	public static boolean darkModeEnabled() {
+	public static boolean isDarkModeEnabled() {
 		return darkModeEnabled;
 	}
-	static void setDarkMode(boolean dark_mode) {
+	public static void setDarkModeEnabled(boolean dark_mode) {
 		darkModeEnabled = dark_mode;
+
+		if (dark_mode) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+
+		LilyPondWriter.clearAllCachedChordPreviews();
+
+		for (Tab tab : tabPane.getTabs()) {
+			MainSceneController controller = tabControllerMap.get(tab);
+			controller.refreshVerseTextStyle();
+			controller.refreshAllChordPreviews();
+		}
+
 	}
 
 	private static boolean getSystemDarkMode() {
