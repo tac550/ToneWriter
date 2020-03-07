@@ -290,8 +290,8 @@ public class MainApp extends Application {
 		addTabButton.setGraphic(addImageView);
 		addTabButton.setStyle("-fx-background-color: transparent");
 		addTabButton.setOnAction(event -> addTab());
-		addTabButton.setTooltip(new Tooltip(String.format(Locale.US,"Add item (%s + T)",
-				OS_NAME.startsWith("mac") ? "\u2318" : "Ctrl")));
+		addTabButton.setTooltip(new Tooltip(String.format(Locale.US,"Add item (%s)",
+				OS_NAME.startsWith("mac") ? "\u2318T" : "Ctrl + T")));
 
 		rootPane.getChildren().addAll(tabPane, addTabButton);
 		AnchorPane.setTopAnchor(addTabButton, 3.0);
