@@ -179,11 +179,11 @@ public class MainSceneController {
 			saveLPMenuItem.setDisable(true);
 		}
 
-		// Behavior for "Save LilyPond file" option
+		// Initial state and behavior for "Save LilyPond file" option
+		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
-		// Set initial state for "Save LilyPond file" option and paper size, which may have been saved in preferences.
-		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
+		// Set initial state for paper size, which may have been saved in preferences.
 		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 
 		// Hover Highlight menu item behavior and initial state
