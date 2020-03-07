@@ -164,6 +164,8 @@ public class MainApp extends Application {
 		mainStage.setOnCloseRequest(ev -> {
 			for (Tab tab : tabPane.getTabs()) {
 				MainSceneController controller = tabControllerMap.get(tab);
+				if (!controller.isToneEdited()) continue;
+
 				if (!controller.checkSave()) {
 
 					for (MainSceneController controllerToReset : resetStatusIfCloseCanceled) {
@@ -526,7 +528,8 @@ public class MainApp extends Application {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
 				if (shutdown) {
-					if (controller.resetToneEditedStatus()) {
+					if (controller.isToneEdited()) {
+						controller.resetToneEditedStatus();
 						resetStatusIfCloseCanceled.add(controller);
 					}
 				} else {

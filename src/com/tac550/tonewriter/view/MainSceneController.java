@@ -1057,13 +1057,12 @@ public class MainSceneController {
 			updateStageTitle();
 		}
 	}
-	boolean resetToneEditedStatus() {
-		boolean initial = toneEdited;
-
+	void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
-
-		return initial;
+	}
+	boolean isToneEdited() {
+		return toneEdited;
 	}
 
 	File getToneFile() {
