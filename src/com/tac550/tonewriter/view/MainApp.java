@@ -7,6 +7,8 @@ import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -308,6 +310,8 @@ public class MainApp extends Application {
 				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleShortcut(e));
 		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
 				MainApp::addTab);
+		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
+				() -> closeTab(tabPane.getSelectionModel().getSelectedItem()));
 
 		mainStage.setScene(scene);
 
@@ -316,7 +320,7 @@ public class MainApp extends Application {
 		setDarkModeEnabled(darkModeEnabled);
 	}
 
-	static void addTab() {
+	private static void addTab() {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
@@ -365,6 +369,17 @@ public class MainApp extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void closeTab(Tab tab) {
+		EventHandler<Event> handler = tab.getOnCloseRequest();
+		if (handler != null) {
+			Event event = new Event(null, null, null);
+			handler.handle(event);
+			if (event.isConsumed()) return;
+		}
+
+		tabPane.getTabs().remove(tab);
 	}
 
 	public static boolean lilyPondAvailable() {
