@@ -708,7 +708,8 @@ public class LilyPondWriter {
 	}
 
 	public static void renderChord(String fields, String keySignature, ChantChordController chordView) throws IOException {
-		String chordID = fields.replace("<", "(").replace(">", ")") + "-" + keySignature;
+		String chordID = fields.replace("<", "(").replace(">", ")") + "-"
+				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
 		if (!uniqueChordRenders.containsKey(chordID)) {
 			// First time we're seeing this chord
 			File lilypondFile = LilyPondWriter.createTempLYChordFile(chordID);
