@@ -63,7 +63,7 @@ public class ToneReaderWriter {
 			// Header info
 			printWriter.println("VERSION: " + MainApp.APP_VERSION);
 			printWriter.println("Key Signature: " +
-					keySig.replace("♯", "s").replace("♭", "f"));
+					keySig.replace("\u266F", "s").replace("\u266D", "f"));
 			printWriter.println("Tone: " + poetText);
 			printWriter.println("Composer: " + composerText);
 			printWriter.println("Manually Assign Phrases: " + manualCLAssignmentMenuItem.isSelected());
@@ -162,7 +162,7 @@ public class ToneReaderWriter {
 
 			versionSaved = Float.parseFloat(tryReadingLine(header, 0, "0"));
 			keySig = tryReadingLine(header, 1, "C major")
-					.replace("s", "♯").replace("f", "♭");
+					.replace("s", "\u266F").replace("f", "\u266D");
 			if (versionSaved < 0.6) {
 				composerText = tryReadingLine(header, 2, "");
 			} else {

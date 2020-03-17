@@ -684,39 +684,11 @@ public class MainSceneController {
 		createChantLine(true);
 	}
 	@FXML private void handleSetKeySignature() {
-		List<String> choices = new ArrayList<>();
-		choices.add("C major");
-		choices.add("G major");
-		choices.add("D major");
-		choices.add("A major");
-		choices.add("E major");
-		choices.add("B major");
-		choices.add("F\u266F major");
-		choices.add("C\u266F major");
-		choices.add("F major");
-		choices.add("B\u266Dmajor");
-		choices.add("E\u266Dmajor");
-		choices.add("A\u266Dmajor");
-		choices.add("D\u266Dmajor");
-		choices.add("G\u266Dmajor");
-		choices.add("C\u266Dmajor");
-
-		choices.add("A minor");
-		choices.add("E minor");
-		choices.add("B minor");
-		choices.add("F\u266F minor");
-		choices.add("C\u266F minor");
-		choices.add("G\u266F minor");
-		choices.add("D\u266F minor");
-		choices.add("A\u266F minor");
-		choices.add("D minor");
-		choices.add("G minor");
-		choices.add("C minor");
-		choices.add("F minor");
-		choices.add("B\u266Dminor");
-		choices.add("E\u266Dminor");
-		choices.add("A\u266Dminor");
-
+		List<String> choices = new ArrayList<>(List.of("C major", "G major", "D major", "A major", "E major", "B major",
+				"F\u266F major", "C\u266F major", "F major", "B\u266Dmajor", "E\u266Dmajor", "A\u266Dmajor", "D\u266Dmajor",
+				"G\u266Dmajor", "C\u266Dmajor", "A minor", "E minor", "B minor", "F\u266F minor", "C\u266F minor", "G\u266F minor",
+				"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
+				"A\u266Dminor"));
 
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
