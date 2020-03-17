@@ -680,9 +680,9 @@ public class LilyPondWriter {
 		// Add the key's note letter.
 		keySigString += keySigParts[0].substring(0, 1).toLowerCase();
 		// Add sharp or flat, if any.
-		if (keySigParts[0].contains("♯")) {
+		if (keySigParts[0].contains("\u266F")) {
 			keySigString += "s";
-		} else if (keySigParts[0].contains("♭")) {
+		} else if (keySigParts[0].contains("\u266D")) {
 			keySigString += "f";
 		}
 		// Add " \major" or " \minor".
