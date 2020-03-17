@@ -372,6 +372,8 @@ public class MainApp extends Application {
 	}
 
 	private static void closeTab(Tab tab) {
+		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
+
 		EventHandler<Event> handler = tab.getOnCloseRequest();
 		if (handler != null) {
 			Event event = new Event(null, null, null);
