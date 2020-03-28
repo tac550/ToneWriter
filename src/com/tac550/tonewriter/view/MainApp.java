@@ -283,7 +283,7 @@ public class MainApp extends Application {
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
 			MainSceneController controller = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
-			controller.updateStageTitle();
+			controller.updateMainStageTitle();
 		});
 
 		Button addTabButton = new Button();
@@ -362,6 +362,16 @@ public class MainApp extends Application {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 			});
+
+			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+
+			if (previousTab.getToneFile() != null) {
+				TWUtils.showAlert(AlertType.CONFIRMATION, "New Tab",
+						"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
+						true, mainStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
+							if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
+						});
+			}
 
 			tabPane.getSelectionModel().selectLast();
 			tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();

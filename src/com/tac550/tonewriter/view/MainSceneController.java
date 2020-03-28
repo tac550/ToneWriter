@@ -599,7 +599,7 @@ public class MainSceneController {
 		}
 	}
 
-	void updateStageTitle() {
+	void updateMainStageTitle() {
 		if (MainApp.isActiveTab(this))
 			mainStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
 	}
@@ -1054,12 +1054,12 @@ public class MainSceneController {
 	void toneEdited() {
 		if (!toneEdited && isToneSavable()) {
 			toneEdited = true;
-			updateStageTitle();
+			updateMainStageTitle();
 		}
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
-		updateStageTitle();
+		updateMainStageTitle();
 	}
 	boolean isToneEdited() {
 		return toneEdited;
