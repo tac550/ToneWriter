@@ -158,119 +158,115 @@
       </SplitPane>
    </center>
    <top>
-      <HBox BorderPane.alignment="CENTER">
-         <children>
-            <MenuBar fx:id="menuBar" HBox.hgrow="ALWAYS">
-              <menus>
-                <Menu text="_File">
-                  <items>
-                    <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone...">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator>
-                        </MenuItem>
-                        <MenuItem fx:id="openToneMenuItem" mnemonicParsing="false" onAction="#handleOpenTone" text="Open Tone...">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator>
-                        </MenuItem>
-                        <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator>
-                        </MenuItem>
-                        <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New...">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
-                           </accelerator>
-                        </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="exportPDFMenuItem" mnemonicParsing="false" onAction="#handleExport" text="Export PDF">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator>
-                        </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
-                  </items>
-                </Menu>
-                <Menu fx:id="editMenu" disable="true" text="_Edit">
-                  <items>
-                    <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
-                        <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
-                        <MenuItem fx:id="editHeaderInfoMenuItem" mnemonicParsing="false" onAction="#handleEditHeaderInfo" text="Edit Header Info..." />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
-                  </items>
-                </Menu>
-                  <Menu text="_Tools">
-                    <items>
-                      <MenuItem fx:id="combinePDFsMenuItem" mnemonicParsing="false" onAction="#handleCombinePDFs" text="Combine PDFs..." />
-                    </items>
-                  </Menu>
-                  <Menu text="_Options">
-                     <items>
-                        <CustomMenuItem mnemonicParsing="false" text="Output Separator">
-                           <content>
-                              <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
-                                 <children>
-                                    <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Output" />
-                                    <Line endX="999.0" stroke="#bcbcbc">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </Line>
-                                 </children>
-                              </HBox>
-                           </content>
-                        </CustomMenuItem>
-                        <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File With PDF" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleSetPaperSize" text="Set Paper Size..." />
-                        <CustomMenuItem mnemonicParsing="false" text="LilyPond Separator">
-                           <content>
-                              <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
-                                 <children>
-                                    <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="LilyPond" />
-                                    <Line endX="999.0" stroke="#bcbcbc">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </Line>
-                                 </children>
-                              </HBox>
-                           </content>
-                        </CustomMenuItem>
-                        <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
-                        <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Location (use built-in LilyPond)" />
-                        <CustomMenuItem mnemonicParsing="false" text="Interface Separator">
-                           <content>
-                              <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
-                                 <children>
-                                    <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Interface" />
-                                    <Line endX="999.0" stroke="#bcbcbc">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </Line>
-                                 </children>
-                              </HBox>
-                           </content>
-                        </CustomMenuItem>
-                        <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
-                        <CheckMenuItem fx:id="hoverHighlightMenuItem" mnemonicParsing="false" selected="true" text="Hover Highlighting" />
-                        <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
-                     </items>
-                  </Menu>
-                <Menu text="_Help">
-                  <items>
-                        <MenuItem fx:id="updateMenuitem" mnemonicParsing="false" onAction="#handleUpdateCheck" text="Check for Updates..." />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-         </children>
-      </HBox>
+      <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
+         <menus>
+            <Menu text="_File">
+               <items>
+                  <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="openToneMenuItem" mnemonicParsing="false" onAction="#handleOpenTone" text="Open Tone...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="exportPDFMenuItem" mnemonicParsing="false" onAction="#handleExport" text="Export PDF">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+               </items>
+            </Menu>
+            <Menu fx:id="editMenu" disable="true" text="_Edit">
+               <items>
+                  <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
+                  <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
+                  <MenuItem fx:id="editHeaderInfoMenuItem" mnemonicParsing="false" onAction="#handleEditHeaderInfo" text="Edit Header Info..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
+               </items>
+            </Menu>
+            <Menu text="_Tools">
+               <items>
+                  <MenuItem fx:id="combinePDFsMenuItem" mnemonicParsing="false" onAction="#handleCombinePDFs" text="Combine PDFs..." />
+               </items>
+            </Menu>
+            <Menu text="_Options">
+               <items>
+                  <CustomMenuItem mnemonicParsing="false" text="Output Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Output" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File With PDF" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleSetPaperSize" text="Set Paper Size..." />
+                  <CustomMenuItem mnemonicParsing="false" text="LilyPond Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="LilyPond" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <MenuItem fx:id="setLilyPondLocationItem" mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
+                  <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Location (use built-in LilyPond)" />
+                  <CustomMenuItem mnemonicParsing="false" text="Interface Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Interface" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
+                  <CheckMenuItem fx:id="hoverHighlightMenuItem" mnemonicParsing="false" selected="true" text="Hover Highlighting" />
+                  <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
+               </items>
+            </Menu>
+            <Menu text="_Help">
+               <items>
+                  <MenuItem fx:id="updateMenuitem" mnemonicParsing="false" onAction="#handleUpdateCheck" text="Check for Updates..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
    </top>
 </BorderPane>
