@@ -365,13 +365,11 @@ public class MainApp extends Application {
 
 			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
 
-			if (previousTab.getToneFile() != null) {
-				TWUtils.showAlert(AlertType.CONFIRMATION, "New Tab",
-						"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
-						true, mainStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
-							if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
-						});
-			}
+			if (previousTab.getToneFile() != null) TWUtils.showAlert(AlertType.CONFIRMATION, "New Tab",
+					"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
+					true, mainStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
+						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
+					});
 
 			tabPane.getSelectionModel().selectLast();
 			tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
