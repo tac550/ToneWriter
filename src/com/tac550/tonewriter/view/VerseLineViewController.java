@@ -447,13 +447,21 @@ public class VerseLineViewController {
 
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == lastSyllable) { // If placing the final instance of the last chord in the chant line, make it a half note.
-				noteButton = createNoteButton(currentText, true, currentChord);
+				if (parentController.isLastVerseLine(this)) {
+					noteButton = createNoteButton(currentText, true, true, currentChord);
 
-				undoFrame.buttons.add(noteButton);
-				currentText.select(currentChord, noteButton);
-				currentText.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
+					undoFrame.buttons.add(noteButton);
+					currentText.select(currentChord, noteButton);
+					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
+				} else {
+					noteButton = createNoteButton(currentText, true, false, currentChord);
+
+					undoFrame.buttons.add(noteButton);
+					currentText.select(currentChord, noteButton);
+					currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
+				}
 			} else {
-				noteButton = createNoteButton(currentText, false, currentChord);
+				noteButton = createNoteButton(currentText, false, false, currentChord);
 
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
@@ -467,7 +475,7 @@ public class VerseLineViewController {
 		undoActions.push(undoFrame);
 	}
 
-	private Button createNoteButton(SyllableText syllable, boolean finalNote, ChantChordController chord) {
+	private Button createNoteButton(SyllableText syllable, boolean lineEnd, boolean verseEnd, ChantChordController chord) {
 		Button noteButton = new Button(currentChord.getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(currentChord.getColor())));
 		chordButtonPane.getChildren().add(noteButton);
@@ -487,10 +495,11 @@ public class VerseLineViewController {
 		CheckMenuItem wholeNote = new CheckMenuItem("whole note");
 
 		// Set initial selection
-		if (finalNote) {
+		if (verseEnd) {
 			wholeNote.setSelected(true);
-		}
-		else quarterNote.setSelected(true);
+		} else if (lineEnd) {
+			halfNote.setSelected(true);
+		} else quarterNote.setSelected(true);
 
 		// Right click functionality plays chord associated with button
 		noteButton.setOnMouseClicked(e -> {

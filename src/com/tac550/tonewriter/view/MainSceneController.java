@@ -425,6 +425,10 @@ public class MainSceneController {
 
 	}
 
+	boolean isLastVerseLine(VerseLineViewController line) {
+		return (verseLineControllers.indexOf(line) == verseLineControllers.size() - 1);
+	}
+
 	public void clearChantLines() {
 		chantLineControllers.clear();
 		chantLineBox.getChildren().clear();
