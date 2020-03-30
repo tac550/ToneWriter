@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 
 public class MainApp extends Application {
@@ -323,9 +324,28 @@ public class MainApp extends Application {
 	private static boolean getSystemDarkMode() {
 		if (OS_NAME.startsWith("win")) {
 
-			// TODO: Not sure how to determine light/dark theme on Windows
+			try {
+				Process process = Runtime.getRuntime().exec(
+						"reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize /v AppsUseLightTheme");
 
-			return false;
+				AtomicReference<Character> r = new AtomicReference<>();
+				Thread reader = new Thread(() -> {
+					try {
+						int c;
+						while ((c = process.getInputStream().read()) != -1) {
+							if (!Character.isWhitespace((char) c)) r.set((char) c);
+						}
+					} catch (IOException ignored) {}
+				});
+
+				reader.start();
+				process.waitFor();
+				reader.join();
+				return Integer.parseInt(String.valueOf(r.get())) == 0;
+
+			} catch (IOException | InterruptedException | NumberFormatException e) {
+				return false;
+			}
 		} if (OS_NAME.startsWith("mac")) {
 			try {
 				// checking for exit status only.
