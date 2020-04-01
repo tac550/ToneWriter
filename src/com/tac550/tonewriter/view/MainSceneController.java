@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
+import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
@@ -17,9 +18,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -29,7 +27,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.robot.Robot;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -71,34 +68,10 @@ Hear me O Lord!
 
 public class MainSceneController {
 
-	private Stage mainStage;
+	private Stage parentStage;
+	private TopSceneController topSceneController; // TODO: Trace references here
 
-	@FXML private MenuBar menuBar;
-
-	@FXML private MenuItem newToneMenuItem;
-	@FXML private MenuItem openToneMenuItem;
-	@FXML private MenuItem saveToneMenuItem;
-	@FXML private MenuItem saveToneAsMenuItem;
-	@FXML private MenuItem exportPDFMenuItem;
-	@FXML private MenuItem exitMenuItem;
-
-	@FXML private MenuItem addCLMenuItem;
-	@FXML private MenuItem setKeyMenuItem;
-	@FXML private MenuItem editHeaderInfoMenuItem;
-
-	@FXML private Menu editMenu;
-	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
-	@FXML private CheckMenuItem playMidiMenuItem;
-	@FXML private CheckMenuItem hoverHighlightMenuItem;
-	@FXML private CheckMenuItem saveLPMenuItem;
-	@FXML private MenuItem setLilyPondLocationItem;
-	@FXML private MenuItem resetLilyPondLocationItem;
-	@FXML private CheckMenuItem darkModeMenuItem;
-
-	@FXML private MenuItem combinePDFsMenuItem;
-
-	@FXML private MenuItem aboutMenuItem;
-	@FXML private MenuItem updateMenuitem;
+	private MenuState menuState = new MenuState();
 
 	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
@@ -116,15 +89,11 @@ public class MainSceneController {
 
 	private Robot robot = new Robot();
 
-	private static final String composerIconPath = "/media/profile.png";
-	private static final String keyIconPath = "/media/key.png";
-
 	private File toneFile;
 
 	private String currentKey = "C major";
 	private String poetText = "";
 	private String composerText = "";
-	private String paperSize = "";
 
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
@@ -134,7 +103,6 @@ public class MainSceneController {
 	private boolean toneEdited = false;
 	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
-	private File currentSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
@@ -148,55 +116,6 @@ public class MainSceneController {
 	private boolean setVerseCancelled = false;
 
 	@FXML private void initialize() {
-
-		// Menu icons
-		setMenuIcon(newToneMenuItem, "/media/file-text.png");
-		setMenuIcon(openToneMenuItem, "/media/folder.png");
-		setMenuIcon(saveToneMenuItem, "/media/floppy.png");
-		setMenuIcon(saveToneAsMenuItem, "/media/floppy-add.png");
-		setMenuIcon(exitMenuItem, "/media/sign-error.png");
-		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
-		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
-		setMenuIcon(addCLMenuItem, "/media/sign-add.png");
-		setMenuIcon(setKeyMenuItem, keyIconPath);
-		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
-		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
-		setMenuIcon(combinePDFsMenuItem, "/media/file-pdf.png");
-		setMenuIcon(updateMenuitem, "/media/cloud-sync.png");
-
-		// Modify LilyPond location editing menu items on Mac
-		if (MainApp.OS_NAME.startsWith("mac")) {
-			setLilyPondLocationItem.setText("Locate LilyPond.app");
-		} if (MainApp.OS_NAME.startsWith("lin")) {
-			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
-		}
-
-		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
-		if (!MainApp.lilyPondAvailable()) {
-			playMidiMenuItem.setSelected(false);
-			playMidiMenuItem.setDisable(true);
-			saveLPMenuItem.setSelected(true);
-			saveLPMenuItem.setDisable(true);
-		}
-
-		// Initial state and behavior for "Save LilyPond file" option
-		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
-		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
-		// Set initial state for paper size, which may have been saved in preferences.
-		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
-
-		// Hover Highlight menu item behavior and initial state
-		hoverHighlightMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, true));
-		hoverHighlightMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, newVal));
-
-		// Dark Mode menu item behavior and initial state
-		darkModeMenuItem.setSelected(MainApp.isDarkModeEnabled());
-		darkModeMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
-			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
-			MainApp.setDarkModeEnabled(newVal);
-		});
 
 		// Set up behavior for reader verse text completion buttons and fields
 		verseTopButton.setOnAction((ae) -> showQuickVerseStage(verseTopField));
@@ -249,16 +168,9 @@ public class MainSceneController {
 
 	}
 
-	private void setMenuIcon(MenuItem menu_item, String imagePath) {
-		ImageView saveIcon = new ImageView(getClass().getResource(imagePath).toExternalForm());
-		double menuIconSize = 30;
-		saveIcon.setFitHeight(menuIconSize);
-		saveIcon.setFitWidth(menuIconSize);
-		menu_item.setGraphic(saveIcon);
-	}
-
-	void setStage(Stage stage) {
-		mainStage = stage;
+	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
+		parentStage = stage;
+		topSceneController = top_scene;
 	}
 
 	String getCurrentKey() {
@@ -274,17 +186,11 @@ public class MainSceneController {
 		composerText = composer;
 	}
 
-	private void setPaperSize(String size) {
-		paperSize = size;
-
-		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
-	}
-
 	private Task<FXMLLoader> createVerseLine(String line) {
 
 		return FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
-			controller.setParentController(this);
+			controller.setParentControllers(this, topSceneController);
 
 			controller.setVerseLine(line);
 
@@ -359,7 +265,7 @@ public class MainSceneController {
 		if (toneFile == null) return; // No tone is loaded; don't do anything
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
-		if (manualCLAssignmentMenuItem.isSelected()) {
+		if (manualCLAssignmentEnabled()) {
 
 			for (VerseLineViewController verseLine : verseLineControllers) {
 				// Default last chant line selection to Cadence line.
@@ -457,7 +363,7 @@ public class MainSceneController {
 			@Override
 			protected Void call() {
 
-				String[] lines = Syllables.getSyllabificationLines(verseArea.getText(), mainStage);
+				String[] lines = Syllables.getSyllabificationLines(verseArea.getText(), parentStage);
 
 				if (setVerseCancelled) {
 					setVerseCancelled = false;
@@ -518,7 +424,7 @@ public class MainSceneController {
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
-				"Do you want to save tone \"" + toneFile.getName() + "\"?", true, mainStage,
+				"Do you want to save tone \"" + toneFile.getName() + "\"?", true, parentStage,
 				new ButtonType[] {saveButton, dontSaveButton, cancelButton});
 
 		if (result.isPresent()) {
@@ -544,19 +450,20 @@ public class MainSceneController {
 			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
 		}
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-		File saveFile = fileChooser.showSaveDialog(mainStage);
+		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return false;
 
 		if (ToneReaderWriter.createToneFile(saveFile)) {
 			toneFile = saveFile;
 
-			saveToneMenuItem.setDisable(false);
+			menuState.saveToneMenuItemDisabled = false;
+			topSceneController.setMenuState(menuState);
 
 			return true;
 		} else {
 
 			TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while creating the tone!",
-					true, mainStage);
+					true, parentStage);
 
 			return false;
 		}
@@ -575,49 +482,53 @@ public class MainSceneController {
 				}
 			}
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-			selectedFile = fileChooser.showOpenDialog(mainStage);
+			selectedFile = fileChooser.showOpenDialog(parentStage);
 		}
 		if (selectedFile == null) return false;
 
 		if (selectedFile.exists()) {
 			toneFile = selectedFile;
 
-			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem);
+			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, this);
 
 			if (toneReader.loadTone(this, toneFile)) {
 				return true;
 			} else {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, mainStage);
+				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
 				return false;
 			}
 
 		} else {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, mainStage);
+			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, parentStage);
 			return false;
 		}
 	}
 
-	void updateMainStageTitle() {
-		if (MainApp.isActiveTab(this))
-			mainStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
+	void updateTopLevelInfo() {
+		if (topSceneController.isActiveTab(this)) {
+			// Update stage title to show loaded tone name and edit status
+			parentStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
+
+			topSceneController.setMenuState(menuState);
+		}
 	}
 
 	/*
 	 * File Menu Actions
 	 */
-	@FXML void handleNewTone() {
+	void handleNewTone() {
 		if (checkSave() && createNewTone()) {
 			clearChantLines();
-			editMenu.setDisable(false);
-			saveToneAsMenuItem.setDisable(false);
+			menuState.editMenuDisabled = false;
+			menuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
 			poetText = "";
 			composerText = "";
 			currentKey = "C major";
-			manualCLAssignmentMenuItem.setSelected(false);
+			menuState.manualCLAssignmentSelected = false;
 
 			Task<FXMLLoader> loaderTask = createChantLine(true);
 			loaderTask.setOnSucceeded(event -> handleSave()); // So that the tone is loadable
@@ -626,52 +537,75 @@ public class MainSceneController {
 	void handleOpenTone(File selectedFile, boolean auto_load) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((auto_load || checkSave()) && loadTone(selectedFile)) {
-			editMenu.setDisable(false);
-			saveToneMenuItem.setDisable(false);
-			saveToneAsMenuItem.setDisable(false);
+			menuState.editMenuDisabled = false;
+			menuState.saveToneMenuItemDisabled = false;
+			menuState.saveToneAsMenuItemDisabled = false;
+			menuState.saveToneMenuItemDisabled = !isToneSavable();
+
 			resetToneEditedStatus();
 
-			saveToneMenuItem.setDisable(!isToneSavable());
-
 			askToOverwriteOutput = false;
-
 		}
 
 		LoadingTone = false;
 		refreshAllChordPreviews();
 	}
-	@FXML private void handleOpenTone() {
-		handleOpenTone(null, false);
-	}
-	@FXML void handleSave() {
+	void handleSave() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, manualCLAssignmentMenuItem, currentKey,
+		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, currentKey,
 				poetText, composerText);
 		if (!toneWriter.saveTone(toneFile)) {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, mainStage);
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
 			resetToneEditedStatus();
-			MainApp.refreshToneInstances(toneFile, this, false);
+			topSceneController.refreshToneInstances(toneFile, this, false);
 		}
 
 	}
-	@FXML private void handleSaveAs() {
+	void handleSaveAs() {
 		if (createNewTone()) handleSave();
 	}
-	@FXML private void handleExit() {
-		if (checkSave()) {
-			Platform.exit();
+	void handleExport() {
+
+		if (askToOverwriteOutput) {
+			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Overwrite",
+					"Do you want to overwrite the previous output? (Choose cancel to create a new file)", true,
+					parentStage);
+			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+				if (!getNewRenderFilename()) return;
+			} else if (!deletePreviousRender()) {
+				TWUtils.showAlert(AlertType.ERROR, "Error",
+						"An error occurred while overwriting the previous files, attempting to output anyway...",
+						true, parentStage);
+			}
+		} else {
+			if (getNewRenderFilename()) {
+				askToOverwriteOutput = true;
+			} else {
+				return;
+			}
 		}
+
+		try {
+			if (!LilyPondWriter.writeToLilypond(topSceneController.currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
+					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
+					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), topSceneController.paperSize)) {
+				TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while saving!",
+						true, parentStage);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
+					true, parentStage);
+		}
+
 	}
 
 	/*
 	 * Edit Menu Actions
 	 */
-	@FXML private void handleCreateChantLine() {
-		createChantLine(true);
-	}
-	@FXML private void handleSetKeySignature() {
+	void handleSetKeySignature() {
 		List<String> choices = new ArrayList<>();
 		choices.add("C major");
 		choices.add("G major");
@@ -709,11 +643,11 @@ public class MainSceneController {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
-		ImageView keyIcon = new ImageView(getClass().getResource(keyIconPath).toExternalForm());
+		ImageView keyIcon = new ImageView(getClass().getResource(TopSceneController.keyIconPath).toExternalForm());
 		keyIcon.setFitHeight(50);
 		keyIcon.setFitWidth(50);
 		dialog.setGraphic(keyIcon);
-		dialog.initOwner(mainStage);
+		dialog.initOwner(parentStage);
 		Optional<String> result = dialog.showAndWait();
 
 		result.ifPresent(key -> {
@@ -721,17 +655,17 @@ public class MainSceneController {
 			setCurrentKey(key);
 		});
 	}
-	@FXML private void handleEditHeaderInfo() {
+	void handleEditHeaderInfo() {
 
 		new Thread(() -> Platform.runLater(() -> {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
 			dialog.setHeaderText("Input header info for first page");
-			ImageView composerIcon = new ImageView(getClass().getResource(composerIconPath).toExternalForm());
+			ImageView composerIcon = new ImageView(getClass().getResource(TopSceneController.composerIconPath).toExternalForm());
 			composerIcon.setFitHeight(50);
 			composerIcon.setFitWidth(50);
 			dialog.setGraphic(composerIcon);
-			dialog.initOwner(mainStage);
+			dialog.initOwner(parentStage);
 
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -771,110 +705,16 @@ public class MainSceneController {
 		})).start();
 
 	}
-	@FXML private void handleToggleManualCLAssignment() {
+	void handleToggleManualCLAssignment() {
 		toneEdited();
 		syncCVLMapping();
 	}
-
-	/*
-	 * Tools Menu Actions
-	 */
-	@FXML private void handleCombinePDFs() {
-
-		FXMLLoaderIO.loadFXMLLayoutAsync("pdfCombineView.fxml", loader -> {
-			BorderPane rootLayout = loader.getRoot();
-			PDFCombineViewController controller = loader.getController();
-			controller.setDefaultDirectory(currentSavingDirectory);
-
-			Platform.runLater(() -> {
-				Stage pdfStage = new Stage();
-				pdfStage.setTitle("Combine PDFs");
-				pdfStage.getIcons().add(MainApp.APP_ICON);
-				pdfStage.setScene(new Scene(rootLayout));
-				pdfStage.setResizable(false);
-				pdfStage.show();
-			});
-		});
-
+	public boolean manualCLAssignmentEnabled() {
+		return topSceneController.manualCLAssignmentEnabled();
 	}
-
-	/*
-	 * Options Menu Actions
-	 */
-	@FXML private void handleSetLilyPondDir() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
-		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, MainApp.getPlatformSpecificRootDir())));
-		File savingDirectory = directoryChooser.showDialog(mainStage);
-		if (savingDirectory == null) return;
-
-		String previousLocation = MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, null);
-		MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
-		if (new File(savingDirectory.getAbsolutePath() + File.separator + MainApp.getPlatformSpecificLPExecutable()).exists()) {
-			TWUtils.showAlert(AlertType.INFORMATION, "Restart",
-					String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true, mainStage);
-		} else {
-			if (previousLocation == null) {
-				MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
-			} else {
-				MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, previousLocation);
-			}
-
-			TWUtils.showAlert(AlertType.ERROR, "Error",
-					"That directory does not contain a valid LilyPond executable.", true, mainStage);
-
-		}
-
-	}
-	@FXML private void handleResetLilyPondDir() {
-		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
-		TWUtils.showAlert(AlertType.INFORMATION, "Restart",
-				String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true,
-				mainStage);
-	}
-	@FXML private void handleSetPaperSize() {
-		List<String> choices = new ArrayList<>();
-
-		choices.add("a4 (210 x 297 mm)");
-		choices.add("junior-legal (8.0 x 5.0 in)");
-		choices.add("legal (8.5 x 14.0 in)");
-		choices.add("ledger (17.0 x 11.0 in)");
-		choices.add("letter (8.5 x 11.0 in)");
-		choices.add("tabloid (11.0 x 17.0 in)");
-		choices.add("11x17 (11.0 x 17.0 in)");
-		choices.add("17x11 (17.0 x 11.0 in)");
-
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
-		dialog.setTitle("Paper sizes");
-		dialog.setHeaderText("Choose a paper size");
-		dialog.initOwner(mainStage);
-		Optional<String> result = dialog.showAndWait();
-
-		result.ifPresent(this::setPaperSize);
-	}
-
-	/*
-	 * Help Menu Actions
-	 */
-	@FXML private void handleAbout() {
-		FXMLLoaderIO.loadFXMLLayoutAsync("AboutScene.fxml", loader -> {
-			BorderPane aboutLayout = loader.getRoot();
-
-			Platform.runLater(() -> {
-				Stage aboutStage = new Stage();
-				aboutStage.setScene(new Scene(aboutLayout));
-
-				aboutStage.setTitle("About " + MainApp.APP_NAME);
-				aboutStage.setResizable(false);
-				aboutStage.initOwner(mainStage);
-				aboutStage.initModality(Modality.APPLICATION_MODAL);
-				aboutStage.getIcons().add(MainApp.APP_ICON);
-				aboutStage.show();
-			});
-		});
-	}
-	@FXML private void handleUpdateCheck() {
-		AutoUpdater.updateCheck(mainStage, false);
+	public void setManualCLAssignmentSilently(boolean enable) { // Doesn't trigger tone edited status
+		menuState.manualCLAssignmentSelected = enable;
+		topSceneController.setMenuState(menuState);
 	}
 
 	private void refreshChordKeySignatures(String key) {
@@ -951,42 +791,6 @@ public class MainSceneController {
 		}
 	}
 
-	@FXML private void handleExport() {
-
-		if (askToOverwriteOutput) {
-			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Overwrite",
-					"Do you want to overwrite the previous output? (Choose cancel to create a new file)", true,
-					mainStage);
-			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-				if (!getNewRenderFilename()) return;
-			} else if (!deletePreviousRender()) {
-				TWUtils.showAlert(AlertType.ERROR, "Error",
-						"An error occurred while overwriting the previous files, attempting to output anyway...",
-						true, mainStage);
-			}
-		} else {
-			if (getNewRenderFilename()) {
-				askToOverwriteOutput = true;
-			} else {
-				return;
-			}
-		}
-
-		try {
-			if (!LilyPondWriter.writeToLilypond(currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
-					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), paperSize)) {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while saving!",
-						true, mainStage);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
-					true, mainStage);
-		}
-
-	}
-
 	private boolean builtInToneLoaded() {
 		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
 	}
@@ -994,12 +798,12 @@ public class MainSceneController {
 	private boolean getNewRenderFilename() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(titleTextField.getText());
-		fileChooser.setInitialDirectory(currentSavingDirectory);
+		fileChooser.setInitialDirectory(topSceneController.currentSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
-		File PDFFile = fileChooser.showSaveDialog(mainStage);
+		File PDFFile = fileChooser.showSaveDialog(parentStage);
 		if (PDFFile == null) return false;
-		else currentSavingDirectory = PDFFile.getParentFile();
+		else topSceneController.currentSavingDirectory = PDFFile.getParentFile();
 
 		currentRenderFileName = FilenameUtils.removeExtension(PDFFile.getName());
 
@@ -1007,9 +811,8 @@ public class MainSceneController {
 	}
 
 	private boolean deletePreviousRender() {
-		File lyFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
-		File pdfFile = new File(currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
-
+		File lyFile = new File(topSceneController.currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
+		File pdfFile = new File(topSceneController.currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
 
         return pdfFile.delete() || lyFile.delete();
 	}
@@ -1029,20 +832,13 @@ public class MainSceneController {
 				syllableStage.setScene(new Scene(rootLayout));
 				syllableStage.initModality(Modality.APPLICATION_MODAL);
 				syllableStage.setResizable(false);
-				syllableStage.initOwner(mainStage);
+				syllableStage.initOwner(parentStage);
 				syllableStage.show();
 
 				controller.focusFilterField();
 			});
 		});
 
-	}
-
-	boolean playMidiAsAssigned() {
-		return playMidiMenuItem.isSelected();
-	}
-	boolean hoverHighlightEnabled() {
-		return hoverHighlightMenuItem.isSelected();
 	}
 
 	void refreshVerseTextStyle() {
@@ -1054,12 +850,12 @@ public class MainSceneController {
 	void toneEdited() {
 		if (!toneEdited && isToneSavable()) {
 			toneEdited = true;
-			updateMainStageTitle();
+			updateTopLevelInfo();
 		}
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
-		updateMainStageTitle();
+		updateTopLevelInfo();
 	}
 	boolean isToneEdited() {
 		return toneEdited;
@@ -1074,17 +870,6 @@ public class MainSceneController {
 	}
 	void setTitleText(String title) {
 		titleTextField.setText(title);
-	}
-
-	void handleShortcut(KeyEvent e) {
-		for (Menu menu : menuBar.getMenus()) {
-			for (MenuItem item : menu.getItems()) {
-				if (item.getAccelerator() != null && item.getAccelerator().match(e)) {
-					item.fire();
-					e.consume();
-				}
-			}
-		}
 	}
 
 }

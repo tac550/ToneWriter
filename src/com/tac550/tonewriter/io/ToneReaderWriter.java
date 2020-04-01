@@ -8,7 +8,6 @@ import com.tac550.tonewriter.view.MainSceneController;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.CheckMenuItem;
 import org.apache.commons.text.TextStringBuilder;
 
 import java.io.File;
@@ -30,21 +29,21 @@ public class ToneReaderWriter {
 	private String poetText;
 	private String composerText;
 	private String keySig;
-	private CheckMenuItem manualCLAssignmentMenuItem;
+	private MainSceneController associatedMainScene;
 
 	private MainSceneController mainScene;
 
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment,
+	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, MainSceneController main_scene,
 	                        String key, String poet, String composer) {
 		chantLines = lines;
-		manualCLAssignmentMenuItem = manual_assignment;
+		associatedMainScene = main_scene;
 		keySig = key;
 		poetText = poet;
 		composerText = composer;
 	}
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, CheckMenuItem manual_assignment) {
+	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, MainSceneController main_scene) {
 		chantLines = lines;
-		manualCLAssignmentMenuItem = manual_assignment;
+		associatedMainScene = main_scene;
 	}
 
 	public boolean saveTone(File toneFile) {
@@ -66,7 +65,7 @@ public class ToneReaderWriter {
 					keySig.replace("♯", "s").replace("♭", "f"));
 			printWriter.println("Tone: " + poetText);
 			printWriter.println("Composer: " + composerText);
-			printWriter.println("Manually Assign Phrases: " + manualCLAssignmentMenuItem.isSelected());
+			printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
 			printWriter.println();
 			printWriter.println();
 
@@ -169,7 +168,7 @@ public class ToneReaderWriter {
 				poetText = tryReadingLine(header, 2, "");
 				composerText = tryReadingLine(header, 3, "");
 			}
-			manualCLAssignmentMenuItem.setSelected(
+			associatedMainScene.setManualCLAssignmentSilently(
 					Boolean.parseBoolean(tryReadingLine(header, versionSaved < 0.6 ? 3 : 4, "false")));
 
 			if (footer != null) {

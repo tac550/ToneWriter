@@ -6,20 +6,12 @@ import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -27,8 +19,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -43,7 +33,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
 
@@ -89,10 +80,7 @@ public class MainApp extends Application {
 
 	// Fields for main stage, controller, and main tab pane.
 	private static Stage mainStage;
-	private static final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
-	private static TabPane tabPane;
-
-	private static final ArrayList<MainSceneController> resetStatusIfCloseCanceled = new ArrayList<>();
+	private static TopSceneController topSceneController;
 
 	public static void main(String[] args) {
 
@@ -163,24 +151,7 @@ public class MainApp extends Application {
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest(ev -> {
-			for (Tab tab : tabPane.getTabs()) {
-				MainSceneController controller = tabControllerMap.get(tab);
-				if (!controller.isToneEdited()) continue;
-
-				if (!controller.checkSave()) {
-
-					for (MainSceneController controllerToReset : resetStatusIfCloseCanceled) {
-						controllerToReset.toneEdited();
-					}
-
-					ev.consume();
-					break;
-				} else { // "Save" or "Don't Save" selected. Avoids repeat prompts.
-					refreshToneInstances(controller.getToneFile(), controller, true);
-				}
-			}
-		});
+		mainStage.setOnCloseRequest(ev -> topSceneController.requestExit(ev));
 
 		// Show the stage (required for the next operation to work)
 		mainStage.show();
@@ -203,7 +174,7 @@ public class MainApp extends Application {
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
-			if (openFile.isFile()) tabControllerMap.get(tabPane.getTabs().get(0)).handleOpenTone(new File(params.get(0)), true);
+			if (openFile.isFile()) topSceneController.openParameterTone(openFile);
 		}
 	}
 
@@ -271,125 +242,30 @@ public class MainApp extends Application {
 
 	private void loadMainLayout() {
 
-		AnchorPane rootPane = new AnchorPane();
-		tabPane = new TabPane();
-		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
-		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
-			if (tabPane.getTabs().size() == 1) {
-				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-			} else {
-				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-			}
-		});
-		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
-			MainSceneController controller = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
-			controller.updateMainStageTitle();
-		});
-
-		Button addTabButton = new Button();
-		ImageView addImageView = new ImageView(new Image(getClass().getResource("/media/sign-add.png").toExternalForm(),
-				16, 16, false, true));
-		addTabButton.setGraphic(addImageView);
-		addTabButton.setStyle("-fx-background-color: transparent");
-		addTabButton.setOnAction(event -> addTab());
-		addTabButton.setTooltip(new Tooltip(String.format(Locale.US,"Add item (%s)",
-				OS_NAME.startsWith("mac") ? "\u2318T" : "Ctrl + T")));
-
-		rootPane.getChildren().addAll(tabPane, addTabButton);
-		AnchorPane.setTopAnchor(addTabButton, 3.0);
-		AnchorPane.setRightAnchor(addTabButton, 15.0);
-		AnchorPane.setTopAnchor(tabPane, 0d);
-		AnchorPane.setRightAnchor(tabPane, 0d);
-		AnchorPane.setLeftAnchor(tabPane, 0d);
-		AnchorPane.setBottomAnchor(tabPane, 0d);
-
-		Scene scene = new Scene(rootPane);
-		// Allows for keyboard shortcuts to be directed to the correct (currently-selected) tab.
-		// TODO: Unnecessary in JDK 14?
-		scene.addEventFilter(KeyEvent.KEY_PRESSED, e ->
-				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleShortcut(e));
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
-				MainApp::addTab);
-		scene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
-				() -> closeTab(tabPane.getSelectionModel().getSelectedItem()));
-
-		mainStage.setScene(scene);
-
-		addTab();
-
-		setDarkModeEnabled(darkModeEnabled);
-	}
-
-	private static void addTab() {
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
-			BorderPane mainLayout = loader.load();
-			MainSceneController mainController = loader.getController();
-			mainController.setStage(mainStage);
+			loader.setLocation(MainApp.class.getResource("TopScene.fxml"));
+			BorderPane rootPane = loader.load();
+			topSceneController = loader.getController();
+			topSceneController.setParentStage(mainStage);
 
-			Tab tab = new Tab();
+			Scene mainScene = new Scene(rootPane);
+			mainStage.setScene(mainScene);
 
-			tab.textProperty().bind(mainController.getTitleTextProperty());
-			mainController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
-
-			tabControllerMap.put(tab, mainController);
-
-			AnchorPane anchorPane = new AnchorPane();
-			anchorPane.getChildren().add(mainLayout);
-			AnchorPane.setTopAnchor(mainLayout, 0d);
-			AnchorPane.setBottomAnchor(mainLayout, 0d);
-			AnchorPane.setLeftAnchor(mainLayout, 0d);
-			AnchorPane.setRightAnchor(mainLayout, 0d);
-
-			tab.setContent(anchorPane);
-			tabPane.getTabs().add(tab);
-
-			tab.setOnCloseRequest(event -> {
-				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
-				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix menu consistency issues (dark mode, etc), and closing save check issues ("first change sticks" if Save selected)
-
-				Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Deleting Item",
-						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, mainStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-					event.consume();
-				} else {
-					tabControllerMap.remove(tab);
-				}
-
-				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
-				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
-			});
-
-			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
-
-			if (previousTab.getToneFile() != null) TWUtils.showAlert(AlertType.CONFIRMATION, "New Tab",
-					"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
-					true, mainStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
-						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
-					});
-
-			tabPane.getSelectionModel().selectLast();
-			tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
+			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
+					topSceneController::addTab);
+			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
+					() -> topSceneController.closeSelectedTab());
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private static void closeTab(Tab tab) {
-		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
-
-		EventHandler<Event> handler = tab.getOnCloseRequest();
-		if (handler != null) {
-			Event event = new Event(null, null, null);
-			handler.handle(event);
-			if (event.isConsumed()) return;
+			TWUtils.showAlert(AlertType.ERROR, "Error",
+					"Error loading main UI layout. Exiting application.", true);
+			Platform.exit();
 		}
 
-		tabPane.getTabs().remove(tab);
+		setDarkModeEnabled(darkModeEnabled);
 	}
 
 	public static boolean lilyPondAvailable() {
@@ -456,11 +332,7 @@ public class MainApp extends Application {
 
 		LilyPondWriter.clearAllCachedChordPreviews();
 
-		for (Tab tab : tabPane.getTabs()) {
-			MainSceneController controller = tabControllerMap.get(tab);
-			controller.refreshVerseTextStyle();
-			controller.refreshAllChordPreviews();
-		}
+		topSceneController.propagateDarkModeSetting();
 
 	}
 
@@ -546,27 +418,6 @@ public class MainApp extends Application {
 
 			}
 		}
-	}
-
-	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
-	protected static void refreshToneInstances(File toneFile, MainSceneController caller, boolean shutdown) {
-		for (Tab tab : tabPane.getTabs()) {
-			MainSceneController controller = tabControllerMap.get(tab);
-			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
-				if (shutdown) {
-					if (controller.isToneEdited()) {
-						controller.resetToneEditedStatus();
-						resetStatusIfCloseCanceled.add(controller);
-					}
-				} else {
-					controller.handleOpenTone(toneFile, true);
-				}
-			}
-		}
-	}
-
-	public static boolean isActiveTab(MainSceneController controller) {
-		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()) == controller;
 	}
 
 }

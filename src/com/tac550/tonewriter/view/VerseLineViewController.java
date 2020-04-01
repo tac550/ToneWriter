@@ -33,6 +33,7 @@ import java.util.Stack;
 public class VerseLineViewController {
 
 	private MainSceneController parentController;
+	private TopSceneController topSceneController;
 
 	private VerseLine verseLine;
 
@@ -148,8 +149,9 @@ public class VerseLineViewController {
 		rootPane.requestLayout();
 	}
 
-	void setParentController(MainSceneController parent) {
+	void setParentControllers(MainSceneController parent, TopSceneController top_controller) {
 		parentController = parent;
+		topSceneController = top_controller;
 	}
 
 	void setVerseLine(String line_text) {
@@ -354,7 +356,7 @@ public class VerseLineViewController {
 
 	void syllableHovered() {
 		if (currentChord == null) return;
-		if (parentController.hoverHighlightEnabled()) {
+		if (topSceneController.hoverHighlightEnabled()) {
 			currentChord.setHighlighted(true);
 		}
 	}
@@ -430,7 +432,7 @@ public class VerseLineViewController {
 
 	private void assignChord(int firstSyllable, int lastSyllable) {
 		// First, play the chord if chord playing is on.
-		if (parentController.playMidiAsAssigned()) {
+		if (topSceneController.playMidiAsAssigned()) {
 			currentChord.playMidi();
 		}
 
@@ -499,7 +501,7 @@ public class VerseLineViewController {
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
-			if (parentController.hoverHighlightEnabled()) {
+			if (topSceneController.hoverHighlightEnabled()) {
 				chord.setHighlighted(true);
 			}
 		});
