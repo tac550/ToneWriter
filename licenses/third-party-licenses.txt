@@ -931,6 +931,6 @@ Icons on menu items are from the Creative Commons Zero-licensed collection "smal
 http://paomedia.github.io/small-n-flat/
 
 -----------------------------------------------------------------------------
- 
-Automatic syllabification provided by
+
+Automatic syllabification system uses
 https://juiciobrennan.com/hyphenator/

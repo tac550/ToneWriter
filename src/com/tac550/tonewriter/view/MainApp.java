@@ -16,6 +16,9 @@ import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -78,9 +81,9 @@ public class MainApp extends Application {
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
 
-	// Fields for main stage and controller.
-	private Stage mainStage;
-	private MainSceneController mainController;
+	// Fields for main stage, controller, and main tab pane.
+	private static Stage mainStage;
+	private static TopSceneController topSceneController;
 
 	public static void main(String[] args) {
 
@@ -146,18 +149,15 @@ public class MainApp extends Application {
 
 	private void loadMainStage(Stage main_stage) {
 		mainStage = main_stage;
+		mainStage.setTitle(APP_NAME);
 		mainStage.getIcons().add(APP_ICON);
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest(ev -> {
-			if (!mainController.checkSave()) {
-				ev.consume();
-			}
-		});
+		mainStage.setOnCloseRequest(ev -> topSceneController.requestExit(ev));
 
 		// Show the stage (required for the next operation to work)
-		this.mainStage.show();
+		mainStage.show();
 
 		// Run auto update check TODO: Move this call further down?
 		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
@@ -177,7 +177,7 @@ public class MainApp extends Application {
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
-			if (openFile.isFile()) mainController.handleOpenTone(new File(params.get(0)));
+			if (openFile.isFile()) topSceneController.openParameterTone(openFile);
 		}
 	}
 
@@ -244,23 +244,31 @@ public class MainApp extends Application {
 	}
 
 	private void loadMainLayout() {
+
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
-			BorderPane rootLayout = loader.load();
-			mainController = loader.getController();
+			loader.setLocation(MainApp.class.getResource("TopScene.fxml"));
+			BorderPane rootPane = loader.load();
+			topSceneController = loader.getController();
+			topSceneController.setParentStage(mainStage);
 
-			// Apply the layout as the new scene
-			Scene scene = new Scene(rootLayout);
+			Scene mainScene = new Scene(rootPane);
+			mainStage.setScene(mainScene);
 
-			mainStage.setScene(scene);
-
-			mainController.setStage(mainStage);
+			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
+					topSceneController::addTab);
+			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
+					() -> topSceneController.closeSelectedTab());
 
 		} catch (IOException e) {
 			e.printStackTrace();
+			TWUtils.showAlert(AlertType.ERROR, "Error",
+					"Error loading main UI layout. Exiting application.", true);
+			Platform.exit();
 		}
+
+		setDarkModeEnabled(darkModeEnabled);
 	}
 
 	public static boolean lilyPondAvailable() {
@@ -316,11 +324,19 @@ public class MainApp extends Application {
 		} else return null;
 	}
 
-	public static boolean darkModeEnabled() {
+	public static boolean isDarkModeEnabled() {
 		return darkModeEnabled;
 	}
-	static void setDarkMode(boolean dark_mode) {
+	public static void setDarkModeEnabled(boolean dark_mode) {
 		darkModeEnabled = dark_mode;
+
+		if (dark_mode) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+
+		LilyPondWriter.clearAllCachedChordPreviews();
+
+		topSceneController.propagateDarkModeSetting();
+
 	}
 
 	private static boolean getSystemDarkMode() {

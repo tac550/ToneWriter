@@ -38,7 +38,8 @@ public class Syllables {
 		} catch (FailingHttpStatusCodeException | IOException e) {
 
 			Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Warning",
-					"Internet connection failure! Use Edit buttons to break words up into syllables.", true, main_stage));
+					"Failed to connect to online hyphenator service! " +
+							"Use Edit buttons to break words up into syllables.", true, main_stage));
 
 			// Return the provided text without modification if there's a failure.
 			return full_verse.split("\\r?\\n");

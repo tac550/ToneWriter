@@ -35,7 +35,7 @@ public class TWUtils {
 	}
 
     public static Color getUIBaseColor() {
-    	return MainApp.darkModeEnabled() ? new Color(0.345, 0.361, 0.373, 1)
+    	return MainApp.isDarkModeEnabled() ? new Color(0.345, 0.361, 0.373, 1)
 			    : new Color(0.957, 0.957, 0.957, 1);
     }
 
