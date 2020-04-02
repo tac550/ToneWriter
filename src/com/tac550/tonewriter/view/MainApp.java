@@ -35,6 +35,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainApp extends Application {
 
@@ -379,42 +381,50 @@ public class MainApp extends Application {
 				}
 			}
 		} if (OS_NAME.startsWith("mac")) {
-			
-			if (new File("/opt/local/share/lilypond").exists()) {
-				// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
-				File localLPVerDir = new File(new File("lilypond/opt/local/share/lilypond").getAbsolutePath());
-				String LPVersion = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
+
+		// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
+		File localLPVerDir = new File(new File("lilypond/").getAbsolutePath());
+		String packageName = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
+
+		if (new File("/opt/local/share/lilypond").exists()) {
+
+			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(packageName);
+			if (matcher.find()) {
+				String LPVer = matcher.group();
+
 				for (File file : Objects.requireNonNull(new File("/opt/local/share/lilypond").listFiles())) {
-					if (file.getName().equals(LPVersion)) return;
+					if (file.getName().equals(LPVer)) return;
 				}
 			}
+		}
 
-			TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
-					String.format("Welcome to %s! Please enter your password when prompted to complete setup.", MainApp.APP_NAME), true);
+		// TODO: Give user the choice to cancel and exit now
+		TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
+				String.format("Welcome to %s! Lilypond must be updated or installed in order to continue.", MainApp.APP_NAME), true);
 
-			try {
-				String[] command = {
-						"osascript",
-						"-e",
-						String.format("do shell script \"cp -Rf %s /opt/\" with administrator privileges",
-								new File("lilypond/opt/local").getAbsolutePath()) };
-				Process process = Runtime.getRuntime().exec(command);
-				process.waitFor();
-				BufferedReader bufferedReader = new BufferedReader(
-						new InputStreamReader(process.getErrorStream()));
-				String line;
-				while ((line = bufferedReader.readLine()) != null)
-					System.out.println(line);
+		try {
+			String[] command = {
+					"osascript",
+					"-e",
+					String.format("do shell script \"installer -pkg %s -target /\" with administrator privileges",
+							Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
+			Process process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+			BufferedReader bufferedReader = new BufferedReader(
+					new InputStreamReader(process.getErrorStream()));
+			String line;
+			while ((line = bufferedReader.readLine()) != null)
+				System.out.println(line);
 
-				System.out.println("SETUP EXIT CODE: " + process.exitValue());
-				if (process.exitValue() != 0) {
-					Platform.exit();
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+			System.out.println("SETUP EXIT CODE: " + process.exitValue());
+			if (process.exitValue() != 0) {
+				Platform.exit();
 			}
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
 
-		} if (OS_NAME.startsWith("lin")) {
+	} if (OS_NAME.startsWith("lin")) {
 			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
 				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
