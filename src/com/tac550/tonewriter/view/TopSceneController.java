@@ -335,7 +335,7 @@ public class TopSceneController {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix menu consistency issues (dark mode, etc), and closing save check issues ("first change sticks" if Save selected)
+				// TODO: Need to fix closing save check issues ("first change sticks" if Save selected)
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
