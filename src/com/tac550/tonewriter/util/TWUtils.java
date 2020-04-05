@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -43,6 +44,72 @@ public class TWUtils {
 //	public static int countOccurrences(String string, String single_character) {
 //		return string.length() - string.replace(single_character, "").length();
 //	}
+
+	/**
+	 * Compares two version strings.
+	 *
+	 * Use this instead of String.compareTo() for a non-lexicographical
+	 * comparison that works for version strings. e.g. "1.10".compareTo("1.6").
+	 *
+	 * @param v1 a string of alpha numerals separated by decimal points.
+	 * @param v2 a string of alpha numerals separated by decimal points.
+	 * @return The result is 1 if v1 is greater than v2.
+	 *         The result is 2 if v2 is greater than v1.
+	 *         The result is -1 if the version format is unrecognized.
+	 *         The result is zero if the strings are equal.
+	 */
+
+	public static int versionCompare(String v1, String v2) {
+
+		int v1Len = StringUtils.countMatches(v1,".");
+		int v2Len = StringUtils.countMatches(v2,".");
+
+		if (v1Len != v2Len) {
+			int count = Math.abs(v1Len-v2Len);
+			if (v1Len > v2Len) {
+				v2 = v2 + ".0".repeat(Math.max(0, count));
+			} else {
+				v1 = v1 + ".0".repeat(Math.max(0, count));
+			}
+		}
+
+		if (v1.equals(v2)) return 0;
+
+		String[] v1Str = StringUtils.split(v1, ".");
+		String[] v2Str = StringUtils.split(v2, ".");
+		for (int i = 0; i < v1Str.length; i++) {
+			StringBuilder str1 = new StringBuilder();
+			StringBuilder str2 = new StringBuilder();
+			for (char c : v1Str[i].toCharArray()) {
+				if (Character.isLetter(c)) {
+					int u = c - 'a' + 1;
+					if (u < 10)
+						str1.append("0").append(u);
+					else str1.append(u);
+				} else str1.append(c);
+			}
+			for (char c : v2Str[i].toCharArray()) {
+				if (Character.isLetter(c)) {
+					int u = c - 'a' + 1;
+					if (u < 10)
+						str2.append("0").append(u);
+					else str2.append(u);
+				} else str2.append(c);
+			}
+			v1Str[i] = "1" + str1;
+			v2Str[i] = "1" + str2;
+
+			int num1 = Integer.parseInt(v1Str[i]);
+			int num2 = Integer.parseInt(v2Str[i]);
+
+			if (num1 != num2) {
+				if (num1 > num2) return 1;
+				else return 2;
+			}
+		}
+
+		return -1;
+	}
 
 	// I/O
 

@@ -16,7 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -231,35 +230,10 @@ public class TopSceneController {
 	 * Options Menu Actions
 	 */
 	@FXML private void handleSetLilyPondDir() {
-		DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
-		directoryChooser.setInitialDirectory(new File(MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, MainApp.getPlatformSpecificRootDir())));
-		File savingDirectory = directoryChooser.showDialog(parentStage);
-		if (savingDirectory == null) return;
-
-		String previousLocation = MainApp.prefs.get(MainApp.PREFS_LILYPOND_LOCATION, null);
-		MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
-		if (new File(savingDirectory.getAbsolutePath() + File.separator + MainApp.getPlatformSpecificLPExecutable()).exists()) {
-			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Restart",
-					String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true, parentStage);
-		} else {
-			if (previousLocation == null) {
-				MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
-			} else {
-				MainApp.prefs.put(MainApp.PREFS_LILYPOND_LOCATION, previousLocation);
-			}
-
-			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
-					"That directory does not contain a valid LilyPond executable.", true, parentStage);
-
-		}
-
+		MainApp.setLilyPondDir(parentStage, false);
 	}
 	@FXML private void handleResetLilyPondDir() {
-		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
-		TWUtils.showAlert(Alert.AlertType.INFORMATION, "Restart",
-				String.format("This change will take effect the next time you restart %s.", MainApp.APP_NAME), true,
-				parentStage);
+		MainApp.resetLilyPondDir(false);
 	}
 	@FXML private void handleSetPaperSize() {
 		List<String> choices = new ArrayList<>();
@@ -426,7 +400,13 @@ public class TopSceneController {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			controller.refreshVerseTextStyle();
-			controller.refreshAllChordPreviews();
+		}
+		refreshAllChordPreviews();
+	}
+
+	protected void refreshAllChordPreviews() {
+		for (Tab tab : tabPane.getTabs()) {
+			tabControllerMap.get(tab).refreshAllChordPreviews();
 		}
 	}
 

@@ -11,7 +11,9 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
@@ -25,9 +27,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
@@ -77,7 +78,10 @@ public class MainApp extends Application {
 
 	private static boolean darkModeEnabled = false;
 
-	// LilyPond connection stuff.
+	// LilyPond stuff.
+	private static File bundledLPDir = new File(new File("lilypond" + File.separator).getAbsolutePath());
+	// Not sure why I have to do the above line. If I use the relative path Java thinks it doesn't exist
+
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
 
@@ -106,28 +110,22 @@ public class MainApp extends Application {
 		prefs = Preferences.userNodeForPackage(this.getClass());
 
 		// Initialize dark mode state
-		darkModeEnabled = prefs.getBoolean(MainApp.PREFS_DARK_MODE, getSystemDarkMode());
+		darkModeEnabled = prefs.getBoolean(PREFS_DARK_MODE, getSystemDarkMode());
 
-		// Print saved LilyPond directory if any, otherwise print null.
-		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
+		// Initialize LilyPond
 
-		// See if first-time setup is needed if using built-in LilyPond
-		if (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) {
-			platformSpecificInitialization(); // First-time setup processes
-		}
+		refreshLilyPondLocation();
+		// If the installation is no good, do initialization
+		if (!lilyPondAvailable()) {
+			platformSpecificInitialization();
 
-		// Check for LilyPond installation - from prefs first
-		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
-		if (new File(lilyPondDirectory.getAbsolutePath() + getPlatformSpecificLPExecutable()).exists()) {
-			lilyPondAvailable = true;
-			System.out.println("LilyPond Found!");
-			MidiInterface.setUpMidiSystem(); // Set up the midi playback system only if lilypond is present.
-
-		} else {
-			System.out.println("LilyPond Missing!");
+			// Final availability determination after initialization attempt
+			refreshLilyPondLocation();
 		}
 
 		if (lilyPondAvailable()) {
+			MidiInterface.setUpMidiSystem();
+
 			try {
 				runLilyPondStartup(() -> {
 					splashStage.close();
@@ -159,7 +157,7 @@ public class MainApp extends Application {
 		// Show the stage (required for the next operation to work)
 		mainStage.show();
 
-		// Run auto update check TODO: Move this call further down?
+		// Run auto update check
 		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
 
 		// Makes sure the stage can't be made too small.
@@ -330,8 +328,8 @@ public class MainApp extends Application {
 	public static void setDarkModeEnabled(boolean dark_mode) {
 		darkModeEnabled = dark_mode;
 
-		if (dark_mode) MainApp.setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
-		else MainApp.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+		if (dark_mode) setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		else setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
 		LilyPondWriter.clearAllCachedChordPreviews();
 
@@ -378,15 +376,35 @@ public class MainApp extends Application {
 	}
 
 	private static void platformSpecificInitialization() {
+
+		// First, prompt the user asking how to proceed
+		// (either to locate a compatible LilyPond installation, continue anyway, or install the bundled one).
+
+		ButtonType locateInstall = new ButtonType("Locate preferred LilyPond");
+
+		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
+				String.format("Welcome to %s! Lilypond must be %s in order to continue " +
+								"(Will install to default location).", APP_NAME,
+						isLilyPondInstalled() ? "updated to version " + getBundledLPVersion() : "installed"), true, null,
+				new ButtonType[] {ButtonType.OK, ButtonType.CANCEL, locateInstall});
+
+		if (result.isPresent()) {
+			if (result.get() == ButtonType.CANCEL) return; // continue without change
+			else if (result.get() == locateInstall) { // Set directory and continue
+				setLilyPondDir(splashStage, true);
+				return;
+			}
+		} else return; // No result, probably pressed close button; continue without change
+
+		// Reset to default directory for after installation
+		resetLilyPondDir(true);
+
 		if (OS_NAME.startsWith("win")) {
 			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
-				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s!" +
-						" Please click through the following LilyPond installer to complete setup.", MainApp.APP_NAME), true);
-
 				try {
 					Process process = Runtime.getRuntime().exec(String.format("cmd /c lilypond\\%s",
-							Objects.requireNonNull(new File("lilypond\\").listFiles(
+							Objects.requireNonNull(bundledLPDir.listFiles( // TODO: Make sure this works!
 									file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
 					process.waitFor();
 					if (process.exitValue() != 0) {
@@ -398,56 +416,132 @@ public class MainApp extends Application {
 			}
 		} if (OS_NAME.startsWith("mac")) {
 
-		// Not sure why I have to do the following line. If I use the relative path Java thinks it doesn't exist
-		File localLPVerDir = new File(new File("lilypond/").getAbsolutePath());
-		String packageName = Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getName();
-
-		if (new File("/opt/local/share/lilypond").exists()) {
-
-			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(packageName);
-			if (matcher.find()) {
-				String LPVer = matcher.group();
-
-				for (File file : Objects.requireNonNull(new File("/opt/local/share/lilypond").listFiles())) {
-					if (file.getName().equals(LPVer)) return;
-				}
-			}
-		}
-
-		// TODO: Give user the choice to cancel and exit now
-		TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
-				String.format("Welcome to %s! Lilypond must be updated or installed in order to continue.", MainApp.APP_NAME), true);
-
 		try {
 			String[] command = {
 					"osascript",
 					"-e",
 					String.format("do shell script \"installer -pkg %s -target /\" with administrator privileges",
-							Objects.requireNonNull(localLPVerDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
+							Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
 			Process process = Runtime.getRuntime().exec(command);
 			process.waitFor();
-			BufferedReader bufferedReader = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
-			String line;
-			while ((line = bufferedReader.readLine()) != null)
-				System.out.println(line);
+//			BufferedReader bufferedReader = new BufferedReader(
+//					new InputStreamReader(process.getErrorStream()));
+//			String line;
+//			while ((line = bufferedReader.readLine()) != null)
+//				System.out.println(line);
 
-			System.out.println("SETUP EXIT CODE: " + process.exitValue());
 			if (process.exitValue() != 0) {
-				Platform.exit();
+				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", false);
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 
-	} if (OS_NAME.startsWith("lin")) {
+		} if (OS_NAME.startsWith("lin")) {
 			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
 				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
-						"distribution's repositories or locate your copy from the Options menu.", MainApp.APP_NAME), true);
+						"distribution's repositories or locate your copy from the Options menu.", APP_NAME), true);
 
 			}
 		}
+	}
+
+	static void setLilyPondDir(Stage owner, boolean startup) {
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
+		directoryChooser.setInitialDirectory(new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificRootDir())));
+		File savingDirectory = directoryChooser.showDialog(owner);
+		if (savingDirectory == null) return;
+
+		String previousLocation = prefs.get(PREFS_LILYPOND_LOCATION, null);
+		prefs.put(PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
+		if (new File(savingDirectory.getAbsolutePath() + File.separator + getPlatformSpecificLPExecutable()).exists()) {
+			refreshLilyPondLocation();
+			if (!isLilyPondVersionCompatible())
+				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond version must be " +
+						getBundledLPVersion() + " or above. This one is " + getInstalledLPVersion(), true);
+			if (!startup) topSceneController.refreshAllChordPreviews();
+		} else {
+			if (previousLocation == null) {
+				prefs.remove(PREFS_LILYPOND_LOCATION);
+			} else {
+				prefs.put(PREFS_LILYPOND_LOCATION, previousLocation);
+			}
+
+			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"That directory does not contain a valid LilyPond executable.", true, owner);
+
+		}
+	}
+
+	static void resetLilyPondDir(boolean startup) {
+		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
+		refreshLilyPondLocation();
+		if (!startup) topSceneController.refreshAllChordPreviews();
+	}
+
+	private static void refreshLilyPondLocation() {
+		System.out.println("Saved LilyPond directory: " + prefs.get(PREFS_LILYPOND_LOCATION, null));
+
+		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
+
+		lilyPondAvailable = isLilyPondInstalled() && isLilyPondVersionCompatible();
+	}
+
+	private static boolean isLilyPondInstalled() {
+		// First check that LilyPond is available
+		return new File(getLilyPondPath() + getPlatformSpecificLPExecutable()).exists();
+
+	}
+
+	private static boolean isLilyPondVersionCompatible() {
+		return TWUtils.versionCompare(getInstalledLPVersion(), getBundledLPVersion()) != 2;
+
+	}
+
+	private static String getInstalledLPVersion() {
+
+		String installedVersion = null;
+
+		try {
+			Process pr = Runtime.getRuntime().exec(new String[] {getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
+			"--version"});
+
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+			String s;
+			while ((s = stdInput.readLine()) != null) {
+				Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(s);
+				if (matcher.find()) {
+					installedVersion = matcher.group();
+				}
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Installed LilyPond version is " + installedVersion);
+		return installedVersion;
+	}
+
+	private static String getBundledLPVersion() {
+		if (OS_NAME.startsWith("win")) {
+			// TODO: Implement
+			return "";
+		} else if (OS_NAME.startsWith("mac")) {
+
+			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(
+					Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getName());
+			if (matcher.find()) {
+				String ver = matcher.group();
+				System.out.println("Bundled LilyPond version is " + ver);
+				return ver;
+			} else return null;
+		} else if (OS_NAME.startsWith("lin")) {
+			// TODO: Implement
+			return "";
+		} else return null;
 	}
 
 }
