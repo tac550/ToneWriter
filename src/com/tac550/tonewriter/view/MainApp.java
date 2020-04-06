@@ -27,7 +27,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -400,20 +404,53 @@ public class MainApp extends Application {
 		resetLilyPondDir(true);
 
 		if (OS_NAME.startsWith("win")) {
-			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
 
-				try {
-					Process process = Runtime.getRuntime().exec(String.format("cmd /c lilypond\\%s",
-							Objects.requireNonNull(bundledLPDir.listFiles( // TODO: Make sure this works!
-									file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
-					process.waitFor();
-					if (process.exitValue() != 0) {
-						Platform.exit();
-					}
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
+			try {
+				// Uninstall old version if present
+				String uninstallerLocation = new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))
+						.getParentFile().getParentFile().getAbsolutePath() + "\\uninstall.exe";
+
+				if (new File(uninstallerLocation).exists()) {
+					Optional<ButtonType> uninsResult = TWUtils.showAlert(AlertType.CONFIRMATION, "Uninstall",
+							"Previous LilyPond installation will be removed.", true);
+					if (uninsResult.isPresent() && uninsResult.get() == ButtonType.OK) {
+						Process uninsProc = Runtime.getRuntime().exec(String.format("cmd /c \"%s\"", uninstallerLocation));
+						uninsProc.waitFor();
+
+						AtomicBoolean done = new AtomicBoolean(false);
+						int loops = 0;
+						while (!done.get() && loops < 3) {
+							Thread.sleep(1000);
+							String line;
+							Process p = Runtime.getRuntime().exec
+									(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+							BufferedReader input =
+									new BufferedReader(new InputStreamReader(p.getInputStream()));
+							while ((line = input.readLine()) != null) {
+								if (line.startsWith("Au_.exe ")) {
+									loops = 0;
+									input.close();
+									break;
+								}
+							}
+							loops++;
+							input.close();
+						}
+
+					} else return;
 				}
+
+				Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
+						Objects.requireNonNull(bundledLPDir.listFiles( // TODO: Make sure this works!
+								file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
+				process.waitFor();
+				if (process.exitValue() != 0) {
+					TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 			}
+
 		} if (OS_NAME.startsWith("mac")) {
 
 		try {
@@ -431,7 +468,7 @@ public class MainApp extends Application {
 //				System.out.println(line);
 
 			if (process.exitValue() != 0) {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", false);
+				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
 			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -526,10 +563,7 @@ public class MainApp extends Application {
 	}
 
 	private static String getBundledLPVersion() {
-		if (OS_NAME.startsWith("win")) {
-			// TODO: Implement
-			return "";
-		} else if (OS_NAME.startsWith("mac")) {
+		if (OS_NAME.startsWith("win") || OS_NAME.startsWith("mac")) {
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(
 					Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getName());

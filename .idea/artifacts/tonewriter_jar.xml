@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="tonewriter:jar">
+  <artifact type="jar" name="tonewriter:jar">
     <output-path>$PROJECT_DIR$/build/res</output-path>
     <root id="archive" name="tonewriter.jar">
       <element id="module-output" name="tonewriter" />
