@@ -565,8 +565,12 @@ public class MainApp extends Application {
 	private static String getBundledLPVersion() {
 		if (OS_NAME.startsWith("win") || OS_NAME.startsWith("mac")) {
 
-			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(
-					Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getName());
+			File[] files = Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()));
+
+			if (files.length == 0) return "";
+
+			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(files[0].getName());
+
 			if (matcher.find()) {
 				String ver = matcher.group();
 				System.out.println("Bundled LilyPond version is " + ver);
