@@ -62,15 +62,15 @@ public class ChantLineViewController implements CommentableView {
 	@FXML private Button playButton;
 	
 	@FXML private HBox chordBox;
-	private ArrayList<ChantChordController> chantChordControllers = new ArrayList<>();
+	private final ArrayList<ChantChordController> chantChordControllers = new ArrayList<>();
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
 
 	// Fields related to drag reordering of chords
 	private static final String CHORD_DRAG_KEY = "ToneWriter chord: ";
-	private ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
-	private ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
+	private final ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
+	private final ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
 
 	// Fields for automatic drag-scrolling
 	AnimationTimer autoScroller;

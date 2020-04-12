@@ -19,8 +19,8 @@ public class SyllableText extends Text {
 	
 	private VerseLineViewController parentController;
 	
-	private ArrayList<ChordData> associatedChords = new ArrayList<>();
-	private ArrayList<Button> associatedButtons = new ArrayList<>();
+	private final ArrayList<ChordData> associatedChords = new ArrayList<>();
+	private final ArrayList<Button> associatedButtons = new ArrayList<>();
 	
 	private boolean active = true;
 	// Was this the one that was clicked?

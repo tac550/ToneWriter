@@ -24,12 +24,12 @@ import java.util.concurrent.ExecutionException;
 
 public class ToneReaderWriter {
 
-	private ArrayList<ChantLineViewController> chantLines;
+	private final ArrayList<ChantLineViewController> chantLines;
 
 	private String poetText;
 	private String composerText;
 	private String keySig;
-	private MainSceneController associatedMainScene;
+	private final MainSceneController associatedMainScene;
 
 	private MainSceneController mainScene;
 

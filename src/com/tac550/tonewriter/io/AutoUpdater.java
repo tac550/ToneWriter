@@ -33,7 +33,7 @@ public class AutoUpdater {
 
 	private static WebClient webClient;
 
-	private static Stage updaterStage = new Stage();
+	private static final Stage updaterStage = new Stage();
 
 	private static Alert downloadAlert;
 

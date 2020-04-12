@@ -9,9 +9,9 @@ import java.util.List;
 public class ProcessExitDetector extends Thread {
 
 	/** The process for which we have to detect the end. */
-	private Process process;
+	private final Process process;
 	/** The associated listeners to be invoked at the end of the process. */
-	private List<ProcessListener> listeners = new ArrayList<>();
+	private final List<ProcessListener> listeners = new ArrayList<>();
 
 	/**
 	 * Starts the detection for the given process

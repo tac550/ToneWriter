@@ -71,7 +71,7 @@ public class MainSceneController {
 	private Stage parentStage;
 	private TopSceneController topSceneController; // TODO: Trace references here
 
-	private MenuState menuState = new MenuState();
+	private final MenuState menuState = new MenuState();
 
 	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
@@ -87,7 +87,7 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
-	private Robot robot = new Robot();
+	private final Robot robot = new Robot();
 
 	private File toneFile;
 
@@ -101,17 +101,17 @@ public class MainSceneController {
 	private boolean verseSet = false;
 	private boolean askToOverwriteOutput = false; // If false, save dialog always appears for final output.
 	private boolean toneEdited = false;
-	private File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
+	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
-	private ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
+	private final ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
 
-	private List<ChantLineViewController> mainChantLines = new ArrayList<>();
+	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
 	@FXML private VBox verseLineBox;
-	private ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
+	private final ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
 
 	private boolean setVerseCancelled = false;
 

@@ -36,7 +36,7 @@ public class PDFCombineViewController {
 	@FXML private VBox fileBox;
 
 	private static final String TAB_DRAG_KEY = "pdfPane";
-	private ObjectProperty<GridPane> draggingPane = new SimpleObjectProperty<>();
+	private final ObjectProperty<GridPane> draggingPane = new SimpleObjectProperty<>();
 	
 	@FXML private void initialize() {
 		dragInstructions.setVisible(false);

@@ -54,7 +54,7 @@ public class ChantChordController implements CommentableView {
 	@FXML private Button commentButton;
 	@FXML ImageView moveHandleImage;
 	
-	private ArrayList<ChantChordController> prepsAndPosts = new ArrayList<>();
+	private final ArrayList<ChantChordController> prepsAndPosts = new ArrayList<>();
 	private ChantChordController associatedRecitingChord; // Only populated if this is a prep or post chord
 	
 	@FXML private void initialize() {

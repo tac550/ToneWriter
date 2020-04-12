@@ -31,7 +31,7 @@ public class QuickVerseController {
 	
 	private ListView<String> verseList;
 	
-	private ObservableList<String> verses = FXCollections.observableArrayList();
+	private final ObservableList<String> verses = FXCollections.observableArrayList();
 	
 	@FXML private void initialize() {
 

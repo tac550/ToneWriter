@@ -43,7 +43,7 @@ public class VerseLineViewController {
 	private boolean isSeparatorLine = false;
 	@FXML private VBox separatorIndicatorBox;
 
-	private Stack<AssignmentAction> undoActions = new Stack<>();
+	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;

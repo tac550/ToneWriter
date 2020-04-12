@@ -83,7 +83,7 @@ public class MainApp extends Application {
 	private static boolean darkModeEnabled = false;
 
 	// LilyPond stuff.
-	private static File bundledLPDir = new File(new File("lilypond" + File.separator).getAbsolutePath());
+	private static final File bundledLPDir = new File(new File("lilypond" + File.separator).getAbsolutePath());
 	// Not sure why I have to do the above line. If I use the relative path Java thinks it doesn't exist
 
 	private static boolean lilyPondAvailable = false;
