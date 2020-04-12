@@ -475,11 +475,9 @@ public class MainApp extends Application {
 		}
 
 		} if (OS_NAME.startsWith("lin")) {
-			if (!new File(getPlatformSpecificDefaultLPDir() + getPlatformSpecificLPExecutable()).exists()) {
-
+			if (!isLilyPondInstalled()) { // TODO: Need to test this
 				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
 						"distribution's repositories or locate your copy from the Options menu.", APP_NAME), true);
-
 			}
 		}
 	}
@@ -577,8 +575,7 @@ public class MainApp extends Application {
 				return ver;
 			} else return null;
 		} else if (OS_NAME.startsWith("lin")) {
-			// TODO: Implement
-			return "";
+			return ""; // No bundled LP for Linux
 		} else return null;
 	}
 
