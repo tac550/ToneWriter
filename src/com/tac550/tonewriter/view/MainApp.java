@@ -441,7 +441,7 @@ public class MainApp extends Application {
 				}
 
 				Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
-						Objects.requireNonNull(bundledLPDir.listFiles( // TODO: Make sure this works!
+						Objects.requireNonNull(bundledLPDir.listFiles(
 								file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
 				process.waitFor();
 				if (process.exitValue() != 0) {
