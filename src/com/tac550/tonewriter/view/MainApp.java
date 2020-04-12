@@ -32,10 +32,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -389,7 +386,7 @@ public class MainApp extends Application {
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
 				String.format("Welcome to %s! Lilypond must be %s in order to continue " +
 								"(Will install to default location).", APP_NAME,
-						isLilyPondInstalled() ? "updated to version " + getBundledLPVersion() : "installed"), true, null,
+						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
 				new ButtonType[] {ButtonType.OK, ButtonType.CANCEL, locateInstall});
 
 		if (result.isPresent()) {
@@ -495,7 +492,7 @@ public class MainApp extends Application {
 			refreshLilyPondLocation();
 			if (!isLilyPondVersionCompatible())
 				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond version must be " +
-						getBundledLPVersion() + " or above. This one is " + getInstalledLPVersion(), true);
+						getRequiredLPVersion() + " or above. This one is " + getInstalledLPVersion(), true);
 			if (!startup) topSceneController.refreshAllChordPreviews();
 		} else {
 			if (previousLocation == null) {
@@ -531,7 +528,7 @@ public class MainApp extends Application {
 	}
 
 	private static boolean isLilyPondVersionCompatible() {
-		return TWUtils.versionCompare(getInstalledLPVersion(), getBundledLPVersion()) != 2;
+		return TWUtils.versionCompare(getInstalledLPVersion(), getRequiredLPVersion()) != 2;
 
 	}
 
@@ -560,23 +557,23 @@ public class MainApp extends Application {
 		return installedVersion;
 	}
 
-	private static String getBundledLPVersion() {
-		if (OS_NAME.startsWith("win") || OS_NAME.startsWith("mac")) {
+	private static String getRequiredLPVersion() {
+		try {
+			String versionLine = new BufferedReader(new FileReader(
+					new File(LilyPondWriter.class.getResource("renderTemplate.ly").getPath()))).readLine();
 
-			File[] files = Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()));
-
-			if (files.length == 0) return "";
-
-			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(files[0].getName());
+			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 
 			if (matcher.find()) {
 				String ver = matcher.group();
-				System.out.println("Bundled LilyPond version is " + ver);
+				System.out.println("Required LilyPond version is " + ver);
 				return ver;
-			} else return null;
-		} else if (OS_NAME.startsWith("lin")) {
-			return ""; // No bundled LP for Linux
-		} else return null;
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }
