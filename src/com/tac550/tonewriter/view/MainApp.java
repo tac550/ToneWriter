@@ -124,6 +124,10 @@ public class MainApp extends Application {
 			refreshLilyPondLocation();
 		}
 
+		if (!isLilyPondVersionCompatible()) {
+			Platform.exit();
+		}
+
 		if (lilyPondAvailable()) {
 			MidiInterface.setUpMidiSystem();
 
