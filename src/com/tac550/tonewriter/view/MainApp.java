@@ -318,7 +318,6 @@ public class MainApp extends Application {
 
 	public static String getPlatformSpecificRootDir() {
 		if (OS_NAME.startsWith("win")) {
-			System.out.println(System.getenv("SystemDrive"));
 			return System.getenv("SystemDrive") + "\\";
 		} if (OS_NAME.startsWith("mac")) {
 			return "/";
@@ -507,6 +506,8 @@ public class MainApp extends Application {
 
 			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 					"That directory does not contain a valid LilyPond executable.", true, owner);
+
+			setLilyPondDir(owner, startup);
 
 		}
 	}
