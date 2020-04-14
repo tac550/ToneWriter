@@ -11,7 +11,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -20,34 +19,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
+<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <items>
-      <AnchorPane>
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
-            <ScrollPane fx:id="toneScrollPane" fitToWidth="true" minViewportHeight="137.0" pannable="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <ScrollPane fx:id="toneScrollPane" fitToWidth="true" pannable="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <content>
                   <VBox fx:id="chantLineBox" prefWidth="1020.0" />
                </content>
             </ScrollPane>
          </children>
       </AnchorPane>
-      <AnchorPane>
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
-            <SplitPane dividerPositions="0.75" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <items>
-                  <BorderPane minWidth="0.0">
-                     <center>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <content>
-                                    <VBox fx:id="verseLineBox" prefWidth="610.0" />
-                                 </content>
-                              </ScrollPane>
-                           </children>
-                        </AnchorPane>
-                     </center>
-                  </BorderPane>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <content>
+                              <VBox fx:id="verseLineBox" prefWidth="610.0" />
+                           </content>
+                        </ScrollPane>
+                     </children>
+                  </AnchorPane>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                      <children>
                         <VBox fx:id="bottomRightBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -94,21 +89,6 @@
                                  </children>
                               </GridPane>
                               <TextArea fx:id="verseArea" VBox.vgrow="ALWAYS" />
-                              <StackPane>
-                                 <children>
-                                    <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
-                                       <children>
-                                          <Button mnemonicParsing="false" onAction="#handleCancelSetVerse" text="Cancel" />
-                                          <ProgressBar HBox.hgrow="ALWAYS">
-                                             <HBox.margin>
-                                                <Insets />
-                                             </HBox.margin>
-                                          </ProgressBar>
-                                       </children>
-                                    </HBox>
-                                    <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="_Apply Above Text" />
-                                 </children>
-                              </StackPane>
                               <GridPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="25.0">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="NEVER" />
@@ -135,9 +115,24 @@
                                     <ChoiceBox fx:id="verseBottomChoice" />
                                  </children>
                               </GridPane>
+                              <StackPane>
+                                 <children>
+                                    <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
+                                       <children>
+                                          <Button mnemonicParsing="false" onAction="#handleCancelSetVerse" text="Cancel" />
+                                          <ProgressBar HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </ProgressBar>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set _Verse" />
+                                 </children>
+                              </StackPane>
                            </children>
                            <padding>
-                              <Insets left="5.0" right="5.0" />
+                              <Insets left="5.0" />
                            </padding>
                         </VBox>
                      </children>
