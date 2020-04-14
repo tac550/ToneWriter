@@ -534,6 +534,8 @@ public class MainApp extends Application {
 
 	private static String getInstalledLPVersion() {
 
+		if (!isLilyPondInstalled()) return null;
+
 		String installedVersion = null;
 
 		try {
