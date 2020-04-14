@@ -6,38 +6,15 @@ Manually Assign Phrases: false
 
 
 A
-1: g-e-b,-e: Typically not used on the first phrase.
-2: a-e-c-a
-	Post: a-fs-c-d
-3: g-d-b,-g
+1: a-e-c-a
+2: g-d-b,-g
 	Post: g-e-b,-e
 END: a-e-c-a
 
-B
+Cadence
 1: b-g-d-g
 2: a-g-c-g
 END: g-d-b,-g
-
-C
-1: a-g-c-e
-	Post: b-g-d-d
-2: c'-g-e-c
-END: g-d-b,-g
-	Prep: b-g-d-g
-	Prep: c'-g-e-g
-	Prep: b-g-d-g
-	Prep: a-g-c-g
-
-Cadence
-1: a-e-c-a
-	Post: b-g-d-g
-2: c'-g-e-c
-END: a-e-c-<a a,>
-	Prep: b-g-d-g
-	Prep: a-e-c-a
-	Prep: a-fs-c-d
-	Prep: g-d-b,-g
-	Prep: g-e-b,-e
 
 
 First Repeated: 

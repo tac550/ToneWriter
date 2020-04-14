@@ -313,7 +313,7 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !tabControllerMap.get(tab).checkSave()) {
 					event.consume();
 				} else {
 					tabControllerMap.remove(tab);
@@ -339,7 +339,7 @@ public class TopSceneController {
 		}
 	}
 
-	private void closeTab(Tab tab) { // TODO: Check save when closing tab
+	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
 		EventHandler<Event> handler = tab.getOnCloseRequest();
