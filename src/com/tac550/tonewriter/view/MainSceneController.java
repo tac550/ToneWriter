@@ -73,6 +73,8 @@ public class MainSceneController {
 
 	private final MenuState menuState = new MenuState();
 
+	@FXML private SplitPane mainSplitPane;
+
 	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> verseTopChoice;
 	@FXML private TextField verseTopField;
@@ -846,6 +848,10 @@ public class MainSceneController {
 	}
 	void setTitleText(String title) {
 		titleTextField.setText(title);
+	}
+
+	double getDividerPosition() {
+		return mainSplitPane.getDividerPositions()[0];
 	}
 
 }
