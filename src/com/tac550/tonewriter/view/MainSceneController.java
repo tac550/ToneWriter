@@ -565,7 +565,7 @@ public class MainSceneController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
 			resetToneEditedStatus();
-			topSceneController.refreshToneInstances(toneFile, this, false);
+			topSceneController.refreshToneInstances(toneFile, this);
 		}
 
 	}
@@ -835,8 +835,8 @@ public class MainSceneController {
 		toneEdited = false;
 		updateTopLevelInfo();
 	}
-	boolean isToneEdited() {
-		return toneEdited;
+	boolean isToneUnedited() {
+		return !toneEdited;
 	}
 
 	File getToneFile() {
@@ -848,6 +848,10 @@ public class MainSceneController {
 	}
 	void setTitleText(String title) {
 		titleTextField.setText(title);
+	}
+
+	void setDividerPosition(double position) {
+		mainSplitPane.setDividerPosition(0, position);
 	}
 
 	double getDividerPosition() {

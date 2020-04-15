@@ -290,7 +290,7 @@ public class ChantChordController implements CommentableView {
 	}
 	@FXML public void deleteAll() { // Deletes this chord and its associated preps and posts. // TODO: Needs cleanup!
 		chantLineController.edited();
-		for (ChantChordController chord : prepsAndPosts) {
+		for (ChantChordController chord : prepsAndPosts) { // TODO: Commonly throws ConcurrentModificationException
 			chord.deleteAll();
 		}
 		if (associatedRecitingChord != null) {

@@ -59,8 +59,6 @@ public class TopSceneController {
 	@FXML private TabPane tabPane;
 	private final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
 
-	private final ArrayList<MainSceneController> resetStatusIfCloseCanceled = new ArrayList<>();
-
 	@FXML private Button addTabButton;
 
 	static final String composerIconPath = "/media/profile.png";
@@ -282,7 +280,7 @@ public class TopSceneController {
 
 	@FXML void addTab() {
 		try {
-			// Load layout from fxml file
+			// Load layout from fxml file TODO: Why not Thread this?
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
 			SplitPane mainLayout = loader.load();
@@ -309,7 +307,6 @@ public class TopSceneController {
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
-				// TODO: Need to fix closing save check issues ("first change sticks" if Save selected)
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
@@ -325,7 +322,7 @@ public class TopSceneController {
 
 			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
 
-			mainLayout.setDividerPosition(0, previousTab.getDividerPosition());
+			mainController.setDividerPosition(previousTab.getDividerPosition());
 			if (previousTab.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 					"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
 					true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
@@ -379,22 +376,30 @@ public class TopSceneController {
 	}
 
 	void requestExit(Event ev) {
+		Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
+
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
-			if (!controller.isToneEdited()) continue;
+			if (controller.isToneUnedited()) continue;
 
-			if (!controller.checkSave()) {
+			tabPane.getSelectionModel().select(tab);
+			double prevPosition = controller.getDividerPosition();
+			controller.setDividerPosition(1.0);
 
-				for (MainSceneController controllerToReset : resetStatusIfCloseCanceled) {
-					controllerToReset.toneEdited();
-				}
+			boolean saveCancelled = !controller.checkSave();
 
+			controller.setDividerPosition(prevPosition);
+
+			if (saveCancelled) {
 				ev.consume();
 				break;
-			} else { // "Save" or "Don't Save" selected. Avoids repeat prompts.
-				refreshToneInstances(controller.getToneFile(), controller, true);
+			} else if (controller.isToneUnedited()) {
+				refreshToneInstances(controller.getToneFile(), controller);
 			}
+
 		}
+
+		tabPane.getSelectionModel().select(prevTab);
 	}
 
 	protected void propagateDarkModeSetting() {
@@ -412,18 +417,11 @@ public class TopSceneController {
 	}
 
 	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
-	protected void refreshToneInstances(File toneFile, MainSceneController caller, boolean shutdown) {
+	protected void refreshToneInstances(File toneFile, MainSceneController caller) {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
-				if (shutdown) {
-					if (controller.isToneEdited()) {
-						controller.resetToneEditedStatus();
-						resetStatusIfCloseCanceled.add(controller);
-					}
-				} else {
-					controller.handleOpenTone(toneFile, true);
-				}
+				controller.handleOpenTone(toneFile, true);
 			}
 		}
 	}
