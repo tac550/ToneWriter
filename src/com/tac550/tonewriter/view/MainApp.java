@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
@@ -385,12 +386,13 @@ public class MainApp extends Application {
 		// (either to locate a compatible LilyPond installation, continue anyway, or install the bundled one).
 
 		ButtonType locateInstall = new ButtonType("Locate preferred LilyPond");
+		ButtonType updateLilyPond = new ButtonType(isLilyPondInstalled() ? "Update" : "Install", ButtonBar.ButtonData.OK_DONE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
 				String.format("Welcome to %s! Lilypond must be %s in order to continue " +
 								"(Will install to default location).", APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
-				new ButtonType[] {ButtonType.OK, ButtonType.CANCEL, locateInstall});
+				new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall});
 
 		if (result.isPresent()) {
 			if (result.get() == ButtonType.CANCEL) return; // continue without change
