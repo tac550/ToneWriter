@@ -385,19 +385,24 @@ public class MainApp extends Application {
 		// First, prompt the user asking how to proceed
 		// (either to locate a compatible LilyPond installation, continue anyway, or install the bundled one).
 
-		ButtonType locateInstall = new ButtonType("Locate preferred LilyPond");
+		ButtonType locateInstall = new ButtonType("Locate LilyPond Installation");
 		ButtonType updateLilyPond = new ButtonType(isLilyPondInstalled() ? "Update" : "Install", ButtonBar.ButtonData.OK_DONE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
-				String.format("Welcome to %s! Lilypond must be %s in order to continue " +
-								"(Will install to default location).", APP_NAME,
+				String.format("Welcome to %s! LilyPond must be %s in order to continue " +
+								(OS_NAME.startsWith("lin") ? "(likely available in your distro's repositories)" :
+										"(Will install to default location)."), APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
-				new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall});
+				OS_NAME.startsWith("lin") ? new ButtonType[] {ButtonType.CANCEL, locateInstall} :
+						new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall});
 
 		if (result.isPresent()) {
 			if (result.get() == ButtonType.CANCEL) return; // continue without change
 			else if (result.get() == locateInstall) { // Set directory and continue
 				setLilyPondDir(splashStage, true);
+				if (!isLilyPondVersionCompatible()) { // Try again if version incompatible
+					platformSpecificInitialization();
+				}
 				return;
 			}
 		} else return; // No result, probably pressed close button; continue without change
@@ -442,6 +447,7 @@ public class MainApp extends Application {
 					} else return;
 				}
 
+				// Install bundled version
 				Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
 						Objects.requireNonNull(bundledLPDir.listFiles(
 								file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
@@ -471,11 +477,6 @@ public class MainApp extends Application {
 				e.printStackTrace();
 			}
 
-		} if (OS_NAME.startsWith("lin")) {
-			if (!isLilyPondInstalled()) { // TODO: Need to test this
-				TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup", String.format("Welcome to %s! Please either install \"lilypond\" from your " +
-						"distribution's repositories or locate your copy from the Options menu.", APP_NAME), true);
-			}
 		}
 	}
 
