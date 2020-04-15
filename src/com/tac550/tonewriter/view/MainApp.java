@@ -455,26 +455,21 @@ public class MainApp extends Application {
 
 		} if (OS_NAME.startsWith("mac")) {
 
-		try {
-			String[] command = {
-					"osascript",
-					"-e",
-					String.format("do shell script \"installer -pkg %s -target /\" with administrator privileges",
-							Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
-			Process process = Runtime.getRuntime().exec(command);
-			process.waitFor();
-//			BufferedReader bufferedReader = new BufferedReader(
-//					new InputStreamReader(process.getErrorStream()));
-//			String line;
-//			while ((line = bufferedReader.readLine()) != null)
-//				System.out.println(line);
+			try {
+				String[] command = {
+						"osascript",
+						"-e",
+						String.format("do shell script \"installer -pkg %s -target /\" with administrator privileges",
+								Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
+				Process process = Runtime.getRuntime().exec(command);
+				process.waitFor();
 
-			if (process.exitValue() != 0) {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
+				if (process.exitValue() != 0) {
+					TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
+				}
+			} catch (IOException | InterruptedException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		} if (OS_NAME.startsWith("lin")) {
 			if (!isLilyPondInstalled()) { // TODO: Need to test this
