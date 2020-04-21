@@ -390,7 +390,7 @@ public class MainApp extends Application {
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
 				String.format("Welcome to %s! LilyPond must be %s in order to continue " +
-								(OS_NAME.startsWith("lin") ? "(likely available in your distro's repositories)" :
+								(OS_NAME.startsWith("lin") ? "(likely available in your distro's repositories)." :
 										"(Will install to default location)."), APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
 				OS_NAME.startsWith("lin") ? new ButtonType[] {ButtonType.CANCEL, locateInstall} :
