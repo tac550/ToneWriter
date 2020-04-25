@@ -43,10 +43,10 @@ public class ChantChordController implements CommentableView {
 	
 	@FXML private AnchorPane mainPane;
 	
-	@FXML private Text numText;
+	@FXML protected Text numText;
 	@FXML private ImageView chordView;
 	@FXML private TextField SField, AField, TField, BField;
-	@FXML private Button preButton, posButton;
+	@FXML protected Button preButton, posButton;
 
 	@FXML private Button copyButton;
 	@FXML private Button pasteButton;
@@ -57,7 +57,7 @@ public class ChantChordController implements CommentableView {
 	private final ArrayList<ChantChordController> prepsAndPosts = new ArrayList<>();
 	private ChantChordController associatedRecitingChord; // Only populated if this is a prep or post chord
 	
-	@FXML private void initialize() {
+	@FXML protected void initialize() {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
 			// Listening for user-generated edits to the part fields.
@@ -133,28 +133,15 @@ public class ChantChordController implements CommentableView {
 
 		refreshChordPreview();
 	}
-	void makePrep() {
-		numText.setText("Prep");
-		disableButtons();
-	}
-	void makePost() {
-		numText.setText("Post");
-		disableButtons();
-	}
-	void makeFinalChord() {
-		numText.setText("End");
-		preButton.setDisable(false);
-		posButton.setDisable(true);
-	}
-	private void disableButtons() {
+	protected void disableButtons() {
 		preButton.setDisable(true);
 		posButton.setDisable(true);
 	}
-	public int getType() {
+	public int getType() { // TODO: Probably needs cleanup
 		if (numText.getText().equals("Text")) return 0; // Default state; chord is not set up.
-		if (numText.getText().equals("Prep")) return -1; // Chord is a prep chord.
-		if (numText.getText().equals("Post")) return -2; // Chord is a post chord.
-		if (numText.getText().equals("End")) return -3; // Chord is an end chord.
+		if (this instanceof PrepChordController) return -1; // Chord is a prep chord.
+		if (this instanceof PostChordController) return -2; // Chord is a post chord.
+		if (this instanceof FinalChordController) return -3; // Chord is an end chord.
 		else return 1; // Chord is a normal reciting tone.
 	}
 	public String getName() {

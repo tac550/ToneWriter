@@ -228,8 +228,13 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	private ChantChordController addChord(int position) throws IOException {
+		return addChord(position, new ChantChordController());
+	}
+
+	private ChantChordController addChord(int position, ChantChordController other_controller) throws IOException {
 		// Load layout from fxml file
 		FXMLLoader loader = new FXMLLoader();
+		loader.setControllerFactory(aClass -> other_controller);
 		loader.setLocation(MainApp.class.getResource("chantChordView.fxml"));
 
 		AnchorPane chordPane = loader.load();
@@ -445,10 +450,11 @@ public class ChantLineViewController implements CommentableView {
 
 		int before_reciting_chord = chantChordControllers.indexOf(caller_chord);
 
-		ChantChordController controller = addChord(before_reciting_chord);
+		PrepChordController controller = new PrepChordController();
+
+		addChord(before_reciting_chord, controller);
 
 		controller.setColor(chord_color);
-		controller.makePrep();
 		recalcCHNames();
 		
 		return controller;
@@ -457,10 +463,11 @@ public class ChantLineViewController implements CommentableView {
 
 		int after_reciting_chord = chantChordControllers.indexOf(caller_chord) + 1;
 
-		ChantChordController controller = addChord(after_reciting_chord);
+		PostChordController controller = new PostChordController();
+
+		addChord(after_reciting_chord, controller);
 
 		controller.setColor(chord_color);
-		controller.makePost();
 		recalcCHNames();
 		
 		return controller;
@@ -469,10 +476,11 @@ public class ChantLineViewController implements CommentableView {
 
 		int last_position = chantChordControllers.size();
 
-		ChantChordController controller = addChord(last_position);
+		FinalChordController controller = new FinalChordController();
+
+		addChord(last_position, controller);
 
 		controller.setColor(MainApp.END_CHORD_COLOR);
-		controller.makeFinalChord();
 		recalcCHNames();
 		
 		return controller;
