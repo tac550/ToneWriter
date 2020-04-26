@@ -79,8 +79,8 @@ public class ChantLineViewController implements CommentableView {
 	private final double scrollThreshold = 0.1;
 	private final double scrollSpeed = 10;
 	private double cursorLocation;
-	private double previousMouseVector = 0;
-	private double mouseVector;
+	private double previousMouseX = 0;
+	private double mouseX;
 
 	@FXML private void initialize() {
 		initializeMenus();
@@ -287,23 +287,23 @@ public class ChantLineViewController implements CommentableView {
 						if (prevTime == -1) prevTime = now;
 
 						double timeDelta = (now - prevTime) / 1000000000; // In seconds
-						double previousVectorAbs = Math.abs(previousMouseVector);
-						double mouseVectorAbs = Math.abs(mouseVector);
+						double previousVectorAbs = Math.abs(previousMouseX);
+						double mouseVectorAbs = Math.abs(mouseX);
 
 						// Only proceed if cursor is within scrolling threshold
 						if (cursorLocation < scrollThreshold || cursorLocation > 1 - scrollThreshold) {
 							if (mouseVectorAbs > previousVectorAbs) {
-								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseVector * timeDelta)
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseX * timeDelta)
 										* (chordScrollPane.getWidth() / (2 * chordBox.getWidth()))));
 								if (mouseReversed) mouseReversed = false;
 							} else if (mouseVectorAbs == previousVectorAbs && !mouseReversed) {
-								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseVector * timeDelta)
+								chordScrollPane.setHvalue(chordScrollPane.getHvalue() + ((scrollSpeed * mouseX * timeDelta)
 										* (chordScrollPane.getWidth() / (2 * chordBox.getWidth()))));
 							} else if (mouseVectorAbs < previousVectorAbs) {
 								mouseReversed = true;
 							}
 						}
-						previousMouseVector = mouseVector;
+						previousMouseX = mouseX;
 						prevTime = now;
 					}
 				};
@@ -318,7 +318,7 @@ public class ChantLineViewController implements CommentableView {
 
 			// Update auto scrolling values
 			cursorLocation = getCursorPositionFraction(chordPane, event.getX());
-			mouseVector = cursorLocation - 0.5;
+			mouseX = cursorLocation - 0.5;
 
 			final Dragboard dragboard = event.getDragboard();
 			if (dragboard.hasString()
