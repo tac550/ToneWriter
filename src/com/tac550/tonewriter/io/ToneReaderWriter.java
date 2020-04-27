@@ -91,22 +91,18 @@ public class ToneReaderWriter {
 			    	if (chord.getType() > 0) { // Main chords with preps and posts
 			    		printWriter.println(chord.getName() + ": " + chord.getFields() + 
 				    			(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (ChantChordController child : chord.getPrepsAndPosts()) {
-			    			if (child.getType() == -1) { // Preps save out first
-			    				printWriter.println("\tPrep: " + child.getFields() + 
-						    			(child.hasComment() ? ": " + child.getComment() : ""));
-			    			}
+			    		for (ChantChordController child : chord.getPreps()) { // Preps save out first
+		                    printWriter.println("\tPrep: " + child.getFields() +
+					                (child.hasComment() ? ": " + child.getComment() : ""));
 			    		}
-			    		for (ChantChordController child : chord.getPrepsAndPosts()) {
-			    			if (child.getType() == -2) { // Posts second
-			    				printWriter.println("\tPost: " + child.getFields() + 
-						    			(child.hasComment() ? ": " + child.getComment() : ""));
-			    			}
+			    		for (ChantChordController child : chord.getPosts()) { // Posts second
+		                    printWriter.println("\tPost: " + child.getFields() +
+					                (child.hasComment() ? ": " + child.getComment() : ""));
 			    		}
 			    	} else if (chord.getType() == -3) { // Ending chords
 			    		printWriter.println("END: " + chord.getFields() + 
 			    				(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (ChantChordController child : chord.getPrepsAndPosts()) {
+			    		for (ChantChordController child : chord.getPreps()) {
 			    			printWriter.println("\tPrep: " + child.getFields() + 
 			    			(child.hasComment() ? ": " + child.getComment() : ""));
 			    		}
