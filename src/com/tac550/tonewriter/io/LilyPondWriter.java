@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.ChordData;
+import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
@@ -120,9 +120,9 @@ public class LilyPondWriter {
 				// Gets set if a note was combined on the last chord.
 				String[] tempCurrentNotes = new String[]{"", "", "", ""};
 
-				List<ChordData> chordList = Arrays.asList(syllableData.getAssociatedChords());
+				List<AssignedChordData> chordList = Arrays.asList(syllableData.getAssociatedChords());
 				// For each chord assigned to the syllable...
-				for (ChordData chordData : chordList) {
+				for (AssignedChordData chordData : chordList) {
 
 					String syllable = chordData.getSyllable();
 
@@ -200,7 +200,7 @@ public class LilyPondWriter {
 								hideThisChord = false;
 							} else {
 								// The previous note is the note from the last chord from the previous syllable.
-								ChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllableData) - 1).getAssociatedChords();
+								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllableData) - 1).getAssociatedChords();
 								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
 							}
 						} else {

@@ -2,7 +2,7 @@ package com.tac550.tonewriter.view;
 
 import java.util.ArrayList;
 
-import com.tac550.tonewriter.model.ChordData;
+import com.tac550.tonewriter.model.AssignedChordData;
 
 import javafx.scene.control.Button;
 import javafx.scene.input.*;
@@ -19,7 +19,7 @@ public class SyllableText extends Text {
 	
 	private VerseLineViewController parentController;
 	
-	private final ArrayList<ChordData> associatedChords = new ArrayList<>();
+	private final ArrayList<AssignedChordData> associatedChords = new ArrayList<>();
 	private final ArrayList<Button> associatedButtons = new ArrayList<>();
 	
 	private boolean active = true;
@@ -86,7 +86,7 @@ public class SyllableText extends Text {
 
 		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
 		
-		associatedChords.add(new ChordData(getText(), chord));
+		associatedChords.add(new AssignedChordData(getText(), chord));
 		associatedButtons.add(note_button);
 		
 		setColor(chord.getColor());
@@ -119,8 +119,8 @@ public class SyllableText extends Text {
 		associatedChords.get(associatedButtons.indexOf(note_button)).setDuration(duration);
 	}
 	
-	public ChordData[] getAssociatedChords() {
-		return associatedChords.toArray(new ChordData[] {});
+	public AssignedChordData[] getAssociatedChords() {
+		return associatedChords.toArray(new AssignedChordData[] {});
 	}
 	
 	int getNextNoteButtonPosY() {

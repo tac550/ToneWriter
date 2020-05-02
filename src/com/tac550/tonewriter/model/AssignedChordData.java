@@ -3,13 +3,13 @@ package com.tac550.tonewriter.model;
 import com.tac550.tonewriter.io.LilyPondWriter;
 import com.tac550.tonewriter.view.ChantChordController;
 
-public class ChordData {
+public class AssignedChordData {
 
 	private final String syllable;
 	private final ChantChordController chord;
 	private String duration;
 
-	public ChordData(String syllable_data, ChantChordController chord_data) {
+	public AssignedChordData(String syllable_data, ChantChordController chord_data) {
 		syllable = syllable_data;
 		chord = chord_data;
 		duration = "4";
