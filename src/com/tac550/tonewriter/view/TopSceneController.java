@@ -348,6 +348,7 @@ public class TopSceneController {
 		}
 
 		tabPane.getTabs().remove(tab);
+		tabControllerMap.remove(tab);
 	}
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
