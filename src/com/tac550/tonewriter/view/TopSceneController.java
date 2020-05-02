@@ -337,7 +337,7 @@ public class TopSceneController {
 		}
 	}
 
-	private void closeTab(Tab tab) {
+	private void closeTab(Tab tab) { // TODO: Memory leak (closing tabs doesn't free RAM)
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
 		EventHandler<Event> handler = tab.getOnCloseRequest();

@@ -23,18 +23,16 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Locale;
 
-public class ChantChordController implements CommentableView {
+public abstract class ChantChordController implements CommentableView {
 	
-	private ChantLineViewController chantLineController;
+	protected ChantLineViewController chantLineController;
 
 	private File midiFile;
 	
 	private String keySignature = "C major";
-	private Color chordColor;
+	protected Color chordColor;
 	
 	private String commentString = "";
 	private Image commentButtonState;
@@ -55,11 +53,6 @@ public class ChantChordController implements CommentableView {
 	@FXML private Button commentButton;
 	@FXML ImageView moveHandleImage;
 
-	// TODO: Make these members of subclasses?
-	private final ArrayList<ChantChordController> prepChords = new ArrayList<>(); // Stored left-to-right
-	private final ArrayList<ChantChordController> postChords = new ArrayList<>(); // Stored right-to-left
-	private ChantChordController associatedRecitingChord; // Only populated if this is a prep or post chord
-	
 	@FXML protected void initialize() {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
@@ -116,19 +109,9 @@ public class ChantChordController implements CommentableView {
 		
 		refreshChordPreview();
 	}
-	void setNumber(int number) {
-		numText.setText(String.valueOf(number));
-	}
-	void setColor(Color color) {
+	public void setColor(Color color) {
 		chordColor = color;
-
-		setMainElementsColor(chordColor);
-		
-		for (ChantChordController chord : prepChords) {
-			chord.setColor(chordColor);
-		} for (ChantChordController chord : postChords) {
-			chord.setColor(chordColor);
-		}
+		setMainElementsColor(color);
 	}
 	Color getColor() {
 		return chordColor;
@@ -141,13 +124,6 @@ public class ChantChordController implements CommentableView {
 	protected void disableButtons() {
 		preButton.setDisable(true);
 		posButton.setDisable(true);
-	}
-	public int getType() { // TODO: Probably needs OO cleanup
-		if (numText.getText().equals("Text")) return 0; // Default state; chord is not set up.
-		if (this instanceof PrepChordController) return -1; // Chord is a prep chord.
-		if (this instanceof PostChordController) return -2; // Chord is a post chord.
-		if (this instanceof FinalChordController) return -3; // Chord is an end chord.
-		else return 1; // Chord is a normal reciting tone.
 	}
 	public String getName() {
 		return numText.getText();
@@ -166,40 +142,7 @@ public class ChantChordController implements CommentableView {
 	public boolean hasComment() {
 		return !commentString.isEmpty();
 	}
-	public ArrayList<ChantChordController> getPreps() {
-		return prepChords;
-	}
-	public ArrayList<ChantChordController> getPosts() {
-		return postChords;
-	}
-	void rotatePrepsOrPosts(int type, ChantChordController source, ChantChordController target) {
-		ArrayList<ChantChordController> targetList = (type == -1 ? prepChords : postChords);
 
-		ArrayList<ChantChordController> resultList = new ArrayList<>(targetList);
-
-		int sourceIndex = targetList.indexOf(source);
-		int targetIndex = targetList.indexOf(target);
-
-		if (sourceIndex < targetIndex) {
-			Collections.rotate(resultList.subList(sourceIndex, targetIndex + 1), -1);
-		} else {
-			Collections.rotate(resultList.subList(targetIndex, sourceIndex + 1), 1);
-		}
-
-		targetList.clear();
-		targetList.addAll(resultList);
-
-	}
-	private void setAssociatedRecitingChord(ChantChordController chord) {
-		associatedRecitingChord = chord;
-	}
-	ChantChordController getAssociatedRecitingChord() {
-		if (getType() == 1 || getType() == -3) {
-			return this;
-		} else {
-			return associatedRecitingChord;
-		}
-	}
 	public void setFields(String data) {
 		if (data == null || !data.contains("-")) {
 			return;
@@ -251,53 +194,15 @@ public class ChantChordController implements CommentableView {
 		midiFile = files[1];
 	}
 	
-	@FXML public void addPrepChord() throws IOException {
+	@FXML public abstract void addPrepChord() throws IOException;
+	@FXML public abstract void addPostChord() throws IOException;
+
+	@FXML public void remove() {
 		chantLineController.edited();
-		addPrepChord("");
+		deleteAll();
 	}
-	public ChantChordController addPrepChord(String values) throws IOException {
-		ChantChordController prepChordController = chantLineController.addPrepChord(this, chordColor);
-		prepChords.add(prepChordController);
-		prepChordController.setAssociatedRecitingChord(this);
-		prepChordController.setFields(values);
-		
-		return prepChordController;
-	}
-	@FXML public void addPostChord() throws IOException {
-		chantLineController.edited();
-		if (getType() == -3) { // TODO: Is this even possible?
-			ChantChordController endChord = chantLineController.addEndChord();
-			postChords.add(endChord);
-			endChord.setAssociatedRecitingChord(this);
-		} else {
-			addPostChord("");
-		}
-	}
-	public ChantChordController addPostChord(String values) throws IOException {
-		ChantChordController postChordController = chantLineController.addPostChord(this, chordColor);
-		postChords.add(postChordController);
-		postChordController.setAssociatedRecitingChord(this);
-		postChordController.setFields(values);
-		
-		return postChordController;
-	}
-	@FXML public void deleteAll() { // Deletes this chord and its associated preps and posts.
-		chantLineController.edited();
-		// TODO: These deletions commonly throw ConcurrentModificationException
-		for (ChantChordController chord : prepChords) {
-			chord.deleteAll();
-		} for (ChantChordController chord : postChords) {
-			chord.deleteAll();
-		}
-		if (associatedRecitingChord != null) {
-			if (getType() == -1) {
-				associatedRecitingChord.getPreps().remove(this);
-			} else if (getType() == -2) {
-				associatedRecitingChord.getPosts().remove(this);
-			}
-		}
-		chantLineController.removeChord(this);
-	}
+	public abstract void deleteAll(); // Deletes this chord and its associated preps and posts. TODO: ConcurrentModificationException
+
 	@FXML private void copy() {
 		MainSceneController.copiedChord = getFields();
 	}
@@ -372,4 +277,6 @@ public class ChantChordController implements CommentableView {
 		setMainElementsColor(chordColor);
 	}
 
+	public abstract ChantChordController getAssociatedRecitingChord();
+	public abstract void rotatePrepsOrPosts(ChantChordController source, ChantChordController target);
 }

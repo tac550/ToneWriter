@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -204,10 +205,10 @@ public class ChantLineViewController implements CommentableView {
 		}
 		
 	}
-	private int countMainChords() {
+	private int countRecitingChords() {
 		int count = 0;
 		for (ChantChordController chord : chantChordControllers) {
-			if (chord.getType() > 0) {
+			if (chord instanceof RecitingChord) {
 				count++;
 			}
 		}
@@ -227,11 +228,7 @@ public class ChantLineViewController implements CommentableView {
 		return mainPane;
 	}
 
-	private ChantChordController addChord(int position) throws IOException {
-		return addChord(position, new ChantChordController());
-	}
-
-	private ChantChordController addChord(int position, ChantChordController other_controller) throws IOException {
+	private void addChord(int position, ChantChordController other_controller) throws IOException {
 		// Load layout from fxml file
 		FXMLLoader loader = new FXMLLoader();
 		loader.setControllerFactory(aClass -> other_controller);
@@ -338,7 +335,7 @@ public class ChantLineViewController implements CommentableView {
 				}
 
 				// Move validation
-				if (draggingController.get().getType() == 1) { // If chord being dragged is a reciting chord...
+				if (draggingController.get() instanceof RecitingChord) {
 					// Disallow any move that would place it (and its preps/posts) in the middle of any other reciting chord's preps/posts.
 					if (otherChord != null) {
 						if (otherChord.getAssociatedRecitingChord() == hoveredChord.getAssociatedRecitingChord()
@@ -348,19 +345,20 @@ public class ChantLineViewController implements CommentableView {
 							return;
 						}
 					} else {
-						if (hoveredChord.getType() == -3) {
+						if (hoveredChord instanceof EndChord) {
 							event.consume();
 							return;
 						}
 					}
-				} else if (draggingController.get().getType() == -3) { // If chord being dragged is an End chord...
+				} else if (draggingController.get() instanceof EndChord) {
 					// Disallow all moves.
 					event.consume();
 					return;
-				} else { // If chord being dragged is any other type (prep or post)...
+				} else if (draggingController.get() instanceof SubChord) {
 					// Disallow any move outside its own group of preps or posts.
-					if (hoveredChord.getType() != draggingController.get().getType()
-							|| hoveredChord.getAssociatedRecitingChord() != draggingController.get().getAssociatedRecitingChord()) {
+					if (!(hoveredChord instanceof SubChord)
+							|| hoveredChord.getAssociatedRecitingChord()
+							!= draggingController.get().getAssociatedRecitingChord()) {
 						event.consume();
 						return;
 					}
@@ -392,8 +390,10 @@ public class ChantLineViewController implements CommentableView {
 				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
 				if (sourceIndex != targetIndex) {
 
-					int numPreps = draggingController.get().getPreps().size();
-					int numPosts = draggingController.get().getPosts().size();
+					int numPreps = draggingController.get() instanceof RecitingChord ?
+							((RecitingChord) draggingController.get()).getPreps().size() : 0;
+					int numPosts = draggingController.get() instanceof RecitingChord ?
+							((RecitingChord) draggingController.get()).getPosts().size() : 0;
 
 					ChantChordController targetController = chantChordControllers.get(targetIndex);
 
@@ -419,8 +419,9 @@ public class ChantLineViewController implements CommentableView {
 					chantChordControllers.clear();
 					chantChordControllers.addAll(controllers);
 
-					draggingController.get().getAssociatedRecitingChord().rotatePrepsOrPosts(
-							draggingController.get().getType(), draggingController.get(), targetController);
+					if (!(draggingController.get() instanceof RecitingChord))
+						draggingController.get().getAssociatedRecitingChord().rotatePrepsOrPosts(
+								draggingController.get(), targetController);
 
 					recalcCHNames();
 					edited();
@@ -439,26 +440,27 @@ public class ChantLineViewController implements CommentableView {
 		controller.setChantLineController(this);
 		controller.setKeySignature(mainController.getCurrentKey());
 
-		return controller;
 	}
-	public ChantChordController addRecitingChord() throws IOException {
-		if (countMainChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
+	public RecitingChord addRecitingChord() throws IOException {
+		if (countRecitingChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
 			return null;
 		}
 		// Add to end of lists but before any ending chords
 		int position = chantChordControllers.size() - countEndChords();
 
-		ChantChordController controller = addChord(position);
+		RecitingChord controller = new RecitingChord();
+
+		addChord(position, controller);
 
 		recalcCHNames();
 
 		return controller;
 	}
-	ChantChordController addPrepChord(ChantChordController caller_chord, Color chord_color) throws IOException {
+	public PrepChord addPrepChord(ChantChordController caller_chord, Color chord_color) throws IOException {
 
 		int before_reciting_chord = chantChordControllers.indexOf(caller_chord);
 
-		PrepChordController controller = new PrepChordController();
+		PrepChord controller = new PrepChord();
 
 		addChord(before_reciting_chord, controller);
 
@@ -467,11 +469,11 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	ChantChordController addPostChord(ChantChordController caller_chord, Color chord_color) throws IOException {
+	public PostChord addPostChord(RecitingChord caller_chord, Color chord_color) throws IOException {
 
 		int after_reciting_chord = chantChordControllers.indexOf(caller_chord) + 1;
 
-		PostChordController controller = new PostChordController();
+		PostChord controller = new PostChord();
 
 		addChord(after_reciting_chord, controller);
 
@@ -480,11 +482,11 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	public ChantChordController addEndChord() throws IOException {
+	public EndChord addEndChord() throws IOException {
 
 		int last_position = chantChordControllers.size();
 
-		FinalChordController controller = new FinalChordController();
+		EndChord controller = new EndChord();
 
 		addChord(last_position, controller);
 
@@ -493,7 +495,7 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	void removeChord(ChantChordController chord) {
+	public void removeChord(ChantChordController chord) {
 		chordBox.getChildren().remove(chord.getMainPane());
 		chantChordControllers.remove(chord);
 		recalcCHNames();
@@ -501,7 +503,7 @@ public class ChantLineViewController implements CommentableView {
 	@FXML private void removeEndingChords() {
 		ArrayList<ChantChordController> chordsToDelete = new ArrayList<>();
 		for (ChantChordController chord : chantChordControllers) {
-			if (chord.getType() == -3) { // If it's an ending chord
+			if (chord instanceof EndChord) {
 				chordsToDelete.add(chord);
 			}
 		}
@@ -536,8 +538,8 @@ public class ChantLineViewController implements CommentableView {
 	private void recalcCHNames() {
 		int currentNumber = 0;
 		for (ChantChordController chantChord : chantChordControllers) {
-			if (!(chantChord.getType() < 0)) { // If not special
-				chantChord.setNumber(currentNumber + 1);
+			if (chantChord instanceof RecitingChord) {
+				((RecitingChord) chantChord).setNumber(currentNumber + 1);
 				chantChord.setColor(MainApp.CHORD_COLORS[currentNumber]);
 				currentNumber++;
 			}
@@ -695,9 +697,9 @@ public class ChantLineViewController implements CommentableView {
 		if (cc.getChords().size() != this.getChords().size()) return false;
 
 		for (int i = 0; i < this.getChords().size(); i++) {
-			if (!(cc.getChords().get(i).getFields().equals(this.getChords().get(i).getFields()) &&
-					cc.getChords().get(i).getName().equals(this.getChords().get(i).getName()) &&
-					cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
+			if (!(cc.getChords().get(i).getFields().equals(this.getChords().get(i).getFields())
+					&& cc.getChords().get(i).getName().equals(this.getChords().get(i).getName())
+					&& cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
 				return false;
 		}
 
@@ -705,7 +707,7 @@ public class ChantLineViewController implements CommentableView {
 
 	}
 
-	void edited() {
+	public void edited() {
 		mainController.toneEdited();
 	}
 

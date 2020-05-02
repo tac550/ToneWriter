@@ -1,5 +1,9 @@
 package com.tac550.tonewriter.io;
 
+import com.tac550.tonewriter.model.EndChord;
+import com.tac550.tonewriter.model.PostChord;
+import com.tac550.tonewriter.model.PrepChord;
+import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
@@ -88,23 +92,23 @@ public class ToneReaderWriter {
 			    
 			    // For each chord in the chant line...
 			    for (ChantChordController chord : chantLine.getChords()) {
-			    	if (chord.getType() > 0) { // Main chords with preps and posts
+			    	if (chord instanceof RecitingChord) {
 			    		printWriter.println(chord.getName() + ": " + chord.getFields() + 
 				    			(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (ChantChordController child : chord.getPreps()) { // Preps save out first
-		                    printWriter.println("\tPrep: " + child.getFields() +
-					                (child.hasComment() ? ": " + child.getComment() : ""));
+			    		for (PrepChord prep : ((RecitingChord) chord).getPreps()) { // Preps save out first
+		                    printWriter.println("\tPrep: " + prep.getFields() +
+					                (prep.hasComment() ? ": " + prep.getComment() : ""));
 			    		}
-			    		for (ChantChordController child : chord.getPosts()) { // Posts second
-		                    printWriter.println("\tPost: " + child.getFields() +
-					                (child.hasComment() ? ": " + child.getComment() : ""));
+			    		for (ChantChordController post : ((RecitingChord) chord).getPosts()) { // Posts second
+		                    printWriter.println("\tPost: " + post.getFields() +
+					                (post.hasComment() ? ": " + post.getComment() : ""));
 			    		}
-			    	} else if (chord.getType() == -3) { // Ending chords
+			    	} else if (chord instanceof EndChord) {
 			    		printWriter.println("END: " + chord.getFields() + 
 			    				(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (ChantChordController child : chord.getPreps()) {
-			    			printWriter.println("\tPrep: " + child.getFields() + 
-			    			(child.hasComment() ? ": " + child.getComment() : ""));
+			    		for (PrepChord prep : ((EndChord) chord).getPreps()) {
+			    			printWriter.println("\tPrep: " + prep.getFields() +
+			    			(prep.hasComment() ? ": " + prep.getComment() : ""));
 			    		}
 			    	}
 			    }
@@ -265,11 +269,19 @@ public class ToneReaderWriter {
 				currentMainChord.setComment(comment);
 			} else if (chantLineLine.contains("Post")) {
 				assert currentMainChord != null;
-				ChantChordController postChord = currentMainChord.addPostChord(fields);
+				PostChord postChord = null;
+				if (currentMainChord instanceof RecitingChord)
+					postChord = ((RecitingChord) currentMainChord).addPostChord(fields);
+				assert postChord != null;
 				postChord.setComment(comment);
 			} else if (chantLineLine.contains("Prep")) {
 				assert currentMainChord != null;
-				ChantChordController prepChord = currentMainChord.addPrepChord(fields);
+				PrepChord prepChord;
+				if (currentMainChord instanceof EndChord)
+					prepChord = ((EndChord) currentMainChord).addPrepChord(fields);
+				else
+					prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
+				assert prepChord != null;
 				prepChord.setComment(comment);
 			} else if (chantLineLine.contains("END")) {
 				currentMainChord = currentChantLine.addEndChord();

@@ -419,9 +419,9 @@ public class MainSceneController {
 	 * Returns false if the user chooses cancel or closes. This should halt any impending file related functions.
 	 */
 	boolean checkSave() {
-		if (toneFile == null ||
-				!toneEdited ||
-				!isToneSavable()) {
+		if (toneFile == null
+				|| !toneEdited
+				|| !isToneSavable()) {
 			return true;
 		}
 

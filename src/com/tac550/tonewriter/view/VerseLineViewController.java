@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.model.AssignmentAction;
+import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -298,7 +299,7 @@ public class VerseLineViewController {
 			// Special disabling based on prep/post/normal
 			deactivateAll();
 
-			if (currentChord.getType() < 0) { // If current chord is a Prep, Post, or End (limit assignment)
+			if (!(currentChord instanceof RecitingChord)) {
 				if (nextChordIndex == 1) { // If no chords have been assigned yet...
 					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
@@ -368,7 +369,8 @@ public class VerseLineViewController {
 	void syllableDragStarted(SyllableText dragged_text) {
 		if (currentChord == null) return;
 
-		if (currentChord.getType() == 1) { // Only allow drag operation to continue if not assigning a prep/post/end.
+		// Only allow drag operation to continue if assigning a reciting chord.
+		if (currentChord instanceof RecitingChord) {
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
 
