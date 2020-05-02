@@ -313,7 +313,7 @@ public class TopSceneController {
 				if (result.isPresent() && result.get() == ButtonType.CANCEL || !tabControllerMap.get(tab).checkSave()) {
 					event.consume();
 				} else {
-					tabControllerMap.remove(tab);
+					cleanUpTabForRemoval(tab);
 				}
 
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
@@ -337,7 +337,7 @@ public class TopSceneController {
 		}
 	}
 
-	private void closeTab(Tab tab) { // TODO: Memory leak (closing tabs doesn't free RAM)
+	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
 		EventHandler<Event> handler = tab.getOnCloseRequest();
@@ -348,10 +348,15 @@ public class TopSceneController {
 		}
 
 		tabPane.getTabs().remove(tab);
-		tabControllerMap.remove(tab);
 	}
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
+	}
+
+	void cleanUpTabForRemoval(Tab tab) { // TODO: Still have a memory leak (closing tabs doesn't free RAM)
+		tab.textProperty().unbind();
+		tabControllerMap.remove(tab);
+		System.out.println("Removed");
 	}
 
 	void setMenuState(MenuState menu_state) {
