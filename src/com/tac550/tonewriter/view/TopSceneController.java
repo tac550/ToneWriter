@@ -356,7 +356,6 @@ public class TopSceneController {
 	void cleanUpTabForRemoval(Tab tab) { // TODO: Still have a memory leak (closing tabs doesn't free RAM)
 		tab.textProperty().unbind();
 		tabControllerMap.remove(tab);
-		System.out.println("Removed");
 	}
 
 	void setMenuState(MenuState menu_state) {
