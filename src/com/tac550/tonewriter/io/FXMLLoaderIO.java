@@ -15,12 +15,19 @@ public class FXMLLoaderIO {
 		Task<FXMLLoader> loaderTask = new Task<>() {
 
 			@Override
-			protected FXMLLoader call() throws IOException {
+			protected FXMLLoader call() {
 
 				// Load layout from fxml file
 				FXMLLoader loader = new FXMLLoader();
 				loader.setLocation(MainApp.class.getResource(filename));
-				loader.load();
+
+				try {
+					loader.load();
+				} catch (IOException e) {
+					e.printStackTrace();
+					TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+							"IO Error while loading layout file " + filename, true);
+				}
 
 				additionalActions.accept(loader);
 
