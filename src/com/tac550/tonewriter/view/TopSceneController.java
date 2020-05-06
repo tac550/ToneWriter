@@ -356,6 +356,8 @@ public class TopSceneController {
 	void cleanUpTabForRemoval(Tab tab) { // TODO: Still have a memory leak (closing tabs doesn't free RAM)
 		tab.textProperty().unbind();
 		tabControllerMap.remove(tab);
+
+		System.gc();
 	}
 
 	void setMenuState(MenuState menu_state) {
@@ -376,8 +378,8 @@ public class TopSceneController {
 		return hoverHighlightMenuItem.isSelected();
 	}
 
-	void openParameterTone(File tone) {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(tone, true);
+	void openParameterFile(File file) {
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(file, true);
 	}
 
 	void requestExit(Event ev) {

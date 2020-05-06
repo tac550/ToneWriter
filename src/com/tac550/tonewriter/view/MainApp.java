@@ -181,7 +181,7 @@ public class MainApp extends Application {
 		List<String> params = getParameters().getRaw();
 		if (params.size() > 0) {
 			File openFile = new File(params.get(0));
-			if (openFile.isFile()) topSceneController.openParameterTone(openFile);
+			if (openFile.isFile()) topSceneController.openParameterFile(openFile);
 		}
 	}
 
