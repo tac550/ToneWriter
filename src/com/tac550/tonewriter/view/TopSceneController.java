@@ -354,7 +354,7 @@ public class TopSceneController {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
 	}
 
-	void cleanUpTabForRemoval(Tab tab) { // TODO: Still have a memory leak (closing tabs doesn't free RAM)
+	void cleanUpTabForRemoval(Tab tab) { // TODO: We seem to have a memory leak (closing tabs doesn't fully free RAM)
 		tab.textProperty().unbind();
 		tabControllerMap.remove(tab);
 
