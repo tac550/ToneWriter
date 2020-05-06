@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LilyPondWriter {
+public class LilyPondInterface {
 
 	// Constants for how much to adjust notes for each part when applying relative octaves.
 	// Each ' shifts the user's input up one octave and each , shifts the same down one octave.
@@ -712,7 +712,7 @@ public class LilyPondWriter {
 				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
 		if (!uniqueChordRenders.containsKey(chordID)) {
 			// First time we're seeing this chord
-			File lilypondFile = LilyPondWriter.createTempLYChordFile(chordID);
+			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
 
 			uniqueChordRenders.put(chordID, null);
 

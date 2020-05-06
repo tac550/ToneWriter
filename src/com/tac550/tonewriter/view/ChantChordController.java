@@ -1,7 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -183,7 +183,7 @@ public abstract class ChantChordController implements CommentableView {
 		}
 
 		try {
-			LilyPondWriter.renderChord(getFields(), keySignature, this);
+			LilyPondInterface.renderChord(getFields(), keySignature, this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

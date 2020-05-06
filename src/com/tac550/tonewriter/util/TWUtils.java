@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.util;
 
-import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -131,7 +131,7 @@ public class TWUtils {
 		InputStream stream = null;
 		OutputStream resStreamOut = null;
 		try {
-			stream = LilyPondWriter.class.getResourceAsStream(resource_name);
+			stream = LilyPondInterface.class.getResourceAsStream(resource_name);
 			if (stream == null) {
 				throw new Exception("Cannot get resource \"" + resource_name + "\" from Jar file.");
 			}

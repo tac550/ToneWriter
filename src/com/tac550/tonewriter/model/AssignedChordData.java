@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.model;
 
-import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.view.ChantChordController;
 
 public class AssignedChordData {
@@ -48,20 +48,20 @@ public class AssignedChordData {
 	}
 
 	private String getSoprano() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[0],
-				LilyPondWriter.ADJUSTMENT_SOPRANO) + duration;
+		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[0],
+				LilyPondInterface.ADJUSTMENT_SOPRANO) + duration;
 	}
 	private String getAlto() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[1],
-				LilyPondWriter.ADJUSTMENT_ALTO) + duration;
+		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[1],
+				LilyPondInterface.ADJUSTMENT_ALTO) + duration;
 	}
 	private String getTenor() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[2],
-				LilyPondWriter.ADJUSTMENT_TENOR) + duration;
+		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[2],
+				LilyPondInterface.ADJUSTMENT_TENOR) + duration;
 	}
 	private String getBass() {
-		return LilyPondWriter.parseNoteRelative(chord.getFields().split("-")[3],
-				LilyPondWriter.ADJUSTMENT_BASS) + duration;
+		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[3],
+				LilyPondInterface.ADJUSTMENT_BASS) + duration;
 	}
 
 }

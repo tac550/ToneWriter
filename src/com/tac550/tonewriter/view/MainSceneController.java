@@ -594,7 +594,7 @@ public class MainSceneController {
 		}
 
 		try {
-			if (!LilyPondWriter.writeToLilypond(topSceneController.currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
+			if (!LilyPondInterface.writeToLilypond(topSceneController.currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
 					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
 					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), topSceneController.paperSize)) {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while saving!",

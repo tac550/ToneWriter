@@ -1,7 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.AutoUpdater;
-import com.tac550.tonewriter.io.LilyPondWriter;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
@@ -239,7 +239,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
-		LilyPondWriter.executePlatformSpecificLPRender(lilypondFile, false, () -> {
+		LilyPondInterface.executePlatformSpecificLPRender(lilypondFile, false, () -> {
 			if (!(lilypondFile.delete() && outputFile.delete())) {
 				System.out.println("Warning: Could not delete temporary file(s)");
 			}
@@ -336,7 +336,7 @@ public class MainApp extends Application {
 		if (dark_mode) setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 		else setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
-		LilyPondWriter.clearAllCachedChordPreviews();
+		LilyPondInterface.clearAllCachedChordPreviews();
 
 		topSceneController.propagateDarkModeSetting();
 
@@ -565,7 +565,7 @@ public class MainApp extends Application {
 	private static String getRequiredLPVersion() {
 		try {
 			String versionLine = new BufferedReader(new FileReader(
-					new File(LilyPondWriter.class.getResource("renderTemplate.ly").getPath()))).readLine();
+					new File(LilyPondInterface.class.getResource("renderTemplate.ly").getPath()))).readLine();
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 

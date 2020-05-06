@@ -13,7 +13,7 @@ public class QuickVerseIO {
 	public static ArrayList<String> getBuiltinVerses() throws IOException {
 		ArrayList<String> finalList = new ArrayList<>();
 
-		InputStream stream = LilyPondWriter.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
+		InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
 		InputStreamReader inputReader = new InputStreamReader(stream);
 		BufferedReader bufferedReader = new BufferedReader(inputReader);
 
