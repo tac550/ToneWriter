@@ -89,7 +89,7 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
-	private final Robot robot = new Robot();
+	private Robot robot;
 
 	private File toneFile;
 
@@ -167,6 +167,8 @@ public class MainSceneController {
 		VBox.setVgrow(verseArea, Priority.ALWAYS);
 		bottomRightBox.getChildren().remove(index);
 		bottomRightBox.getChildren().add(index, verseArea);
+
+		Platform.runLater(() -> robot = new Robot());
 
 	}
 

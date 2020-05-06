@@ -9,7 +9,6 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -21,7 +20,6 @@ import javafx.stage.Stage;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -279,11 +277,10 @@ public class TopSceneController {
 	}
 
 	@FXML void addTab() {
-		try {
-			// Load layout from fxml file TODO: Why not Thread this?
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("MainScene.fxml"));
-			SplitPane mainLayout = loader.load();
+		// Load layout from fxml file
+		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
+
+			SplitPane mainLayout = loader.getRoot();
 			MainSceneController mainController = loader.getController();
 			mainController.setStageAndTopScene(parentStage, this);
 
@@ -301,9 +298,6 @@ public class TopSceneController {
 			AnchorPane.setLeftAnchor(mainLayout, 0d);
 			AnchorPane.setRightAnchor(mainLayout, 0d);
 
-			tab.setContent(anchorPane);
-			tabPane.getTabs().add(tab);
-
 			tab.setOnCloseRequest(event -> {
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
@@ -320,21 +314,28 @@ public class TopSceneController {
 				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
 			});
 
+			// Null if this is the first tab being created
 			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
 
-			mainController.setDividerPosition(previousTab.getDividerPosition());
-			if (previousTab.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
-					"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
-					true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
-				if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
+			Platform.runLater(() -> {
+				tab.setContent(anchorPane);
+
+				if (previousTab != null) {
+					mainController.setDividerPosition(previousTab.getDividerPosition());
+					if (previousTab.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
+							"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
+							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
+						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
+					});
+				}
+
+				tabPane.getTabs().add(tab);
+				tabPane.getSelectionModel().selectLast();
+				tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
 			});
 
-			tabPane.getSelectionModel().selectLast();
-			tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
+		});
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void closeTab(Tab tab) {
