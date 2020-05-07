@@ -357,8 +357,8 @@ public class ChantLineViewController implements CommentableView {
 				} else if (draggingController.get() instanceof SubChord) {
 					// Disallow any move outside its own group of preps or posts.
 					if (!(hoveredChord instanceof SubChord)
-							|| hoveredChord.getAssociatedRecitingChord()
-							!= draggingController.get().getAssociatedRecitingChord()) {
+							|| hoveredChord.getClass() != draggingController.get().getClass()
+							|| hoveredChord.getAssociatedRecitingChord() != draggingController.get().getAssociatedRecitingChord()) {
 						event.consume();
 						return;
 					}
