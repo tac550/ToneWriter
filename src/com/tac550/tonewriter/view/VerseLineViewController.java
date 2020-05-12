@@ -450,8 +450,8 @@ public class VerseLineViewController {
 			Button noteButton;
 
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
-					&& i == lastSyllable) { // If placing the final instance of the last chord in the chant line, make it a half note.
-				if (parentController.isLastVerseLine(this)) {
+					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
+				if (parentController.isLastVerseLineOfSection(this)) {
 					noteButton = createNoteButton(currentText, true, true, currentChord);
 
 					undoFrame.buttons.add(noteButton);

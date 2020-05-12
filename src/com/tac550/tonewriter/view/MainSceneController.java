@@ -334,8 +334,9 @@ public class MainSceneController {
 
 	}
 
-	boolean isLastVerseLine(VerseLineViewController line) {
-		return (verseLineControllers.indexOf(line) == verseLineControllers.size() - 1);
+	boolean isLastVerseLineOfSection(VerseLineViewController line) {
+		return (verseLineControllers.indexOf(line) == verseLineControllers.size() - 1
+				|| verseLineControllers.get(verseLineControllers.indexOf(line) + 1).isSeparator());
 	}
 
 	public void clearChantLines() {
