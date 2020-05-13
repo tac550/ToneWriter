@@ -243,7 +243,7 @@ public class LilyPondInterface {
 							// If the current and next notes both have the same pitch... (they must if they are to be combined)
 							if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))) {
 
-								// The addNotes function handles adding the notes together.
+								// Try to do the combination
 								String addedNotes = combineNotes(currentNote, nextNote);
 
 								// If the previous note was also combined, remove it (and any tokens after it).
