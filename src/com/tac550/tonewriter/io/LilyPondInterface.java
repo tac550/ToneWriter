@@ -455,13 +455,13 @@ public class LilyPondInterface {
 		if (largeTitle) lines.set(53, lines.get(53).replace("subtitle", "title"));
 		// Add markup for readers' parts, if any.
 		if (!topReader.isEmpty()) {
-			lines.set(57, "\\markup {");
-			lines.set(58, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}");
+			lines.set(57, "\\markup \\column {");
+			lines.set(58, "  \\vspace #1 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}" + " \\vspace #0.5");
 			lines.set(59, "}");
 		}
 		if (!bottomReader.isEmpty()) {
-			lines.set(94, "\\markup {");
-			lines.set(95, "  \\vspace #2 \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}");
+			lines.set(94, "\\markup \\column {");
+			lines.set(95, "  \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}" + " \\vspace #1");
 			lines.set(96, "}");
 		}
 
