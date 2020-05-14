@@ -1,24 +1,19 @@
 package com.tac550.tonewriter.model;
 
 import com.tac550.tonewriter.view.ChantChordController;
-import javafx.fxml.FXML;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class EndChord extends MainChord {
+public class MainChord extends ChantChordController {
 
-	private final ArrayList<PrepChord> prepChords = new ArrayList<>(); // Stored left-to-right
-
-	@FXML protected void initialize() {
-		super.initialize();
-		numText.setText("End");
-		preButton.setDisable(false);
-		posButton.setDisable(true);
-	}
+	protected final ArrayList<PrepChord> prepChords = new ArrayList<>(); // Stored left-to-right
+	protected final ArrayList<PostChord> postChords = new ArrayList<>(); // Stored right-to-left
 
 	public PrepChord addPrepChord(String values) throws IOException {
+		chantLineController.edited();
+
 		PrepChord prepChord = chantLineController.addPrepChord(this, chordColor);
 		prepChords.add(prepChord);
 		prepChord.setAssociatedChord(this);
@@ -26,17 +21,17 @@ public class EndChord extends MainChord {
 
 		return prepChord;
 	}
+	public PostChord addPostChord(String values) throws IOException {
+		chantLineController.edited();
 
-	@Override
-	public void deleteAll() {
-		for (PrepChord chord : prepChords) {
-			chord.deleteAll();
-		}
+		PostChord postChord = chantLineController.addPostChord(this, chordColor);
+		postChords.add(postChord);
+		postChord.setAssociatedChord(this);
+		postChord.setFields(values);
 
-		chantLineController.removeChord(this);
+		return postChord;
 	}
 
-	@Override
 	public void rotatePrepsOrPosts(ChantChordController source, ChantChordController target) {
 		ArrayList<ChantChordController> resultList = new ArrayList<>(prepChords);
 
@@ -53,8 +48,26 @@ public class EndChord extends MainChord {
 		resultList.forEach(item -> prepChords.add((PrepChord) item));
 	}
 
+	@Override
+	public void deleteAll() {
+		for (PrepChord chord : prepChords) {
+			chord.deleteAll();
+		} for (PostChord chord : postChords) {
+			chord.deleteAll();
+		}
+		chantLineController.removeChord(this);
+	}
+
+	@Override
+	public MainChord getAssociatedMainChord() {
+		return this;
+	}
+
 	public ArrayList<PrepChord> getPreps() {
 		return prepChords;
+	}
+	public ArrayList<PostChord> getPosts() {
+		return postChords;
 	}
 
 }

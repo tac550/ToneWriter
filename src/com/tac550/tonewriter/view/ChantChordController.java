@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.model.MainChord;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -193,9 +194,17 @@ public abstract class ChantChordController implements CommentableView {
 		chordView.setImage(new Image(files[0].toURI().toString()));
 		midiFile = files[1];
 	}
-	
-	@FXML public abstract void addPrepChord() throws IOException;
-	@FXML public abstract void addPostChord() throws IOException;
+
+	@FXML private void addPrepChord() throws IOException {
+		if (this instanceof MainChord) {
+			((MainChord) this).addPrepChord("");
+		}
+	}
+	@FXML private void addPostChord() throws IOException {
+		if (this instanceof MainChord) {
+			((MainChord) this).addPostChord("");
+		}
+	}
 
 	@FXML public void remove() {
 		chantLineController.edited();
@@ -277,6 +286,5 @@ public abstract class ChantChordController implements CommentableView {
 		setMainElementsColor(chordColor);
 	}
 
-	public abstract ChantChordController getAssociatedRecitingChord();
-	public abstract void rotatePrepsOrPosts(ChantChordController source, ChantChordController target);
+	public abstract MainChord getAssociatedMainChord();
 }

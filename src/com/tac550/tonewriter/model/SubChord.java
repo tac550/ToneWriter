@@ -3,13 +3,13 @@ package com.tac550.tonewriter.model;
 import com.tac550.tonewriter.view.ChantChordController;
 
 public abstract class SubChord extends ChantChordController {
-	private ChantChordController associatedRecitingChord;
+	private MainChord associatedMainChord;
 
-	public void setAssociatedChord(ChantChordController chord) {
-		associatedRecitingChord = chord;
+	public void setAssociatedChord(MainChord chord) {
+		associatedMainChord = chord;
 	}
-	public ChantChordController getAssociatedRecitingChord() {
-		return associatedRecitingChord;
+	public MainChord getAssociatedMainChord() {
+		return associatedMainChord;
 	}
 
 }

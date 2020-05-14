@@ -12,20 +12,10 @@ public class PostChord extends SubChord {
 	}
 
 	@Override
-	public void addPrepChord() {}
-	@Override
-	public void addPostChord() {}
-
-	@Override
 	public void deleteAll() {
-		((RecitingChord) getAssociatedRecitingChord()).getPosts().remove(this);
+		((RecitingChord) getAssociatedMainChord()).getPosts().remove(this);
 
 		chantLineController.removeChord(this);
-	}
-
-	@Override
-	public void rotatePrepsOrPosts(ChantChordController source, ChantChordController target) {
-
 	}
 
 }

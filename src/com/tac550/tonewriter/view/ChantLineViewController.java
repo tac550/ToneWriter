@@ -338,9 +338,9 @@ public class ChantLineViewController implements CommentableView {
 				if (draggingController.get() instanceof RecitingChord) {
 					// Disallow any move that would place it (and its preps/posts) in the middle of any other reciting chord's preps/posts.
 					if (otherChord != null) {
-						if (otherChord.getAssociatedRecitingChord() == hoveredChord.getAssociatedRecitingChord()
-								|| otherChord.getAssociatedRecitingChord() == draggingController.get()
-								|| hoveredChord.getAssociatedRecitingChord() == draggingController.get()) {
+						if (otherChord.getAssociatedMainChord() == hoveredChord.getAssociatedMainChord()
+								|| otherChord.getAssociatedMainChord() == draggingController.get()
+								|| hoveredChord.getAssociatedMainChord() == draggingController.get()) {
 							event.consume();
 							return;
 						}
@@ -358,7 +358,7 @@ public class ChantLineViewController implements CommentableView {
 					// Disallow any move outside its own group of preps or posts.
 					if (!(hoveredChord instanceof SubChord)
 							|| hoveredChord.getClass() != draggingController.get().getClass()
-							|| hoveredChord.getAssociatedRecitingChord() != draggingController.get().getAssociatedRecitingChord()) {
+							|| hoveredChord.getAssociatedMainChord() != draggingController.get().getAssociatedMainChord()) {
 						event.consume();
 						return;
 					}
@@ -419,8 +419,8 @@ public class ChantLineViewController implements CommentableView {
 					chantChordControllers.clear();
 					chantChordControllers.addAll(controllers);
 
-					if (!(draggingController.get() instanceof RecitingChord))
-						draggingController.get().getAssociatedRecitingChord().rotatePrepsOrPosts(
+					if (draggingController.get() instanceof SubChord)
+						draggingController.get().getAssociatedMainChord().rotatePrepsOrPosts(
 								draggingController.get(), targetController);
 
 					recalcCHNames();
@@ -456,7 +456,7 @@ public class ChantLineViewController implements CommentableView {
 
 		return controller;
 	}
-	public PrepChord addPrepChord(ChantChordController caller_chord, Color chord_color) throws IOException {
+	public PrepChord addPrepChord(MainChord caller_chord, Color chord_color) throws IOException {
 
 		int before_reciting_chord = chantChordControllers.indexOf(caller_chord);
 
@@ -469,7 +469,7 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	public PostChord addPostChord(RecitingChord caller_chord, Color chord_color) throws IOException {
+	public PostChord addPostChord(MainChord caller_chord, Color chord_color) throws IOException {
 
 		int after_reciting_chord = chantChordControllers.indexOf(caller_chord) + 1;
 

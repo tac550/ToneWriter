@@ -1,6 +1,5 @@
 package com.tac550.tonewriter.model;
 
-import com.tac550.tonewriter.view.ChantChordController;
 import javafx.fxml.FXML;
 
 public class PrepChord extends SubChord {
@@ -12,17 +11,9 @@ public class PrepChord extends SubChord {
 	}
 
 	@Override
-	public void addPrepChord() {}
-	@Override
-	public void addPostChord() {}
-
-	@Override
 	public void deleteAll() {
-		((RecitingChord) getAssociatedRecitingChord()).getPreps().remove(this);
+		getAssociatedMainChord().getPreps().remove(this);
 		chantLineController.removeChord(this);
 	}
-
-	@Override
-	public void rotatePrepsOrPosts(ChantChordController source, ChantChordController target) {}
 
 }
