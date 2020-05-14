@@ -324,7 +324,7 @@ public class TopSceneController {
 					mainController.setDividerPosition(previousTab.getDividerPosition());
 					if (previousTab.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 							"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
-							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}).ifPresent(buttonType -> {
+							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
 						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
 					});
 				}

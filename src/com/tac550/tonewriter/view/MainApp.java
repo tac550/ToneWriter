@@ -394,7 +394,7 @@ public class MainApp extends Application {
 										"(Will install to default location)."), APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
 				OS_NAME.startsWith("lin") ? new ButtonType[] {ButtonType.CANCEL, locateInstall} :
-						new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall});
+						new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall}, locateInstall);
 
 		if (result.isPresent()) {
 			if (result.get() == ButtonType.CANCEL) return; // continue without change

@@ -3,6 +3,7 @@ package com.tac550.tonewriter.util;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -156,21 +157,22 @@ public class TWUtils {
 	// UI
 
 	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait) {
-		return showAlert(alert_type, title_text, header_text, wait, null, null);
+		return showAlert(alert_type, title_text, header_text, wait, null, null, null);
 	}
 	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait,
 												 Stage owner) {
-		return showAlert(alert_type, title_text, header_text, wait, owner, null);
+		return showAlert(alert_type, title_text, header_text, wait, owner, null, null);
 	}
 	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait,
-												 Stage owner, ButtonType[] button_types) {
+												 Stage owner, ButtonType[] button_types, ButtonType default_button) {
 		Alert alert = new Alert(alert_type);
 		alert.setTitle(title_text);
 		alert.setHeaderText(header_text);
 		alert.initOwner(owner);
 		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
-		if (button_types != null) {
+		if (button_types != null && default_button != null) {
 			alert.getButtonTypes().setAll(button_types);
+			((Button) alert.getDialogPane().lookupButton(default_button)).setDefaultButton(true);
 		}
 
 		if (wait) {

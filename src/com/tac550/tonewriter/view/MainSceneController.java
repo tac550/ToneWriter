@@ -434,7 +434,7 @@ public class MainSceneController {
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
 				"Do you want to save tone \"" + toneFile.getName() + "\"?", true, parentStage,
-				new ButtonType[] {saveButton, dontSaveButton, cancelButton});
+				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
 
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
