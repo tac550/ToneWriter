@@ -678,10 +678,16 @@ public class MainSceneController {
 			Optional<Pair<String, String>> result = dialog.showAndWait();
 
 			result.ifPresent(poetComposer -> {
-				if (poetComposer.getKey().matches("[0-9]")) poetText = "Tone " + poetComposer.getKey();
-				else poetText = poetComposer.getKey();
+				String tempPoetText = poetComposer.getKey();
+				String tempComposerText = poetComposer.getValue();
+				if (poetComposer.getKey().matches("[0-9]")) tempPoetText = "Tone " + tempPoetText;
 
-				composerText = poetComposer.getValue();
+				if (!(tempPoetText.equals(poetText) && tempComposerText.equals(composerText))) {
+					toneEdited();
+
+					poetText = tempPoetText;
+					composerText = tempComposerText;
+				}
 			});
 		})).start();
 
