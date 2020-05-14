@@ -336,7 +336,7 @@ public class ChantLineViewController implements CommentableView {
 
 				// Move validation
 				if (draggingController.get() instanceof RecitingChord) {
-					// Disallow any move that would place it (and its preps/posts) in the middle of any other reciting chord's preps/posts.
+					// Disallow any move that would place it (and its preps/posts) in the middle of any other main chord's preps/posts.
 					if (otherChord != null) {
 						if (otherChord.getAssociatedMainChord() == hoveredChord.getAssociatedMainChord()
 								|| otherChord.getAssociatedMainChord() == draggingController.get()
