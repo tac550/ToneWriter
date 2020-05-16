@@ -68,7 +68,8 @@ public class LilyPondInterface {
 
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		lines.set(7, lines.get(7).replace("$PROJECT_TITLE", project_title));
+		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 
@@ -87,7 +88,7 @@ public class LilyPondInterface {
 
 			// Score header
 			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", item.getTitle()),
+					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitle()),
 					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
 					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
 					String.format("    opus = \"%s\"", item.getRightHeaderText()),
