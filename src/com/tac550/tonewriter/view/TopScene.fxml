@@ -62,11 +62,6 @@
                   <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
                </items>
             </Menu>
-            <Menu text="_Tools">
-               <items>
-                  <MenuItem fx:id="combinePDFsMenuItem" mnemonicParsing="false" onAction="#handleCombinePDFs" text="Combine PDFs..." />
-               </items>
-            </Menu>
             <Menu text="_Options">
                <items>
                   <CustomMenuItem mnemonicParsing="false" text="Output Separator">

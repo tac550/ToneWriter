@@ -49,8 +49,6 @@ public class TopSceneController {
 	@FXML private MenuItem resetLilyPondLocationItem;
 	@FXML private CheckMenuItem darkModeMenuItem;
 
-	@FXML private MenuItem combinePDFsMenuItem;
-
 	@FXML private MenuItem aboutMenuItem;
 	@FXML private MenuItem updateMenuitem;
 
@@ -80,7 +78,6 @@ public class TopSceneController {
 		setMenuIcon(setKeyMenuItem, keyIconPath);
 		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
-		setMenuIcon(combinePDFsMenuItem, "/media/file-pdf.png");
 		setMenuIcon(updateMenuitem, "/media/cloud-sync.png");
 
 		// Modify LilyPond location editing menu items on Mac
@@ -198,28 +195,6 @@ public class TopSceneController {
 	}
 	@FXML private void handleToggleManualCLAssignment() {
 		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleToggleManualCLAssignment();
-	}
-
-	/*
-	 * Tools Menu Actions
-	 */
-	@FXML private void handleCombinePDFs() {
-
-		FXMLLoaderIO.loadFXMLLayoutAsync("pdfCombineView.fxml", loader -> {
-			BorderPane rootLayout = loader.getRoot();
-			PDFCombineViewController controller = loader.getController();
-			controller.setDefaultDirectory(currentSavingDirectory);
-
-			Platform.runLater(() -> {
-				Stage pdfStage = new Stage();
-				pdfStage.setTitle("Combine PDFs");
-				pdfStage.getIcons().add(MainApp.APP_ICON);
-				pdfStage.setScene(new Scene(rootLayout));
-				pdfStage.setResizable(false);
-				pdfStage.show();
-			});
-		});
-
 	}
 
 	/*
