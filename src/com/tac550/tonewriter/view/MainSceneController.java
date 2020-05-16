@@ -68,8 +68,14 @@ Hear me O Lord!
 
 public class MainSceneController {
 
+	enum OutputMode {
+		NONE,
+		ITEM,
+		PROJECT
+	}
+
 	private Stage parentStage;
-	private TopSceneController topSceneController; // TODO: Trace references here
+	private TopSceneController topSceneController;
 
 	private final MenuState menuState = new MenuState();
 
@@ -101,9 +107,10 @@ public class MainSceneController {
 	static String copiedChord = "";
 
 	private boolean verseSet = false;
-	private boolean askToOverwriteOutput = false; // If false, save dialog always appears for final output.
 	private boolean toneEdited = false;
 	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
+
+	private OutputMode outputMode = OutputMode.NONE;
 	private String currentRenderFileName = MainApp.APP_NAME + " Render";
 
 	@FXML private ScrollPane toneScrollPane;
@@ -355,7 +362,8 @@ public class MainSceneController {
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Set Verse Confirmation",
 					"Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)", true);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
-			else askToOverwriteOutput = false;
+			if (outputMode == OutputMode.ITEM)
+				outputMode = OutputMode.NONE;
 		}
 
 		clearVerseLines();
@@ -529,23 +537,19 @@ public class MainSceneController {
 	 */
 	void handleExport() {
 
-		if (askToOverwriteOutput) {
+		if (outputMode != OutputMode.NONE) {
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Overwrite",
-					"Do you want to overwrite the previous output? (Choose cancel to create a new file)", true,
+					"Do you want to overwrite the previous output? (Cancel to change output settings)", true,
 					parentStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-				if (!getNewRenderFilename()) return;
+				if (!setNewRenderFilename()) return;
 			} else if (!deletePreviousRender()) {
 				TWUtils.showAlert(AlertType.ERROR, "Error",
 						"An error occurred while overwriting the previous files, attempting to output anyway...",
 						true, parentStage);
 			}
 		} else {
-			if (getNewRenderFilename()) {
-				askToOverwriteOutput = true;
-			} else {
-				return;
-			}
+			if (!setNewRenderFilename()) return;
 		}
 
 		try {
@@ -592,7 +596,8 @@ public class MainSceneController {
 
 			resetToneEditedStatus();
 
-			askToOverwriteOutput = false;
+			if (outputMode == OutputMode.ITEM)
+				outputMode = OutputMode.NONE;
 		}
 
 		LoadingTone = false;
@@ -786,17 +791,44 @@ public class MainSceneController {
 		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
 	}
 
-	private boolean getNewRenderFilename() {
+	private boolean setNewRenderFilename() {
+
+		OutputMode tempOutputMode;
+
+		if (topSceneController.tabCount() > 1) {
+			ButtonType projectBT = new ButtonType("Entire project");
+			ButtonType itemBT = new ButtonType("Current item only");
+
+			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Export Type",
+					"Which type of export do you want? (both result in 1 PDF file)", true, parentStage,
+					new ButtonType[] {projectBT, itemBT, ButtonType.CANCEL}, projectBT);
+
+			if (result.isPresent()) {
+				if (result.get() == projectBT) {
+					tempOutputMode = OutputMode.PROJECT;
+				} else if (result.get() == itemBT) {
+					tempOutputMode = OutputMode.ITEM;
+				} else return false;
+			} else return false;
+
+		} else {
+			tempOutputMode = OutputMode.ITEM;
+		}
+
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(titleTextField.getText());
 		fileChooser.setInitialDirectory(topSceneController.currentSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
-		if (PDFFile == null) return false;
-		else topSceneController.currentSavingDirectory = PDFFile.getParentFile();
+		if (PDFFile == null) {
+			return false;
+		} else {
+			topSceneController.currentSavingDirectory = PDFFile.getParentFile();
+			currentRenderFileName = FilenameUtils.removeExtension(PDFFile.getName());
 
-		currentRenderFileName = FilenameUtils.removeExtension(PDFFile.getName());
+			outputMode = tempOutputMode;
+		}
 
 		return true;
 	}

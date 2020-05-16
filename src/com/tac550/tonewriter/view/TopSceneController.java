@@ -417,4 +417,8 @@ public class TopSceneController {
 		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()) == controller;
 	}
 
+	public int tabCount() {
+		return tabPane.getTabs().size();
+	}
+
 }
