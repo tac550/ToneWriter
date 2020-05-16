@@ -165,7 +165,7 @@ public class QuickVerseController {
 
 				verses.add(resultField.getText());
 			} else {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "That verse is already in the list!",
+				TWUtils.showAlert(AlertType.ERROR, "Add failed", "That verse is already in the list!",
 						true, getStage());
 			}
 		} catch (IOException e) {
