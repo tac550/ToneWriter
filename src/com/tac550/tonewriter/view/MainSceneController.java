@@ -540,14 +540,18 @@ public class MainSceneController {
 					"Do you want to overwrite the previous output? (Cancel to change output settings)", true,
 					parentStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
-				if (!setNewRenderFilename()) return;
+				try {
+					setNewRenderFilename();
+				} catch (RenderFormatException e) { return; }
 			} else if (!deletePreviousRender()) {
 				TWUtils.showAlert(AlertType.ERROR, "Error",
 						"An error occurred while overwriting the previous files, attempting to output anyway...",
 						true, parentStage);
 			}
 		} else {
-			if (!setNewRenderFilename()) return;
+			try {
+				setNewRenderFilename();
+			} catch (RenderFormatException e) { return; }
 		}
 
 		try {
@@ -792,7 +796,7 @@ public class MainSceneController {
 		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
 	}
 
-	private boolean setNewRenderFilename() {
+	private void setNewRenderFilename() throws RenderFormatException {
 
 		OutputMode tempOutputMode;
 
@@ -809,8 +813,8 @@ public class MainSceneController {
 					tempOutputMode = OutputMode.PROJECT;
 				} else if (result.get() == itemBT) {
 					tempOutputMode = OutputMode.ITEM;
-				} else return false;
-			} else return false;
+				} else throw new RenderFormatException();
+			} else throw new RenderFormatException();
 
 		} else {
 			tempOutputMode = OutputMode.ITEM;
@@ -823,7 +827,7 @@ public class MainSceneController {
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
 		if (PDFFile == null) {
-			return false;
+			throw new RenderFormatException();
 		} else {
 
 			if (tempOutputMode == OutputMode.PROJECT) {
@@ -838,8 +842,6 @@ public class MainSceneController {
 
 			outputMode = tempOutputMode;
 		}
-
-		return true;
 	}
 
 	void setProjectOutputMode() {
@@ -953,4 +955,5 @@ public class MainSceneController {
 		return keySignature;
 	}
 
+	private static class RenderFormatException extends Exception {}
 }
