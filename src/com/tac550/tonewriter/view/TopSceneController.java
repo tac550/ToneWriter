@@ -399,7 +399,7 @@ public class TopSceneController {
 	}
 
 	@FXML boolean handleSetProjectTitle() {
-		TextInputDialog dialog = new TextInputDialog();
+		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
 		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
