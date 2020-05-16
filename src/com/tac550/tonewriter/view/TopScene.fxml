@@ -21,7 +21,18 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
          <menus>
-            <Menu text="_File">
+            <Menu text="_Project">
+               <items>
+                  <MenuItem fx:id="exportPDFMenuItem" mnemonicParsing="false" onAction="#handleExport" text="Export PDF">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
+               </items>
+            </Menu>
+            <Menu text="_Tone">
                <items>
                   <MenuItem fx:id="newToneMenuItem" mnemonicParsing="false" onAction="#handleNewTone" text="New Tone...">
                      <accelerator>
@@ -33,24 +44,16 @@
                         <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSave" text="Save Tone">
+                  <MenuItem fx:id="saveToneMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveTone" text="Save Tone">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveAs" text="Save As New...">
+                  <MenuItem fx:id="saveToneAsMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSaveToneAs" text="Save As New...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="exportPDFMenuItem" mnemonicParsing="false" onAction="#handleExport" text="Export PDF">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#handleExit" text="Exit" />
                </items>
             </Menu>
             <Menu fx:id="editMenu" disable="true" text="_Edit">

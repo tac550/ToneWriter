@@ -158,20 +158,8 @@ public class TopSceneController {
 	}
 
 	/*
-	 * File Menu Actions
+	 * Project Menu Actions
 	 */
-	@FXML void handleNewTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleNewTone();
-	}
-	@FXML private void handleOpenTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(null, false);
-	}
-	@FXML void handleSave() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSave();
-	}
-	@FXML private void handleSaveAs() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveAs();
-	}
 	@FXML private void handleExport() {
 		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleExport();
 	}
@@ -179,6 +167,22 @@ public class TopSceneController {
 		Event event = new Event(null, null, null);
 		requestExit(event);
 		if (!event.isConsumed()) Platform.exit();
+	}
+
+	/*
+	 * Tone Menu Actions
+	 */
+	@FXML void handleNewTone() {
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleNewTone();
+	}
+	@FXML private void handleOpenTone() {
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(null, false);
+	}
+	@FXML void handleSaveTone() {
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveTone();
+	}
+	@FXML private void handleSaveToneAs() {
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveToneAs();
 	}
 
 	/*

@@ -210,7 +210,7 @@ public abstract class ChantChordController implements CommentableView {
 		chantLineController.edited();
 		deleteAll();
 	}
-	public abstract void deleteAll(); // Deletes this chord and its associated preps and posts. TODO: ConcurrentModificationException
+	public abstract void deleteAll(); // Deletes this chord and its associated preps and posts.
 
 	@FXML private void copy() {
 		MainSceneController.copiedChord = getFields();

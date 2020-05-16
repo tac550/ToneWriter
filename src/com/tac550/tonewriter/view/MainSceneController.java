@@ -438,7 +438,7 @@ public class MainSceneController {
 
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
-				handleSave();
+				handleSaveTone();
 				return true;
 			} else return result.get() == dontSaveButton;
 		} else {
@@ -525,56 +525,8 @@ public class MainSceneController {
 	}
 
 	/*
-	 * File Menu Actions
+	 * Project Menu Actions
 	 */
-	void handleNewTone() {
-		if (checkSave() && createNewTone()) {
-			clearChantLines();
-			menuState.editMenuDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-
-			// Reset settings pertaining to any previously-loaded tone
-			poetText = "";
-			composerText = "";
-			currentKey = "C major";
-			menuState.manualCLAssignmentSelected = false;
-
-			Task<FXMLLoader> loaderTask = createChantLine(true);
-			loaderTask.setOnSucceeded(event -> handleSave()); // So that the tone is loadable
-		}
-	}
-	void handleOpenTone(File selectedFile, boolean auto_load) {
-		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSave()) && loadTone(selectedFile)) {
-			menuState.editMenuDisabled = false;
-			menuState.saveToneMenuItemDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-			menuState.saveToneMenuItemDisabled = !isToneSavable();
-
-			resetToneEditedStatus();
-
-			askToOverwriteOutput = false;
-		}
-
-		LoadingTone = false;
-		refreshAllChordPreviews();
-	}
-	void handleSave() {
-		if (toneFile == null || !isToneSavable()) return;
-
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, currentKey,
-				poetText, composerText);
-		if (!toneWriter.saveTone(toneFile)) {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
-		} else { // Save successful
-			resetToneEditedStatus();
-			topSceneController.refreshToneInstances(toneFile, this);
-		}
-
-	}
-	void handleSaveAs() {
-		if (createNewTone()) handleSave();
-	}
 	void handleExport() {
 
 		if (askToOverwriteOutput) {
@@ -609,6 +561,58 @@ public class MainSceneController {
 					true, parentStage);
 		}
 
+	}
+
+	/*
+	 * Tone Menu Actions
+	 */
+	void handleNewTone() {
+		if (checkSave() && createNewTone()) {
+			clearChantLines();
+			menuState.editMenuDisabled = false;
+			menuState.saveToneAsMenuItemDisabled = false;
+
+			// Reset settings pertaining to any previously-loaded tone
+			poetText = "";
+			composerText = "";
+			currentKey = "C major";
+			menuState.manualCLAssignmentSelected = false;
+
+			Task<FXMLLoader> loaderTask = createChantLine(true);
+			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
+		}
+	}
+	void handleOpenTone(File selectedFile, boolean auto_load) {
+		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
+		if ((auto_load || checkSave()) && loadTone(selectedFile)) {
+			menuState.editMenuDisabled = false;
+			menuState.saveToneMenuItemDisabled = false;
+			menuState.saveToneAsMenuItemDisabled = false;
+			menuState.saveToneMenuItemDisabled = !isToneSavable();
+
+			resetToneEditedStatus();
+
+			askToOverwriteOutput = false;
+		}
+
+		LoadingTone = false;
+		refreshAllChordPreviews();
+	}
+	void handleSaveTone() {
+		if (toneFile == null || !isToneSavable()) return;
+
+		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, currentKey,
+				poetText, composerText);
+		if (!toneWriter.saveTone(toneFile)) {
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
+		} else { // Save successful
+			resetToneEditedStatus();
+			topSceneController.refreshToneInstances(toneFile, this);
+		}
+
+	}
+	void handleSaveToneAs() {
+		if (createNewTone()) handleSaveTone();
 	}
 
 	/*
