@@ -3,10 +3,7 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.ChantChordController;
-import com.tac550.tonewriter.view.MainApp;
-import com.tac550.tonewriter.view.SyllableText;
-import com.tac550.tonewriter.view.VerseLineViewController;
+import com.tac550.tonewriter.view.*;
 import org.apache.commons.io.FilenameUtils;
 
 import java.awt.*;
@@ -40,9 +37,8 @@ public class LilyPondInterface {
 	private static final Map<String, ArrayList<ChantChordController>> pendingChordControllers = new HashMap<>();
 
 	// The function that handles final output.
-	public static boolean writeToLilypond(File saving_dir, String file_name, ArrayList<VerseLineViewController> verse_lines, String keySignature,
-	                                      Boolean largeTitle, String title, String subtitle, String poet, String composer,
-	                                      String topReaderType, String topReader, String bottomReaderType, String bottomReader, String paperSize) throws IOException {
+	public static boolean exportItems(File saving_dir, String file_name, String project_title,
+	                                  MainSceneController[] items, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
@@ -59,9 +55,9 @@ public class LilyPondInterface {
 			return false;
 		}
 
-		// Copy the chord template file, the basis for all our LilyPond output files, to the output path.
+		// Copy the render template file to the output path.
 		try {
-			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile);
+			TWUtils.exportIOResource("outputTemplate.ly", lilypondFile);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -70,19 +66,110 @@ public class LilyPondInterface {
 		// The buffer in which we'll store the output file as we build it.
 		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-		// Adding paper size, title, and header info.
+		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		lines.set(7, (largeTitle ? "  title = \"" : "  subtitle = \"") + title + "\"");
-		lines.set(8, "  subsubtitle = \"" + (subtitle.isEmpty() ? " " : subtitle) + "\"");
-		lines.set(9, "  poet = \"" + poet.trim() + "\"");
-		lines.set(10, "  composer = \"" + composer.trim() + "\"");
-
-		lines.set(12, lines.get(12).replace("$VERSION", MainApp.APP_VERSION)
+		lines.set(7, lines.get(7).replace("$PROJECT_TITLE", project_title));
+		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 
-		// Adding key signature info.
-		lines.set(16, keySignatureToLilyPond(keySignature));
+		// Add a blank line before scores begin
+		lines.add("");
 
+		for (MainSceneController item : items) {
+
+			// Top verse, if any
+			if (!item.getTopVerse().isEmpty()) {
+				Collections.addAll(lines, "\\markup \\column {",
+						String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
+								item.getTopVerseChoice(), item.getTopVerse()),
+						"}\n");
+			}
+
+			// Score header
+			Collections.addAll(lines, "\\score {\n", "  \\header {",
+					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", item.getTitle()),
+					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
+					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
+					String.format("    opus = \"%s\"", item.getRightHeaderText()),
+					"    instrument = \"\"",
+					"  }\n");
+
+			// Perform layout process
+			String[] results = buildMusicLayout(item.getVerseLineControllers());
+
+			// Staff, lyrics, and notes
+			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
+					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
+					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
+					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
+					"    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+					"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
+					"      defaultBarType = \"\" % Hides any auto-generated barlines",
+					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
+					"    }", "  }", "}\n");
+
+			// Bottom verse, if any
+			if (!item.getBottomVerse().isEmpty()) {
+				Collections.addAll(lines, "\\markup \\column {",
+						String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
+								item.getBottomVerseChoice(), item.getBottomVerse()),
+						"}\n");
+			}
+
+		}
+
+		// Remove extra newline at end of file (result is one blank line)
+		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replace("\n", ""));
+
+		// Write the file back out.
+		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+
+		if (MainApp.lilyPondAvailable()) {
+			executePlatformSpecificLPRender(lilypondFile, false, () -> {
+				try {
+					// After the render is complete, ask the OS to open the resulting PDF file.
+					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+
+					// Delete the lilypond file if the option to save it isn't set
+					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
+						if (!lilypondFile.delete()) {
+							// TODO: Replace with TWUtils showError function which calls showAlert and takes single string
+							System.out.println("Failed to delete LilyPond file, continuing...");
+						}
+					}
+
+				} catch (Exception e) {
+					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
+					// if it's not set to be saved).
+					try {
+						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+		} else {
+			try {
+				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+
+		return true;
+	}
+
+	private static String[] buildMusicLayout(ArrayList<VerseLineViewController> verse_lines) {
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.
@@ -428,80 +515,66 @@ public class LilyPondInterface {
 			int roundedBeats = (int) Math.ceil(lineBeats);
 			// We never want a 0/4 time signature (hangs Lilypond)
 			int finalBeats = roundedBeats == 0 ? 1 : roundedBeats;
-			// Add time signature information before each verse line except the first one.
-			if (verse_lines.indexOf(verseLineController) != 0) {
-				verseText.append(String.format(Locale.US, " \\time %d/4 ", finalBeats)).append(verseLine);
-			} else {
-				// If it's the first line, put its time signature in the header instead.
-				verseText.append(verseLine);
-				lines.set(17, String.format(Locale.US, "  \\time %d/4", finalBeats));
-			}
+			// Add time signature information before each verse line.
+			verseText.append(String.format(Locale.US, " \\time %d/4 ", finalBeats)).append(verseLine);
 
 			// Add a barline after each verse line
 			parts[PART_SOPRANO] += " \\bar \"|\"";
 
 		}
-		// That's it for each verse line.
 
-		// WRITING LINES OUT TO FINAL BUFFER
+		// Add a double barline at the end
+		parts[PART_SOPRANO] += " \\bar \"||\"";
 
-		// Add a double barline at the end of the page.
-		lines.set(24, parts[PART_SOPRANO] + " \\bar \"||\"");
-		lines.set(30, parts[PART_ALTO]);
-		lines.set(36, parts[PART_TENOR]);
-		lines.set(42, parts[PART_BASS]);
-		lines.set(48, verseText.toString());
-		// If using title instead of subtitle, make sure it repeats on each page.
-		if (largeTitle) lines.set(53, lines.get(53).replace("subtitle", "title"));
-		// Add markup for readers' parts, if any.
-		if (!topReader.isEmpty()) {
-			lines.set(57, "\\markup \\column {");
-			lines.set(58, "  \\vspace #1 \\justify { \\halign #-1 \\bold {" + topReaderType + "} " + topReader + "}" + " \\vspace #0.5");
-			lines.set(59, "}");
-		}
-		if (!bottomReader.isEmpty()) {
-			lines.set(94, "\\markup \\column {");
-			lines.set(95, "  \\justify { \\halign #-1 \\bold {" + bottomReaderType + "} " + bottomReader + "}" + " \\vspace #1");
-			lines.set(96, "}");
-		}
+		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
+	}
 
-		// Write the file back out.
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+	public static void renderChord(String fields, String keySignature, ChantChordController chordView) throws IOException {
+		String chordID = fields.replace("<", "(").replace(">", ")") + "-"
+				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
+		if (!uniqueChordRenders.containsKey(chordID)) {
+			// First time we're seeing this chord
+			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
 
-		if (MainApp.lilyPondAvailable()) {
-			executePlatformSpecificLPRender(lilypondFile, false, () -> {
-				try {
-					// After the render is complete, ask the OS to open the resulting PDF file.
-					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+			uniqueChordRenders.put(chordID, null);
 
-					// Delete the lilypond file if the option to save it isn't set
-					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
-						if (!lilypondFile.delete()) {
-							System.out.println("Failed to delete LilyPond file, continuing...");
-						}
-					}
+			String[] parts = fields.split("-");
 
-				} catch (Exception e) {
-					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
-					// if it's not set to be saved).
-//					e.printStackTrace();
-					try {
-						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+
+			lines.set(10, "  \\key " + keySignatureToLilyPond(keySignature));
+			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
+			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
+			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
+			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
+			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
+			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+
+			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
+			outputFile.deleteOnExit();
+			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
+			midiFile.deleteOnExit();
+			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
+			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
+			psFile.deleteOnExit();
+
+			File[] results = new File[] {outputFile, midiFile};
+			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
+			executePlatformSpecificLPRender(lilypondFile, true, () -> {
+				uniqueChordRenders.put(chordID, results);
+				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
+					controller.setChordInfoDirectly(uniqueChordRenders.get(chordID));
 				}
 			});
+		} else if (uniqueChordRenders.get(chordID) == null) {
+			// Render already started; automatically acquire the render when it's finished.
+			pendingChordControllers.get(chordID).add(chordView);
 		} else {
-			try {
-				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			// Chord already rendered; use existing files.
+			chordView.setChordInfoDirectly(uniqueChordRenders.get(chordID));
 		}
 
-
-		return true;
 	}
 
 	// Takes two notes in LilyPond syntax (which ought to have the same pitch) and returns their combination as if next to each other on a single syllable.
@@ -669,7 +742,7 @@ public class LilyPondInterface {
 
 	// Converts the UI string for the selected key signature into the format LilyPond expects.
 	private static String keySignatureToLilyPond(String key_sig) {
-		String keySigString = "  \\key ";
+		String keySigString = "";
 
 		// Splitting up the two parts of the key string...
 		String[] keySigParts = new String[2];
@@ -705,52 +778,19 @@ public class LilyPondInterface {
 		prExitDetector.start();
 	}
 
-	public static void renderChord(String fields, String keySignature, ChantChordController chordView) throws IOException {
-		String chordID = fields.replace("<", "(").replace(">", ")") + "-"
-				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
-		if (!uniqueChordRenders.containsKey(chordID)) {
-			// First time we're seeing this chord
-			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
+	public static File createTempLYChordFile(String toneFileName) {
+		File tempFile = null;
+		try {
+			// Create the temporary file to hold the lilypond markup
+			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
+			tempFile.deleteOnExit();
 
-			uniqueChordRenders.put(chordID, null);
-
-			String[] parts = fields.split("-");
-
-			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
-
-			lines.set(10, keySignatureToLilyPond(keySignature));
-			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
-			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
-			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
-			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
-			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
-
-			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-			outputFile.deleteOnExit();
-			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-			midiFile.deleteOnExit();
-			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-			psFile.deleteOnExit();
-
-			File[] results = new File[] {outputFile, midiFile};
-			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
-			executePlatformSpecificLPRender(lilypondFile, true, () -> {
-				uniqueChordRenders.put(chordID, results);
-				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
-					controller.setChordInfoDirectly(uniqueChordRenders.get(chordID));
-				}
-			});
-		} else if (uniqueChordRenders.get(chordID) == null) {
-			// Render already started; automatically acquire the render when it's finished.
-			pendingChordControllers.get(chordID).add(chordView);
-		} else {
-			// Chord already rendered; use existing files.
-			chordView.setChordInfoDirectly(uniqueChordRenders.get(chordID));
+			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
+		return tempFile;
 	}
 
 	public static void clearAllCachedChordPreviews() {
@@ -766,21 +806,6 @@ public class LilyPondInterface {
 
 		uniqueChordRenders.clear();
 		pendingChordControllers.clear();
-	}
-
-	public static File createTempLYChordFile(String toneFileName) {
-		File tempFile = null;
-		try {
-			// Create the temporary file to hold the lilypond markup
-			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
-			tempFile.deleteOnExit();
-
-			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
 	}
 
 }

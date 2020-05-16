@@ -438,7 +438,7 @@ public class ChantLineViewController implements CommentableView {
 		});
 
 		controller.setChantLineController(this);
-		controller.setKeySignature(mainController.getCurrentKey());
+		controller.setKeySignature(mainController.getKeySignature());
 
 	}
 	public RecitingChord addRecitingChord() throws IOException {

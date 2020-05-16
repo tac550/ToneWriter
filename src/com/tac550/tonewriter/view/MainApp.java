@@ -234,7 +234,7 @@ public class MainApp extends Application {
 		outputFile.deleteOnExit();
 
 		try {
-			TWUtils.exportIOResource("renderTemplate.ly", lilypondFile);
+			TWUtils.exportIOResource("chordTemplate.ly", lilypondFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -565,7 +565,7 @@ public class MainApp extends Application {
 	private static String getRequiredLPVersion() {
 		try {
 			String versionLine = new BufferedReader(new FileReader(
-					new File(LilyPondInterface.class.getResource("renderTemplate.ly").getPath()))).readLine();
+					new File(LilyPondInterface.class.getResource("outputTemplate.ly").getPath()))).readLine();
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 

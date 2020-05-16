@@ -204,7 +204,7 @@ public class ToneReaderWriter {
 			return false;
 		}
 
-		main_scene.setCurrentKey(keySig);
+		main_scene.setKeySignature(keySig);
 		if (versionSaved < 0.6) {
 			String[] headerParts = composerText.split("-", 2);
 			main_scene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");

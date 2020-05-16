@@ -82,16 +82,16 @@ public class MainSceneController {
 	@FXML private SplitPane mainSplitPane;
 
 	@FXML private VBox bottomRightBox;
-	@FXML private ChoiceBox<String> verseTopChoice;
-	@FXML private TextField verseTopField;
-	@FXML private Button verseTopButton;
+	@FXML private ChoiceBox<String> topVerseChoice;
+	@FXML private TextField topVerseField;
+	@FXML private Button topVerseButton;
 	@FXML private CheckBox largeTitleCheckBox;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
 	@FXML private TextArea verseArea;
-	@FXML private ChoiceBox<String> verseBottomChoice;
-	@FXML private TextField verseBottomField;
-	@FXML private Button verseBottomButton;
+	@FXML private ChoiceBox<String> bottomVerseChoice;
+	@FXML private TextField bottomVerseField;
+	@FXML private Button bottomVerseButton;
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
@@ -99,9 +99,9 @@ public class MainSceneController {
 
 	private File toneFile;
 
-	private String currentKey = "C major";
-	private String poetText = "";
-	private String composerText = "";
+	private String keySignature = "C major";
+	private String leftText = "";
+	private String rightText = "";
 
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
@@ -111,7 +111,8 @@ public class MainSceneController {
 	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 
 	private OutputMode outputMode = OutputMode.NONE;
-	private String currentRenderFileName = MainApp.APP_NAME + " Render";
+	private String itemOutputFileName = MainApp.APP_NAME + " Render";
+	private File itemSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
@@ -127,12 +128,12 @@ public class MainSceneController {
 	@FXML private void initialize() {
 
 		// Set up behavior for reader verse text completion buttons and fields
-		verseTopButton.setOnAction((ae) -> showQuickVerseStage(verseTopField));
-		verseBottomButton.setOnAction((ae) -> showQuickVerseStage(verseBottomField));
+		topVerseButton.setOnAction((ae) -> showQuickVerseStage(topVerseField));
+		bottomVerseButton.setOnAction((ae) -> showQuickVerseStage(bottomVerseField));
 
 		ArrayList<ChoiceBox<String>> verseChoices = new ArrayList<>();
-		verseChoices.add(verseTopChoice);
-		verseChoices.add(verseBottomChoice);
+		verseChoices.add(topVerseChoice);
+		verseChoices.add(bottomVerseChoice);
 		for (ChoiceBox<String> box : verseChoices) {
 			box.getItems().add("Reader:");
 			box.getItems().add("Sing:");
@@ -184,17 +185,14 @@ public class MainSceneController {
 		topSceneController = top_scene;
 	}
 
-	String getCurrentKey() {
-		return currentKey;
-	}
-	public void setCurrentKey(String key) {
-		currentKey = key;
-		refreshChordKeySignatures(currentKey);
+	public void setKeySignature(String key) {
+		keySignature = key;
+		refreshChordKeySignatures(keySignature);
 	}
 
-	public void setHeaderText(String poet, String composer) {
-		poetText = poet;
-		composerText = composer;
+	public void setHeaderText(String left, String right) {
+		leftText = left;
+		rightText = right;
 	}
 
 	private Task<FXMLLoader> createVerseLine(String line) {
@@ -553,11 +551,14 @@ public class MainSceneController {
 		}
 
 		try {
-			if (!LilyPondInterface.writeToLilypond(topSceneController.currentSavingDirectory, currentRenderFileName, verseLineControllers, currentKey,
-					largeTitleCheckBox.isSelected(), titleTextField.getText(), subtitleTextField.getText(), poetText, composerText,
-					verseTopChoice.getValue(), verseTopField.getText(), verseBottomChoice.getValue(), verseBottomField.getText(), topSceneController.paperSize)) {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while saving!",
-						true, parentStage);
+			if (outputMode == OutputMode.ITEM) {
+				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemOutputFileName, titleTextField.getText(),
+						new MainSceneController[] {this}, topSceneController.paperSize)) {
+					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
+							true, parentStage);
+				}
+			} else if (outputMode == OutputMode.PROJECT) {
+				topSceneController.exportProject();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -577,9 +578,9 @@ public class MainSceneController {
 			menuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
-			poetText = "";
-			composerText = "";
-			currentKey = "C major";
+			leftText = "";
+			rightText = "";
+			keySignature = "C major";
 			menuState.manualCLAssignmentSelected = false;
 
 			Task<FXMLLoader> loaderTask = createChantLine(true);
@@ -606,8 +607,8 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, currentKey,
-				poetText, composerText);
+		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, keySignature,
+				leftText, rightText);
 		if (!toneWriter.saveTone(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
@@ -630,7 +631,7 @@ public class MainSceneController {
 				"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
 				"A\u266Dminor"));
 
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(currentKey, choices);
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(keySignature, choices);
 		dialog.setTitle("Key Choice");
 		dialog.setHeaderText("Choose a key");
 		ImageView keyIcon = new ImageView(getClass().getResource(TopSceneController.keyIconPath).toExternalForm());
@@ -642,7 +643,7 @@ public class MainSceneController {
 
 		result.ifPresent(key -> {
 			toneEdited();
-			setCurrentKey(key);
+			setKeySignature(key);
 		});
 	}
 	void handleEditHeaderInfo() {
@@ -651,10 +652,10 @@ public class MainSceneController {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
 			dialog.setHeaderText("Input header info for first page");
-			ImageView composerIcon = new ImageView(getClass().getResource(TopSceneController.composerIconPath).toExternalForm());
-			composerIcon.setFitHeight(50);
-			composerIcon.setFitWidth(50);
-			dialog.setGraphic(composerIcon);
+			ImageView headerIcon = new ImageView(getClass().getResource(TopSceneController.headerIconPath).toExternalForm());
+			headerIcon.setFitHeight(50);
+			headerIcon.setFitWidth(50);
+			dialog.setGraphic(headerIcon);
 			dialog.initOwner(parentStage);
 
 			dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -664,38 +665,38 @@ public class MainSceneController {
 			grid.setVgap(10);
 			grid.setPadding(new Insets(20, 20, 10, 10));
 
-			TextField poetField = new TextField(poetText);
-			poetField.setPromptText("Tone #");
-			TextField composerField = new TextField(composerText);
-			composerField.setPromptText("Composer - System");
-			composerField.setPrefWidth(200);
+			TextField leftField = new TextField(leftText);
+			leftField.setPromptText("Tone #");
+			TextField rightField = new TextField(rightText);
+			rightField.setPromptText("Composer - System");
+			rightField.setPrefWidth(200);
 
 			grid.add(new Label("Left side:"), 0, 0);
-			grid.add(poetField, 1, 0);
+			grid.add(leftField, 1, 0);
 			grid.add(new Label("Right side:"), 2, 0);
-			grid.add(composerField, 3, 0);
+			grid.add(rightField, 3, 0);
 
 			dialog.getDialogPane().setContent(grid);
 
 			dialog.setResultConverter(dialogButton -> {
 				if (dialogButton == ButtonType.OK) {
-					return new Pair<>(poetField.getText(), composerField.getText());
+					return new Pair<>(leftField.getText(), rightField.getText());
 				}
 				return null;
 			});
 
 			Optional<Pair<String, String>> result = dialog.showAndWait();
 
-			result.ifPresent(poetComposer -> {
-				String tempPoetText = poetComposer.getKey();
-				String tempComposerText = poetComposer.getValue();
-				if (poetComposer.getKey().matches("[0-9]")) tempPoetText = "Tone " + tempPoetText;
+			result.ifPresent(leftRightText -> {
+				String tempLeftText = leftRightText.getKey();
+				String tempRightText = leftRightText.getValue();
+				if (leftRightText.getKey().matches("[0-9]")) tempLeftText = "Tone " + tempLeftText;
 
-				if (!(tempPoetText.equals(poetText) && tempComposerText.equals(composerText))) {
+				if (!(tempLeftText.equals(leftText) && tempRightText.equals(rightText))) {
 					toneEdited();
 
-					poetText = tempPoetText;
-					composerText = tempComposerText;
+					leftText = tempLeftText;
+					rightText = tempRightText;
 				}
 			});
 		})).start();
@@ -817,15 +818,23 @@ public class MainSceneController {
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(titleTextField.getText());
-		fileChooser.setInitialDirectory(topSceneController.currentSavingDirectory);
+		fileChooser.setInitialDirectory(outputMode == OutputMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
 		if (PDFFile == null) {
 			return false;
 		} else {
-			topSceneController.currentSavingDirectory = PDFFile.getParentFile();
-			currentRenderFileName = FilenameUtils.removeExtension(PDFFile.getName());
+
+			if (tempOutputMode == OutputMode.PROJECT) {
+				topSceneController.projectOutputFileName = FilenameUtils.removeExtension(PDFFile.getName());
+				topSceneController.projectSavingDirectory = PDFFile.getParentFile();
+
+				topSceneController.propagateProjectOutputSetting();
+			} else {
+				itemOutputFileName = FilenameUtils.removeExtension(PDFFile.getName());
+				itemSavingDirectory = PDFFile.getParentFile();
+			}
 
 			outputMode = tempOutputMode;
 		}
@@ -833,9 +842,16 @@ public class MainSceneController {
 		return true;
 	}
 
+	void setProjectOutputMode() {
+		outputMode = OutputMode.PROJECT;
+	}
+
 	private boolean deletePreviousRender() {
-		File lyFile = new File(topSceneController.currentSavingDirectory + File.separator + currentRenderFileName + ".ly");
-		File pdfFile = new File(topSceneController.currentSavingDirectory + File.separator + currentRenderFileName + ".pdf");
+		boolean item = outputMode == OutputMode.ITEM;
+
+		File lyFile = new File((item ? itemSavingDirectory : topSceneController.projectSavingDirectory) +
+				File.separator + (item ? itemOutputFileName : topSceneController.projectOutputFileName) + ".ly");
+		File pdfFile = new File(FilenameUtils.removeExtension(lyFile.getAbsolutePath()) + ".pdf");
 
         return pdfFile.delete() || lyFile.delete();
 	}
@@ -901,6 +917,40 @@ public class MainSceneController {
 
 	double getDividerPosition() {
 		return mainSplitPane.getDividerPositions()[0];
+	}
+
+	public String getTopVerseChoice() {
+		return topVerseChoice.getValue();
+	}
+	public String getTopVerse() {
+		return topVerseField.getText();
+	}
+	public String getBottomVerseChoice() {
+		return bottomVerseChoice.getValue();
+	}
+	public String getBottomVerse() {
+		return bottomVerseField.getText();
+	}
+	public boolean getLargeTitle() {
+		return largeTitleCheckBox.isSelected();
+	}
+	public String getTitle() {
+		return titleTextField.getText();
+	}
+	public String getSubtitle() {
+		return subtitleTextField.getText();
+	}
+	public String getLeftHeaderText() {
+		return leftText;
+	}
+	public String getRightHeaderText() {
+		return rightText;
+	}
+	public ArrayList<VerseLineViewController> getVerseLineControllers() {
+		return verseLineControllers;
+	}
+	public String getKeySignature() {
+		return keySignature;
 	}
 
 }

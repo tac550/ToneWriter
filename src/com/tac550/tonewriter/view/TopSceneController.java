@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -20,6 +21,7 @@ import javafx.stage.Stage;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +31,14 @@ public class TopSceneController {
 
 	private Stage parentStage;
 
+	@FXML private MenuItem projectTitleMenuItem;
+	@FXML private MenuItem exportPDFMenuItem;
+	@FXML private MenuItem exitMenuItem;
+
 	@FXML private MenuItem newToneMenuItem;
 	@FXML private MenuItem openToneMenuItem;
 	@FXML private MenuItem saveToneMenuItem;
 	@FXML private MenuItem saveToneAsMenuItem;
-	@FXML private MenuItem exportPDFMenuItem;
-	@FXML private MenuItem exitMenuItem;
 
 	@FXML private MenuItem addCLMenuItem;
 	@FXML private MenuItem setKeyMenuItem;
@@ -57,28 +61,33 @@ public class TopSceneController {
 
 	@FXML private Button addTabButton;
 
-	static final String composerIconPath = "/media/profile.png";
+	static final String headerIconPath = "/media/profile.png";
 	static final String keyIconPath = "/media/key.png";
+	static final String bookIconPath = "/media/book.png";
 
-	File currentSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+	String projectOutputFileName;
+	File projectSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+
+	String projectTitle = "";
 
 	String paperSize = "";
 
 	@FXML private void initialize() {
 
 		// Menu icons
+		setMenuIcon(projectTitleMenuItem, bookIconPath);
+		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
+		setMenuIcon(exitMenuItem, "/media/sign-error.png");
 		setMenuIcon(newToneMenuItem, "/media/file-text.png");
 		setMenuIcon(openToneMenuItem, "/media/folder.png");
 		setMenuIcon(saveToneMenuItem, "/media/floppy.png");
 		setMenuIcon(saveToneAsMenuItem, "/media/floppy-add.png");
-		setMenuIcon(exitMenuItem, "/media/sign-error.png");
-		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
-		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
 		setMenuIcon(addCLMenuItem, "/media/sign-add.png");
 		setMenuIcon(setKeyMenuItem, keyIconPath);
-		setMenuIcon(editHeaderInfoMenuItem, composerIconPath);
+		setMenuIcon(editHeaderInfoMenuItem, headerIconPath);
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(updateMenuitem, "/media/cloud-sync.png");
+		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
@@ -389,7 +398,47 @@ public class TopSceneController {
 		tabPane.getSelectionModel().select(prevTab);
 	}
 
-	protected void propagateDarkModeSetting() {
+	@FXML boolean handleSetProjectTitle() {
+		TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle("Project Title");
+		dialog.setHeaderText("Enter project title");
+		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
+		bookIcon.setFitHeight(50);
+		bookIcon.setFitWidth(50);
+		dialog.setGraphic(bookIcon);
+		dialog.initOwner(parentStage);
+
+		Optional<String> result = dialog.showAndWait();
+
+		if (result.isPresent()) {
+			projectTitle = result.get();
+			return true;
+		} else return false;
+	}
+
+	void exportProject() throws IOException {
+
+		while (true) {
+			if (!projectTitle.isBlank() || !handleSetProjectTitle()) break;
+		}
+
+		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
+		for (int i = 0; i < tabPane.getTabs().size(); i++) {
+			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
+		}
+
+		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
+				mainControllers, paperSize);
+
+	}
+
+	void propagateProjectOutputSetting() {
+		for (Tab tab : tabPane.getTabs()) {
+			tabControllerMap.get(tab).setProjectOutputMode();
+		}
+	}
+
+	void propagateDarkModeSetting() {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			controller.refreshVerseTextStyle();
@@ -397,14 +446,14 @@ public class TopSceneController {
 		refreshAllChordPreviews();
 	}
 
-	protected void refreshAllChordPreviews() {
+	void refreshAllChordPreviews() {
 		for (Tab tab : tabPane.getTabs()) {
 			tabControllerMap.get(tab).refreshAllChordPreviews();
 		}
 	}
 
 	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
-	protected void refreshToneInstances(File toneFile, MainSceneController caller) {
+	void refreshToneInstances(File toneFile, MainSceneController caller) {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {

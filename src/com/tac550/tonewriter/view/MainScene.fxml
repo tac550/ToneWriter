@@ -72,12 +72,12 @@
                                     <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
                                  </rowConstraints>
                                  <children>
-                                    <TextField fx:id="verseTopField" promptText="(Leave blank to skip)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                    <TextField fx:id="topVerseField" promptText="(Leave blank to skip)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
                                     </TextField>
-                                    <Button fx:id="verseTopButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                    <Button fx:id="topVerseButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font>
@@ -85,7 +85,7 @@
                                           <Tooltip text="Verse Finder..." />
                                        </tooltip>
                                     </Button>
-                                    <ChoiceBox fx:id="verseTopChoice" />
+                                    <ChoiceBox fx:id="topVerseChoice" />
                                  </children>
                               </GridPane>
                               <TextArea fx:id="verseArea" VBox.vgrow="ALWAYS" />
@@ -99,12 +99,12 @@
                                     <RowConstraints minHeight="25.0" prefHeight="25.0" vgrow="NEVER" />
                                  </rowConstraints>
                                  <children>
-                                    <TextField fx:id="verseBottomField" promptText="(Leave blank to skip)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                    <TextField fx:id="bottomVerseField" promptText="(Leave blank to skip)" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
                                     </TextField>
-                                    <Button fx:id="verseBottomButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
+                                    <Button fx:id="bottomVerseButton" focusTraversable="false" mnemonicParsing="false" text="..." GridPane.columnIndex="2">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font>
@@ -112,7 +112,7 @@
                                           <Tooltip text="Verse Finder..." />
                                        </tooltip>
                                     </Button>
-                                    <ChoiceBox fx:id="verseBottomChoice" />
+                                    <ChoiceBox fx:id="bottomVerseChoice" />
                                  </children>
                               </GridPane>
                               <StackPane>
