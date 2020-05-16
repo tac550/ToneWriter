@@ -418,10 +418,6 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 
-		while (true) {
-			if (!projectTitle.isBlank() || !handleSetProjectTitle()) break;
-		}
-
 		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
 		for (int i = 0; i < tabPane.getTabs().size(); i++) {
 			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
@@ -430,6 +426,12 @@ public class TopSceneController {
 		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
 				mainControllers, paperSize);
 
+	}
+
+	void checkProjectName() {
+		while (true) {
+			if (!projectTitle.isBlank() || !handleSetProjectTitle()) break;
+		}
 	}
 
 	void propagateProjectOutputSetting() {

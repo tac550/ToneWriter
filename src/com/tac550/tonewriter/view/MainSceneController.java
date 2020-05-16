@@ -811,6 +811,7 @@ public class MainSceneController {
 			if (result.isPresent()) {
 				if (result.get() == projectBT) {
 					tempOutputMode = OutputMode.PROJECT;
+					topSceneController.checkProjectName();
 				} else if (result.get() == itemBT) {
 					tempOutputMode = OutputMode.ITEM;
 				} else throw new RenderFormatException();
@@ -821,8 +822,8 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(titleTextField.getText());
-		fileChooser.setInitialDirectory(outputMode == OutputMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
+		fileChooser.setInitialFileName(tempOutputMode == OutputMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
+		fileChooser.setInitialDirectory(tempOutputMode == OutputMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
