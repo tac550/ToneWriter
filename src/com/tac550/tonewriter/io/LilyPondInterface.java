@@ -72,6 +72,8 @@ public class LilyPondInterface {
 				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
+		if (items.length == 1 && items[0].getLargeTitle())
+			lines.set(17, lines.get(17).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 
 		// Add a blank line before scores begin
 		lines.add("");
