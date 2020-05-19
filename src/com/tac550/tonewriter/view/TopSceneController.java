@@ -292,7 +292,7 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL || !tabControllerMap.get(tab).checkSave()) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !mainController.checkSave()) {
 					event.consume();
 				} else {
 					cleanUpTabForRemoval(tab);
@@ -315,6 +315,9 @@ public class TopSceneController {
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
 						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
 					});
+
+					if (previousTab.getOutputMode() == MainSceneController.OutputMode.PROJECT)
+						mainController.setProjectOutputMode();
 				}
 
 				tabPane.getTabs().add(tab);

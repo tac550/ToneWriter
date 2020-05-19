@@ -859,6 +859,9 @@ public class MainSceneController {
 		}
 	}
 
+	OutputMode getOutputMode() {
+		return outputMode;
+	}
 	void setProjectOutputMode() {
 		outputMode = OutputMode.PROJECT;
 	}
