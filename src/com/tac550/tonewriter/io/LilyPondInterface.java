@@ -635,6 +635,7 @@ public class LilyPondInterface {
 
 		StringBuilder outputBuffer = new StringBuilder();
 
+		// Delimiters are included to enable rebuilding the entire string with whitespace
 		StringTokenizer tokenizer = new StringTokenizer(input, " \t\n\r\f", true);
 
 		while (tokenizer.hasMoreTokens()) {
@@ -649,14 +650,8 @@ public class LilyPondInterface {
 					working_token.insert(index, "\\");
 				}
 
-				// If the syllable contains a leading space... (Most do, to separate them from the previous word or syllable)
-				if (working_token.toString().startsWith(" ")) {
-					// Surround just the syllable (not the leading space) with double quotes
-					outputBuffer.append(working_token.toString().replace(" ", " \"")).append("\"");
-				} else {
-					// Otherwise just surround the syllable without a leading space with quotes.
-					outputBuffer.append("\"").append(working_token.toString()).append("\"");
-				}
+				// Surround the syllable without a leading space with quotes.
+				outputBuffer.append("\"").append(working_token.toString()).append("\"");
 			} else {
 				outputBuffer.append(current_token);
 			}
