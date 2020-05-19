@@ -81,7 +81,6 @@ public class MainSceneController {
 
 	@FXML private SplitPane mainSplitPane;
 
-	@FXML private VBox bottomRightBox;
 	@FXML private ChoiceBox<String> topVerseChoice;
 	@FXML private TextField topVerseField;
 	@FXML private Button topVerseButton;
@@ -92,6 +91,7 @@ public class MainSceneController {
 	@FXML private ChoiceBox<String> bottomVerseChoice;
 	@FXML private TextField bottomVerseField;
 	@FXML private Button bottomVerseButton;
+	@FXML private StackPane setVersePane;
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
@@ -107,6 +107,9 @@ public class MainSceneController {
 	static String copiedChord = "";
 
 	private boolean verseSet = false;
+	private boolean setVerseCancelled = false;
+	private String lastVerseSet = "";
+
 	private boolean toneEdited = false;
 	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 
@@ -124,8 +127,6 @@ public class MainSceneController {
 	@FXML private VBox verseLineBox;
 	private final ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
 
-	private boolean setVerseCancelled = false;
-
 	@FXML private void initialize() {
 
 		// Set up behavior for reader verse text completion buttons and fields
@@ -142,7 +143,8 @@ public class MainSceneController {
 		}
 
 		// Replace text area with a custom one.
-		int index = bottomRightBox.getChildren().indexOf(verseArea);
+		AnchorPane verseAreaPane = (AnchorPane) verseArea.getParent();
+		verseAreaPane.getChildren().remove(verseArea);
 		verseArea = new TextArea() {
 			@Override
 			public void paste() { // Intercept paste actions.
@@ -173,11 +175,18 @@ public class MainSceneController {
 				event.consume();
 			}
 		});
-		VBox.setVgrow(verseArea, Priority.ALWAYS);
-		bottomRightBox.getChildren().remove(index);
-		bottomRightBox.getChildren().add(index, verseArea);
+		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
+			boolean visible = !newVal.isEmpty() && !newVal.equals(lastVerseSet);
+			setVerseButton.setVisible(visible);
+			setVersePane.setMouseTransparent(!visible);
+		});
+		verseAreaPane.getChildren().add(0, verseArea);
+		AnchorPane.setLeftAnchor(verseArea, 0.0); AnchorPane.setRightAnchor(verseArea, 0.0);
+		AnchorPane.setTopAnchor(verseArea, 0.0); AnchorPane.setBottomAnchor(verseArea, 0.0);
 
 		Platform.runLater(() -> robot = new Robot());
+
+		setVerseButton.setVisible(false);
 
 		// Title and subtitle field tooltip info reflects current output mode
 		titleTextField.getTooltip().setOnShown(event -> {
@@ -382,9 +391,12 @@ public class MainSceneController {
 
 		if (verseArea.getText().isEmpty()) return;
 
+		lastVerseSet = verseArea.getText();
+
 		// Show working indicator
 		setVerseButton.setVisible(false);
 		setVerseProgressBox.setVisible(true);
+		setVersePane.setMouseTransparent(false);
 
 		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
 		Task<Void> syllabificationTask = new Task<>() {
@@ -419,8 +431,8 @@ public class MainSceneController {
 					syncCVLMapping();
 
 					// Hide working indicator
-					setVerseButton.setVisible(true);
 					setVerseProgressBox.setVisible(false);
+					setVersePane.setMouseTransparent(true);
 				});
 				return null;
 			}
@@ -434,8 +446,12 @@ public class MainSceneController {
 	@FXML private void handleCancelSetVerse() {
 		setVerseCancelled = true;
 
+		verseSet = false;
+		lastVerseSet = "";
+
 		setVerseButton.setVisible(true);
 		setVerseProgressBox.setVisible(false);
+		setVersePane.setMouseTransparent(false);
 	}
 
 	/*
