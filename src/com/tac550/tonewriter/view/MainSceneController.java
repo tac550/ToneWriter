@@ -112,7 +112,8 @@ public class MainSceneController {
 
 	private OutputMode outputMode = OutputMode.NONE;
 	private String itemOutputFileName = MainApp.APP_NAME + " Render";
-	private File itemSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+	private File itemSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+		: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
@@ -838,6 +839,8 @@ public class MainSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(tempOutputMode == OutputMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
 		fileChooser.setInitialDirectory(tempOutputMode == OutputMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
+		if (!fileChooser.getInitialDirectory().exists())
+			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);

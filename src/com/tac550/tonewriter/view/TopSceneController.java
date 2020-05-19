@@ -67,7 +67,8 @@ public class TopSceneController {
 	static final String bookIconPath = "/media/book.png";
 
 	String projectOutputFileName;
-	File projectSavingDirectory = new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	String projectTitle = "";
 
