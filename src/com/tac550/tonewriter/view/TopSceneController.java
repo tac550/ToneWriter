@@ -5,6 +5,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.MainSceneController.OutputMode;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -316,7 +317,7 @@ public class TopSceneController {
 						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
 					});
 
-					if (previousTab.getOutputMode() == MainSceneController.OutputMode.PROJECT)
+					if (previousTab.getOutputMode() == OutputMode.PROJECT)
 						mainController.setProjectOutputMode();
 				}
 
