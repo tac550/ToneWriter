@@ -27,6 +27,8 @@ public class SyllableEditViewController {
 		// Also don't send if it's the same as the existing verse line.
 		if (!syllableTextField.getText().isEmpty() && !syllableTextField.getText().equals(parentController.getVerseLineText())) {
 			parentController.setVerseLine(syllableTextField.getText());
+
+			parentController.edited();
 		}
 		
 		closeStage();

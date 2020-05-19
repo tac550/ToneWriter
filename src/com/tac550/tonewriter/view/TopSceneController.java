@@ -213,7 +213,7 @@ public class TopSceneController {
 	}
 
 	/*
-	 * Options Menu Actions
+	 * Settings Menu Actions
 	 */
 	@FXML private void handleSetLilyPondDir() {
 		MainApp.setLilyPondDir(parentStage, false);

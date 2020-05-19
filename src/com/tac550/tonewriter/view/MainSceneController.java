@@ -1,6 +1,9 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.*;
+import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.io.LilyPondInterface;
+import com.tac550.tonewriter.io.Syllables;
+import com.tac550.tonewriter.io.ToneReaderWriter;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -84,7 +87,7 @@ public class MainSceneController {
 	@FXML private ChoiceBox<String> topVerseChoice;
 	@FXML private TextField topVerseField;
 	@FXML private Button topVerseButton;
-	@FXML private CheckBox largeTitleCheckBox;
+	@FXML private MenuButton optionsButton;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
 	@FXML private TextArea verseArea;
@@ -94,6 +97,9 @@ public class MainSceneController {
 	@FXML private StackPane setVersePane;
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
+
+	@FXML private CheckMenuItem largeTitleMenuItem;
+	@FXML private CheckMenuItem hideHeaderMenuItem;
 
 	private Robot robot;
 
@@ -112,6 +118,8 @@ public class MainSceneController {
 
 	private boolean toneEdited = false;
 	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
+
+	private boolean verseEdited = false;
 
 	private OutputMode outputMode = OutputMode.NONE;
 	private String itemOutputFileName = MainApp.APP_NAME + " Render";
@@ -176,7 +184,7 @@ public class MainSceneController {
 			}
 		});
 		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
-			boolean visible = !newVal.isEmpty() && !newVal.equals(lastVerseSet);
+			boolean visible = !newVal.equals(lastVerseSet) || verseEdited;
 			setVerseButton.setVisible(visible);
 			setVersePane.setMouseTransparent(!visible);
 		});
@@ -193,14 +201,23 @@ public class MainSceneController {
 			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
 				((Tooltip) event.getTarget()).setText("Appears on every page (Single-item export mode)");
 			else
-				((Tooltip) event.getTarget()).setText("Ceneterd above subtitle, appears once (Project export mode)");
+				((Tooltip) event.getTarget()).setText("Centered above subtitle, appears once (Project export mode)");
 		});
 		subtitleTextField.getTooltip().setOnShown(event -> {
 			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
 				((Tooltip) event.getTarget()).setText("First page only (Single-item export mode)");
 			else
-				((Tooltip) event.getTarget()).setText("Ceneterd above item, appears once (Project export mode)");
+				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
 		});
+
+		hideHeaderMenuItem.disableProperty().addListener((ov, oldval, newVal) ->
+				hideHeaderMenuItem.setSelected(newVal));
+		optionsButton.showingProperty().addListener((obs, oldVal, newVal) -> {
+			if (newVal)
+				// TODO: Possibly need to revise second condition
+				hideHeaderMenuItem.setDisable(toneFile == null || verseLineControllers.isEmpty());
+		});
+
 	}
 
 	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
@@ -388,10 +405,15 @@ public class MainSceneController {
 		}
 
 		clearVerseLines();
-
-		if (verseArea.getText().isEmpty()) return;
+		verseEdited = false;
 
 		lastVerseSet = verseArea.getText();
+
+		if (lastVerseSet.isEmpty()) {
+			setVerseButton.setVisible(false);
+			setVersePane.setMouseTransparent(true);
+			return;
+		}
 
 		// Show working indicator
 		setVerseButton.setVisible(false);
@@ -404,7 +426,7 @@ public class MainSceneController {
 			@Override
 			protected Void call() {
 
-				String[] lines = Syllables.getSyllabificationLines(verseArea.getText(), parentStage);
+				String[] lines = Syllables.getSyllabificationLines(lastVerseSet, parentStage);
 
 				if (setVerseCancelled) {
 					setVerseCancelled = false;
@@ -771,6 +793,9 @@ public class MainSceneController {
 	void removeVerseLine(VerseLineViewController verseLineViewController) {
 		verseLineBox.getChildren().remove(verseLineViewController.getRootPane());
 		verseLineControllers.remove(verseLineViewController);
+
+		verseEdited();
+
 		syncCVLMapping();
 	}
 	void chantLineUp(ChantLineViewController chantLineViewController) {
@@ -939,6 +964,13 @@ public class MainSceneController {
 		return !toneEdited;
 	}
 
+	void verseEdited() {
+		verseEdited = true;
+
+		setVerseButton.setVisible(true);
+		setVersePane.setMouseTransparent(false);
+	}
+
 	File getToneFile() {
 		return toneFile;
 	}
@@ -971,7 +1003,7 @@ public class MainSceneController {
 		return bottomVerseField.getText();
 	}
 	public boolean getLargeTitle() {
-		return largeTitleCheckBox.isSelected();
+		return largeTitleMenuItem.isSelected();
 	}
 	public String getTitle() {
 		return titleTextField.getText();
@@ -980,10 +1012,10 @@ public class MainSceneController {
 		return subtitleTextField.getText();
 	}
 	public String getLeftHeaderText() {
-		return leftText;
+		return hideHeaderMenuItem.isSelected() ? "" : leftText;
 	}
 	public String getRightHeaderText() {
-		return rightText;
+		return hideHeaderMenuItem.isSelected() ? "" : rightText;
 	}
 	public ArrayList<VerseLineViewController> getVerseLineControllers() {
 		return verseLineControllers;

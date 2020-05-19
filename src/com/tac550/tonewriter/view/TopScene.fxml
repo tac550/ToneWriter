@@ -71,7 +71,7 @@
                   <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
                </items>
             </Menu>
-            <Menu text="_Options">
+            <Menu text="_Settings">
                <items>
                   <CustomMenuItem mnemonicParsing="false" text="Output Separator">
                      <content>

@@ -33,8 +33,8 @@ import java.util.Stack;
 
 public class VerseLineViewController {
 
-	private MainSceneController parentController;
-	private TopSceneController topSceneController;
+	private MainSceneController mainController;
+	private TopSceneController topController;
 
 	private VerseLine verseLine;
 
@@ -151,8 +151,8 @@ public class VerseLineViewController {
 	}
 
 	void setParentControllers(MainSceneController parent, TopSceneController top_controller) {
-		parentController = parent;
-		topSceneController = top_controller;
+		mainController = parent;
+		topController = top_controller;
 	}
 
 	void setVerseLine(String line_text) {
@@ -279,7 +279,7 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void remove() {
-		parentController.removeVerseLine(this);
+		mainController.removeVerseLine(this);
 	}
 
 	StackPane getRootPane() {
@@ -357,7 +357,7 @@ public class VerseLineViewController {
 
 	void syllableHovered() {
 		if (currentChord == null) return;
-		if (topSceneController.hoverHighlightEnabled()) {
+		if (topController.hoverHighlightEnabled()) {
 			currentChord.setHighlighted(true);
 		}
 	}
@@ -434,7 +434,7 @@ public class VerseLineViewController {
 
 	private void assignChord(int firstSyllable, int lastSyllable) {
 		// First, play the chord if chord playing is on.
-		if (topSceneController.playMidiAsAssigned()) {
+		if (topController.playMidiAsAssigned()) {
 			currentChord.playMidi();
 		}
 
@@ -451,7 +451,7 @@ public class VerseLineViewController {
 
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
-				if (parentController.isLastVerseLineOfSection(this)) {
+				if (mainController.isLastVerseLineOfSection(this)) {
 					noteButton = createNoteButton(currentText, true, true, currentChord);
 
 					undoFrame.buttons.add(noteButton);
@@ -512,7 +512,7 @@ public class VerseLineViewController {
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
-			if (topSceneController.hoverHighlightEnabled()) {
+			if (topController.hoverHighlightEnabled()) {
 				chord.setHighlighted(true);
 			}
 		});
@@ -621,6 +621,10 @@ public class VerseLineViewController {
 		}
 
 		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
+	}
+
+	public void edited() {
+		mainController.verseEdited();
 	}
 
 }
