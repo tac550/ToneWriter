@@ -818,7 +818,7 @@ public class MainSceneController {
 			ButtonType itemBT = new ButtonType("Current item only");
 
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Export Type",
-					"Which type of export do you want? (both result in 1 PDF file)", true, parentStage,
+					"Which type of export do you want? (Both result in 1 PDF file)", true, parentStage,
 					new ButtonType[] {projectBT, itemBT, ButtonType.CANCEL}, projectBT);
 
 			if (result.isPresent()) {
