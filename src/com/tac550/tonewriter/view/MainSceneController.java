@@ -178,6 +178,19 @@ public class MainSceneController {
 
 		Platform.runLater(() -> robot = new Robot());
 
+		// Title and subtitle field tooltip info reflects current output mode
+		titleTextField.getTooltip().setOnShown(event -> {
+			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
+				((Tooltip) event.getTarget()).setText("Appears on every page (Single-item export mode)");
+			else
+				((Tooltip) event.getTarget()).setText("Ceneterd above subtitle, appears once (Project export mode)");
+		});
+		subtitleTextField.getTooltip().setOnShown(event -> {
+			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
+				((Tooltip) event.getTarget()).setText("First page only (Single-item export mode)");
+			else
+				((Tooltip) event.getTarget()).setText("Ceneterd above item, appears once (Project export mode)");
+		});
 	}
 
 	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
