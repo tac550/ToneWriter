@@ -492,11 +492,12 @@ public class VerseLineViewController {
 		noteButton.setPadding(Insets.EMPTY);
 
 		ContextMenu noteMenu = new ContextMenu();
-		CheckMenuItem quarterNote = new CheckMenuItem("quarter note");
-		CheckMenuItem dottedQuarterNote = new CheckMenuItem("dotted quarter note");
-		CheckMenuItem halfNote = new CheckMenuItem("half note");
-		CheckMenuItem eighthNote = new CheckMenuItem("eighth note");
-		CheckMenuItem wholeNote = new CheckMenuItem("whole note");
+		ToggleGroup durationGroup = new ToggleGroup();
+		RadioMenuItem quarterNote = new RadioMenuItem("quarter note");
+		RadioMenuItem dottedQuarterNote = new RadioMenuItem("dotted quarter note");
+		RadioMenuItem halfNote = new RadioMenuItem("half note");
+		RadioMenuItem eighthNote = new RadioMenuItem("eighth note");
+		RadioMenuItem wholeNote = new RadioMenuItem("whole note");
 
 		// Set initial selection
 		if (verseEnd) {
@@ -520,19 +521,10 @@ public class VerseLineViewController {
 
 		// Context menu for changing chord duration
 		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
+		for (MenuItem item : noteMenu.getItems()) {
+			((RadioMenuItem) item).setToggleGroup(durationGroup);
+		}
 		noteMenu.setOnAction(event -> {
-			for (MenuItem item : noteMenu.getItems()) {
-				// Deselect previous item when another is checked
-				if (!item.getText().equals(((CheckMenuItem) event.getTarget()).getText())) {
-					((CheckMenuItem) item).setSelected(false);
-				}
-			}
-			// Something must always be selected. Clicking the currently selected one should have no effect (re-select)
-			if (!((CheckMenuItem) event.getTarget()).isSelected()) {
-				((CheckMenuItem) event.getTarget()).setSelected(true);
-			}
-
-			// Individual actions
 			if (event.getTarget().equals(quarterNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButton);
 			} else if (event.getTarget().equals(dottedQuarterNote)) {
