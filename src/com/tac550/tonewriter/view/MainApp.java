@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.6";
+	public static final String APP_VERSION = "0.7";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
