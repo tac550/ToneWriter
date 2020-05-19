@@ -4,12 +4,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -18,7 +21,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <SplitPane fx:id="mainSplitPane" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <items>
@@ -52,7 +57,41 @@
                                  <children>
                                     <MenuButton fx:id="optionsButton" minWidth="-Infinity" mnemonicParsing="false" text="Options">
                                        <items>
-                                          <CheckMenuItem fx:id="largeTitleMenuItem" mnemonicParsing="false" text="Large Title" />
+                                          <CustomMenuItem mnemonicParsing="false" text="Title Separator">
+                                             <content>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                                                   <children>
+                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Title" />
+                                                      <Line endX="999.0" stroke="#bcbcbc">
+                                                         <HBox.margin>
+                                                            <Insets left="5.0" right="5.0" />
+                                                         </HBox.margin>
+                                                      </Line>
+                                                   </children>
+                                                </HBox>
+                                             </content>
+                                          </CustomMenuItem>
+                                          <RadioMenuItem fx:id="largeTitleMenuItem" mnemonicParsing="false" text="Large">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="titleOptions" />
+                                             </toggleGroup>
+                                          </RadioMenuItem>
+                                          <RadioMenuItem mnemonicParsing="false" selected="true" text="Normal" toggleGroup="$titleOptions" />
+                                          <RadioMenuItem fx:id="hiddenTitleMenuItem" mnemonicParsing="false" text="Hidden" toggleGroup="$titleOptions" />
+                                          <CustomMenuItem mnemonicParsing="false" text="Other Separator">
+                                             <content>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                                                   <children>
+                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Other" />
+                                                      <Line endX="999.0" stroke="#bcbcbc">
+                                                         <HBox.margin>
+                                                            <Insets left="5.0" right="5.0" />
+                                                         </HBox.margin>
+                                                      </Line>
+                                                   </children>
+                                                </HBox>
+                                             </content>
+                                          </CustomMenuItem>
                                           <CheckMenuItem fx:id="hideHeaderMenuItem" mnemonicParsing="false" text="Hide Tone Header" />
                                        </items>
                                     </MenuButton>

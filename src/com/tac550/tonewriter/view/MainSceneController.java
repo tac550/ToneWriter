@@ -98,7 +98,8 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
-	@FXML private CheckMenuItem largeTitleMenuItem;
+	@FXML private RadioMenuItem largeTitleMenuItem;
+	@FXML private RadioMenuItem hiddenTitleMenuItem;
 	@FXML private CheckMenuItem hideHeaderMenuItem;
 
 	private Robot robot;
@@ -609,7 +610,8 @@ public class MainSceneController {
 
 		try {
 			if (outputMode == OutputMode.ITEM) {
-				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemOutputFileName, titleTextField.getText(),
+				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemOutputFileName,
+						hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText(),
 						new MainSceneController[] {this}, topSceneController.paperSize)) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
@@ -1006,7 +1008,7 @@ public class MainSceneController {
 		return largeTitleMenuItem.isSelected();
 	}
 	public String getTitle() {
-		return titleTextField.getText();
+		return hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText();
 	}
 	public String getSubtitle() {
 		return subtitleTextField.getText();
