@@ -84,7 +84,7 @@ public class LilyPondInterface {
 			if (!item.getTopVerse().isEmpty()) {
 				Collections.addAll(lines, "\\markup \\column {",
 						String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
-								item.getTopVerseChoice(), item.getTopVerse()),
+								item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
 						"}\n");
 			}
 
@@ -124,7 +124,7 @@ public class LilyPondInterface {
 			if (!item.getBottomVerse().isEmpty()) {
 				Collections.addAll(lines, "\\markup \\column {",
 						String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
-								item.getBottomVerseChoice(), item.getBottomVerse()),
+								item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
 						"}\n");
 			}
 
@@ -214,8 +214,6 @@ public class LilyPondInterface {
 				// For each chord assigned to the syllable...
 				for (AssignedChordData chordData : chordList) {
 
-					String syllable = chordData.getSyllable();
-
 					// SYLLABLE TEXT PROCESSING
 
 					// If this is the first chord associated with the syllable, then we do text parsing right now and only once.
@@ -224,27 +222,8 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == 0) {
 
 						// Make any double quotes in the text understandable to LilyPond.
-						if (syllable.contains("\"")) { // If the syllable contains a double quote...
-							// Store the syllable without the leading hyphen, if any (we always throw this hyphen away in the end).
-							StringBuilder cleanSyllable = new StringBuilder(syllable.replace("-", ""));
-
-							// Insert the escape character before each occurrence of a double quote in the syllable.
-							for (int index = cleanSyllable.indexOf("\""); index >= 0; index = cleanSyllable.indexOf("\"", index + 2)) {
-								cleanSyllable.insert(index, "\\");
-							}
-
-							// If the syllable contains a leading space... (Most do, to separate them from the previous word or syllable)
-							if (cleanSyllable.toString().startsWith(" ")) {
-								// Surround just the syllable (not the leading space) with double quotes
-								syllableTextBuffer.append(cleanSyllable.toString().replace(" ", " \"")).append("\"");
-							} else {
-								// Otherwise just surround the syllable without a leading space with quotes.
-								syllableTextBuffer.append("\"").append(cleanSyllable.toString()).append("\"");
-							}
-
-						} else { // If there are no double quotes, add the syllable normally (throwing away the leading hyphen, if any).
-							syllableTextBuffer.append(syllable.replace("-", ""));
-						}
+						// Throw away any (presumably leading) hyphens beforehand.
+						syllableTextBuffer.append(escapeDoubleQuotes(chordData.getSyllable().replace("-", "")));
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
 						if (syllableList.indexOf(syllableData) < syllableList.size() - 1) {
@@ -650,6 +629,40 @@ public class LilyPondInterface {
 			return beats;
 		}
 
+	}
+
+	private static String escapeDoubleQuotes(String input) {
+
+		StringBuilder outputBuffer = new StringBuilder();
+
+		StringTokenizer tokenizer = new StringTokenizer(input, " \t\n\r\f", true);
+
+		while (tokenizer.hasMoreTokens()) {
+			String current_token = tokenizer.nextToken();
+
+			if (current_token.contains("\"")) {
+
+				StringBuilder working_token = new StringBuilder(current_token);
+
+				// Insert the escape character before each occurrence of a double quote in the syllable.
+				for (int index = working_token.indexOf("\""); index >= 0; index = working_token.indexOf("\"", index + 2)) {
+					working_token.insert(index, "\\");
+				}
+
+				// If the syllable contains a leading space... (Most do, to separate them from the previous word or syllable)
+				if (working_token.toString().startsWith(" ")) {
+					// Surround just the syllable (not the leading space) with double quotes
+					outputBuffer.append(working_token.toString().replace(" ", " \"")).append("\"");
+				} else {
+					// Otherwise just surround the syllable without a leading space with quotes.
+					outputBuffer.append("\"").append(working_token.toString()).append("\"");
+				}
+			} else {
+				outputBuffer.append(current_token);
+			}
+		}
+
+		return outputBuffer.toString();
 	}
 
 	// TODO: Seems to have bugs with note groups of more than 2 notes
