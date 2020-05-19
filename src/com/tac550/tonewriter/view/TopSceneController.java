@@ -402,6 +402,8 @@ public class TopSceneController {
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
+		dialog.setContentText("This appears on the top of every page of a project export");
+		dialog.getEditor().setPrefWidth(250);
 		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
 		bookIcon.setFitHeight(50);
 		bookIcon.setFitWidth(50);
