@@ -549,7 +549,8 @@ public class MainSceneController {
 	void handleExport() {
 
 		if (outputMode != OutputMode.NONE) {
-			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Overwrite",
+			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION,
+					"Overwrite " + (outputMode == OutputMode.ITEM ? "(Single-item mode)" : "(Project mode)"),
 					"Do you want to overwrite the previous output? (Cancel to change output settings)", true,
 					parentStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
