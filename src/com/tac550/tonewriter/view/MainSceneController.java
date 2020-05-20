@@ -995,14 +995,26 @@ public class MainSceneController {
 	public String getTopVerseChoice() {
 		return topVerseChoice.getValue();
 	}
+	public void setTopVerseChoice(String choice) {
+		if (topVerseChoice.getItems().contains(choice)) topVerseChoice.setValue(choice);
+	}
 	public String getTopVerse() {
 		return topVerseField.getText();
+	}
+	public void setTopVerse(String verse) {
+		topVerseField.setText(verse);
 	}
 	public String getBottomVerseChoice() {
 		return bottomVerseChoice.getValue();
 	}
+	public void setBottomVerseChoice(String choice) {
+		if (bottomVerseChoice.getItems().contains(choice)) bottomVerseChoice.setValue(choice);
+	}
 	public String getBottomVerse() {
 		return bottomVerseField.getText();
+	}
+	public void setBottomVerse(String verse) {
+		bottomVerseField.setText(verse);
 	}
 	public boolean getLargeTitle() {
 		return largeTitleMenuItem.isSelected();

@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
+import com.tac550.tonewriter.io.QuickVerseIO;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.OutputMode;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TopSceneController {
 
@@ -271,15 +274,14 @@ public class TopSceneController {
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
 			SplitPane mainLayout = loader.getRoot();
-			MainSceneController mainController = loader.getController();
-			mainController.setStageAndTopScene(parentStage, this);
+			MainSceneController newTabController = loader.getController();
+			newTabController.setStageAndTopScene(parentStage, this);
 
 			Tab tab = new Tab();
 
-			tab.textProperty().bind(mainController.getTitleTextProperty());
-			mainController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
+			tab.textProperty().bind(newTabController.getTitleTextProperty());
 
-			tabControllerMap.put(tab, mainController);
+			tabControllerMap.put(tab, newTabController);
 
 			AnchorPane anchorPane = new AnchorPane();
 			anchorPane.getChildren().add(mainLayout);
@@ -294,7 +296,7 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL || !mainController.checkSave()) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSave()) {
 					event.consume();
 				} else {
 					cleanUpTabForRemoval(tab);
@@ -305,26 +307,81 @@ public class TopSceneController {
 			});
 
 			// Null if this is the first tab being created
-			MainSceneController previousTab = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+			Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
+			MainSceneController prevTabController = tabControllerMap.get(prevTab);
 
 			Platform.runLater(() -> {
 				tab.setContent(anchorPane);
 
-				if (previousTab != null) {
-					mainController.setDividerPosition(previousTab.getDividerPosition());
-					if (previousTab.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
-							"Open tone \"" + previousTab.getToneFile().getName() + "\" for new item?",
+				if (prevTabController != null) {
+					newTabController.setDividerPosition(prevTabController.getDividerPosition());
+					if (prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
+							"Open tone \"" + prevTabController.getToneFile().getName() + "\" for new item?",
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
-						if (buttonType == ButtonType.YES) mainController.handleOpenTone(previousTab.getToneFile(), true);
+						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true);
 					});
 
-					if (previousTab.getOutputMode() == OutputMode.PROJECT)
-						mainController.setProjectOutputMode();
+					// Propagate project output mode if it's active on the previous tab.
+					if (prevTabController.getOutputMode() == OutputMode.PROJECT)
+						newTabController.setProjectOutputMode();
+
+					// Increment any verses used from the built-in verse finder data.
+					try {
+						ArrayList<String> verses = QuickVerseIO.getBuiltinVerses();
+
+						if (!prevTabController.getTopVerse().isBlank()) {
+							newTabController.setTopVerseChoice(prevTabController.getTopVerseChoice());
+
+							String prevTopVerse = prevTabController.getTopVerse();
+
+							if (verses.contains(prevTopVerse) && verses.indexOf(prevTopVerse) < verses.size() - 1)
+								newTabController.setTopVerse(
+										verses.get(verses.indexOf(prevTopVerse) + 1));
+						}
+						if (!prevTabController.getBottomVerse().isBlank()) {
+							newTabController.setBottomVerseChoice(prevTabController.getBottomVerseChoice());
+
+							String prevBottomVerse = prevTabController.getBottomVerse();
+
+							if (verses.contains(prevBottomVerse) && verses.indexOf(prevBottomVerse) < verses.size() - 1)
+								newTabController.setBottomVerse(
+										verses.get(verses.indexOf(prevBottomVerse) + 1));
+						}
+
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					// Increment the number at the end of the previous tab's title, if any.
+					// Otherwise give the new tab a generic title
+					String prevTitle = prevTabController.getTitle();
+					if (!prevTitle.isEmpty() && Character.isDigit(prevTitle.charAt(prevTitle.length() - 1))) {
+						Pattern lastIntPattern = Pattern.compile("([0-9]+)$");
+						Matcher matcher = lastIntPattern.matcher(prevTitle);
+						if (matcher.find()) {
+							String prevNum = matcher.group();
+							int numIndex = matcher.start();
+							int nextNum = Integer.parseInt(prevNum) + 1;
+
+							newTabController.setTitleText(prevTitle.substring(0, numIndex) + nextNum);
+						}
+					} else {
+						newTabController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
+					}
+
+				} else {
+					// Title text for the first tab created (at startup)
+					newTabController.setTitleText("Item 1");
 				}
 
-				tabPane.getTabs().add(tab);
-				tabPane.getSelectionModel().selectLast();
-				tabPane.getSelectionModel().getSelectedItem().getContent().requestFocus();
+				// Add the tab after the selected one, if any.
+				if (prevTabController != null) {
+					tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
+				} else {
+					tabPane.getTabs().add(tab);
+				}
+				tabPane.getSelectionModel().select(tab);
+				tab.getContent().requestFocus();
 			});
 
 		});
