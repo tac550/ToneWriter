@@ -2,7 +2,6 @@
 mkdir ../mac/ & \
 rm -rf ../mac/ToneWriter.app & \
 rm -rf ../mac/ToneWriter*.app.zip & \
-rm -rf ../mac/ToneWriter.app/Contents/lilypond & \
 rm -rf java-runtime & \
 jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods* \
 --add-modules java.xml,java.scripting,java.desktop,java.management,jdk.unsupported,javafx.controls,javafx.fxml,javafx.web,\
