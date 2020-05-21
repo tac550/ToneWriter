@@ -122,6 +122,21 @@
                   <CheckMenuItem fx:id="playMidiMenuItem" mnemonicParsing="false" selected="true" text="Play Chords As Assigned" />
                   <CheckMenuItem fx:id="hoverHighlightMenuItem" mnemonicParsing="false" selected="true" text="Hover Highlighting" />
                   <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
+                  <CustomMenuItem mnemonicParsing="false" text="System Separator">
+                     <content>
+                        <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                           <children>
+                              <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="System" />
+                              <Line endX="999.0" stroke="#bcbcbc">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </Line>
+                           </children>
+                        </HBox>
+                     </content>
+                  </CustomMenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#handleResetMidi" text="Reset MIDI System" />
                </items>
             </Menu>
             <Menu text="_Help">

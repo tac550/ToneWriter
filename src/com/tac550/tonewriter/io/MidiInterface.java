@@ -49,21 +49,27 @@ public class MidiInterface {
 
 	public static void setUpMidiSystem() {
 		// Set up sequencer if not already done
-		if (sequencer == null) {
-			try {
+		try {
+			if (sequencer == null) {
 				sequencer = javax.sound.midi.MidiSystem.getSequencer();
-				sequencer.open();
-			} catch (MidiUnavailableException e) {
-				e.printStackTrace();
-				TWUtils.showAlert(AlertType.ERROR, "Error", "MIDI system unavailable!", true);
 			}
+
+			sequencer.open();
+		} catch (MidiUnavailableException e) {
+			e.printStackTrace();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "MIDI system unavailable!", true);
 		}
 	}
 
 	/*
-	This fixes the application not closing correctly if the user played midi.
+	 * This fixes the application not closing correctly if the user played midi.
 	 */
 	public static void closeMidiSystem() {
 		if (sequencer != null) sequencer.close();
+	}
+
+	public static void resetMidiSystem() {
+		closeMidiSystem();
+		setUpMidiSystem();
 	}
 }

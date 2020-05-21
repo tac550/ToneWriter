@@ -1,9 +1,6 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.AutoUpdater;
-import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondInterface;
-import com.tac550.tonewriter.io.QuickVerseIO;
+import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.OutputMode;
@@ -44,12 +41,12 @@ public class TopSceneController {
 	@FXML private MenuItem saveToneMenuItem;
 	@FXML private MenuItem saveToneAsMenuItem;
 
+	@FXML private Menu editMenu;
 	@FXML private MenuItem addCLMenuItem;
 	@FXML private MenuItem setKeyMenuItem;
 	@FXML private MenuItem editHeaderInfoMenuItem;
-
-	@FXML private Menu editMenu;
 	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
+
 	@FXML private CheckMenuItem playMidiMenuItem;
 	@FXML private CheckMenuItem hoverHighlightMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
@@ -243,6 +240,9 @@ public class TopSceneController {
 		Optional<String> result = dialog.showAndWait();
 
 		result.ifPresent(this::setPaperSize);
+	}
+	@FXML private void handleResetMidi() {
+		MidiInterface.resetMidiSystem();
 	}
 
 	/*
