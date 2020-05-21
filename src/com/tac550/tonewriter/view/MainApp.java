@@ -564,8 +564,8 @@ public class MainApp extends Application {
 
 	private static String getRequiredLPVersion() {
 		try {
-			String versionLine = new BufferedReader(new FileReader(
-					new File(LilyPondInterface.class.getResource("outputTemplate.ly").getPath()))).readLine();
+			String versionLine = new BufferedReader(new InputStreamReader(
+					LilyPondInterface.class.getResourceAsStream("outputTemplate.ly"))).readLine();
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 
