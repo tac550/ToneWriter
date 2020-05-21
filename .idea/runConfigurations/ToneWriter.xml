@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ToneWriter" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.tac550.tonewriter.view.MainApp" />
+    <module name="tonewriter" />
+    <option name="VM_PARAMETERS" value="-DdeveloperMode=true -Djdk.gtk.version=2 --module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml,javafx.web -Xms256m -Xmx4096m" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
