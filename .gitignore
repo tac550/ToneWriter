@@ -5,6 +5,7 @@
 /build/res/path.txt
 /build/res/java-runtime
 /build/res/javafx-jmods*
+/build/res/jar
 /lilypond/
 
 # Mac stuff
