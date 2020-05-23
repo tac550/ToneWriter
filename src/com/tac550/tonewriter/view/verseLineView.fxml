@@ -58,13 +58,13 @@
             </ScrollPane>
             <AnchorPane GridPane.columnIndex="2">
                <children>
-                  <VBox alignment="CENTER" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <Button fx:id="expandButton" mnemonicParsing="false" onAction="#toggleExpand" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                  <VBox alignment="CENTER" layoutY="48.0" spacing="5.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="25.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#editSyllables" text="Edit..." />
-                        <Button mnemonicParsing="false" onAction="#undo" text="Undo" />
+                        <Button mnemonicParsing="false" onAction="#editSyllables" prefWidth="46.0" text="Edit..." />
+                        <Button mnemonicParsing="false" onAction="#undo" prefWidth="46.0" text="Undo" />
                      </children>
                   </VBox>
-                  <Button fx:id="expandButton" mnemonicParsing="false" onAction="#toggleExpand" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                   <Button layoutX="10.0" layoutY="90.0" mnemonicParsing="false" onAction="#remove" text="X" textFill="RED" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
                         <Font name="System Bold" size="12.0" />
