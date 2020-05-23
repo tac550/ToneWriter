@@ -59,10 +59,16 @@
             <AnchorPane GridPane.columnIndex="2">
                <children>
                   <Button fx:id="expandButton" mnemonicParsing="false" onAction="#toggleExpand" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                  <VBox alignment="CENTER" layoutY="48.0" spacing="5.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="25.0">
+                  <VBox alignment="CENTER" layoutY="48.0" spacing="5.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="25.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#editSyllables" prefWidth="46.0" text="Edit..." />
-                        <Button mnemonicParsing="false" onAction="#undo" prefWidth="46.0" text="Undo" />
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#editSyllables" text="Edit...">
+                           <VBox.margin>
+                              <Insets left="2.0" right="2.0" top="2.0" />
+                           </VBox.margin></Button>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#undo" text="Undo">
+                           <VBox.margin>
+                              <Insets bottom="2.0" left="2.0" right="2.0" />
+                           </VBox.margin></Button>
                      </children>
                   </VBox>
                   <Button layoutX="10.0" layoutY="90.0" mnemonicParsing="false" onAction="#remove" text="X" textFill="RED" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
