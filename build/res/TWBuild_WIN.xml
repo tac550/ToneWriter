@@ -24,5 +24,6 @@
     <runtimeBits>64/32</runtimeBits>
     <initialHeapSize>256</initialHeapSize>
     <maxHeapSize>4096</maxHeapSize>
+    <opt>--enable-preview</opt>
   </jre>
 </launch4jConfig>
