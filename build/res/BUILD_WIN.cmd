@@ -1,5 +1,6 @@
 where launch4j.jar > path.txt && ^
 rd /s /q java-runtime & ^
+rd /s /q ..\win\ & ^
 mkdir ..\win\ & ^
 jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path javafx-jmods* ^
 --add-modules java.xml,java.scripting,java.desktop,java.management,jdk.unsupported,javafx.controls,javafx.fxml,javafx.web,^

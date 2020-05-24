@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>ToneWriter.jar</jar>
+  <jar>jar\ToneWriter.jar</jar>
   <outfile>..\win\ToneWriter.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
