@@ -142,6 +142,9 @@ public class LilyPondInterface {
 						"}\n");
 			}
 
+			if (!createStaff)
+				lines.add("\\markup \\column {\\vspace #1 }\n");
+
 		}
 
 		// Remove extra newline at end of file (result is one blank line)
