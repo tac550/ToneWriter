@@ -143,7 +143,7 @@ public class LilyPondInterface {
 			}
 
 			if (!createStaff)
-				lines.add("\\markup \\column {\\vspace #1 }\n");
+				lines.add("\\markup \\column {\\vspace #0.5 }\n");
 
 		}
 
