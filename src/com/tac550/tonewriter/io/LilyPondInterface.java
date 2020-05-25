@@ -100,25 +100,39 @@ public class LilyPondInterface {
 			// Perform layout process
 			String[] results = buildMusicLayout(item.getVerseLineControllers());
 
-			// Staff, lyrics, and notes
-			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
-					"      midiInstrument = #\"choir aahs\"", "    } <<",
-					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
-					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
-					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
-					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
-					"    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-					"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
-					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-					"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
-					"      defaultBarType = \"\" % Hides any auto-generated barlines",
-					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
-					"    }", "  }", "}\n");
+			// Create staff only if note data is present.
+			boolean createStaff = false;
+
+			Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
+			for (String result : results) {
+				if (noteDataPattern.matcher(result).find()) {
+					createStaff = true;
+					break;
+				}
+			}
+
+			if (createStaff)
+				Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
+						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
+						"      midiInstrument = #\"choir aahs\"", "    } <<",
+						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+						"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
+						"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
+						"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
+						"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
+						"    \\new Staff \\with {",
+						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
+						"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
+						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+						"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
+						"      defaultBarType = \"\" % Hides any auto-generated barlines",
+						"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
+						"    }", "  }", "}\n");
+			else
+				Collections.addAll(lines, "\\lyricmode {}",
+						"}\n");
 
 			// Bottom verse, if any
 			if (!item.getBottomVerse().isEmpty()) {
