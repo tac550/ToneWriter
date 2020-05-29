@@ -187,7 +187,7 @@ public class TopSceneController {
 		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleNewTone();
 	}
 	@FXML private void handleOpenTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(null, false);
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(null, false, false);
 	}
 	@FXML void handleSaveTone() {
 		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveTone();
@@ -318,7 +318,7 @@ public class TopSceneController {
 					if (prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 							"Open tone \"" + prevTabController.getToneFile().getName() + "\" for new item?",
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
-						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true);
+						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true, true);
 					});
 
 					// Propagate project output mode if it's active on the previous tab.
@@ -430,7 +430,7 @@ public class TopSceneController {
 	}
 
 	void openParameterFile(File file) {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(file, true);
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(file, true, false);
 	}
 
 	void requestExit(Event ev) {
@@ -523,7 +523,7 @@ public class TopSceneController {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
-				controller.handleOpenTone(toneFile, true);
+				controller.handleOpenTone(toneFile, true, false);
 			}
 		}
 	}

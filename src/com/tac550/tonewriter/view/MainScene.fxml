@@ -92,7 +92,7 @@
                                                 </HBox>
                                              </content>
                                           </CustomMenuItem>
-                                          <CheckMenuItem fx:id="hideHeaderMenuItem" mnemonicParsing="false" text="Hide Tone Header" />
+                                          <CheckMenuItem fx:id="hideToneHeaderMenuItem" mnemonicParsing="false" text="Hide Tone Header" />
                                        </items>
                                     </MenuButton>
                                     <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS">

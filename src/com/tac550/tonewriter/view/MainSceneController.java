@@ -100,7 +100,7 @@ public class MainSceneController {
 
 	@FXML private RadioMenuItem largeTitleMenuItem;
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
-	@FXML private CheckMenuItem hideHeaderMenuItem;
+	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 
 	private Robot robot;
 
@@ -211,12 +211,11 @@ public class MainSceneController {
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
 		});
 
-		hideHeaderMenuItem.disableProperty().addListener((ov, oldval, newVal) ->
-				hideHeaderMenuItem.setSelected(newVal));
+		hideToneHeaderMenuItem.setSelected(false);
 		optionsButton.showingProperty().addListener((obs, oldVal, newVal) -> {
 			if (newVal)
 				// TODO: Possibly need to revise second condition
-				hideHeaderMenuItem.setDisable(toneFile == null || verseLineControllers.isEmpty());
+				hideToneHeaderMenuItem.setDisable(toneFile == null || verseLineControllers.isEmpty());
 		});
 
 	}
@@ -536,7 +535,7 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean loadTone(File selectedFile) {
+	private boolean loadTone(File selectedFile, boolean selectHideToneHeader) {
 		if (selectedFile == null) {
 			FileChooser fileChooser = new FileChooser();
 			if (toneFile != null) {
@@ -560,6 +559,7 @@ public class MainSceneController {
 			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, this);
 
 			if (toneReader.loadTone(this, toneFile)) {
+				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
 				return true;
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
@@ -646,9 +646,9 @@ public class MainSceneController {
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
-	void handleOpenTone(File selectedFile, boolean auto_load) {
+	void handleOpenTone(File selectedFile, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSave()) && loadTone(selectedFile)) {
+		if ((auto_load || checkSave()) && loadTone(selectedFile, selectHideToneHeader)) {
 			menuState.editMenuDisabled = false;
 			menuState.saveToneMenuItemDisabled = false;
 			menuState.saveToneAsMenuItemDisabled = false;
@@ -1026,10 +1026,10 @@ public class MainSceneController {
 		return subtitleTextField.getText();
 	}
 	public String getLeftHeaderText() {
-		return hideHeaderMenuItem.isSelected() ? "" : leftText;
+		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;
 	}
 	public String getRightHeaderText() {
-		return hideHeaderMenuItem.isSelected() ? "" : rightText;
+		return hideToneHeaderMenuItem.isSelected() ? "" : rightText;
 	}
 	public ArrayList<VerseLineViewController> getVerseLineControllers() {
 		return verseLineControllers;
