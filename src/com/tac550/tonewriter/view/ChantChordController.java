@@ -196,13 +196,13 @@ public abstract class ChantChordController implements CommentableView {
 	}
 
 	@FXML private void addPrepChord() throws IOException {
-		if (this instanceof MainChord) {
-			((MainChord) this).addPrepChord("");
+		if (this instanceof MainChord thisMainChord) {
+			thisMainChord.addPrepChord("");
 		}
 	}
 	@FXML private void addPostChord() throws IOException {
-		if (this instanceof MainChord) {
-			((MainChord) this).addPostChord("");
+		if (this instanceof MainChord thisMainChord) {
+			thisMainChord.addPostChord("");
 		}
 	}
 

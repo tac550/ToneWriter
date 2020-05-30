@@ -92,21 +92,21 @@ public class ToneReaderWriter {
 			    
 			    // For each chord in the chant line...
 			    for (ChantChordController chord : chantLine.getChords()) {
-			    	if (chord instanceof RecitingChord) {
-			    		printWriter.println(chord.getName() + ": " + chord.getFields() + 
-				    			(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (PrepChord prep : ((RecitingChord) chord).getPreps()) { // Preps save out first
+			    	if (chord instanceof RecitingChord rChord) {
+			    		printWriter.println(rChord.getName() + ": " + rChord.getFields() +
+				    			(rChord.hasComment() ? ": " + rChord.getComment() : ""));
+			    		for (PrepChord prep : rChord.getPreps()) { // Preps save out first
 		                    printWriter.println("\tPrep: " + prep.getFields() +
 					                (prep.hasComment() ? ": " + prep.getComment() : ""));
 			    		}
-			    		for (ChantChordController post : ((RecitingChord) chord).getPosts()) { // Posts second
+			    		for (ChantChordController post : rChord.getPosts()) { // Posts second
 		                    printWriter.println("\tPost: " + post.getFields() +
 					                (post.hasComment() ? ": " + post.getComment() : ""));
 			    		}
-			    	} else if (chord instanceof EndChord) {
-			    		printWriter.println("END: " + chord.getFields() + 
-			    				(chord.hasComment() ? ": " + chord.getComment() : ""));
-			    		for (PrepChord prep : ((EndChord) chord).getPreps()) {
+			    	} else if (chord instanceof EndChord eChord) {
+			    		printWriter.println("END: " + eChord.getFields() +
+			    				(eChord.hasComment() ? ": " + eChord.getComment() : ""));
+			    		for (PrepChord prep : eChord.getPreps()) {
 			    			printWriter.println("\tPrep: " + prep.getFields() +
 			    			(prep.hasComment() ? ": " + prep.getComment() : ""));
 			    		}
@@ -270,15 +270,15 @@ public class ToneReaderWriter {
 			} else if (chantLineLine.contains("Post")) {
 				assert currentMainChord != null;
 				PostChord postChord = null;
-				if (currentMainChord instanceof RecitingChord)
-					postChord = ((RecitingChord) currentMainChord).addPostChord(fields);
+				if (currentMainChord instanceof RecitingChord rMainChord)
+					postChord = rMainChord.addPostChord(fields);
 				assert postChord != null;
 				postChord.setComment(comment);
 			} else if (chantLineLine.contains("Prep")) {
 				assert currentMainChord != null;
 				PrepChord prepChord;
-				if (currentMainChord instanceof EndChord)
-					prepChord = ((EndChord) currentMainChord).addPrepChord(fields);
+				if (currentMainChord instanceof EndChord eMainChord)
+					prepChord = eMainChord.addPrepChord(fields);
 				else
 					prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
 				assert prepChord != null;

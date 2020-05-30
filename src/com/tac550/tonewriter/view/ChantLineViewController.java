@@ -390,10 +390,10 @@ public class ChantLineViewController implements CommentableView {
 				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
 				if (sourceIndex != targetIndex) {
 
-					int numPreps = draggingController.get() instanceof RecitingChord ?
-							((RecitingChord) draggingController.get()).getPreps().size() : 0;
-					int numPosts = draggingController.get() instanceof RecitingChord ?
-							((RecitingChord) draggingController.get()).getPosts().size() : 0;
+					int numPreps = draggingController.get() instanceof RecitingChord rDraggingChord ?
+							rDraggingChord.getPreps().size() : 0;
+					int numPosts = draggingController.get() instanceof RecitingChord rDraggingChord ?
+							rDraggingChord.getPosts().size() : 0;
 
 					ChantChordController targetController = chantChordControllers.get(targetIndex);
 
@@ -538,9 +538,9 @@ public class ChantLineViewController implements CommentableView {
 	private void recalcCHNames() {
 		int currentNumber = 0;
 		for (ChantChordController chantChord : chantChordControllers) {
-			if (chantChord instanceof RecitingChord) {
-				((RecitingChord) chantChord).setNumber(currentNumber + 1);
-				chantChord.setColor(MainApp.CHORD_COLORS[currentNumber]);
+			if (chantChord instanceof RecitingChord rChord) {
+                rChord.setNumber(currentNumber + 1);
+                rChord.setColor(MainApp.CHORD_COLORS[currentNumber]);
 				currentNumber++;
 			}
 		}
@@ -691,10 +691,9 @@ public class ChantLineViewController implements CommentableView {
 	public boolean equals(Object obj) { // TODO: Also need to override HashCode?
 
 		if (obj == this) return true;
-		if (!(obj instanceof ChantLineViewController)) return false;
-		ChantLineViewController cc = (ChantLineViewController) obj;
+		if (!(obj instanceof ChantLineViewController cc)) return false;
 
-		if (cc.getChords().size() != this.getChords().size()) return false;
+        if (cc.getChords().size() != this.getChords().size()) return false;
 
 		for (int i = 0; i < this.getChords().size(); i++) {
 			if (!(cc.getChords().get(i).getFields().equals(this.getChords().get(i).getFields())

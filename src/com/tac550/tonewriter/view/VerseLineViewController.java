@@ -124,8 +124,8 @@ public class VerseLineViewController {
 	private void setUpScrollPane() {
 
 		for (Node node : syllableScrollPane.lookupAll(".scroll-bar")) {
-			if (node instanceof ScrollBar) {
-				scrollBar = (ScrollBar) node;
+			if (node instanceof ScrollBar scrollBarNode) {
+				scrollBar = scrollBarNode;
 				if (scrollBar.getOrientation() == Orientation.HORIZONTAL && scrollBar.getParent() == syllableScrollPane) {
 					scrollBar.heightProperty().addListener((obs, oldVal, newVal) -> {
 						scrollBarHeight = newVal.doubleValue();
