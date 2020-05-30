@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -214,8 +215,10 @@ public class MainSceneController {
 		hideToneHeaderMenuItem.setSelected(false);
 		optionsButton.showingProperty().addListener((obs, oldVal, newVal) -> {
 			if (newVal)
-				// TODO: Possibly need to revise second condition
-				hideToneHeaderMenuItem.setDisable(toneFile == null || verseLineControllers.isEmpty());
+				// TODO: Should probably revise condition to only depend on the presence of notes
+				for (MenuItem item : optionsButton.getItems()) {
+					item.setDisable(toneFile == null || verseLineControllers.isEmpty());
+				}
 		});
 
 	}
