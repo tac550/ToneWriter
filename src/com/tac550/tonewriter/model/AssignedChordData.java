@@ -27,23 +27,13 @@ public class AssignedChordData {
 	}
 
 	public String getPart(int part_index) {
-		switch (part_index) {
-
-		case 0:
-			return getSoprano();
-
-		case 1:
-			return getAlto();
-
-		case 2:
-			return getTenor();
-
-		case 3:
-			return getBass();
-
-		default:
-			return "";
-		}
+		return switch (part_index) {
+			case 0 -> getSoprano();
+			case 1 -> getAlto();
+			case 2 -> getTenor();
+			case 3 -> getBass();
+			default -> "";
+		};
 
 	}
 
