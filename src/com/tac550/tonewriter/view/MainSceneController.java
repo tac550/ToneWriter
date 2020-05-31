@@ -114,7 +114,6 @@ public class MainSceneController {
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
 
-	private boolean verseSet = false;
 	private boolean setVerseCancelled = false;
 	private String lastVerseSet = "";
 
@@ -399,7 +398,7 @@ public class MainSceneController {
 
 	@FXML private void handleSetVerse() {
 
-		if (verseSet) {
+		if (!verseLineControllers.isEmpty()) {
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Set Verse Confirmation",
 					"Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)", true);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
@@ -452,7 +451,6 @@ public class MainSceneController {
 						}
 					}
 
-					verseSet = true;
 					syncCVLMapping();
 
 					// Hide working indicator
@@ -471,7 +469,6 @@ public class MainSceneController {
 	@FXML private void handleCancelSetVerse() {
 		setVerseCancelled = true;
 
-		verseSet = false;
 		lastVerseSet = "";
 
 		setVerseButton.setVisible(true);
