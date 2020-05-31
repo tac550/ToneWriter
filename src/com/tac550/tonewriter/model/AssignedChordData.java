@@ -25,6 +25,9 @@ public class AssignedChordData {
 	public void setDuration(String new_duration) {
 		duration = new_duration;
 	}
+	public String getDuration() {
+		return duration;
+	}
 
 	public String getPart(int part_index) {
 		return switch (part_index) {

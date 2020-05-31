@@ -74,6 +74,15 @@ public class VerseLineViewController {
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
 	private ChantChordController currentChord; // The chord currently being assigned
 
+	// Note duration menu elements are re-used to save memory
+	private static final ContextMenu noteMenu = new ContextMenu();
+	private static  final ToggleGroup durationGroup = new ToggleGroup();
+	private static final RadioMenuItem quarterNote = new RadioMenuItem("quarter note");
+	private static final RadioMenuItem dottedQuarterNote = new RadioMenuItem("dotted quarter note");
+	private static final RadioMenuItem halfNote = new RadioMenuItem("half note");
+	private static final RadioMenuItem eighthNote = new RadioMenuItem("eighth note");
+	private static final RadioMenuItem wholeNote = new RadioMenuItem("whole note");
+
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
 	@FXML private void initialize() {
@@ -116,6 +125,14 @@ public class VerseLineViewController {
 		} else {
 			// Skin is already attached, just access the scroll bars
 			setUpScrollPane();
+		}
+
+		// Context menu for changing chord duration (set up only first time; fields are static)
+		if (noteMenu.getItems().isEmpty()) {
+			noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
+			for (MenuItem item : noteMenu.getItems()) {
+				((RadioMenuItem) item).setToggleGroup(durationGroup);
+			}
 		}
 
 	}
@@ -491,14 +508,6 @@ public class VerseLineViewController {
 		noteButton.setPrefWidth(30);
 		noteButton.setPadding(Insets.EMPTY);
 
-		ContextMenu noteMenu = new ContextMenu();
-		ToggleGroup durationGroup = new ToggleGroup();
-		RadioMenuItem quarterNote = new RadioMenuItem("quarter note");
-		RadioMenuItem dottedQuarterNote = new RadioMenuItem("dotted quarter note");
-		RadioMenuItem halfNote = new RadioMenuItem("half note");
-		RadioMenuItem eighthNote = new RadioMenuItem("eighth note");
-		RadioMenuItem wholeNote = new RadioMenuItem("whole note");
-
 		// Set initial selection
 		if (verseEnd) {
 			wholeNote.setSelected(true);
@@ -519,11 +528,23 @@ public class VerseLineViewController {
 		});
 		noteButton.setOnMouseExited((me) -> chord.setHighlighted(false));
 
-		// Context menu for changing chord duration
-		noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
-		for (MenuItem item : noteMenu.getItems()) {
-			((RadioMenuItem) item).setToggleGroup(durationGroup);
+		noteButton.setOnAction(event ->
+				showNoteMenu(syllable, noteButton));
+
+		return noteButton;
+	}
+
+	private void showNoteMenu(SyllableText syllable, Button noteButton) {
+
+		switch (syllable.getNoteDuration(noteButton)) {
+			case SyllableText.NOTE_QUARTER -> quarterNote.setSelected(true);
+			case SyllableText.NOTE_DOTTED_QUARTER -> dottedQuarterNote.setSelected(true);
+			case SyllableText.NOTE_HALF -> halfNote.setSelected(true);
+			case SyllableText.NOTE_EIGHTH -> eighthNote.setSelected(true);
+			case SyllableText.NOTE_WHOLE -> wholeNote.setSelected(true);
+			default -> throw new IllegalStateException("Unexpected duration: " + syllable.getNoteDuration(noteButton));
 		}
+
 		noteMenu.setOnAction(event -> {
 			if (event.getTarget().equals(quarterNote)) {
 				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButton);
@@ -538,10 +559,7 @@ public class VerseLineViewController {
 			}
 		});
 
-		noteButton.setOnAction(event ->
-				noteMenu.show(noteButton, Side.BOTTOM, 0, 0));
-
-		return noteButton;
+		noteMenu.show(noteButton, Side.BOTTOM, 0, 0);
 	}
 
 	@FXML private void toggleExpand() {

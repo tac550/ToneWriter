@@ -118,6 +118,9 @@ public class SyllableText extends Text {
 	void setNoteDuration(String duration, Button note_button) {
 		associatedChords.get(associatedButtons.indexOf(note_button)).setDuration(duration);
 	}
+	String getNoteDuration(Button note_button) {
+		return associatedChords.get(associatedButtons.indexOf(note_button)).getDuration();
+	}
 	
 	public AssignedChordData[] getAssociatedChords() {
 		return associatedChords.toArray(new AssignedChordData[] {});
