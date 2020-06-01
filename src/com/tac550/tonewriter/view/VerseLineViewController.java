@@ -75,13 +75,14 @@ public class VerseLineViewController {
 	private ChantChordController currentChord; // The chord currently being assigned
 
 	// Note duration menu elements are re-used to save memory
-	private static final ContextMenu noteMenu = new ContextMenu();
-	private static  final ToggleGroup durationGroup = new ToggleGroup();
+	private static boolean setupComplete = false;
 	private static final RadioMenuItem quarterNote = new RadioMenuItem("quarter note");
 	private static final RadioMenuItem dottedQuarterNote = new RadioMenuItem("dotted quarter note");
 	private static final RadioMenuItem halfNote = new RadioMenuItem("half note");
 	private static final RadioMenuItem eighthNote = new RadioMenuItem("eighth note");
 	private static final RadioMenuItem wholeNote = new RadioMenuItem("whole note");
+	private static final ContextMenu noteMenu = new ContextMenu(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
+	private static final ToggleGroup durationGroup = new ToggleGroup();
 
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
@@ -128,11 +129,13 @@ public class VerseLineViewController {
 		}
 
 		// Context menu for changing chord duration (set up only first time; fields are static)
-		if (noteMenu.getItems().isEmpty()) {
-			noteMenu.getItems().addAll(quarterNote, dottedQuarterNote, halfNote, eighthNote, wholeNote);
-			for (MenuItem item : noteMenu.getItems()) {
-				((RadioMenuItem) item).setToggleGroup(durationGroup);
-			}
+		if (!setupComplete) {
+			setupComplete = true;
+			Platform.runLater(() -> {
+				for (MenuItem item : noteMenu.getItems()) {
+					((RadioMenuItem) item).setToggleGroup(durationGroup);
+				}
+			});
 		}
 
 	}
