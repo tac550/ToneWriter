@@ -448,7 +448,7 @@ public class LilyPondInterface {
 				// SLUR PROCESSING
 
 				// Flags for whether we needed a slur on the syllable for each part.
-				boolean[] addedSlur = new boolean[]{false, false, false, false};
+				boolean[] addedSlur = new boolean[] {false, false, false, false};
 
 				// For each part...
 				for (int i = 0; i < 4; i++) {
