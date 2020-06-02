@@ -102,6 +102,7 @@ public class MainSceneController {
 	@FXML private RadioMenuItem largeTitleMenuItem;
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
+	@FXML private CheckMenuItem pageBreakMenuItem;
 
 	private Robot robot;
 
@@ -1018,6 +1019,9 @@ public class MainSceneController {
 	}
 	public boolean getLargeTitle() {
 		return largeTitleMenuItem.isSelected();
+	}
+	public boolean getPageBreak() {
+		return pageBreakMenuItem.isSelected();
 	}
 	public String getTitle() {
 		return hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText();

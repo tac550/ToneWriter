@@ -89,7 +89,7 @@ public class LilyPondInterface {
 			}
 
 			// Score header
-			Collections.addAll(lines, "\\score {\n", "  \\header {",
+			Collections.addAll(lines, item.getPageBreak() ? "\\pageBreak\n" : "", "\\score {\n", "  \\header {",
 					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitle()),
 					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
 					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
@@ -100,10 +100,12 @@ public class LilyPondInterface {
 			// Perform layout process
 			String[] results = buildMusicLayout(item.getVerseLineControllers());
 
-			// Create staff only if note data is present.
+			// Create staff only if note data is present
 			boolean createStaff = false;
 
+			// Pattern which matches valid LilyPond notes
 			Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
+			// Check all four parts for any note data
 			for (String result : results) {
 				if (noteDataPattern.matcher(result).find()) {
 					createStaff = true;

@@ -78,11 +78,11 @@
                                           </RadioMenuItem>
                                           <RadioMenuItem mnemonicParsing="false" selected="true" text="Normal" toggleGroup="$titleOptions" />
                                           <RadioMenuItem fx:id="hiddenTitleMenuItem" mnemonicParsing="false" text="Hidden" toggleGroup="$titleOptions" />
-                                          <CustomMenuItem mnemonicParsing="false" text="Other Separator">
+                                          <CustomMenuItem mnemonicParsing="false" text="Header Separator">
                                              <content>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
                                                    <children>
-                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Other" />
+                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Header" />
                                                       <Line endX="999.0" stroke="#bcbcbc">
                                                          <HBox.margin>
                                                             <Insets left="5.0" right="5.0" />
@@ -93,6 +93,21 @@
                                              </content>
                                           </CustomMenuItem>
                                           <CheckMenuItem fx:id="hideToneHeaderMenuItem" mnemonicParsing="false" text="Hide Tone Header" />
+                                          <CustomMenuItem mnemonicParsing="false" text="Spacing Separator">
+                                             <content>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                                                   <children>
+                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Spacing" />
+                                                      <Line endX="999.0" stroke="#bcbcbc">
+                                                         <HBox.margin>
+                                                            <Insets left="5.0" right="5.0" />
+                                                         </HBox.margin>
+                                                      </Line>
+                                                   </children>
+                                                </HBox>
+                                             </content>
+                                          </CustomMenuItem>
+                                          <CheckMenuItem fx:id="pageBreakMenuItem" mnemonicParsing="false" text="Page break before item" />
                                        </items>
                                     </MenuButton>
                                     <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS">
