@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.QuickVerseIO;
 import com.tac550.tonewriter.util.TWUtils;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -177,6 +178,10 @@ public class QuickVerseController {
 	@FXML private void handleOK() {
 		if (!resultField.getText().isEmpty()) {
 			targetField.setText(resultField.getText());
+			Platform.runLater(() -> {
+				targetField.requestFocus();
+				targetField.positionCaret(targetField.getText().length());
+			});
 		}
 
 		closeStage();
