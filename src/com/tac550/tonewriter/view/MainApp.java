@@ -33,7 +33,10 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,9 +77,6 @@ public class MainApp extends Application {
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
 			Color.DEEPSKYBLUE, Color.BURLYWOOD, Color.AQUA, Color.GOLD};
 	static final Color END_CHORD_COLOR = Color.DARKMAGENTA;
-
-	// How tall to make note buttons in the verse view.
-	static final int NOTE_BUTTON_HEIGHT = 15;
 
 	private static boolean darkModeEnabled = false;
 

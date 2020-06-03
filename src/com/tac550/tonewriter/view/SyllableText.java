@@ -1,13 +1,12 @@
 package com.tac550.tonewriter.view;
 
-import java.util.ArrayList;
-
 import com.tac550.tonewriter.model.AssignedChordData;
-
 import javafx.scene.control.Button;
-import javafx.scene.input.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+
+import java.util.ArrayList;
 
 public class SyllableText extends Text {
 
@@ -84,7 +83,7 @@ public class SyllableText extends Text {
 	void select(ChantChordController chord, Button note_button) {
 		if (!clicked) active = false;
 
-		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT;
+		nextNoteButtonYPos += VerseLineViewController.NOTE_BUTTON_HEIGHT;
 		
 		associatedChords.add(new AssignedChordData(getText(), chord));
 		associatedButtons.add(note_button);
@@ -125,6 +124,9 @@ public class SyllableText extends Text {
 	public AssignedChordData[] getAssociatedChords() {
 		return associatedChords.toArray(new AssignedChordData[] {});
 	}
+	ArrayList<Button> getAssociatedButtons() {
+		return associatedButtons;
+	}
 	
 	int getNextNoteButtonPosY() {
 		return nextNoteButtonYPos;
@@ -134,7 +136,7 @@ public class SyllableText extends Text {
 		associatedChords.remove(associatedChords.size()-1);
 		associatedButtons.remove(associatedButtons.size()-1);
 		
-		nextNoteButtonYPos -= MainApp.NOTE_BUTTON_HEIGHT;
+		nextNoteButtonYPos -= VerseLineViewController.NOTE_BUTTON_HEIGHT;
 		
 		if (!associatedButtons.isEmpty()) {
 			String colorString = "#" + associatedButtons.get(associatedButtons.size()-1).getStyle().split("#")[1];
