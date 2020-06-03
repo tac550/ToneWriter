@@ -58,14 +58,9 @@ public abstract class ChantChordController implements CommentableView {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
 			// Listening for user-generated edits to the part fields.
-			field.setOnKeyPressed(keyEvent -> {
-				if ((keyEvent.getCode().isLetterKey() || keyEvent.getCode().isDigitKey() ||
-						keyEvent.getCode().isWhitespaceKey()) && !keyEvent.isShortcutDown()) {
-					chantLineController.edited();
-				}
-			});
-			field.focusedProperty().addListener((ov, old_val, new_val) -> {
-				if (!new_val) { // Re-render when focus switched away only if the contents of this field changed
+			field.textProperty().addListener((ov, oldVal, newVal) -> chantLineController.edited());
+			field.focusedProperty().addListener((ov, oldVal, newVal) -> {
+				if (!newVal) { // Re-render when focus switched away only if the contents of this field changed
 					if (lastFocusedField == field && !field.getText().equals(lastFocusedContents)) {
 						refreshChordPreview();
 					}
