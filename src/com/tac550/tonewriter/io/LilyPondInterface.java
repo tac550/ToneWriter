@@ -80,16 +80,20 @@ public class LilyPondInterface {
 
 		for (MainSceneController item : items) {
 
+			// Page break, if requested
+			if (item.getPageBreak())
+				lines.add("\\pageBreak\n");
+
 			// Top verse, if any
 			if (!item.getTopVerse().isEmpty()) {
 				Collections.addAll(lines, "\\markup \\column {",
 						String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
 								item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
-						"}\n");
+						"}\n", "\\noPageBreak\n");
 			}
 
 			// Score header
-			Collections.addAll(lines, item.getPageBreak() ? "\\pageBreak\n" : "", "\\score {\n", "  \\header {",
+			Collections.addAll(lines, "\\score {\n", "  \\header {",
 					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitle()),
 					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
 					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
@@ -138,7 +142,8 @@ public class LilyPondInterface {
 
 			// Bottom verse, if any
 			if (!item.getBottomVerse().isEmpty()) {
-				Collections.addAll(lines, "\\markup \\column {",
+				Collections.addAll(lines, "\\noPageBreak\n",
+						"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
 						String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
 								item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
 						"}\n");
