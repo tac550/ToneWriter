@@ -523,7 +523,7 @@ public class TopSceneController {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
-				controller.handleOpenTone(toneFile, true, false);
+				controller.handleOpenTone(toneFile, true, controller.getHideToneHeader());
 			}
 		}
 	}

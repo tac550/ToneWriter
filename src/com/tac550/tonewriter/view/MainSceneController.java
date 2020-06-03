@@ -1020,6 +1020,9 @@ public class MainSceneController {
 	public boolean getLargeTitle() {
 		return largeTitleMenuItem.isSelected();
 	}
+	boolean getHideToneHeader() {
+		return hideToneHeaderMenuItem.isSelected();
+	}
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
