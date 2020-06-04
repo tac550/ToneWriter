@@ -169,8 +169,7 @@ public class LilyPondInterface {
 					// Delete the lilypond file if the option to save it isn't set
 					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
 						if (!lilypondFile.delete()) {
-							// TODO: Replace with TWUtils showError function which calls showAlert and takes single string
-							System.out.println("Failed to delete LilyPond file, continuing...");
+							TWUtils.showError("Failed to delete LilyPond file, continuing...", false);
 						}
 					}
 

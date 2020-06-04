@@ -171,6 +171,9 @@ public class TWUtils {
 
 	// UI
 
+	public static void showError(String message, boolean wait) {
+		showAlert(Alert.AlertType.ERROR, "Error", message, wait);
+	}
 	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait) {
 		return showAlert(alert_type, title_text, header_text, wait, null, null, null);
 	}
