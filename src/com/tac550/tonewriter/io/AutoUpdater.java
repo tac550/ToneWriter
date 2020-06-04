@@ -196,7 +196,10 @@ public class AutoUpdater {
 		};
 
 		downloadTask.setOnSucceeded(wsevent -> {
-			if (downloadTask.getValue()) executeInstaller(downloadFile);
+			if (downloadTask.getValue()) {
+				executeInstaller(downloadFile);
+				hideDownloadAlert(); // Only reached if executeInstaller() fails
+			}
 		});
 		Thread downloadThread = new Thread(downloadTask);
 		downloadThread.start();
@@ -216,7 +219,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while running installer!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -231,7 +233,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while generating temp files!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -242,7 +243,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Error while exporting installer script!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -258,7 +258,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Failed to run installer script!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -273,7 +272,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while generating temp files!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -284,7 +282,6 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Error while exporting installer script!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
@@ -300,13 +297,12 @@ public class AutoUpdater {
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Failed to run installer script!", true));
 
-				hideDownloadAlert();
 				return;
 			}
 
 		}
 
-		System.out.println("Now exiting for installation!");
+		System.out.println("Now exiting for update installation!");
 		Platform.exit();
 	}
 
