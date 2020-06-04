@@ -232,7 +232,7 @@ public class MainApp extends Application {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
-		File outputFile2 = new File(lilypondFile.getAbsolutePath().replace(getPlatformSpecificMidiExtension(), ".pdf"));
+		File outputFile2 = new File(lilypondFile.getAbsolutePath().replace(".ly", getPlatformSpecificMidiExtension()));
 		lilypondFile.deleteOnExit();
 		outputFile.deleteOnExit();
 		outputFile2.deleteOnExit();
