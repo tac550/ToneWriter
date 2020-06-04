@@ -189,11 +189,14 @@ public class AutoUpdater {
 			}
 		};
 
-		downloadTask.setOnSucceeded(wsevent -> {
-			if (downloadTask.getValue()) {
-				executeInstaller(downloadFile);
-				hideDownloadAlert(); // Only reached if executeInstaller() fails
-			}
+		downloadTask.setOnSucceeded(event -> {
+			executeInstaller(downloadFile);
+			TWUtils.showError("Failed to install update!", true);
+			hideDownloadAlert();
+		});
+		downloadTask.setOnFailed(event -> {
+			TWUtils.showError("Failed to download update!", true);
+			hideDownloadAlert();
 		});
 		Thread downloadThread = new Thread(downloadTask);
 		downloadThread.start();
