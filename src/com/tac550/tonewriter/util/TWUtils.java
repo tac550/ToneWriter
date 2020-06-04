@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TWUtils {
@@ -125,6 +127,19 @@ public class TWUtils {
 		return File.createTempFile(MainApp.APP_NAME + "-" +
 				(prefix.isEmpty() ? "" : prefix + "-"),
 				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix);
+	}
+
+	public static void cleanUpTempFiles(String with_postfix) {
+		File tempDir = new File(System.getProperty("java.io.tmpdir"));
+		File[] files = tempDir.listFiles();
+		for (File file : Objects.requireNonNull(files)) {
+			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith(with_postfix)) {
+				if (!file.delete()) {
+					System.out.println("Failed to delete temp file " + file.getName());
+				}
+			}
+		}
+
 	}
 
 	// Copies file from io package to an external location.

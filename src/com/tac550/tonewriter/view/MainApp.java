@@ -95,6 +95,8 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
+		TWUtils.cleanUpTempFiles("");
+
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
 			System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
@@ -230,8 +232,10 @@ public class MainApp extends Application {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
+		File outputFile2 = new File(lilypondFile.getAbsolutePath().replace(getPlatformSpecificMidiExtension(), ".pdf"));
 		lilypondFile.deleteOnExit();
 		outputFile.deleteOnExit();
+		outputFile2.deleteOnExit();
 
 		try {
 			TWUtils.exportIOResource("chordTemplate.ly", lilypondFile);
@@ -310,11 +314,7 @@ public class MainApp extends Application {
 	public static String getPlatformSpecificMidiExtension() {
 		if (OS_NAME.startsWith("win")) {
 			return ".mid";
-		} if (OS_NAME.startsWith("mac")) {
-			return ".midi";
-		} if (OS_NAME.startsWith("lin")) {
-			return ".midi";
-		} else return null;
+		} else return ".midi";
 	}
 
 	public static String getPlatformSpecificRootDir() {

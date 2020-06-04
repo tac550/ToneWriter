@@ -829,15 +829,7 @@ public class LilyPondInterface {
 	}
 
 	public static void clearAllCachedChordPreviews() {
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] files = tempDir.listFiles();
-		for (File file : Objects.requireNonNull(files)) {
-			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith("-chord")) {
-				if (!file.delete()) {
-					System.out.println("Failed to delete temp file " + file.getName());
-				}
-			}
-		}
+		TWUtils.cleanUpTempFiles("-chord");
 
 		uniqueChordRenders.clear();
 		pendingChordControllers.clear();
