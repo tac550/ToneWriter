@@ -244,9 +244,6 @@ public class MainApp extends Application {
 		}
 
 		LilyPondInterface.executePlatformSpecificLPRender(lilypondFile, false, () -> {
-			if (!(lilypondFile.delete() && outputFile.delete())) {
-				System.out.println("Warning: Could not delete temporary file(s)");
-			}
 			Platform.runLater(final_actions);
 		});
 	}
