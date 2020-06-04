@@ -175,19 +175,13 @@ public class AutoUpdater {
 					IOUtils.copy(response.getContentAsStream(), foStream);
 				} catch (FailingHttpStatusCodeException e) {
 					e.printStackTrace();
-					Platform.runLater(() -> {
-						TWUtils.showAlert(Alert.AlertType.WARNING, "Connection Error",
-								"Internet connection failure! Unable to download update.", true);
-						hideDownloadAlert();
-					});
+					Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Connection Error",
+							"Internet connection failure! Unable to download update.", true));
 					return false;
 				} catch (IOException e) {
 					e.printStackTrace();
-					Platform.runLater(() -> {
-						TWUtils.showAlert(Alert.AlertType.WARNING, "I/O Error",
-								"An error occurred while processing the download.", true);
-						hideDownloadAlert();
-					});
+					Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "I/O Error",
+							"An error occurred while processing the download.", true));
 					return false;
 				}
 
