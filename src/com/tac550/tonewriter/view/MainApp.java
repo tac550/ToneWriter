@@ -243,9 +243,8 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
-		LilyPondInterface.executePlatformSpecificLPRender(lilypondFile, false, () -> {
-			Platform.runLater(final_actions);
-		});
+		LilyPondInterface.executePlatformSpecificLPRender(lilypondFile, false,
+				() -> Platform.runLater(final_actions));
 	}
 
 	private void loadMainLayout() {
