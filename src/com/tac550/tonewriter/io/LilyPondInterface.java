@@ -46,12 +46,12 @@ public class LilyPondInterface {
 		if (lilypondFile.exists()) {
 			// Have to do this because MacOS doesn't like overwriting existing files
 			if (!lilypondFile.delete()) {
-				System.out.println("Error deleting existing LilyPond file. Continuing anyway...");
+				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
 			}
 		}
 
 		if (!lilypondFile.createNewFile()) {
-			System.out.println("Filed to create new file");
+			TWUtils.showError("Failed to create new file", true);
 			return false;
 		}
 

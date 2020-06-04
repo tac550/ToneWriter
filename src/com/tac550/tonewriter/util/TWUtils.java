@@ -135,11 +135,10 @@ public class TWUtils {
 		for (File file : Objects.requireNonNull(files)) {
 			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith(with_postfix)) {
 				if (!file.delete()) {
-					System.out.println("Failed to delete temp file " + file.getName());
+					TWUtils.showError("Failed to delete temp file " + file.getName(), false);
 				}
 			}
 		}
-
 	}
 
 	// Copies file from io package to an external location.
