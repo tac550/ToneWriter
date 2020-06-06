@@ -212,15 +212,6 @@ public class MainSceneController {
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
 		});
 
-		hideToneHeaderMenuItem.setSelected(false);
-		optionsButton.showingProperty().addListener((obs, oldVal, newVal) -> {
-			if (newVal)
-				// TODO: Should probably revise condition to only depend on the presence of notes
-				for (MenuItem item : optionsButton.getItems().filtered(item -> !item.equals(pageBreakMenuItem))) {
-					item.setDisable(toneFile == null || verseLineControllers.isEmpty());
-				}
-		});
-
 	}
 
 	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
