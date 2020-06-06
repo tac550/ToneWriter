@@ -21,7 +21,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -89,7 +88,6 @@ public class MainSceneController {
 	@FXML private ChoiceBox<String> topVerseChoice;
 	@FXML private TextField topVerseField;
 	@FXML private Button topVerseButton;
-	@FXML private MenuButton optionsButton;
 	@FXML private TextField titleTextField;
 	@FXML private TextField subtitleTextField;
 	@FXML private TextArea verseArea;
