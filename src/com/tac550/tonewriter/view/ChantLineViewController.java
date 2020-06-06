@@ -508,7 +508,7 @@ public class ChantLineViewController implements CommentableView {
 			}
 		}
 		for (ChantChordController chord : chordsToDelete) {
-			chord.deleteAll();
+			chord.delete();
 		}
 	}
 

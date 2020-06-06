@@ -11,7 +11,7 @@ public class PrepChord extends SubChord {
 	}
 
 	@Override
-	public void deleteAll() {
+	public void delete() {
 		getAssociatedMainChord().getPreps().remove(this);
 		chantLineController.removeChord(this);
 	}

@@ -203,9 +203,9 @@ public abstract class ChantChordController implements CommentableView {
 
 	@FXML public void remove() {
 		chantLineController.edited();
-		deleteAll();
+		delete();
 	}
-	public abstract void deleteAll(); // Deletes this chord and its associated preps and posts.
+	public abstract void delete(); // Deletes this chord and its associated preps and posts.
 
 	@FXML private void copy() {
 		MainSceneController.copiedChord = getFields();

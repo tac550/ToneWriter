@@ -12,7 +12,7 @@ public class PostChord extends SubChord {
 	}
 
 	@Override
-	public void deleteAll() {
+	public void delete() {
 		((RecitingChord) getAssociatedMainChord()).getPosts().remove(this);
 
 		chantLineController.removeChord(this);

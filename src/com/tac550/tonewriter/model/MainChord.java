@@ -49,12 +49,15 @@ public class MainChord extends ChantChordController {
 	}
 
 	@Override
-	public void deleteAll() { // TODO: ConcurrentModificationException
+	public void delete() {
 		for (PrepChord chord : prepChords) {
-			chord.deleteAll();
+			chantLineController.removeChord(chord);
 		} for (PostChord chord : postChords) {
-			chord.deleteAll();
+			chantLineController.removeChord(chord);
 		}
+		prepChords.clear();
+		postChords.clear();
+
 		chantLineController.removeChord(this);
 	}
 
