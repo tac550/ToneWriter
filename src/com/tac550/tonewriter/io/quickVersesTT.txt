@@ -1,8 +1,13 @@
+# Lines beginning with ^ hint "next item" to go back to the top
+# Lines beginning with - hint no "next item"
+
 # Glory...
 
 Glory to the Father, and to the Son, and to the Holy Spirit, now and ever, and unto ages of ages. Amen.
+-
 Glory to the Father, and to the Son, and to the Holy Spirit;
 now and ever, and unto ages of ages. Amen.
+-
 
 # Lamp-Lighting Psalms
 
@@ -16,6 +21,7 @@ From the morning watch until night, from the morning watch let Israel hope on th
 For with the Lord there is mercy and with Him is plenteous redemption, and He will deliver Israel from all his iniquities.
 Praise the Lord, all nations! Praise Him, all peoples!
 For His mercy is abundant towards us; and the truth of the Lord endures forever.
+^
 
 # Aposticha
 
@@ -23,14 +29,17 @@ For His mercy is abundant towards us; and the truth of the Lord endures forever.
 The Lord is King; He is robed in majesty!
 For He has established the world, so that it shall never be moved.
 Holiness befits Thy house, O Lord, forevermore!
+^
 
 # Weekday
 To Thee, O Lord, I lift up my eyes, O Thou who art enthroned in the heavens. As the eyes of a servant look to the hand of their master, as the eyes of a maid to the hand of her mistress, so our eyes look to the Lord our God, till He have mercy on us.
 Have mercy on us, O Lord, have mercy on us, for we have had more than enough of contempt. Too long our soul has been sated with the scorn of those who are at ease, the contempt of the proud.
+^
 
 # Rememberance
 Blessed are those whom Thou hast chosen and taken, O Lord.
 Their souls shall dwell with the blessed.
+^
 
 # The Praises
 
@@ -40,3 +49,4 @@ Praise Him for His mighty deeds; praise Him according to His exceeding greatness
 Praise Him with trumpet sound; praise Him with lute and harp!
 Praise Him with timbrel and dance; praise Him with strings and pipe!
 Praise Him with sounding cymbals; praise Him with loud clashing cymbals! Let everything that breathes praise the Lord!
+^

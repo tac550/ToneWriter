@@ -197,7 +197,11 @@ public class QuickVerseController {
 		
 		// Built-in verses
 		try {
-			verses.addAll(QuickVerseIO.getBuiltinVerses());
+			for (String item : QuickVerseIO.getBuiltinVerses()) {
+				if (!(item.startsWith("-") || item.startsWith("^"))) {
+					verses.add(item);
+				}
+			}
 		} catch (IOException e) {
 			verses.add("ERROR READING INTERNAL FILE");
 			e.printStackTrace();

@@ -334,18 +334,26 @@ public class TopSceneController {
 
 							String prevTopVerse = prevTabController.getTopVerse();
 
-							if (verses.contains(prevTopVerse) && verses.indexOf(prevTopVerse) < verses.size() - 1)
-								newTabController.setTopVerse(
-										verses.get(verses.indexOf(prevTopVerse) + 1));
+							if (verses.contains(prevTopVerse) && verses.indexOf(prevTopVerse) < verses.size() - 1) {
+								String nextVerse = verses.get(verses.indexOf(prevTopVerse) + 1);
+								if (nextVerse.startsWith("^"))
+									newTabController.setTopVerse(verses.get(0));
+								else if (!nextVerse.startsWith("-"))
+									newTabController.setTopVerse(verses.get(verses.indexOf(prevTopVerse) + 1));
+							}
 						}
 						if (!prevTabController.getBottomVerse().isBlank()) {
 							newTabController.setBottomVerseChoice(prevTabController.getBottomVerseChoice());
 
 							String prevBottomVerse = prevTabController.getBottomVerse();
 
-							if (verses.contains(prevBottomVerse) && verses.indexOf(prevBottomVerse) < verses.size() - 1)
-								newTabController.setBottomVerse(
-										verses.get(verses.indexOf(prevBottomVerse) + 1));
+							if (verses.contains(prevBottomVerse) && verses.indexOf(prevBottomVerse) < verses.size() - 1) {
+								String nextVerse = verses.get(verses.indexOf(prevBottomVerse) + 1);
+								if (nextVerse.startsWith("^"))
+									newTabController.setBottomVerse(verses.get(0));
+								else if (!nextVerse.startsWith("-"))
+									newTabController.setBottomVerse(verses.get(verses.indexOf(prevBottomVerse) + 1));
+							}
 						}
 
 					} catch (IOException e) {
