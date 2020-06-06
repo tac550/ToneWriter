@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /*
  * TEST VERSES:
@@ -143,14 +144,13 @@ public class MainSceneController {
 		topVerseButton.setOnAction((ae) -> showQuickVerseStage(topVerseField));
 		bottomVerseButton.setOnAction((ae) -> showQuickVerseStage(bottomVerseField));
 
-		ArrayList<ChoiceBox<String>> verseChoices = new ArrayList<>();
-		verseChoices.add(topVerseChoice);
-		verseChoices.add(bottomVerseChoice);
-		for (ChoiceBox<String> box : verseChoices) {
+		Stream.of(topVerseChoice, bottomVerseChoice).forEach(box -> {
 			box.getItems().add("Reader:");
 			box.getItems().add("Sing:");
+			box.getItems().add("Priest:");
+			box.getItems().add("v:");
 			box.getSelectionModel().select(0);
-		}
+		});
 
 		// Replace text area with a custom one.
 		AnchorPane verseAreaPane = (AnchorPane) verseArea.getParent();
