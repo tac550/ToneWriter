@@ -267,15 +267,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library name="pdfbox-2.0.13.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/pdfbox-2.0.13.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
