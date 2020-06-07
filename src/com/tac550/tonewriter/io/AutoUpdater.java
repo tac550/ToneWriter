@@ -14,7 +14,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -152,10 +151,8 @@ public class AutoUpdater {
 				updateAlert.setOnShowing(event -> checkCancelled = false);
 			}
 
-			ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
 			TWUtils.showAlert("Update", "Checking for update...", false,
-					new ButtonType[] {cancelButton}, updateAlert);
+					new ButtonType[] {ButtonType.CANCEL}, updateAlert);
 		}
 
 		updateThread.start();
