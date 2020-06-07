@@ -14,6 +14,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -34,6 +36,8 @@ public class AutoUpdater {
 	private static WebClient webClient;
 
 	private static final Stage updaterStage = new Stage();
+	private static Alert updateAlert;
+	private static boolean checkCancelled;
 
 	private static Alert downloadAlert;
 
@@ -83,8 +87,8 @@ public class AutoUpdater {
 
 					finalHTMLBuilder.append("</body>");
 
-					// If there's no update and this is the startup check, stop here.
-					if (startup && releaseNumbers.size() == 0) {
+					// If there's no update and this is the startup check, or the check has been cancelled, stop here.
+					if ((startup && releaseNumbers.size() == 0) || checkCancelled) {
 						return null;
 					}
 
@@ -125,13 +129,35 @@ public class AutoUpdater {
 					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
 							"Internet connection failure! Unable to check for updates.", true));
 
-
 				}
+
+				Platform.runLater(() -> {
+					if (updateAlert != null && updateAlert.isShowing())
+						updateAlert.close();
+				});
+
 				return null;
 			}
 		};
 
 		Thread updateThread = new Thread(updateTask);
+
+		if (!startup) {
+			if (updateAlert == null) {
+				updateAlert = new Alert(AlertType.INFORMATION);
+				updateAlert.initModality(Modality.NONE);
+				((Stage) updateAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+
+				updateAlert.setOnHiding(event -> checkCancelled = true);
+				updateAlert.setOnShowing(event -> checkCancelled = false);
+			}
+
+			ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+			TWUtils.showAlert("Update", "Checking for update...", false,
+					new ButtonType[] {cancelButton}, updateAlert);
+		}
+
 		updateThread.start();
 
 	}
@@ -143,7 +169,8 @@ public class AutoUpdater {
 		// Create temp download file
 		File downloadFile;
 		try {
-			downloadFile = TWUtils.createTWTempFile("Update", MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
+			downloadFile = TWUtils.createTWTempFile("Update-" + version + "-",
+					MainApp.OS_NAME.startsWith("win") ? ".exe" : ".zip");
 		} catch (IOException e) {
 			e.printStackTrace();
 			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
@@ -249,7 +276,8 @@ public class AutoUpdater {
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
-				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid,
+						downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",

@@ -3,6 +3,7 @@ package com.tac550.tonewriter.util;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
@@ -171,26 +172,37 @@ public class TWUtils {
 	// UI
 
 	public static void showError(String message, boolean wait) {
-		showAlert(Alert.AlertType.ERROR, "Error", message, wait);
+		showAlert(AlertType.ERROR, "Error", message, wait);
 	}
-	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait) {
-		return showAlert(alert_type, title_text, header_text, wait, null, null, null);
+	public static Optional<ButtonType> showAlert(String title_text, String header_text, boolean wait,
+	                                             ButtonType[] button_types, Alert alert) {
+		return showAlert(null, title_text, header_text, wait, null, button_types, null, alert);
 	}
-	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait,
+	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait) {
+		return showAlert(alert_type, title_text, header_text, wait, null, null, null, null);
+	}
+	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
 												 Stage owner) {
-		return showAlert(alert_type, title_text, header_text, wait, owner, null, null);
+		return showAlert(alert_type, title_text, header_text, wait, owner, null, null, null);
 	}
-	public static Optional<ButtonType> showAlert(Alert.AlertType alert_type, String title_text, String header_text, boolean wait,
-												 Stage owner, ButtonType[] button_types, ButtonType default_button) {
-		Alert alert = new Alert(alert_type);
+	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
+	                                             Stage owner, ButtonType[] button_types, ButtonType default_button) {
+		return showAlert(alert_type, title_text, header_text, wait, owner, button_types, default_button, null);
+	}
+	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
+												 Stage owner, ButtonType[] button_types, ButtonType default_button, Alert alert) {
+		if (alert == null) {
+			alert = new Alert(alert_type);
+			alert.initOwner(owner);
+			((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+		}
+
 		alert.setTitle(title_text);
 		alert.setHeaderText(header_text);
-		alert.initOwner(owner);
-		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
-		if (button_types != null && default_button != null) {
+		if (button_types != null)
 			alert.getButtonTypes().setAll(button_types);
+		if (default_button != null)
 			((Button) alert.getDialogPane().lookupButton(default_button)).setDefaultButton(true);
-		}
 
 		if (wait) {
 			return alert.showAndWait();
