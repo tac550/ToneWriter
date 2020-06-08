@@ -33,6 +33,7 @@ import javafx.scene.transform.Transform;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -704,6 +705,19 @@ public class ChantLineViewController implements CommentableView {
 
 		return true;
 
+	}
+
+	@Override
+	public int hashCode() {
+		HashCodeBuilder codeBuilder = new HashCodeBuilder(17, 31);
+		codeBuilder.append(this.getChords().size());
+
+		for (ChantChordController chord : this.getChords()) {
+			codeBuilder.append(chord.getFields());
+			codeBuilder.append(chord.getColor());
+		}
+
+		return codeBuilder.toHashCode();
 	}
 
 	public void edited() {
