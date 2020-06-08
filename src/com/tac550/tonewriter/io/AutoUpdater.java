@@ -123,11 +123,8 @@ public class AutoUpdater {
 
 
 				} catch (FailingHttpStatusCodeException | IOException e) {
-					e.printStackTrace();
-
 					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
 							"Internet connection failure! Unable to check for updates.", true));
-
 				}
 
 				Platform.runLater(() -> {
@@ -142,17 +139,19 @@ public class AutoUpdater {
 		Thread updateThread = new Thread(updateTask);
 
 		if (!startup) {
-			if (updateAlert == null) {
-				updateAlert = new Alert(AlertType.INFORMATION);
-				updateAlert.initModality(Modality.NONE);
-				((Stage) updateAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+			Platform.runLater(() -> {
+				if (updateAlert == null) {
+					updateAlert = new Alert(AlertType.INFORMATION);
+					updateAlert.initModality(Modality.NONE);
+					((Stage) updateAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 
-				updateAlert.setOnHiding(event -> checkCancelled = true);
-				updateAlert.setOnShowing(event -> checkCancelled = false);
-			}
+					updateAlert.setOnHiding(event -> checkCancelled = true);
+					updateAlert.setOnShowing(event -> checkCancelled = false);
+				}
 
-			TWUtils.showAlert("Update", "Checking for update...", false,
-					new ButtonType[] {ButtonType.CANCEL}, updateAlert);
+				TWUtils.showAlert("Update", "Checking for update...", false,
+						new ButtonType[] {ButtonType.CANCEL}, updateAlert);
+			});
 		}
 
 		updateThread.start();
