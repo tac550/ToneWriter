@@ -84,6 +84,7 @@ public class MainApp extends Application {
 	private static final File bundledLPDir = new File(new File("lilypond" + File.separator).getAbsolutePath());
 	// Not sure why I have to do the above line. If I use the relative path Java thinks it doesn't exist
 
+	private static String requiredLPVersion;
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
 
@@ -125,10 +126,6 @@ public class MainApp extends Application {
 
 			// Final availability determination after initialization attempt
 			refreshLilyPondLocation();
-		}
-
-		if (!isLilyPondVersionCompatible()) {
-			Platform.exit();
 		}
 
 		if (lilyPondAvailable()) {
@@ -559,6 +556,12 @@ public class MainApp extends Application {
 	}
 
 	private static String getRequiredLPVersion() {
+
+		// Cache the required version so we don't keep checking the file
+		if (requiredLPVersion != null) {
+			return requiredLPVersion;
+		}
+
 		try {
 			String versionLine = new BufferedReader(new InputStreamReader(
 					LilyPondInterface.class.getResourceAsStream("outputTemplate.ly"))).readLine();
@@ -568,7 +571,8 @@ public class MainApp extends Application {
 			if (matcher.find()) {
 				String ver = matcher.group();
 				System.out.println("Required LilyPond version is " + ver);
-				return ver;
+				requiredLPVersion = ver;
+				return requiredLPVersion;
 			}
 
 		} catch (IOException e) {
