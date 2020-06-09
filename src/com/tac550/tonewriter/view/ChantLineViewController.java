@@ -689,7 +689,7 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	@Override
-	public boolean equals(Object obj) { // TODO: Also need to override HashCode?
+	public boolean equals(Object obj) {
 
 		if (obj == this) return true;
 		if (!(obj instanceof ChantLineViewController cc)) return false;
