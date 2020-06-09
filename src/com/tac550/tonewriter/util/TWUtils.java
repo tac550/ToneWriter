@@ -174,29 +174,19 @@ public class TWUtils {
 	public static void showError(String message, boolean wait) {
 		showAlert(AlertType.ERROR, "Error", message, wait);
 	}
-	public static Optional<ButtonType> showAlert(String title_text, String header_text, boolean wait,
-	                                             ButtonType[] button_types, Alert alert) {
-		return showAlert(null, title_text, header_text, wait, null, button_types, null, alert);
-	}
 	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait) {
-		return showAlert(alert_type, title_text, header_text, wait, null, null, null, null);
+		return showAlert(alert_type, title_text, header_text, wait, null, null, null);
 	}
 	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
 												 Stage owner) {
-		return showAlert(alert_type, title_text, header_text, wait, owner, null, null, null);
+		return showAlert(alert_type, title_text, header_text, wait, owner, null, null);
 	}
 	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
-	                                             Stage owner, ButtonType[] button_types, ButtonType default_button) {
-		return showAlert(alert_type, title_text, header_text, wait, owner, button_types, default_button, null);
-	}
-	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
-												 Stage owner, ButtonType[] button_types, ButtonType default_button, Alert alert) {
-		if (alert == null) {
-			alert = new Alert(alert_type);
-			alert.initOwner(owner);
-			((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
-		}
+												 Stage owner, ButtonType[] button_types, ButtonType default_button) {
 
+		Alert alert = new Alert(alert_type);
+		alert.initOwner(owner);
+		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 		alert.setTitle(title_text);
 		alert.setHeaderText(header_text);
 		if (button_types != null)

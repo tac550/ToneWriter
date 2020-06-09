@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -138,21 +139,26 @@ public class AutoUpdater {
 
 		Thread updateThread = new Thread(updateTask);
 
-		if (!startup) {
-			Platform.runLater(() -> {
+		Platform.runLater(() -> {
+			if (!startup) {
 				if (updateAlert == null) {
 					updateAlert = new Alert(AlertType.INFORMATION);
 					updateAlert.initModality(Modality.NONE);
 					((Stage) updateAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
+					updateAlert.setTitle("Update");
+					updateAlert.setHeaderText("Checking for update...");
+					updateAlert.getButtonTypes().set(0, ButtonType.CANCEL);
+					((Button) updateAlert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
 
 					updateAlert.setOnHiding(event -> checkCancelled = true);
 					updateAlert.setOnShowing(event -> checkCancelled = false);
+
 				}
 
-				TWUtils.showAlert("Update", "Checking for update...", false,
-						new ButtonType[] {ButtonType.CANCEL}, updateAlert);
-			});
-		}
+				updateAlert.show();
+
+			}
+		});
 
 		updateThread.start();
 
