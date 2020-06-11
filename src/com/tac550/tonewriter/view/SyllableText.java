@@ -83,7 +83,7 @@ public class SyllableText extends Text {
 	void select(ChantChordController chord, Button note_button) {
 		if (!clicked) active = false;
 
-		nextNoteButtonYPos += VerseLineViewController.NOTE_BUTTON_HEIGHT;
+		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT.get();
 		
 		associatedChords.add(new AssignedChordData(getText(), chord));
 		associatedButtons.add(note_button);
@@ -114,11 +114,11 @@ public class SyllableText extends Text {
 		active = true;
 	}
 	
-	void setNoteDuration(String duration, Button note_button) {
-		associatedChords.get(associatedButtons.indexOf(note_button)).setDuration(duration);
+	void setNoteDuration(String duration, int chord_index) {
+		associatedChords.get(chord_index).setDuration(duration);
 	}
-	String getNoteDuration(Button note_button) {
-		return associatedChords.get(associatedButtons.indexOf(note_button)).getDuration();
+	String getNoteDuration(int chord_index) {
+		return associatedChords.get(chord_index).getDuration();
 	}
 	
 	public AssignedChordData[] getAssociatedChords() {
@@ -133,13 +133,13 @@ public class SyllableText extends Text {
 	}
 	
 	void removeLastChord() {
-		associatedChords.remove(associatedChords.size()-1);
-		associatedButtons.remove(associatedButtons.size()-1);
+		associatedChords.remove(associatedChords.size() - 1);
+		associatedButtons.remove(associatedButtons.size() - 1);
 		
-		nextNoteButtonYPos -= VerseLineViewController.NOTE_BUTTON_HEIGHT;
+		nextNoteButtonYPos -= MainApp.NOTE_BUTTON_HEIGHT.get();
 		
 		if (!associatedButtons.isEmpty()) {
-			String colorString = "#" + associatedButtons.get(associatedButtons.size()-1).getStyle().split("#")[1];
+			String colorString = "#" + associatedButtons.get(associatedButtons.size() - 1).getStyle().split("#")[1];
 			
 			setColor(Color.valueOf(colorString));
 		} else {

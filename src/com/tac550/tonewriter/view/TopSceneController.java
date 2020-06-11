@@ -9,6 +9,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -73,6 +74,27 @@ public class TopSceneController {
 	String projectTitle = "";
 
 	String paperSize = "";
+
+	// Note duration menu elements are re-used to save memory
+	private static final RadioMenuItem quarterNoteMenuItem = new RadioMenuItem("quarter note");
+	private static final RadioMenuItem dottedQuarterNoteMenuItem = new RadioMenuItem("dotted quarter note");
+	private static final RadioMenuItem halfNoteMenuItem = new RadioMenuItem("half note");
+	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
+	private static final RadioMenuItem wholeNoteMenuItem = new RadioMenuItem("whole note");
+	private static final ContextMenu noteMenu = new ContextMenu(quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, eighthNoteMenuItem, wholeNoteMenuItem);
+	private static final ToggleGroup durationGroup = new ToggleGroup();
+
+	static {
+		Platform.runLater(() -> {
+			for (MenuItem item : noteMenu.getItems()) {
+				((RadioMenuItem) item).setToggleGroup(durationGroup);
+			}
+
+			// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
+			// making it impossible to double click a note button near the bottom of the screen.
+			noteMenu.setStyle("-fx-effect: null");
+		});
+	}
 
 	@FXML private void initialize() {
 
@@ -543,5 +565,37 @@ public class TopSceneController {
 	public int tabCount() {
 		return tabPane.getTabs().size();
 	}
+
+	public static void showNoteMenu(SyllableText syllable, Button noteButton) {
+		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
+
+		switch (syllable.getNoteDuration(noteButtonIndex)) {
+			case SyllableText.NOTE_QUARTER -> quarterNoteMenuItem.setSelected(true);
+			case SyllableText.NOTE_DOTTED_QUARTER -> dottedQuarterNoteMenuItem.setSelected(true);
+			case SyllableText.NOTE_HALF -> halfNoteMenuItem.setSelected(true);
+			case SyllableText.NOTE_EIGHTH -> eighthNoteMenuItem.setSelected(true);
+			case SyllableText.NOTE_WHOLE -> wholeNoteMenuItem.setSelected(true);
+			default -> throw new IllegalStateException("Unexpected duration: " + syllable.getNoteDuration(noteButtonIndex));
+		}
+
+		noteMenu.setOnAction(event -> {
+			if (event.getTarget().equals(quarterNoteMenuItem)) {
+				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButtonIndex);
+			} else if (event.getTarget().equals(dottedQuarterNoteMenuItem)) {
+				syllable.setNoteDuration(SyllableText.NOTE_DOTTED_QUARTER, noteButtonIndex);
+			} else if (event.getTarget().equals(halfNoteMenuItem)) {
+				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButtonIndex);
+			} else if (event.getTarget().equals(eighthNoteMenuItem)) {
+				syllable.setNoteDuration(SyllableText.NOTE_EIGHTH, noteButtonIndex);
+			} else if (event.getTarget().equals(wholeNoteMenuItem)) {
+				syllable.setNoteDuration(SyllableText.NOTE_WHOLE, noteButtonIndex);
+			}
+		});
+
+		noteMenu.show(noteButton, Side.BOTTOM, 0,
+				(syllable.getAssociatedButtons().size() - syllable.getAssociatedButtons().indexOf(noteButton) - 1)
+						* MainApp.NOTE_BUTTON_HEIGHT.get());
+	}
+
 
 }

@@ -6,6 +6,7 @@ import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -73,10 +74,13 @@ public class MainApp extends Application {
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
 	static final String PREFS_CHECK_UPDATE_APPSTARTUP = "Check-Update-Appstart";
 
+	// UI Stuff
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
 			Color.DEEPSKYBLUE, Color.BURLYWOOD, Color.AQUA, Color.GOLD};
 	static final Color END_CHORD_COLOR = Color.DARKMAGENTA;
+	// How tall to make note buttons
+	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
 
 	private static boolean darkModeEnabled = false;
 

@@ -11,7 +11,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -74,19 +73,6 @@ public class VerseLineViewController {
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
 	private ChantChordController currentChord; // The chord currently being assigned
 
-	// Note duration menu elements are re-used to save memory
-	private static boolean setupComplete = false;
-	private static final RadioMenuItem quarterNoteMenuItem = new RadioMenuItem("quarter note");
-	private static final RadioMenuItem dottedQuarterNoteMenuItem = new RadioMenuItem("dotted quarter note");
-	private static final RadioMenuItem halfNoteMenuItem = new RadioMenuItem("half note");
-	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
-	private static final RadioMenuItem wholeNoteMenuItem = new RadioMenuItem("whole note");
-	private static final ContextMenu noteMenu = new ContextMenu(quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, eighthNoteMenuItem, wholeNoteMenuItem);
-	private static final ToggleGroup durationGroup = new ToggleGroup();
-
-	// How tall to make note buttons
-	static final int NOTE_BUTTON_HEIGHT = 15;
-
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
 	@FXML private void initialize() {
@@ -129,20 +115,6 @@ public class VerseLineViewController {
 		} else {
 			// Skin is already attached, just access the scroll bars
 			setUpScrollPane();
-		}
-
-		// Context menu for changing chord duration (set up only first time; fields are static)
-		if (!setupComplete) {
-			setupComplete = true;
-			Platform.runLater(() -> {
-				for (MenuItem item : noteMenu.getItems()) {
-					((RadioMenuItem) item).setToggleGroup(durationGroup);
-				}
-
-				// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
-				// making it impossible to double click a note button near the bottom of the screen.
-				noteMenu.setStyle("-fx-effect: null");
-			});
 		}
 
 	}
@@ -479,20 +451,20 @@ public class VerseLineViewController {
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
 				if (mainController.isLastVerseLineOfSection(this)) {
-					noteButton = createNoteButton(currentText, true, true, currentChord);
+					noteButton = createNoteButton(currentText, currentChord);
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(currentChord, noteButton);
-					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
+					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, currentText.getAssociatedButtons().size() - 1);
 				} else {
-					noteButton = createNoteButton(currentText, true, false, currentChord);
+					noteButton = createNoteButton(currentText, currentChord);
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(currentChord, noteButton);
-					currentText.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
+					currentText.setNoteDuration(SyllableText.NOTE_HALF, currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
-				noteButton = createNoteButton(currentText, false, false, currentChord);
+				noteButton = createNoteButton(currentText, currentChord);
 
 				undoFrame.buttons.add(noteButton);
 				currentText.select(currentChord, noteButton);
@@ -506,32 +478,27 @@ public class VerseLineViewController {
 		undoActions.push(undoFrame);
 	}
 
-	private Button createNoteButton(SyllableText syllable, boolean lineEnd, boolean verseEnd, ChantChordController chord) {
+	private Button createNoteButton(SyllableText syllable, ChantChordController chord) {
+		int futureButtonIndex = syllable.getAssociatedButtons().size();
+
 		Button noteButton = new Button(currentChord.getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(currentChord.getColor())));
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
-		noteButton.setMaxHeight(NOTE_BUTTON_HEIGHT);
-		noteButton.setPrefHeight(NOTE_BUTTON_HEIGHT);
-		noteButton.setMinHeight(NOTE_BUTTON_HEIGHT);
+		noteButton.maxHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.prefHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.minHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
+
 		noteButton.setPrefWidth(30);
 		noteButton.setPadding(Insets.EMPTY);
 
-		// Set initial selection
-		if (verseEnd) {
-			wholeNoteMenuItem.setSelected(true);
-		} else if (lineEnd) {
-			halfNoteMenuItem.setSelected(true);
-		} else quarterNoteMenuItem.setSelected(true);
-
-		// Right click functionality plays chord associated with button
 		noteButton.setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.SECONDARY) {
+			if (e.getButton() == MouseButton.SECONDARY) { // Right click functionality plays chord associated with button
 				chord.playMidi();
-			} else if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
-				halfNoteMenuItem.setSelected(true);
+			} else if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) { // Double clicking applies half note
+				syllable.setNoteDuration(SyllableText.NOTE_HALF, futureButtonIndex);
+				TopSceneController.showNoteMenu(syllable, noteButton); // Refresh the note menu view to show selection
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
@@ -542,38 +509,9 @@ public class VerseLineViewController {
 		noteButton.setOnMouseExited((me) -> chord.setHighlighted(false));
 
 		noteButton.setOnAction(event ->
-				showNoteMenu(syllable, noteButton));
+				TopSceneController.showNoteMenu(syllable, noteButton));
 
 		return noteButton;
-	}
-
-	private void showNoteMenu(SyllableText syllable, Button noteButton) {
-
-		switch (syllable.getNoteDuration(noteButton)) {
-			case SyllableText.NOTE_QUARTER -> quarterNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_DOTTED_QUARTER -> dottedQuarterNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_HALF -> halfNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_EIGHTH -> eighthNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_WHOLE -> wholeNoteMenuItem.setSelected(true);
-			default -> throw new IllegalStateException("Unexpected duration: " + syllable.getNoteDuration(noteButton));
-		}
-
-		noteMenu.setOnAction(event -> {
-			if (event.getTarget().equals(quarterNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButton);
-			} else if (event.getTarget().equals(dottedQuarterNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_DOTTED_QUARTER, noteButton);
-			} else if (event.getTarget().equals(halfNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButton);
-			} else if (event.getTarget().equals(eighthNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_EIGHTH, noteButton);
-			} else if (event.getTarget().equals(wholeNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_WHOLE, noteButton);
-			}
-		});
-
-		noteMenu.show(noteButton, Side.BOTTOM, 0,
-				(syllable.getAssociatedButtons().size() - syllable.getAssociatedButtons().indexOf(noteButton) - 1) * NOTE_BUTTON_HEIGHT);
 	}
 
 	@FXML private void toggleExpand() {
@@ -594,7 +532,8 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + NOTE_BUTTON_HEIGHT + scrollBarPadding);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT.get()
+					+ scrollBarPadding);
 			expandButton.setGraphic(minusIcon);
 
 			view_expanded = true;
