@@ -55,7 +55,7 @@ public class TopSceneController {
 	@FXML private CheckMenuItem darkModeMenuItem;
 
 	@FXML private MenuItem aboutMenuItem;
-	@FXML private MenuItem updateMenuitem;
+	@FXML private MenuItem updateMenuItem;
 
 	@FXML private TabPane tabPane;
 	private final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
@@ -88,7 +88,7 @@ public class TopSceneController {
 		setMenuIcon(setKeyMenuItem, keyIconPath);
 		setMenuIcon(editHeaderInfoMenuItem, headerIconPath);
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
-		setMenuIcon(updateMenuitem, "/media/cloud-sync.png");
+		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
 
 		// Modify LilyPond location editing menu items on Mac
