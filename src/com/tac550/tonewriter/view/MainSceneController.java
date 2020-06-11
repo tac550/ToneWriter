@@ -81,8 +81,6 @@ public class MainSceneController {
 	private Stage parentStage;
 	private TopSceneController topSceneController;
 
-	private final MenuState menuState = new MenuState();
-
 	@FXML private SplitPane mainSplitPane;
 
 	@FXML private ChoiceBox<String> topVerseChoice;
@@ -102,6 +100,8 @@ public class MainSceneController {
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 	@FXML private CheckMenuItem pageBreakMenuItem;
+
+	private final MenuState menuState = new MenuState();
 
 	private Robot robot;
 
