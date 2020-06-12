@@ -48,7 +48,7 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;

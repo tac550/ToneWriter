@@ -10,7 +10,7 @@ import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.VerseLineViewController;
 import org.apache.commons.io.FilenameUtils;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
