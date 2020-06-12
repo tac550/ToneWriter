@@ -2,6 +2,7 @@ package com.tac550.tonewriter.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class VerseLine {
 
@@ -19,7 +20,7 @@ public class VerseLine {
 	}
 
 	private String[] splitSyllables(String line) {
-		ArrayList<String> new_syllables = new ArrayList<>(Arrays.asList(
+		List<String> new_syllables = new ArrayList<>(Arrays.asList(
 				line.replace("-", "_-").replace(" ", "_ ").split("_")));
 
 		return new_syllables.toArray(new String[0]);

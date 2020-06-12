@@ -13,13 +13,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Syllables {
 
 	// Sends text off to the syllabification engine and returns the resulting lines as an array of strings.
 	public static String[] getSyllabificationLines(String full_verse, Stage main_stage) {
 		
-		ArrayList<String> lines;
+
+		List<String> lines;
 		
 		try (final WebClient webClient = new WebClient()) {
 

@@ -1,6 +1,10 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.*;
+import com.tac550.tonewriter.io.AutoUpdater;
+import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.io.LilyPondInterface;
+import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.io.QuickVerseIO;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.OutputMode;
@@ -11,7 +15,20 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -349,7 +366,7 @@ public class TopSceneController {
 
 					// Increment any verses used from the built-in verse finder data.
 					try {
-						ArrayList<String> verses = QuickVerseIO.getBuiltinVerses();
+						List<String> verses = QuickVerseIO.getBuiltinVerses();
 
 						if (!prevTabController.getTopVerse().isBlank()) {
 							newTabController.setTopVerseChoice(prevTabController.getTopVerseChoice());

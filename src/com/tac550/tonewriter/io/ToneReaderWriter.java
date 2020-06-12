@@ -20,15 +20,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class ToneReaderWriter {
 
-	private final ArrayList<ChantLineViewController> chantLines;
+	private final List<ChantLineViewController> chantLines;
 
 	private String poetText;
 	private String composerText;
@@ -37,7 +37,7 @@ public class ToneReaderWriter {
 
 	private MainSceneController mainScene;
 
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, MainSceneController main_scene,
+	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene,
 	                        String key, String poet, String composer) {
 		chantLines = lines;
 		associatedMainScene = main_scene;
@@ -45,7 +45,7 @@ public class ToneReaderWriter {
 		poetText = poet;
 		composerText = composer;
 	}
-	public ToneReaderWriter(ArrayList<ChantLineViewController> lines, MainSceneController main_scene) {
+	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene) {
 		chantLines = lines;
 		associatedMainScene = main_scene;
 	}

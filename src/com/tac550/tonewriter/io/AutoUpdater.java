@@ -57,7 +57,7 @@ public class AutoUpdater {
 					// Generate the changelog display HTML and store version numbers.
 					List<HtmlDivision> releaseHeaders = releasesPage.getByXPath("//div[@class='release-header']");
 					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
-					ArrayList<Float> releaseNumbers = new ArrayList<>();
+					List<Float> releaseNumbers = new ArrayList<>();
 
 					StringBuilder finalHTMLBuilder = new StringBuilder();
 

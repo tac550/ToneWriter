@@ -19,16 +19,27 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.*;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -129,12 +140,12 @@ public class MainSceneController {
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
-	private final ArrayList<ChantLineViewController> chantLineControllers = new ArrayList<>();
+	private final List<ChantLineViewController> chantLineControllers = new ArrayList<>();
 
 	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
 	@FXML private VBox verseLineBox;
-	private final ArrayList<VerseLineViewController> verseLineControllers = new ArrayList<>();
+	private final List<VerseLineViewController> verseLineControllers = new ArrayList<>();
 
 	@FXML private void initialize() {
 
@@ -425,7 +436,7 @@ public class MainSceneController {
 					return null;
 				}
 
-				ArrayList<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
+				List<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
 
 				for (String line : lines) {
 					lineLoaders.add(createVerseLine(line));
@@ -1027,7 +1038,7 @@ public class MainSceneController {
 	public String getRightHeaderText() {
 		return hideToneHeaderMenuItem.isSelected() ? "" : rightText;
 	}
-	public ArrayList<VerseLineViewController> getVerseLineControllers() {
+	public List<VerseLineViewController> getVerseLineControllers() {
 		return verseLineControllers;
 	}
 	public String getKeySignature() {

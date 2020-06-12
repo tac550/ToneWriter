@@ -5,11 +5,12 @@ import com.tac550.tonewriter.view.ChantChordController;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MainChord extends ChantChordController {
 
-	protected final ArrayList<PrepChord> prepChords = new ArrayList<>(); // Stored left-to-right
-	protected final ArrayList<PostChord> postChords = new ArrayList<>(); // Stored right-to-left
+	protected final List<PrepChord> prepChords = new ArrayList<>(); // Stored left-to-right
+	protected final List<PostChord> postChords = new ArrayList<>(); // Stored right-to-left
 
 	public PrepChord addPrepChord(String values) throws IOException {
 		chantLineController.edited();
@@ -33,7 +34,7 @@ public class MainChord extends ChantChordController {
 	}
 
 	public void rotatePrepsOrPosts(ChantChordController source, ChantChordController target) {
-		ArrayList<ChantChordController> resultList = new ArrayList<>(prepChords);
+		List<ChantChordController> resultList = new ArrayList<>(prepChords);
 
 		int sourceIndex = resultList.indexOf(source);
 		int targetIndex = resultList.indexOf(target);
@@ -66,10 +67,10 @@ public class MainChord extends ChantChordController {
 		return this;
 	}
 
-	public ArrayList<PrepChord> getPreps() {
+	public List<PrepChord> getPreps() {
 		return prepChords;
 	}
-	public ArrayList<PostChord> getPosts() {
+	public List<PostChord> getPosts() {
 		return postChords;
 	}
 

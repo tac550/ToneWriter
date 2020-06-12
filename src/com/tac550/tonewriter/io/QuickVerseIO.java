@@ -2,16 +2,24 @@ package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.view.MainApp;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class QuickVerseIO {
 
-	public static ArrayList<String> getBuiltinVerses() throws IOException {
-		ArrayList<String> finalList = new ArrayList<>();
+	public static List<String> getBuiltinVerses() throws IOException {
+		List<String> finalList = new ArrayList<>();
 
 		InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
 		InputStreamReader inputReader = new InputStreamReader(stream);
@@ -32,8 +40,8 @@ public class QuickVerseIO {
 		return finalList;
 	}
 
-	public static ArrayList<String> getCustomVerses() throws IOException {
-		ArrayList<String> finalList = new ArrayList<>();
+	public static List<String> getCustomVerses() throws IOException {
+		List<String> finalList = new ArrayList<>();
 
 		File verseFile = getPlatformSpecificVerseFile();
 

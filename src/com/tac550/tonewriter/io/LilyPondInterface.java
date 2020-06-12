@@ -3,7 +3,11 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.*;
+import com.tac550.tonewriter.view.ChantChordController;
+import com.tac550.tonewriter.view.MainApp;
+import com.tac550.tonewriter.view.MainSceneController;
+import com.tac550.tonewriter.view.SyllableText;
+import com.tac550.tonewriter.view.VerseLineViewController;
 import org.apache.commons.io.FilenameUtils;
 
 import java.awt.*;
@@ -11,8 +15,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +45,7 @@ public class LilyPondInterface {
 
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
-	private static final Map<String, ArrayList<ChantChordController>> pendingChordControllers = new HashMap<>();
+	private static final Map<String, List<ChantChordController>> pendingChordControllers = new HashMap<>();
 
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
@@ -195,7 +206,7 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	private static String[] buildMusicLayout(ArrayList<VerseLineViewController> verse_lines) {
+	private static String[] buildMusicLayout(List<VerseLineViewController> verse_lines) {
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.

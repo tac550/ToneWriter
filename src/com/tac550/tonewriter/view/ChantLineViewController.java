@@ -1,7 +1,12 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.model.*;
+import com.tac550.tonewriter.model.EndChord;
+import com.tac550.tonewriter.model.MainChord;
+import com.tac550.tonewriter.model.PostChord;
+import com.tac550.tonewriter.model.PrepChord;
+import com.tac550.tonewriter.model.RecitingChord;
+import com.tac550.tonewriter.model.SubChord;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -64,7 +69,7 @@ public class ChantLineViewController implements CommentableView {
 	@FXML private Button playButton;
 	
 	@FXML private HBox chordBox;
-	private final ArrayList<ChantChordController> chantChordControllers = new ArrayList<>();
+	private final List<ChantChordController> chantChordControllers = new ArrayList<>();
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
@@ -175,7 +180,7 @@ public class ChantLineViewController implements CommentableView {
 	public String getName() {
 		return nameChoice.getValue();
 	}
-	public ArrayList<ChantChordController> getChords() {
+	public List<ChantChordController> getChords() {
 		return chantChordControllers;
 	}
 
@@ -502,7 +507,7 @@ public class ChantLineViewController implements CommentableView {
 		recalcCHNames();
 	}
 	@FXML private void removeEndingChords() {
-		ArrayList<ChantChordController> chordsToDelete = new ArrayList<>();
+		List<ChantChordController> chordsToDelete = new ArrayList<>();
 		for (ChantChordController chord : chantChordControllers) {
 			if (chord instanceof EndChord) {
 				chordsToDelete.add(chord);

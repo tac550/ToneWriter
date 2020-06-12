@@ -1,16 +1,16 @@
 package com.tac550.tonewriter.model;
 
-import java.util.ArrayList;
-
 import com.tac550.tonewriter.view.SyllableText;
-
 import javafx.scene.control.Button;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssignmentAction {
 
 	public int previousChordIndex;
 	public int previousLastSyllableAssigned;
-	public ArrayList<Button> buttons = new ArrayList<>();
-	public ArrayList<SyllableText> syllableTexts = new ArrayList<>();
+	public List<Button> buttons = new ArrayList<>();
+	public List<SyllableText> syllableTexts = new ArrayList<>();
 
 }

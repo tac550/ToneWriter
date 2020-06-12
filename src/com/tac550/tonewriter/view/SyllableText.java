@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SyllableText extends Text {
 
@@ -18,8 +19,8 @@ public class SyllableText extends Text {
 	
 	private VerseLineViewController parentController;
 	
-	private final ArrayList<AssignedChordData> associatedChords = new ArrayList<>();
-	private final ArrayList<Button> associatedButtons = new ArrayList<>();
+	private final List<AssignedChordData> associatedChords = new ArrayList<>();
+	private final List<Button> associatedButtons = new ArrayList<>();
 	
 	private boolean active = true;
 	// Was this the one that was clicked?
@@ -124,7 +125,7 @@ public class SyllableText extends Text {
 	public AssignedChordData[] getAssociatedChords() {
 		return associatedChords.toArray(new AssignedChordData[] {});
 	}
-	ArrayList<Button> getAssociatedButtons() {
+	List<Button> getAssociatedButtons() {
 		return associatedButtons;
 	}
 	
