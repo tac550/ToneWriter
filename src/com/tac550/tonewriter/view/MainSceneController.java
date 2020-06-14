@@ -337,7 +337,7 @@ public class MainSceneController {
 				ChantLineViewController currentChantLine = mainChantLines.get(CLNum);
 
 				// If it's the last line before the end or a separator, it gets Cadence.
-				if (VLNum + 1 == verseLineControllers.size() || verseLineControllers.get(VLNum + 1).isSeparator()) {
+				if (isLastVerseLineOfSection(verseLineControllers.get(VLNum))) {
 					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
 					CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
 					VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
