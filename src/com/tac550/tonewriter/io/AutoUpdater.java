@@ -21,7 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
-import java.awt.Taskbar;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

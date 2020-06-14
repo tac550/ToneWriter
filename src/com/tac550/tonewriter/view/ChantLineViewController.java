@@ -1,12 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.model.EndChord;
-import com.tac550.tonewriter.model.MainChord;
-import com.tac550.tonewriter.model.PostChord;
-import com.tac550.tonewriter.model.PrepChord;
-import com.tac550.tonewriter.model.RecitingChord;
-import com.tac550.tonewriter.model.SubChord;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;

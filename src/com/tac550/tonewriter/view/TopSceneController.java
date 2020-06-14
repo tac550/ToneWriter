@@ -668,9 +668,11 @@ public class TopSceneController {
 		double stepSize = totalWidth / touchItems.size();
 
 		durationTouchStage.show();
-		durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
-				- (stepSize / 2));
-		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
+		Platform.runLater(() -> {
+			durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
+					- (stepSize / 2));
+			durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
+		});
 
 	}
 
