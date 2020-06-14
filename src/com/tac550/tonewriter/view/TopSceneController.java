@@ -1,10 +1,6 @@
 package com.tac550.tonewriter.view;
 
-import com.tac550.tonewriter.io.AutoUpdater;
-import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondInterface;
-import com.tac550.tonewriter.io.MidiInterface;
-import com.tac550.tonewriter.io.QuickVerseIO;
+import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.OutputMode;
@@ -13,36 +9,25 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,24 +78,84 @@ public class TopSceneController {
 	String paperSize = "";
 
 	// Note duration menu elements are re-used to save memory
+	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
 	private static final RadioMenuItem quarterNoteMenuItem = new RadioMenuItem("quarter note");
 	private static final RadioMenuItem dottedQuarterNoteMenuItem = new RadioMenuItem("dotted quarter note");
 	private static final RadioMenuItem halfNoteMenuItem = new RadioMenuItem("half note");
-	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
 	private static final RadioMenuItem wholeNoteMenuItem = new RadioMenuItem("whole note");
-	private static final ContextMenu noteMenu = new ContextMenu(quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, eighthNoteMenuItem, wholeNoteMenuItem);
+	private static final List<RadioMenuItem> clickItems = new ArrayList<>();
+	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, wholeNoteMenuItem);
 	private static final ToggleGroup durationGroup = new ToggleGroup();
+	private static final ImageView eighthNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/eighth-note.png").toExternalForm());
+	private static final ImageView quarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/quarter-note.png").toExternalForm());
+	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/dotted-quarter-note.png").toExternalForm());
+	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/half-note.png").toExternalForm());
+	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/whole-note.png").toExternalForm());
+	private static final List<ImageView> touchItems = new ArrayList<>();
+	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(0.5, 1, 0.5, 1);
+	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
+	private static final List<String> durationMapping = new ArrayList<>();
 
 	static {
+		Collections.addAll(durationMapping, SyllableText.NOTE_EIGHTH, SyllableText.NOTE_QUARTER,
+				SyllableText.NOTE_DOTTED_QUARTER, SyllableText.NOTE_HALF, SyllableText.NOTE_WHOLE);
+
+		Collections.addAll(clickItems, eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem,
+				halfNoteMenuItem, wholeNoteMenuItem);
+
 		Platform.runLater(() -> {
-			for (MenuItem item : noteMenu.getItems()) {
-				((RadioMenuItem) item).setToggleGroup(durationGroup);
+			for (RadioMenuItem item : clickItems) {
+				item.setToggleGroup(durationGroup);
 			}
 
 			// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
 			// making it impossible to double click a note button near the bottom of the screen.
 			noteMenu.setStyle("-fx-effect: null");
 		});
+
+		Collections.addAll(touchItems, eighthNoteTouchItem, quarterNoteTouchItem, dottedQuarterNoteTouchItem,
+				halfNoteTouchItem, wholeNoteTouchItem);
+
+		HBox durationTouchBox = new HBox();
+		durationTouchBox.setStyle("-fx-background: #ffffff");
+		durationTouchBox.setAlignment(Pos.CENTER);
+		durationTouchBox.setSpacing(10);
+
+		durationTouchBox.getChildren().addAll(touchItems);
+		Scene durationTouchScene = new Scene(durationTouchBox);
+
+		for (ImageView item : touchItems) {
+			item.setPreserveRatio(true);
+			item.setFitWidth(40);
+			item.setFitHeight(40);
+		}
+
+		durationTouchScene.setOnTouchMoved(TopSceneController::selectTouchDuration);
+
+		durationTouchScene.setOnTouchReleased(event -> {
+			selectTouchDuration(event);
+			Platform.runLater(durationTouchStage::close);
+		});
+
+
+		durationTouchStage.focusedProperty().addListener((ov, oldVal, newVal) -> {
+			if (!newVal)
+				durationTouchStage.close();
+		});
+
+		durationTouchStage.setScene(durationTouchScene);
+
+	}
+	private static void selectTouchDuration(TouchEvent event) {
+		for (ImageView release_item : touchItems) {
+			release_item.setEffect(null);
+		}
+
+		double totalWidth = durationTouchStage.getWidth();
+		double stepSize = totalWidth / touchItems.size();
+
+		int index = Math.min(Math.max(0, (int) (event.getTouchPoint().getSceneX() / stepSize)), touchItems.size() - 1);
+		touchItems.get(index).setEffect(touchSelectionEffect);
 	}
 
 	@FXML private void initialize() {
@@ -193,12 +238,12 @@ public class TopSceneController {
 		addTab();
 	}
 
-	private void setMenuIcon(MenuItem menu_item, String imagePath) {
-		ImageView saveIcon = new ImageView(getClass().getResource(imagePath).toExternalForm());
+	private static void setMenuIcon(MenuItem menu_item, String imagePath) {
+		ImageView imageView = new ImageView(TopSceneController.class.getResource(imagePath).toExternalForm());
 		double menuIconSize = 30;
-		saveIcon.setFitHeight(menuIconSize);
-		saveIcon.setFitWidth(menuIconSize);
-		menu_item.setGraphic(saveIcon);
+		imageView.setFitHeight(menuIconSize);
+		imageView.setFitWidth(menuIconSize);
+		menu_item.setGraphic(imageView);
 	}
 
 	private void setPaperSize(String size) {
@@ -583,36 +628,50 @@ public class TopSceneController {
 		return tabPane.getTabs().size();
 	}
 
-	public static void showNoteMenu(SyllableText syllable, Button noteButton) {
+	static void showNoteMenu(SyllableText syllable, Button noteButton) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
-		switch (syllable.getNoteDuration(noteButtonIndex)) {
-			case SyllableText.NOTE_QUARTER -> quarterNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_DOTTED_QUARTER -> dottedQuarterNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_HALF -> halfNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_EIGHTH -> eighthNoteMenuItem.setSelected(true);
-			case SyllableText.NOTE_WHOLE -> wholeNoteMenuItem.setSelected(true);
-			default -> throw new IllegalStateException("Unexpected duration: " + syllable.getNoteDuration(noteButtonIndex));
+		// Behavior
+		for (RadioMenuItem item : clickItems) {
+			item.setOnAction(event ->
+					syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex));
 		}
 
-		noteMenu.setOnAction(event -> {
-			if (event.getTarget().equals(quarterNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_QUARTER, noteButtonIndex);
-			} else if (event.getTarget().equals(dottedQuarterNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_DOTTED_QUARTER, noteButtonIndex);
-			} else if (event.getTarget().equals(halfNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_HALF, noteButtonIndex);
-			} else if (event.getTarget().equals(eighthNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_EIGHTH, noteButtonIndex);
-			} else if (event.getTarget().equals(wholeNoteMenuItem)) {
-				syllable.setNoteDuration(SyllableText.NOTE_WHOLE, noteButtonIndex);
-			}
-		});
+		// Initial state
+		clickItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex))).setSelected(true);
 
+		// Showing / Positioning
 		noteMenu.show(noteButton, Side.BOTTOM, 0,
 				(syllable.getAssociatedButtons().size() - syllable.getAssociatedButtons().indexOf(noteButton) - 1)
 						* MainApp.NOTE_BUTTON_HEIGHT.get());
 	}
 
+	static void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
+		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
+
+		// Behavior
+		durationTouchStage.setOnHiding(event -> {
+			for (ImageView item : touchItems) {
+				if (item.getEffect() != null) {
+					syllable.setNoteDuration(durationMapping.get(touchItems.indexOf(item)), noteButtonIndex);
+					item.setEffect(null);
+				}
+			}
+		});
+
+		// Initial state
+		ImageView selectedItem = touchItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex)));
+		selectedItem.setEffect(touchSelectionEffect);
+
+		// Showing / Positioning
+		double totalWidth = durationTouchStage.getWidth();
+		double stepSize = totalWidth / touchItems.size();
+
+		durationTouchStage.show();
+		durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
+				- (stepSize / 2));
+		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
+
+	}
 
 }
