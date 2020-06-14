@@ -161,6 +161,7 @@ public class VerseLineViewController {
 
 			isSeparatorLine = false;
 			separatorIndicatorBox.setVisible(false);
+			mainContentPane.setVisible(true);
 
 			lineTextFlow.getChildren().clear();
 
@@ -183,6 +184,7 @@ public class VerseLineViewController {
 
 			isSeparatorLine = true;
 			separatorIndicatorBox.setVisible(true);
+			mainContentPane.setVisible(false);
 
 		}
 
