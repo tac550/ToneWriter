@@ -309,8 +309,10 @@ public class MainSceneController {
 		if (manualCLAssignmentEnabled()) {
 
 			for (VerseLineViewController verseLine : verseLineControllers) {
+				if (verseLine.isSeparator()) continue;
+
 				// Default last chant line selection to Cadence line.
-				if (verseLineControllers.indexOf(verseLine) == verseLineControllers.size() - 1) {
+				if (isLastVerseLineOfSection(verseLine)) {
 					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]),
 							chantLineControllers.size() - 1);
 				} else {
