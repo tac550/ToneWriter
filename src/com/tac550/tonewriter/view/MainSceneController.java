@@ -629,8 +629,7 @@ public class MainSceneController {
 			menuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
-			leftText = "";
-			rightText = "";
+			setHeaderText("", "");
 			keySignature = "C major";
 			menuState.manualCLAssignmentSelected = false;
 
@@ -746,8 +745,7 @@ public class MainSceneController {
 				if (!(tempLeftText.equals(leftText) && tempRightText.equals(rightText))) {
 					toneEdited();
 
-					leftText = tempLeftText;
-					rightText = tempRightText;
+					setHeaderText(tempLeftText, tempRightText);
 				}
 			});
 		})).start();
