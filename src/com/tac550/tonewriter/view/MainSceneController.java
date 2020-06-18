@@ -675,26 +675,30 @@ public class MainSceneController {
 	 * Edit Menu Actions
 	 */
 	void handleSetKeySignature() {
-		List<String> choices = new ArrayList<>(List.of("C major", "G major", "D major", "A major", "E major", "B major",
-				"F\u266F major", "C\u266F major", "F major", "B\u266Dmajor", "E\u266Dmajor", "A\u266Dmajor", "D\u266Dmajor",
-				"G\u266Dmajor", "C\u266Dmajor", "A minor", "E minor", "B minor", "F\u266F minor", "C\u266F minor", "G\u266F minor",
-				"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
-				"A\u266Dminor"));
 
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(keySignature, choices);
-		dialog.setTitle("Key Choice");
-		dialog.setHeaderText("Choose a key");
-		ImageView keyIcon = new ImageView(getClass().getResource(TopSceneController.keyIconPath).toExternalForm());
-		keyIcon.setFitHeight(50);
-		keyIcon.setFitWidth(50);
-		dialog.setGraphic(keyIcon);
-		dialog.initOwner(parentStage);
-		Optional<String> result = dialog.showAndWait();
+		new Thread(() -> Platform.runLater(() -> {
+			List<String> choices = new ArrayList<>(List.of("C major", "G major", "D major", "A major", "E major", "B major",
+					"F\u266F major", "C\u266F major", "F major", "B\u266Dmajor", "E\u266Dmajor", "A\u266Dmajor", "D\u266Dmajor",
+					"G\u266Dmajor", "C\u266Dmajor", "A minor", "E minor", "B minor", "F\u266F minor", "C\u266F minor", "G\u266F minor",
+					"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
+					"A\u266Dminor"));
 
-		result.ifPresent(key -> {
-			toneEdited();
-			setKeySignature(key);
-		});
+			ChoiceDialog<String> dialog = new ChoiceDialog<>(keySignature, choices);
+			dialog.setTitle("Key Choice");
+			dialog.setHeaderText("Choose a key");
+			ImageView keyIcon = new ImageView(getClass().getResource(TopSceneController.keyIconPath).toExternalForm());
+			keyIcon.setFitHeight(50);
+			keyIcon.setFitWidth(50);
+			dialog.setGraphic(keyIcon);
+			dialog.initOwner(parentStage);
+			Optional<String> result = dialog.showAndWait();
+
+			result.ifPresent(key -> {
+				toneEdited();
+				setKeySignature(key);
+			});
+		})).start();
+
 	}
 	void handleEditHeaderInfo() {
 
