@@ -694,8 +694,10 @@ public class MainSceneController {
 			Optional<String> result = dialog.showAndWait();
 
 			result.ifPresent(key -> {
-				toneEdited();
-				setKeySignature(key);
+				if (!key.equals(keySignature)) {
+					toneEdited();
+					setKeySignature(key);
+				}
 			});
 		})).start();
 
