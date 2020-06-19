@@ -23,6 +23,11 @@
          <menus>
             <Menu text="_Project">
                <items>
+                  <MenuItem fx:id="addItemMenuItem" mnemonicParsing="false" onAction="#addTab" text="Add Item">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
                   <MenuItem fx:id="projectTitleMenuItem" mnemonicParsing="false" onAction="#handleSetProjectTitle" text="Set Project Title...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />

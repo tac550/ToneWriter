@@ -261,8 +261,6 @@ public class MainApp extends Application {
 			Scene mainScene = new Scene(rootPane);
 			mainStage.setScene(mainScene);
 
-			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN),
-					topSceneController::addTab);
 			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
 					() -> topSceneController.closeSelectedTab());
 

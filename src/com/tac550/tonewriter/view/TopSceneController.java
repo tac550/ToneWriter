@@ -35,6 +35,7 @@ public class TopSceneController {
 
 	private Stage parentStage;
 
+	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
 	@FXML private MenuItem exportPDFMenuItem;
 	@FXML private MenuItem exitMenuItem;
@@ -161,6 +162,7 @@ public class TopSceneController {
 	@FXML private void initialize() {
 
 		// Menu icons
+		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
 		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
 		setMenuIcon(exitMenuItem, "/media/sign-error.png");
