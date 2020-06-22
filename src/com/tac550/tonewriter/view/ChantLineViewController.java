@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -640,21 +639,18 @@ public class ChantLineViewController implements CommentableView {
 
 	}
 	@FXML private void handlePlay() {
-		Task<Void> midiTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
+		new Thread(() -> {
 
-				for (ChantChordController controller : chantChordControllers) {
-					controller.playMidi();
+			for (ChantChordController controller : chantChordControllers) {
+				controller.playMidi();
 
+				try {
 					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				return null;
 			}
-		};
-		
-		Thread th = new Thread(midiTask);
-		th.start();
+		}).start();
 	}
 	
 	public String getEncodedComment() {
@@ -686,6 +682,10 @@ public class ChantLineViewController implements CommentableView {
 		if (image != hoveredBubbleImage) {
 			commentButtonState = image;
 		}
+	}
+
+	public void edited() {
+		mainController.toneEdited();
 	}
 
 	@Override
@@ -750,15 +750,12 @@ public class ChantLineViewController implements CommentableView {
 		codeBuilder.append(this.getChords().size());
 
 		for (ChantChordController chord : this.getChords()) {
+			codeBuilder.append(chord.getName());
 			codeBuilder.append(chord.getFields());
 			codeBuilder.append(chord.getColor());
 		}
 
 		return codeBuilder.toHashCode();
-	}
-
-	public void edited() {
-		mainController.toneEdited();
 	}
 
 }
