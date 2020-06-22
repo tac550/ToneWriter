@@ -657,10 +657,10 @@ public class ChantLineViewController implements CommentableView {
 		th.start();
 	}
 	
-	public String getComment() {
+	public String getEncodedComment() {
 		return commentString.replaceAll("\n", "/n");
 	}
-	public void setComment(String comment) {
+	public void setComment(String comment) { // TODO: Needs a rework
 		if (commentString.equals(comment)) return;
 
 		mainController.toneEdited();
@@ -686,6 +686,43 @@ public class ChantLineViewController implements CommentableView {
 		if (image != hoveredBubbleImage) {
 			commentButtonState = image;
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder finalString = new StringBuilder();
+
+		finalString.append(getName()).append("\n");
+
+		// Place chant line comment on the first line, if any.
+		if (hasComment()) {
+			finalString.append(String.format("Comment: %s\n", getEncodedComment()));
+		}
+
+		// For each chord in the chant line...
+		for (ChantChordController chord : getChords()) {
+			if (chord instanceof RecitingChord rChord) {
+				finalString.append(String.format("%s: %s%s\n", rChord.getName(), rChord.getFields(),
+						rChord.hasComment() ? ": " + rChord.getEncodedComment() : ""));
+				for (PrepChord prep : rChord.getPreps()) { // Preps save out first
+					finalString.append(String.format("\tPrep: %s%s\n", prep.getFields(),
+							prep.hasComment() ? ": " + prep.getEncodedComment() : ""));
+				}
+				for (ChantChordController post : rChord.getPosts()) { // Posts second
+					finalString.append(String.format("\tPost: %s%s\n", post.getFields(),
+							post.hasComment() ? ": " + post.getEncodedComment() : ""));
+				}
+			} else if (chord instanceof EndChord eChord) {
+				finalString.append(String.format("END: %s%s\n", eChord.getFields(),
+						eChord.hasComment() ? ": " + eChord.getEncodedComment() : ""));
+				for (PrepChord prep : eChord.getPreps()) {
+					finalString.append(String.format("\tPrep: %s%s\n", prep.getFields(),
+							prep.hasComment() ? ": " + prep.getEncodedComment() : ""));
+				}
+			}
+		}
+
+		return finalString.toString();
 	}
 
 	@Override

@@ -83,37 +83,7 @@ public class ToneReaderWriter {
 					firstRepeated = chantLine.getName();
 				}
 
-				printWriter.println(chantLine.getName());
-
-				// Place chant line comment on the first line, if any.
-			    if (chantLine.hasComment()) {
-			    	printWriter.println("Comment: " + chantLine.getComment());
-			    }
-			    
-			    // For each chord in the chant line...
-			    for (ChantChordController chord : chantLine.getChords()) {
-			    	if (chord instanceof RecitingChord rChord) {
-			    		printWriter.println(rChord.getName() + ": " + rChord.getFields() +
-				    			(rChord.hasComment() ? ": " + rChord.getComment() : ""));
-			    		for (PrepChord prep : rChord.getPreps()) { // Preps save out first
-		                    printWriter.println("\tPrep: " + prep.getFields() +
-					                (prep.hasComment() ? ": " + prep.getComment() : ""));
-			    		}
-			    		for (ChantChordController post : rChord.getPosts()) { // Posts second
-		                    printWriter.println("\tPost: " + post.getFields() +
-					                (post.hasComment() ? ": " + post.getComment() : ""));
-			    		}
-			    	} else if (chord instanceof EndChord eChord) {
-			    		printWriter.println("END: " + eChord.getFields() +
-			    				(eChord.hasComment() ? ": " + eChord.getComment() : ""));
-			    		for (PrepChord prep : eChord.getPreps()) {
-			    			printWriter.println("\tPrep: " + prep.getFields() +
-			    			(prep.hasComment() ? ": " + prep.getComment() : ""));
-			    		}
-			    	}
-			    }
-
-				printWriter.println();
+				printWriter.println(chantLine.toString());
 
 			}
 
