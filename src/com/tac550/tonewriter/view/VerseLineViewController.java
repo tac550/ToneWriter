@@ -68,7 +68,7 @@ public class VerseLineViewController {
 
 	private int nextChordIndex = 0; // Index of the next chord to be assigned
 	private int lastSyllableAssigned = -1; // Index of the last syllable to be assigned a chord
-	private ChantChordController currentChord; // The chord currently being assigned
+	private boolean doneAssigning = false;
 
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
@@ -285,20 +285,29 @@ public class VerseLineViewController {
 		return rootPane;
 	}
 
+	private ChantChordController getCurrentChord() {
+		return associatedChantLines[selectedChantLine].getChords().get(nextChordIndex == 0 ? 0 : nextChordIndex - 1);
+	}
+
+	private boolean notAssigning() {
+		return associatedChantLines == null || doneAssigning;
+	}
+
 	private void nextChordAssignment() {
 		if (associatedChantLines == null) return;
 		// If we have not placed or skipped the last chord...
 		if (nextChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
-			currentChord = associatedChantLines[selectedChantLine].getChords().get(nextChordIndex);
-			chordEntryText.setText(String.valueOf(currentChord.getName()));
-			chordEntryText.setFill(currentChord.getColor());
+			doneAssigning = false;
+
+			chordEntryText.setText(getCurrentChord().getName());
+			chordEntryText.setFill(getCurrentChord().getColor());
 			skipChordButton.setDisable(false);
 			nextChordIndex++;
 
 			// Special disabling based on prep/post/normal
 			deactivateAll();
 
-			if (!(currentChord instanceof RecitingChord)) {
+			if (!(getCurrentChord() instanceof RecitingChord)) {
 				if (nextChordIndex == 1) { // If no chords have been assigned yet...
 					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
@@ -317,7 +326,8 @@ public class VerseLineViewController {
 			}
 
 		} else { // If we have just placed or skipped the last chord
-			currentChord = null;
+			doneAssigning = true;
+
 			chordEntryText.setText("Done!");
 			chordEntryText.setFill(Color.BLACK);
 			skipChordButton.setDisable(true);
@@ -335,7 +345,7 @@ public class VerseLineViewController {
 	}
 
 	void syllableClicked(SyllableText clicked_text) {
-		if (currentChord == null) return;
+		if (notAssigning()) return;
 
 		final int indexClicked = lineTextFlow.getChildren().indexOf(clicked_text);
 
@@ -350,33 +360,33 @@ public class VerseLineViewController {
 
 	}
 	void syllableAltClicked() {
-		if (currentChord == null) return;
-		currentChord.playMidi();
+		if (notAssigning()) return;
+		getCurrentChord().playMidi();
 	}
 
 	void syllableHovered() {
-		if (currentChord == null) return;
+		if (notAssigning()) return;
 		if (topController.hoverHighlightEnabled()) {
-			currentChord.setHighlighted(true);
+			getCurrentChord().setHighlighted(true);
 		}
 	}
 	void syllableUnHovered() {
-		if (currentChord == null) return;
-		currentChord.setHighlighted(false);
+		if (notAssigning()) return;
+		getCurrentChord().setHighlighted(false);
 	}
 
 	void syllableDragStarted(SyllableText dragged_text) {
-		if (currentChord == null) return;
+		if (notAssigning()) return;
 
 		// Only allow drag operation to continue if assigning a reciting chord.
-		if (currentChord instanceof RecitingChord) {
+		if (getCurrentChord() instanceof RecitingChord) {
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
 
 		}
 	}
 	void syllableDragEntered(SyllableText entered_text) {
-		if (currentChord == null || dragStartIndex == -1) return;
+		if (notAssigning() || dragStartIndex == -1) return;
 
 		int dragEnteredIndex = lineTextFlow.getChildren().indexOf(entered_text);
 		int smaller = Math.min(dragStartIndex, dragEnteredIndex);
@@ -384,7 +394,7 @@ public class VerseLineViewController {
 		int i = 0;
 		for (Node syllNode : lineTextFlow.getChildren()) {
 			if (i >= smaller && i <= larger) {
-				((SyllableText) syllNode).setFill(currentChord.getColor());
+				((SyllableText) syllNode).setFill(getCurrentChord().getColor());
 			} else {
 				((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
 			}
@@ -405,7 +415,7 @@ public class VerseLineViewController {
 
 		int dragEndIndex = lineTextFlow.getChildren().indexOf(released_text);
 
-		if (currentChord == null || dragStartIndex == dragEndIndex) return;
+		if (notAssigning() || dragStartIndex == dragEndIndex) return;
 
 		int smaller = Math.min(dragStartIndex, dragEndIndex);
 		int larger = Math.max(dragStartIndex, dragEndIndex);
@@ -434,7 +444,7 @@ public class VerseLineViewController {
 	private void assignChord(int firstSyllable, int lastSyllable) {
 		// First, play the chord if chord playing is on.
 		if (topController.playMidiAsAssigned()) {
-			currentChord.playMidi();
+			getCurrentChord().playMidi();
 		}
 
 		// Set up an undo action frame to store what happens.
@@ -451,23 +461,23 @@ public class VerseLineViewController {
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
 				if (mainController.isLastVerseLineOfSection(this)) {
-					noteButton = createNoteButton(currentText, currentChord);
+					noteButton = createNoteButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
-					currentText.select(currentChord, noteButton);
+					currentText.select(getCurrentChord(), noteButton);
 					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, currentText.getAssociatedButtons().size() - 1);
 				} else {
-					noteButton = createNoteButton(currentText, currentChord);
+					noteButton = createNoteButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
-					currentText.select(currentChord, noteButton);
+					currentText.select(getCurrentChord(), noteButton);
 					currentText.setNoteDuration(SyllableText.NOTE_HALF, currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
-				noteButton = createNoteButton(currentText, currentChord);
+				noteButton = createNoteButton(currentText, getCurrentChord());
 
 				undoFrame.buttons.add(noteButton);
-				currentText.select(currentChord, noteButton);
+				currentText.select(getCurrentChord(), noteButton);
 			}
 
 		}
@@ -481,8 +491,8 @@ public class VerseLineViewController {
 	private Button createNoteButton(SyllableText syllable, ChantChordController chord) {
 		int futureButtonIndex = syllable.getAssociatedButtons().size();
 
-		Button noteButton = new Button(currentChord.getName());
-		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(currentChord.getColor())));
+		Button noteButton = new Button(getCurrentChord().getName());
+		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(getCurrentChord().getColor())));
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
