@@ -656,7 +656,7 @@ public class ChantLineViewController implements CommentableView {
 	public String getEncodedComment() {
 		return commentString.replaceAll("\n", "/n");
 	}
-	public void setComment(String comment) { // TODO: Needs a rework
+	public void setComment(String comment) {
 		if (commentString.equals(comment)) return;
 
 		mainController.toneEdited();
