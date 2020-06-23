@@ -26,6 +26,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class VerseLineViewController {
 
@@ -44,6 +45,7 @@ public class VerseLineViewController {
 
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
+	String previousChantLine = "";
 
 	@FXML private ChoiceBox<String> chantLineChoice;
 	@FXML private TextFlow lineTextFlow;
@@ -200,11 +202,6 @@ public class VerseLineViewController {
 
 	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
-		// Remember previous chant line selection, if any.
-		ChantLineViewController previousChantLine = null;
-		if (associatedChantLines != null) {
-			previousChantLine = associatedChantLines[selectedChantLine];
-		}
 
 		// Load in new chant line choices
 		associatedChantLines = chant_lines;
@@ -217,14 +214,14 @@ public class VerseLineViewController {
 		int index;
 		if (initial_choice != -1) {
 			selectedChantLine = initial_choice;
-			chantLineChoice.getSelectionModel().select(initial_choice);
-		} else if (nextChordIndex > 1 && (index = Arrays.asList(chant_lines).indexOf(previousChantLine)) != -1) {
+		} else if (nextChordIndex > 1 && (index = IntStream.range(0, chant_lines.length)
+				.filter(i -> previousChantLine.equals(chant_lines[i].toString()))
+				.findFirst().orElse(-1)) != -1) {
 			selectedChantLine = index;
-			chantLineChoice.getSelectionModel().select(index);
 		} else {
 			selectedChantLine = 0;
-			chantLineChoice.getSelectionModel().select(0);
 		}
+		chantLineChoice.getSelectionModel().select(selectedChantLine);
 
 		// ChoiceBox highlighting if choices are available
 		if (chantLineChoice.getItems().size() > 1) {
@@ -235,11 +232,15 @@ public class VerseLineViewController {
 
 		// Only reset chord assignments if the new chant line selection is structrally different from the previous one
 		// or has a different name.
+		System.out.println("Deciding....");
 		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
 			resetChordAssignment();
 		}
 
 		changingAssignments = false;
+
+		// Save chant line information for later.
+		previousChantLine = associatedChantLines[selectedChantLine].toString();
 
 	}
 

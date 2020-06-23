@@ -35,10 +35,7 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ChantLineViewController implements CommentableView {
 
@@ -725,19 +722,15 @@ public class ChantLineViewController implements CommentableView {
 		return finalString.toString();
 	}
 
-	public boolean isSimilarTo(ChantLineViewController cc) {
-		if (cc == null) return false;
-		if (cc == this) return true;
+	// Compares other_CL, which should be another chant line's String representation, to this line's String representation.
+	// Returns true if their structure is identical (actual notes and comments may vary)
+	public boolean isSimilarTo(String other_CL) {
+		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
+				item.split(":")[0]).toArray(String[]::new);
+		String[] otherLines = Arrays.stream(other_CL.split("\\r?\\n")).map(item ->
+				item.split(":")[0]).toArray(String[]::new);
 
-		if (cc.getChords().size() != this.getChords().size()) return false;
-
-		for (int i = 0; i < this.getChords().size(); i++) {
-			if (!(cc.getChords().get(i).getName().equals(this.getChords().get(i).getName())
-					&& cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
-				return false;
-		}
-
-		return true;
+		return Arrays.equals(thisLines, otherLines);
 	}
 
 	@Override
