@@ -288,6 +288,9 @@ public class VerseLineViewController {
 	private ChantChordController getCurrentChord() {
 		return associatedChantLines[selectedChantLine].getChords().get(nextChordIndex == 0 ? 0 : nextChordIndex - 1);
 	}
+	private ChantChordController getChordByIndex(int index) {
+		return associatedChantLines[selectedChantLine].getChords().get(index);
+	}
 
 	private boolean notAssigning() {
 		return associatedChantLines == null || doneAssigning;
@@ -489,7 +492,8 @@ public class VerseLineViewController {
 	}
 
 	private Button createNoteButton(SyllableText syllable, ChantChordController chord) {
-		int futureButtonIndex = syllable.getAssociatedButtons().size();
+		int buttonIndex = syllable.getAssociatedButtons().size();
+		int chordIdex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
 
 		Button noteButton = new Button(getCurrentChord().getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(getCurrentChord().getColor())));
@@ -508,19 +512,19 @@ public class VerseLineViewController {
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
-					syllable.setNoteDuration(SyllableText.NOTE_HALF, futureButtonIndex);
+					syllable.setNoteDuration(SyllableText.NOTE_HALF, buttonIndex);
 				}
 				TopSceneController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button
-				chord.playMidi();
+				getChordByIndex(chordIdex).playMidi();
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
 			if (topController.hoverHighlightEnabled()) {
-				chord.setHighlighted(true);
+				getChordByIndex(chordIdex).setHighlighted(true);
 			}
 		});
-		noteButton.setOnMouseExited((me) -> chord.setHighlighted(false));
+		noteButton.setOnMouseExited((me) -> getChordByIndex(chordIdex).setHighlighted(false));
 
 		return noteButton;
 	}
