@@ -1,17 +1,21 @@
 package com.tac550.tonewriter.model;
 
 import com.tac550.tonewriter.io.LilyPondInterface;
-import com.tac550.tonewriter.view.ChantChordController;
+import com.tac550.tonewriter.view.VerseLineViewController;
 
 public class AssignedChordData {
 
+	private final VerseLineViewController lineController;
+
 	private final String syllable;
-	private final ChantChordController chord;
+	private final int chordIndex;
 	private String duration;
 
-	public AssignedChordData(String syllable_data, ChantChordController chord_data) {
+	public AssignedChordData(String syllable_data, int chord_index, VerseLineViewController line_controller) {
+		lineController = line_controller;
+
 		syllable = syllable_data;
-		chord = chord_data;
+		chordIndex = chord_index;
 		duration = "4";
 	}
 
@@ -37,19 +41,19 @@ public class AssignedChordData {
 	}
 
 	private String getSoprano() {
-		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[0],
+		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[0],
 				LilyPondInterface.ADJUSTMENT_SOPRANO) + duration;
 	}
 	private String getAlto() {
-		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[1],
+		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[1],
 				LilyPondInterface.ADJUSTMENT_ALTO) + duration;
 	}
 	private String getTenor() {
-		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[2],
+		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[2],
 				LilyPondInterface.ADJUSTMENT_TENOR) + duration;
 	}
 	private String getBass() {
-		return LilyPondInterface.parseNoteRelative(chord.getFields().split("-")[3],
+		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[3],
 				LilyPondInterface.ADJUSTMENT_BASS) + duration;
 	}
 

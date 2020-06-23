@@ -288,7 +288,7 @@ public class VerseLineViewController {
 	private ChantChordController getCurrentChord() {
 		return associatedChantLines[selectedChantLine].getChords().get(nextChordIndex == 0 ? 0 : nextChordIndex - 1);
 	}
-	private ChantChordController getChordByIndex(int index) {
+	public ChantChordController getChordByIndex(int index) {
 		return associatedChantLines[selectedChantLine].getChords().get(index);
 	}
 
@@ -467,20 +467,20 @@ public class VerseLineViewController {
 					noteButton = createNoteButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
-					currentText.select(getCurrentChord(), noteButton);
+					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, currentText.getAssociatedButtons().size() - 1);
 				} else {
 					noteButton = createNoteButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
-					currentText.select(getCurrentChord(), noteButton);
+					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 					currentText.setNoteDuration(SyllableText.NOTE_HALF, currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
 				noteButton = createNoteButton(currentText, getCurrentChord());
 
 				undoFrame.buttons.add(noteButton);
-				currentText.select(getCurrentChord(), noteButton);
+				currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 			}
 
 		}

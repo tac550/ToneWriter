@@ -81,15 +81,15 @@ public class SyllableText extends Text {
 
 	}
 	
-	void select(ChantChordController chord, Button note_button) {
+	void select(int chord_index, Color chord_color, Button note_button) {
 		if (!clicked) active = false;
 
 		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT.get();
 		
-		associatedChords.add(new AssignedChordData(getText(), chord));
+		associatedChords.add(new AssignedChordData(getText(), chord_index, parentController));
 		associatedButtons.add(note_button);
 		
-		setColor(chord.getColor());
+		setColor(chord_color);
 	}
 	void clearSelection() {
 		active = true;
