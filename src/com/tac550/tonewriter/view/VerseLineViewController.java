@@ -232,7 +232,6 @@ public class VerseLineViewController {
 
 		// Only reset chord assignments if the new chant line selection is structrally different from the previous one
 		// or has a different name.
-		System.out.println("Deciding....");
 		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
 			resetChordAssignment();
 		}
@@ -303,8 +302,8 @@ public class VerseLineViewController {
 		if (nextChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
 			doneAssigning = false;
 
-			chordEntryText.setText(getCurrentChord().getName());
-			chordEntryText.setFill(getCurrentChord().getColor());
+			chordEntryText.setText(getChordByIndex(nextChordIndex).getName());
+			chordEntryText.setFill(getChordByIndex(nextChordIndex).getColor());
 			skipChordButton.setDisable(false);
 			nextChordIndex++;
 
