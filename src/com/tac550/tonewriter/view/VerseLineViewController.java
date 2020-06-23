@@ -25,8 +25,10 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
 
 public class VerseLineViewController {
 
@@ -76,12 +78,12 @@ public class VerseLineViewController {
 
 	@FXML private void initialize() {
 		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
-
 			if (changingAssignments) return;
 
 			selectedChantLine = new_val.intValue();
-			resetChordAssignment();
+			previousChantLine = associatedChantLines[selectedChantLine].toString();
 
+			resetChordAssignment();
 		});
 
 		// Interface icons
@@ -203,6 +205,9 @@ public class VerseLineViewController {
 	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
 
+		int previousSelection = chantLineChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
+				chantLineChoice.getSelectionModel().getSelectedIndex();
+
 		// Load in new chant line choices
 		associatedChantLines = chant_lines;
 		chantLineChoice.getItems().clear();
@@ -211,13 +216,10 @@ public class VerseLineViewController {
 		}
 
 		// Keep chant line selection and chord assignments (if any) if previous selection is still available.
-		int index;
 		if (initial_choice != -1) {
 			selectedChantLine = initial_choice;
-		} else if (nextChordIndex > 1 && (index = IntStream.range(0, chant_lines.length)
-				.filter(i -> previousChantLine.equals(chant_lines[i].toString()))
-				.findFirst().orElse(-1)) != -1) {
-			selectedChantLine = index;
+		} else if (mainController.manualCLAssignmentEnabled()) {
+			selectedChantLine = previousSelection;
 		} else {
 			selectedChantLine = 0;
 		}
