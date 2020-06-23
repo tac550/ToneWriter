@@ -30,7 +30,7 @@
          <children>
             <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefWidth="190.0" vgap="10.0">
                <children>
-                  <Text fx:id="chordEntryText" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+                  <Text fx:id="chordEntryText" strokeType="OUTSIDE" strokeWidth="0.0" />
                   <ChoiceBox fx:id="chantLineChoice" />
                   <Button fx:id="skipChordButton" mnemonicParsing="false" onAction="#skipChord" text="Skip Chord" />
                </children>
