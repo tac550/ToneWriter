@@ -18,10 +18,6 @@ public class AssignedChordData {
 	public String getSyllable() {
 		return syllable;
 	}
-	public ChantChordController getChord() {
-		return chord;
-	}
-
 	public void setDuration(String new_duration) {
 		duration = new_duration;
 	}
