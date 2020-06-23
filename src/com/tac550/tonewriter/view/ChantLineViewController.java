@@ -725,6 +725,21 @@ public class ChantLineViewController implements CommentableView {
 		return finalString.toString();
 	}
 
+	public boolean isSimilarTo(ChantLineViewController cc) {
+		if (cc == null) return false;
+		if (cc == this) return true;
+
+		if (cc.getChords().size() != this.getChords().size()) return false;
+
+		for (int i = 0; i < this.getChords().size(); i++) {
+			if (!(cc.getChords().get(i).getName().equals(this.getChords().get(i).getName())
+					&& cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
+				return false;
+		}
+
+		return true;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 
