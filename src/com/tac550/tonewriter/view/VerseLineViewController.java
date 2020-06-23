@@ -249,6 +249,7 @@ public class VerseLineViewController {
 			((SyllableText) syllable).clearSelection();
 		}
 		chordButtonPane.getChildren().clear();
+		undoActions.clear();
 
 		nextChordIndex = 0;
 		lastSyllableAssigned = -1;
