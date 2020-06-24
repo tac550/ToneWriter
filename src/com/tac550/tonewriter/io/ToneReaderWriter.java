@@ -116,16 +116,16 @@ public class ToneReaderWriter {
 			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
 			String[] header;
-			String[] chantLines;
+			String[] chantLineStrings;
 			String[] footer;
 			if (sections.length == 3) {
 				header = sections[0].split("\\r?\\n");
 				// Double newlines delimit chant lines
-				chantLines = sections[1].split("\\r?\\n\\r?\\n");
+				chantLineStrings = sections[1].split("\\r?\\n\\r?\\n");
 				footer = sections[2].split("\\r?\\n");
 			} else {
 				header = sections[0].split("\\r?\\n");
-				chantLines = null;
+				chantLineStrings = null;
 				footer = null;
 			}
 
@@ -160,30 +160,49 @@ public class ToneReaderWriter {
 			}
 			
 			// Loading chant lines
-			main_scene.clearChantLines();
-
-			if (chantLines != null) {
-				for (String chantLine : chantLines) {
-					readChantLine(chantLine);
+			if (chantLineStrings != null) {
+				int i;
+				for (i = 0; i < chantLineStrings.length; i++) {
+					if (i < chantLines.size()) {
+						if (chantLines.get(i).isSimilarTo(chantLineStrings[i])) {
+							// Don't reload any GUI if chant line is similar
+							readChantLine(chantLineStrings[i], chantLines.get(i));
+						} else {
+							// Replace old chant line if not similar
+							mainScene.removeChantLine(chantLines.get(i));
+							readChantLine(chantLineStrings[i]);
+						}
+					} else {
+						// If we're out of existing chant lines, make new ones instead.
+						readChantLine(chantLineStrings[i]);
+					}
 				}
+				// Remove any leftover chant lines
+				for (; i < chantLines.size(); i++) {
+					mainScene.removeChantLine(chantLines.get(i));
+				}
+			} else {
+				// No chant lines found in file
+				mainScene.clearChantLines();
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			main_scene.clearChantLines();
+			// Clear chant lines if there's an error
+			mainScene.clearChantLines();
 			return false;
 		}
 
-		main_scene.setKeySignature(keySig);
+		mainScene.setKeySignature(keySig);
 		if (versionSaved < 0.6) {
 			String[] headerParts = composerText.split("-", 2);
-			main_scene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
+			mainScene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
 		} else {
-			main_scene.setHeaderText(poetText, composerText);
+			mainScene.setHeaderText(poetText, composerText);
 		}
 
-		main_scene.recalcCLNames();
-		main_scene.setFirstRepeated(firstRepeated);
+		mainScene.recalcCLNames();
+		mainScene.setFirstRepeated(firstRepeated);
 		
 		return true;
 	}
@@ -201,72 +220,93 @@ public class ToneReaderWriter {
 	}
 
 	private void readChantLine(String chantLine) throws IOException {
+		readChantLine(chantLine, null);
+	}
 
-		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(false);
-		ChantLineViewController currentChantLine = null;
-		try {
-			currentChantLine = currentChantLineLoader.get().getController();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		assert currentChantLine != null;
+	private void readChantLine(String chantLine, ChantLineViewController similar) throws IOException {
 
+		ChantLineViewController currentChantLine = similar;
 		Scanner chantLineScanner = new Scanner(chantLine);
 		String chantLineLine;
 
-		ChantChordController currentMainChord = null;
-
-		String chantLineName = chantLineScanner.nextLine();
-
-		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
-			if (chantLineLine.startsWith("Comment: ")) {
-				String[] commentData = chantLineLine.split(": ");
-				String comment = String.join(": ", Arrays.copyOfRange(commentData, 1, commentData.length));
-				currentChantLine.setComment(comment);
-
-				continue;
+		if (currentChantLine == null) { // No similar chant line provided
+			Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(false);
+			try {
+				currentChantLine = currentChantLineLoader.get().getController();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
 			}
-
-			String[] chordData = chantLineLine.split(": ");
-			String fields = chordData[1];
-			// Since the comment may include ": "s, we need to account for the possibility that it's been split and re-combine it here.
-			String comment = String.join(": ", Arrays.copyOfRange(chordData, 2, chordData.length));
-			
-			// Add the appropriate chord type.
-			if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
-				currentMainChord = currentChantLine.addRecitingChord();
-				currentMainChord.setFields(fields);
-				currentMainChord.setComment(comment);
-			} else if (chantLineLine.contains("Post")) {
-				assert currentMainChord != null;
-				PostChord postChord = null;
-				if (currentMainChord instanceof RecitingChord rMainChord)
-					postChord = rMainChord.addPostChord(fields);
-				assert postChord != null;
-				postChord.setComment(comment);
-			} else if (chantLineLine.contains("Prep")) {
-				assert currentMainChord != null;
-				PrepChord prepChord;
-				if (currentMainChord instanceof EndChord eMainChord)
-					prepChord = eMainChord.addPrepChord(fields);
-				else
-					prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
-				assert prepChord != null;
-				prepChord.setComment(comment);
-			} else if (chantLineLine.contains("END")) {
-				currentMainChord = currentChantLine.addEndChord();
-				currentMainChord.setFields(fields);
-				currentMainChord.setComment(comment);
-			}
+			assert currentChantLine != null;
 		}
-		
+
+		// Name / CL type parsing
+		String chantLineName = chantLineScanner.nextLine();
 		if (chantLineName.contains("'")) {
 			currentChantLine.makePrime();
 		} else if (chantLineName.contains("alt")) {
 			currentChantLine.makeAlternate();
 		}
 
+		// For building new chant line
+		ChantChordController currentMainChord = null;
+		// For similar chant line replacement
+		int assigning = 0;
+
+		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+			// Apply chant line comment
+			if (chantLineLine.startsWith("Comment: ")) {
+				String[] commentData = chantLineLine.split(": ");
+				currentChantLine.setComment(extractComment(commentData, 1));
+
+				continue;
+			}
+
+			String[] chordData = chantLineLine.split(": ");
+			String fields = chordData[1];
+			String comment = extractComment(chordData, 2);
+
+			if (similar == null) {
+				// Add the appropriate chord type.
+				if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
+					currentMainChord = currentChantLine.addRecitingChord();
+					currentMainChord.setFields(fields);
+					currentMainChord.setComment(comment);
+				} else if (chantLineLine.contains("Post")) {
+					assert currentMainChord != null;
+					PostChord postChord = null;
+					if (currentMainChord instanceof RecitingChord rMainChord)
+						postChord = rMainChord.addPostChord(fields);
+					assert postChord != null;
+					postChord.setComment(comment);
+				} else if (chantLineLine.contains("Prep")) {
+					assert currentMainChord != null;
+					PrepChord prepChord;
+					if (currentMainChord instanceof EndChord eMainChord)
+						prepChord = eMainChord.addPrepChord(fields);
+					else
+						prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
+					assert prepChord != null;
+					prepChord.setComment(comment);
+				} else if (chantLineLine.contains("END")) {
+					currentMainChord = currentChantLine.addEndChord();
+					currentMainChord.setFields(fields);
+					currentMainChord.setComment(comment);
+				}
+			} else {
+
+				currentChantLine.getChords().get(assigning).setFields(fields);
+				currentChantLine.getChords().get(assigning).setComment(comment);
+
+				assigning++;
+			}
+		}
+
 		chantLineScanner.close();
+	}
+
+	private String extractComment(String[] split_input, int comment_start_offset) {
+		// Since the comment may include ": "s, we need to account for the possibility that it's been split and re-combine it.
+		return String.join(": ", Arrays.copyOfRange(split_input, comment_start_offset, split_input.length));
 	}
 
 	public static boolean createToneFile(File file_to_create) {

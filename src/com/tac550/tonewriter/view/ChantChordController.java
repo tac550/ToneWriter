@@ -185,7 +185,7 @@ public abstract class ChantChordController implements CommentableView {
 		}
 	}
 
-	public void setChordInfoDirectly(File[] files) {
+	public void setMediaFilesDirectly(File[] files) {
 		chordView.setImage(new Image(files[0].toURI().toString()));
 		midiFile = files[1];
 	}

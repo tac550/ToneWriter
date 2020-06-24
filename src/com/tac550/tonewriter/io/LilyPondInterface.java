@@ -569,7 +569,7 @@ public class LilyPondInterface {
 			executePlatformSpecificLPRender(lilypondFile, true, () -> {
 				uniqueChordRenders.put(chordID, results);
 				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
-					controller.setChordInfoDirectly(uniqueChordRenders.get(chordID));
+					controller.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
 				}
 			});
 		} else if (uniqueChordRenders.get(chordID) == null) {
@@ -577,7 +577,7 @@ public class LilyPondInterface {
 			pendingChordControllers.get(chordID).add(chordView);
 		} else {
 			// Chord already rendered; use existing files.
-			chordView.setChordInfoDirectly(uniqueChordRenders.get(chordID));
+			chordView.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
 		}
 
 	}

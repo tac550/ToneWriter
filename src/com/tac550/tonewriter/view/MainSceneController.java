@@ -789,7 +789,7 @@ public class MainSceneController {
 
 	}
 
-	void removeChantLine(ChantLineViewController chantLineViewController) {
+	public void removeChantLine(ChantLineViewController chantLineViewController) {
 		chantLineBox.getChildren().remove(chantLineViewController.getMainPane());
 		chantLineControllers.remove(chantLineViewController);
 		recalcCLNames();
