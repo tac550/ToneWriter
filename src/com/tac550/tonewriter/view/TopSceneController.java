@@ -233,11 +233,11 @@ public class TopSceneController {
 
 	}
 
-	void setParentStage(Stage parent_stage) {
+	void performSetup(Stage parent_stage, File openWithFile) {
 		parentStage = parent_stage;
 
 		// Concluding setup process
-		addTab();
+		addTab(openWithFile);
 	}
 
 	private static void setMenuIcon(MenuItem menu_item, String imagePath) {
@@ -356,6 +356,10 @@ public class TopSceneController {
 	}
 
 	@FXML void addTab() {
+		addTab(null);
+	}
+
+	public void addTab(File openWithFile) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -466,6 +470,11 @@ public class TopSceneController {
 				} else {
 					// Title text for the first tab created (at startup)
 					newTabController.setTitleText("Item 1");
+
+					if (openWithFile != null) {
+						newTabController.handleOpenTone(openWithFile, true, false);
+					}
+
 				}
 
 				// Add the tab after the selected one, if any.
@@ -477,9 +486,7 @@ public class TopSceneController {
 				tabPane.getSelectionModel().select(tab);
 				tab.getContent().requestFocus();
 			});
-
 		});
-
 	}
 
 	private void closeTab(Tab tab) {
@@ -521,10 +528,6 @@ public class TopSceneController {
 	}
 	boolean hoverHighlightEnabled() {
 		return hoverHighlightMenuItem.isSelected();
-	}
-
-	void openParameterFile(File file) {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(file, true, false);
 	}
 
 	void requestExit(Event ev) {

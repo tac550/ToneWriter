@@ -179,13 +179,6 @@ public class MainApp extends Application {
 		// TODO: This issue needs a more comprehensive fix.
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
-
-		// Launching with tone loading TODO: Implement Mac support for this
-		List<String> params = getParameters().getRaw();
-		if (params.size() > 0) {
-			File openFile = new File(params.get(0));
-			if (openFile.isFile()) topSceneController.openParameterFile(openFile);
-		}
 	}
 
 	private void showSplash() {
@@ -256,7 +249,15 @@ public class MainApp extends Application {
 			loader.setLocation(MainApp.class.getResource("TopScene.fxml"));
 			BorderPane rootPane = loader.load();
 			topSceneController = loader.getController();
-			topSceneController.setParentStage(mainStage);
+
+			// Launching with tone loading TODO: Implement Mac support for this
+			List<String> params = getParameters().getRaw();
+			File fileToOpen = null;
+			if (params.size() > 0) {
+				File openFile = new File(params.get(0));
+				if (openFile.isFile()) fileToOpen = openFile;
+			}
+			topSceneController.performSetup(mainStage, fileToOpen);
 
 			Scene mainScene = new Scene(rootPane);
 			mainStage.setScene(mainScene);
