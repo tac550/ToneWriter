@@ -130,6 +130,7 @@ public class MainSceneController {
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
 	private final List<ChantLineViewController> chantLineControllers = new ArrayList<>();
+	private boolean loading = false;
 
 	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
@@ -550,13 +551,18 @@ public class MainSceneController {
 
 			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, this);
 
+			loading = true;
 			if (toneReader.loadTone(this, toneFile)) {
 				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
+
+				loading = false;
 				return true;
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
+
+				loading = false;
 				return false;
 			}
 
@@ -1038,6 +1044,9 @@ public class MainSceneController {
 	}
 	public String getKeySignature() {
 		return keySignature;
+	}
+	boolean isLoading() {
+		return loading;
 	}
 
 	private static class RenderFormatException extends Exception {}

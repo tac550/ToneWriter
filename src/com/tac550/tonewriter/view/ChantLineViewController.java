@@ -541,6 +541,10 @@ public class ChantLineViewController implements CommentableView {
 				currentNumber++;
 			}
 		}
+
+		if (!mainController.isLoading()) {
+			mainController.syncCVLMapping();
+		}
 	}
 	
 	void setKeySignature(String new_key) {
