@@ -161,13 +161,15 @@ public class ToneReaderWriter {
 				int i;
 				for (i = 0; i < chantLineStrings.length; i++) {
 					if (i < chantLines.size()) {
-						if (chantLines.get(i).isSimilarTo(chantLineStrings[i])) {
-							// Don't reload any GUI if chant line is similar
-							readChantLine(i, chantLineStrings[i], chantLines.get(i));
-						} else {
-							// Replace old chant line if not similar
-							mainScene.removeChantLine(chantLines.get(i));
-							readChantLine(i, chantLineStrings[i]);
+						if (!chantLines.get(i).toString().equals(chantLineStrings[i])) { // If the lines are identical we do nothing.
+							if (chantLines.get(i).isSimilarTo(chantLineStrings[i])) {
+								// Don't reload any GUI if chant line is similar
+								readChantLine(i, chantLineStrings[i], chantLines.get(i));
+							} else {
+								// Replace old chant line if not similar
+								mainScene.removeChantLine(chantLines.get(i));
+								readChantLine(i, chantLineStrings[i]);
+							}
 						}
 					} else {
 						// If we're out of existing chant lines, make new ones instead.
