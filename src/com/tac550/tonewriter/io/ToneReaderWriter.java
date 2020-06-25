@@ -36,14 +36,14 @@ public class ToneReaderWriter {
 
 	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene,
 	                        String key, String poet, String composer) {
-		chantLines = lines;
+		chantLines = new ArrayList<>(lines);
 		associatedMainScene = main_scene;
 		keySig = key;
 		poetText = poet;
 		composerText = composer;
 	}
 	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene) {
-		chantLines = lines;
+		chantLines = new ArrayList<>(lines);
 		associatedMainScene = main_scene;
 	}
 
