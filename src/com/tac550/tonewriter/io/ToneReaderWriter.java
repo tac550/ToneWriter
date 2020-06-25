@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class ToneReaderWriter {
@@ -251,6 +248,8 @@ public class ToneReaderWriter {
 		ChantChordController currentMainChord = null;
 		// For similar chant line replacement
 		int assigning = 0;
+		String[] mainChord = null;
+		Stack<String[]> postChords = new Stack<>();
 
 		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
 			// Apply chant line comment
@@ -294,9 +293,49 @@ public class ToneReaderWriter {
 				}
 			} else {
 
-				currentChantLine.getChords().get(assigning).setFields(fields);
-				currentChantLine.getChords().get(assigning).setComment(comment);
+				if (!chantLineLine.startsWith("\t")) {
+					if (mainChord != null) {
+						currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
+						currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
+						assigning++;
+					}
+					while (!postChords.isEmpty()) {
+						String[] postChord = postChords.pop();
+						currentChantLine.getChords().get(assigning).setFields(postChord[0]);
+						currentChantLine.getChords().get(assigning).setComment(postChord[1]);
+						assigning++;
+					}
+					mainChord = new String[] {fields, comment};
+				} else if (chantLineLine.contains("Prep")) {
+					currentChantLine.getChords().get(assigning).setFields(fields);
+					currentChantLine.getChords().get(assigning).setComment(comment);
+					assigning++;
+				} else if (chantLine.contains("Post")) {
+					if (mainChord != null) {
+						currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
+						currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
+						assigning++;
 
+						mainChord = null;
+					}
+
+					postChords.push(new String[] {fields, comment});
+				}
+
+
+			}
+		}
+
+		if (similar != null) {
+			if (mainChord != null) {
+				currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
+				currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
+				assigning++;
+			}
+			while (!postChords.isEmpty()) {
+				String[] postChord = postChords.pop();
+				currentChantLine.getChords().get(assigning).setFields(postChord[0]);
+				currentChantLine.getChords().get(assigning).setComment(postChord[1]);
 				assigning++;
 			}
 		}
