@@ -513,6 +513,10 @@ public class MainSceneController {
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return false;
 
+		if (!saveFile.getName().endsWith(".tone")) {
+			saveFile = new File(saveFile.getAbsolutePath() + ".tone");
+		}
+
 		if (ToneReaderWriter.createToneFile(saveFile)) {
 			toneFile = saveFile;
 

@@ -291,7 +291,7 @@ public class ToneReaderWriter {
 					currentMainChord.setFields(fields);
 					currentMainChord.setComment(comment);
 				}
-			} else {
+			} else { // TODO: Needs serious cleanup
 
 				if (!chantLineLine.startsWith("\t")) {
 					if (mainChord != null) {
