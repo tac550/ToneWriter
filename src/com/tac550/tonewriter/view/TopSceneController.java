@@ -286,7 +286,7 @@ public class TopSceneController {
 	 * Edit Menu Actions
 	 */
 	@FXML private void handleCreateChantLine() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).createChantLine(true);
+		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).createChantLine(0, true);
 	}
 	@FXML private void handleSetKeySignature() {
 		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSetKeySignature();

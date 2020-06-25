@@ -163,15 +163,15 @@ public class ToneReaderWriter {
 					if (i < chantLines.size()) {
 						if (chantLines.get(i).isSimilarTo(chantLineStrings[i])) {
 							// Don't reload any GUI if chant line is similar
-							readChantLine(chantLineStrings[i], chantLines.get(i));
+							readChantLine(i, chantLineStrings[i], chantLines.get(i));
 						} else {
 							// Replace old chant line if not similar
 							mainScene.removeChantLine(chantLines.get(i));
-							readChantLine(chantLineStrings[i]);
+							readChantLine(i, chantLineStrings[i]);
 						}
 					} else {
 						// If we're out of existing chant lines, make new ones instead.
-						readChantLine(chantLineStrings[i]);
+						readChantLine(i, chantLineStrings[i]);
 					}
 				}
 				// Remove any leftover chant lines
@@ -216,18 +216,18 @@ public class ToneReaderWriter {
 		return default_value;
 	}
 
-	private void readChantLine(String chantLine) throws IOException {
-		readChantLine(chantLine, null);
+	private void readChantLine(int index, String chantLine) throws IOException {
+		readChantLine(index, chantLine, null);
 	}
 
-	private void readChantLine(String chantLine, ChantLineViewController similar) throws IOException {
+	private void readChantLine(int index, String chantLine, ChantLineViewController similar) throws IOException {
 
 		ChantLineViewController currentChantLine = similar;
 		Scanner chantLineScanner = new Scanner(chantLine);
 		String chantLineLine;
 
 		if (currentChantLine == null) { // No similar chant line provided
-			Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(false);
+			Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(index, false);
 			try {
 				currentChantLine = currentChantLineLoader.get().getController();
 			} catch (InterruptedException | ExecutionException e) {

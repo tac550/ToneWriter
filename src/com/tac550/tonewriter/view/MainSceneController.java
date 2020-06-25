@@ -239,7 +239,7 @@ public class MainSceneController {
 		});
 
 	}
-	public Task<FXMLLoader> createChantLine(boolean recalculateNames) {
+	public Task<FXMLLoader> createChantLine(int index, boolean recalculateNames) {
 
 		return FXMLLoaderIO.loadFXMLLayoutAsync("chantLineView.fxml", loader -> {
 
@@ -247,9 +247,9 @@ public class MainSceneController {
 			GridPane chantLineLayout = loader.getRoot();
 			controller.setMainController(this);
 
-			chantLineControllers.add(controller);
+			chantLineControllers.add(index, controller);
 			Platform.runLater(() -> {
-				chantLineBox.getChildren().add(chantLineLayout);
+				chantLineBox.getChildren().add(index, chantLineLayout);
 				if (recalculateNames) recalcCLNames();
 			});
 
@@ -643,7 +643,7 @@ public class MainSceneController {
 			keySignature = "C major";
 			menuState.manualCLAssignmentSelected = false;
 
-			Task<FXMLLoader> loaderTask = createChantLine(true);
+			Task<FXMLLoader> loaderTask = createChantLine(0, true);
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
