@@ -232,7 +232,7 @@ public class VerseLineViewController {
 			chantLineChoice.setStyle("");
 		}
 
-		// Only reset chord assignments if the new chant line selection is structrally different from the previous one
+		// Only reset chord assignments if the new chant line selection is structurally different from the previous one
 		// or has a different name.
 		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
 			resetChordAssignment();
