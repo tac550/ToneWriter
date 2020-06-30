@@ -80,8 +80,8 @@ public class LilyPondInterface {
 
 		for (MainSceneController item : items) {
 
-			// Page break, if requested
-			if (item.getPageBreak())
+			// Page break if requested, but only if this item is not the first.
+			if (items[0] != item && item.getPageBreak())
 				lines.add("\\pageBreak\n");
 
 			// Top verse, if any
