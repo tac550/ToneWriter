@@ -727,12 +727,12 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	// Compares other_CL, which should be another chant line's String representation, to this line's String representation.
-	// Returns true if their structure is identical (actual notes and comments may vary)
+	// Returns true if their structure is identical (actual names, notes, and comments may vary)
 	public boolean isSimilarTo(String other_CL) {
 		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
-				item.split(":")[0]).toArray(String[]::new);
+				item.split(":")[0]).skip(1).toArray(String[]::new);
 		String[] otherLines = Arrays.stream(other_CL.split("\\r?\\n")).map(item ->
-				item.split(":")[0]).toArray(String[]::new);
+				item.split(":")[0]).skip(1).toArray(String[]::new);
 
 		return Arrays.equals(thisLines, otherLines);
 	}
