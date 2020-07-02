@@ -13,13 +13,13 @@
 <?import javafx.scene.text.Font?>
 
 <GridPane fx:id="mainPane" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="859.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ChantLineViewController">
-  <columnConstraints>
+   <columnConstraints>
       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" />
-    <ColumnConstraints hgrow="SOMETIMES" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-  </rowConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+   </rowConstraints>
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -63,9 +63,9 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button maxWidth="10.0" minWidth="10.0" mnemonicParsing="false" onAction="#setCadenceAction" prefHeight="200.0" prefWidth="10.0" style="-fx-base: #ff8989; -fx-focus-color: transparent;">
+                  <Button maxWidth="10.0" minWidth="10.0" mnemonicParsing="false" onAction="#endButtonAction" prefHeight="200.0" prefWidth="10.0" style="-fx-base: #ff8989; -fx-focus-color: transparent;">
                      <tooltip>
-                        <Tooltip text="Add Cadence" />
+                        <Tooltip text="Add End Chord" />
                      </tooltip>
                   </Button>
                </children>

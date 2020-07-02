@@ -127,14 +127,14 @@ public class ChantLineViewController implements CommentableView {
 		int previousSelection = nameChoice.getSelectionModel().getSelectedIndex();
 		if (new_letter == 'A' || previous_is_prime) {
 			nameChoice.setItems(FXCollections.observableArrayList(
-				    String.valueOf(new_letter))
+					"Phrase " + new_letter)
 				);
 			
 			setFirstRepeatedAvailable(false);
 			upButton.setDisable(true);
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
-				    String.valueOf(new_letter), --new_letter + "'",
+				    "Phrase " + new_letter, --new_letter + "'",
 					new_letter + " alternate " + next_alternate)
 				);
 			
@@ -145,9 +145,9 @@ public class ChantLineViewController implements CommentableView {
 
 		decideSelection(previousSelection);
 	}
-	void makeCadence() {
+	void makeFinal() {
 		nameChoice.setItems(FXCollections.observableArrayList(
-			    "Cadence")
+			    "Final Phrase")
 			);
 		nameChoice.getSelectionModel().select(0);
 		
@@ -169,7 +169,7 @@ public class ChantLineViewController implements CommentableView {
 		return nameChoice.getValue().contains("alternate");
 	}
 	public String getName() {
-		return nameChoice.getValue();
+		return nameChoice.getValue().replace("Phrase", "").trim();
 	}
 	public List<ChantChordController> getChords() {
 		return chantChordControllers;
@@ -497,7 +497,7 @@ public class ChantLineViewController implements CommentableView {
 		chantChordControllers.remove(chord);
 		recalcCHNames();
 	}
-	@FXML private void removeEndingChords() {
+	private void removeEndingChords() {
 		List<ChantChordController> chordsToDelete = new ArrayList<>();
 		for (ChantChordController chord : chantChordControllers) {
 			if (chord instanceof EndChord) {
@@ -559,7 +559,7 @@ public class ChantLineViewController implements CommentableView {
 		}
 	}
 
-	@FXML public void setCadenceAction() {
+	@FXML public void endButtonAction() {
 		edited();
 		removeEndingChords();
 		try {
@@ -624,7 +624,7 @@ public class ChantLineViewController implements CommentableView {
 			CommentViewController controller = loader.getController();
 
 			controller.setCommentText(commentString);
-			controller.setTargetText(String.format(Locale.US, "Line %s", getName()));
+			controller.setTargetText(String.format(Locale.US, "Phrase: %s", getName()));
 
 			Platform.runLater(() -> {
 				Stage commentStage = new Stage();

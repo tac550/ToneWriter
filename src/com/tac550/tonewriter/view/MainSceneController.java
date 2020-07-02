@@ -291,7 +291,7 @@ public class MainSceneController {
 					currentLetter++;
 				}
 			} else {
-				chantLine.makeCadence();
+				chantLine.makeFinal();
 				// If this is not the only chant line...
 				if (prevMainLine != null) {
 					prevMainLine.setNumAlts(nextAlternate - 1);
@@ -312,7 +312,7 @@ public class MainSceneController {
 			for (VerseLineViewController verseLine : verseLineControllers) {
 				if (verseLine.isSeparator()) continue;
 
-				// Default last chant line selection to Cadence line.
+				// Default last chant line selection to Final Phrase.
 				if (isLastVerseLineOfSection(verseLine)) {
 					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]),
 							chantLineControllers.size() - 1);
@@ -330,7 +330,7 @@ public class MainSceneController {
 				if (CLNum == mainChantLines.size()) {
 					CLNum = firstRepeated;
 
-					// If there are no main chant lines, use the cadence line.
+					// If there are no main chant lines, use the Final Phrase.
 					if (mainChantLines.isEmpty()) {
 						verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
 						continue;
@@ -339,7 +339,7 @@ public class MainSceneController {
 
 				ChantLineViewController currentChantLine = mainChantLines.get(CLNum);
 
-				// If it's the last line before the end or a separator, it gets Cadence.
+				// If it's the last line before the end or a separator, it gets the Final Phrase.
 				if (isLastVerseLineOfSection(verseLineControllers.get(VLNum))) {
 					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
 					CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
