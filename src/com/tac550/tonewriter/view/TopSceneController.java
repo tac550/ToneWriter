@@ -222,7 +222,7 @@ public class TopSceneController {
 			}
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
-			MainSceneController selectedController = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+			MainSceneController selectedController = getSelectedTabScene();
 			selectedController.updateStageTitle();
 			selectedController.applyMenuState();
 		});
@@ -261,7 +261,7 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML private void handleExport() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleExport();
+		getSelectedTabScene().handleExport();
 	}
 	@FXML private void handleExit() {
 		Event event = new Event(null, null, null);
@@ -273,32 +273,32 @@ public class TopSceneController {
 	 * Tone Menu Actions
 	 */
 	@FXML void handleNewTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleNewTone();
+		getSelectedTabScene().handleNewTone();
 	}
 	@FXML private void handleOpenTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleOpenTone(null, false, false);
+		getSelectedTabScene().handleOpenTone(null, false, false);
 	}
 	@FXML void handleSaveTone() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveTone();
+		getSelectedTabScene().handleSaveTone();
 	}
 	@FXML private void handleSaveToneAs() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSaveToneAs();
+		getSelectedTabScene().handleSaveToneAs();
 	}
 
 	/*
 	 * Edit Menu Actions
 	 */
 	@FXML private void handleCreateChantLine() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).createChantLine(0, true);
+		getSelectedTabScene().createChantLine(0, true);
 	}
 	@FXML private void handleSetKeySignature() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleSetKeySignature();
+		getSelectedTabScene().handleSetKeySignature();
 	}
 	@FXML private void handleEditHeaderInfo() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleEditHeaderInfo();
+		getSelectedTabScene().handleEditHeaderInfo();
 	}
 	@FXML private void handleToggleManualCLAssignment() {
-		tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).handleToggleManualCLAssignment();
+		getSelectedTabScene().handleToggleManualCLAssignment();
 	}
 
 	/*
@@ -515,6 +515,10 @@ public class TopSceneController {
 		System.gc();
 	}
 
+	MainSceneController getSelectedTabScene() {
+		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+	}
+
 	void setMenuState(MenuState menu_state) {
 		editMenu.setDisable(menu_state.editMenuDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
@@ -629,7 +633,7 @@ public class TopSceneController {
 	}
 
 	public boolean isActiveTab(MainSceneController controller) {
-		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()) == controller;
+		return getSelectedTabScene() == controller;
 	}
 
 	public int tabCount() {
