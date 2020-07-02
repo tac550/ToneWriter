@@ -81,9 +81,12 @@ public class VerseLineViewController {
 			if (changingAssignments) return;
 
 			selectedChantLine = new_val.intValue();
-			previousChantLine = associatedChantLines[selectedChantLine].toString();
 
-			resetChordAssignment();
+			if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
+				resetChordAssignment();
+			}
+
+			previousChantLine = associatedChantLines[selectedChantLine].toString();
 		});
 
 		// Interface icons
@@ -215,12 +218,32 @@ public class VerseLineViewController {
 			chantLineChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
 		}
 
-		// Keep chant line selection and chord assignments (if any) if previous selection is still available.
+		// Determine initial chant line selection.
 		if (initial_choice != -1) {
 			selectedChantLine = initial_choice;
 		} else if (mainController.manualCLAssignmentEnabled()) {
-			selectedChantLine = previousSelection;
+			// If we're in manual assignment mode, try to autoselect a chant line similar to the previous one.
+			if (!previousChantLine.isEmpty()) {
+				// If we don't find a similar chant line below, default to the previous selection.
+				selectedChantLine = previousSelection;
+
+				int i = 0;
+				for (ChantLineViewController chantLine : associatedChantLines) {
+					if (chantLine.isSimilarTo(previousChantLine)) {
+						// The first time we find a similar chant line, select it and stop searching.
+						selectedChantLine = i;
+						break;
+					}
+
+					i++;
+				}
+
+			} else {
+				// If there is no previous chant line, or it was empty, select the previous index (usually has same letter)
+				selectedChantLine = previousSelection;
+			}
 		} else {
+			// If we're not in manual assignment mode, just select the first by default.
 			selectedChantLine = 0;
 		}
 		chantLineChoice.getSelectionModel().select(selectedChantLine);
