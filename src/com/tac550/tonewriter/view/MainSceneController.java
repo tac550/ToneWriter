@@ -576,13 +576,15 @@ public class MainSceneController {
 		}
 	}
 
-	void updateTopLevelInfo() {
+	void updateStageTitle() {
 		if (topSceneController.isActiveTab(this)) {
 			// Update stage title to show loaded tone name and edit status
 			parentStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
-
-			topSceneController.setMenuState(menuState);
 		}
+	}
+
+	void applyMenuState() {
+		topSceneController.setMenuState(menuState);
 	}
 
 	/*
@@ -655,7 +657,8 @@ public class MainSceneController {
 			menuState.saveToneAsMenuItemDisabled = false;
 			menuState.saveToneMenuItemDisabled = !isToneSavable();
 
-			resetToneEditedStatus();
+			updateStageTitle();
+			applyMenuState();
 
 			if (outputMode == OutputMode.ITEM)
 				outputMode = OutputMode.NONE;
@@ -959,14 +962,14 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
-		if (!toneEdited && isToneSavable()) {
+		if (!toneEdited && isToneSavable() && !loading) {
 			toneEdited = true;
-			updateTopLevelInfo();
+			updateStageTitle();
 		}
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
-		updateTopLevelInfo();
+		updateStageTitle();
 	}
 	boolean isToneUnedited() {
 		return !toneEdited;

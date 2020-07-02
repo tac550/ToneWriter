@@ -221,8 +221,11 @@ public class TopSceneController {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 			}
 		});
-		tabPane.getSelectionModel().selectedItemProperty().addListener(observable ->
-				tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem()).updateTopLevelInfo());
+		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
+			MainSceneController selectedController = tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+			selectedController.updateStageTitle();
+			selectedController.applyMenuState();
+		});
 
 		// Add button initialization
 
