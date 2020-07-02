@@ -16,16 +16,23 @@ A
 
 B
 1: b-g-d-g
-2: c'-g-e-c
-	Post: c'-g-e-e
-END: b-g-d-g
-
-C
-1: b-g-d-g
 2: a-d-c-fs
 	Post: g-d-b,-g
 END: e-b,-g,-e
 	Prep: fs-d-a,-d
+
+C
+1: b-g-d-g
+2: c'-g-e-c
+	Post: c'-g-e-e
+END: b-g-d-g
+
+D
+1: b-g-d-g
+	Post: c'-g-e-c'
+2: d'-g-f-b
+3: c'-g-e-c'
+END: b-g-d-g
 
 Cadence
 1: b-g-d-g
