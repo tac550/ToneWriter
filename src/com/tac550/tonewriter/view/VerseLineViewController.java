@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
@@ -494,13 +495,15 @@ public class VerseLineViewController {
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
-					currentText.setNoteDuration(SyllableText.NOTE_WHOLE, currentText.getAssociatedButtons().size() - 1);
+					currentText.setNoteDuration(LilyPondInterface.NOTE_WHOLE,
+							currentText.getAssociatedButtons().size() - 1);
 				} else {
 					noteButton = createNoteButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
-					currentText.setNoteDuration(SyllableText.NOTE_HALF, currentText.getAssociatedButtons().size() - 1);
+					currentText.setNoteDuration(LilyPondInterface.NOTE_HALF,
+							currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
 				noteButton = createNoteButton(currentText, getCurrentChord());
@@ -538,7 +541,7 @@ public class VerseLineViewController {
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
-					syllable.setNoteDuration(SyllableText.NOTE_HALF, buttonIndex);
+					syllable.setNoteDuration(LilyPondInterface.NOTE_HALF, buttonIndex);
 				}
 				TopSceneController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button

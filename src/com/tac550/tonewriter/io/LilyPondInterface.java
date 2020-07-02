@@ -26,6 +26,13 @@ public class LilyPondInterface {
 	public static final String ADJUSTMENT_TENOR = "'";
 	public static final String ADJUSTMENT_BASS = "";
 
+	// LilyPond duration codes
+	public static final String NOTE_QUARTER = "4";
+	public static final String NOTE_DOTTED_QUARTER = "4.";
+	public static final String NOTE_HALF = "2";
+	public static final String NOTE_EIGHTH = "8";
+	public static final String NOTE_WHOLE = "1";
+
 	// Constants to make some array indices easier to read.
 	private static final int PART_SOPRANO = 0;
 	private static final int PART_ALTO = 1;

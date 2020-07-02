@@ -98,8 +98,8 @@ public class TopSceneController {
 	private static final List<String> durationMapping = new ArrayList<>();
 
 	static {
-		Collections.addAll(durationMapping, SyllableText.NOTE_EIGHTH, SyllableText.NOTE_QUARTER,
-				SyllableText.NOTE_DOTTED_QUARTER, SyllableText.NOTE_HALF, SyllableText.NOTE_WHOLE);
+		Collections.addAll(durationMapping, LilyPondInterface.NOTE_EIGHTH, LilyPondInterface.NOTE_QUARTER,
+				LilyPondInterface.NOTE_DOTTED_QUARTER, LilyPondInterface.NOTE_HALF, LilyPondInterface.NOTE_WHOLE);
 
 		Collections.addAll(clickItems, eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem,
 				halfNoteMenuItem, wholeNoteMenuItem);

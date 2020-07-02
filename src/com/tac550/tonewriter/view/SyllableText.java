@@ -11,12 +11,6 @@ import java.util.List;
 
 public class SyllableText extends Text {
 
-	static final String NOTE_QUARTER = "4";
-	static final String NOTE_DOTTED_QUARTER = "4.";
-	static final String NOTE_HALF = "2";
-	static final String NOTE_EIGHTH = "8";
-	static final String NOTE_WHOLE = "1";
-	
 	private VerseLineViewController parentController;
 	
 	private final List<AssignedChordData> associatedChords = new ArrayList<>();
