@@ -484,7 +484,7 @@ public class MainSceneController {
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
-				"Do you want to save tone \"" + toneFile.getName() + "\"?", true, parentStage,
+				"Save changes to \"" + toneFile.getName() + "\"?", true, parentStage,
 				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
 
 		if (result.isPresent()) {
@@ -593,7 +593,7 @@ public class MainSceneController {
 		if (outputMode != OutputMode.NONE) {
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION,
 					"Overwrite " + (outputMode == OutputMode.ITEM ? "(Single-item mode)" : "(Project mode)"),
-					"Do you want to overwrite the previous output? (Cancel to change output settings)", true,
+					"Overwrite the previous output? (Cancel to change output settings)", true,
 					parentStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
 				try {
