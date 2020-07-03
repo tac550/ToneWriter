@@ -657,7 +657,7 @@ public class MainSceneController {
 			menuState.saveToneAsMenuItemDisabled = false;
 			menuState.saveToneMenuItemDisabled = !isToneSavable();
 
-			updateStageTitle();
+			resetToneEditedStatus();
 			applyMenuState();
 
 			if (outputMode == OutputMode.ITEM)
