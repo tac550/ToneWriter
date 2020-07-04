@@ -655,7 +655,7 @@ public class TopSceneController {
 		// Showing / Positioning
 		noteMenu.show(noteButton, Side.BOTTOM, 0,
 				(syllable.getAssociatedButtons().size() - syllable.getAssociatedButtons().indexOf(noteButton) - 1)
-						* MainApp.NOTE_BUTTON_HEIGHT.get());
+						* VerseLineViewController.NOTE_BUTTON_HEIGHT.get());
 	}
 
 	static void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {

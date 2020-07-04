@@ -7,6 +7,7 @@ import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -37,6 +38,9 @@ public class VerseLineViewController {
 	private TopSceneController topController;
 
 	private VerseLine verseLine;
+
+	// How tall to make note buttons
+	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
 
 	@FXML private StackPane rootPane;
 	@FXML private GridPane mainContentPane;
@@ -529,9 +533,9 @@ public class VerseLineViewController {
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
 		noteButton.setLayoutY(syllable.getNextNoteButtonPosY());
-		noteButton.maxHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
-		noteButton.prefHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
-		noteButton.minHeightProperty().bind(MainApp.NOTE_BUTTON_HEIGHT);
+		noteButton.maxHeightProperty().bind(NOTE_BUTTON_HEIGHT);
+		noteButton.prefHeightProperty().bind(NOTE_BUTTON_HEIGHT);
+		noteButton.minHeightProperty().bind(NOTE_BUTTON_HEIGHT);
 
 		noteButton.setPrefWidth(30);
 		noteButton.setPadding(Insets.EMPTY);
@@ -576,7 +580,7 @@ public class VerseLineViewController {
 				}
 			}
 			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + MainApp.NOTE_BUTTON_HEIGHT.get()
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + NOTE_BUTTON_HEIGHT.get()
 					+ scrollBarPadding);
 			expandButton.setGraphic(minusIcon);
 

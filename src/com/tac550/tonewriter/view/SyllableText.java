@@ -78,7 +78,7 @@ public class SyllableText extends Text {
 	void select(int chord_index, Color chord_color, Button note_button) {
 		if (!clicked) active = false;
 
-		nextNoteButtonYPos += MainApp.NOTE_BUTTON_HEIGHT.get();
+		nextNoteButtonYPos += VerseLineViewController.NOTE_BUTTON_HEIGHT.get();
 		
 		associatedChords.add(new AssignedChordData(getText(), chord_index, parentController));
 		associatedButtons.add(note_button);
@@ -131,7 +131,7 @@ public class SyllableText extends Text {
 		associatedChords.remove(associatedChords.size() - 1);
 		associatedButtons.remove(associatedButtons.size() - 1);
 		
-		nextNoteButtonYPos -= MainApp.NOTE_BUTTON_HEIGHT.get();
+		nextNoteButtonYPos -= VerseLineViewController.NOTE_BUTTON_HEIGHT.get();
 		
 		if (!associatedButtons.isEmpty()) {
 			String colorString = "#" + associatedButtons.get(associatedButtons.size() - 1).getStyle().split("#")[1];

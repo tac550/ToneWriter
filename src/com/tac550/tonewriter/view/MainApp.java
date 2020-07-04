@@ -79,8 +79,6 @@ public class MainApp extends Application {
 	static final Color[] CHORD_COLORS = new Color[]{Color.GREEN, Color.CORNFLOWERBLUE, Color.DARKORANGE,
 			Color.DEEPSKYBLUE, Color.BURLYWOOD, Color.AQUA, Color.GOLD};
 	static final Color END_CHORD_COLOR = Color.DARKMAGENTA;
-	// How tall to make note buttons
-	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
 
 	private static boolean darkModeEnabled = false;
 
