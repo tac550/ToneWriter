@@ -39,6 +39,8 @@ public class LilyPondInterface {
 	private static final int PART_TENOR = 2;
 	private static final int PART_BASS = 3;
 
+	private static final int measureBreakBeatThreshold = 20;
+
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
 	private static final Map<String, List<ChantChordController>> pendingChordControllers = new HashMap<>();
@@ -268,8 +270,9 @@ public class LilyPondInterface {
 			}
 
 			// Buffer for the line's text.
-			StringBuilder verseLine = new StringBuilder();
-			// Number of beats in the line.
+			StringBuilder verseLine = new StringBuilder().append(" %s "); // TOOD: Check spacing
+			// Number of beats in each (invisible) measure in the line. This enables linebreaks for long verse lines.
+			List<Float> lineMeasureLengths = new LinkedList<>();
 			float lineBeats = 0;
 
 			// For each syllable in the line...
@@ -444,7 +447,15 @@ public class LilyPondInterface {
 								// Add the combined note(s) to the buffer.
 								syllableNoteBuffers[i] += " " + addedNotes;
 								// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-								if (i == 0) lineBeats += getBeatDuration(addedNotes);
+								if (i == 0) {
+									lineBeats += getBeatDuration(addedNotes);
+									if (lineBeats >= measureBreakBeatThreshold) {
+										lineBeats = lineBeats - measureBreakBeatThreshold;
+
+										lineMeasureLengths.add((float) measureBreakBeatThreshold);
+										syllableTextBuffer.append(" %s ");
+									}
+								}
 
 								// If the notes were combined into one... (not tied)
 								if (!addedNotes.contains("~")) {
@@ -490,7 +501,15 @@ public class LilyPondInterface {
 							if (!previousNoteCombined[i]) {
 								syllableNoteBuffers[i] += " " + chordData.getPart(i);
 								// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-								if (i == 0) lineBeats += getBeatDuration(chordData.getPart(i));
+								if (i == 0) {
+									lineBeats += getBeatDuration(chordData.getPart(i));
+									if (lineBeats >= measureBreakBeatThreshold) {
+										lineBeats = lineBeats - measureBreakBeatThreshold;
+
+										lineMeasureLengths.add((float) measureBreakBeatThreshold);
+										syllableTextBuffer.append(" %s ");
+									}
+								}
 							} else {
 								// If the previous note was combined, we clear the temp field for the current part and reset the flag.
 								previousNoteCombined[i] = false;
@@ -568,16 +587,16 @@ public class LilyPondInterface {
 
 			}
 
-			// Ceil the beat total because we never want time signatures with fractional parts.
-			// Using ceil here instead of floor because LilyPond won't change the time signature until the current bar is completed.
-			// If a bar ends before we want it to we may be stuck without a bar reset (for accidentals and such) for a very long time
-			// depending on the length of the previous line. It seems better to overshoot a little so any accidental engraving errors may be
-			// kept to a minimum and hopefully occur only at the start of a line.
-			int roundedBeats = (int) Math.ceil(lineBeats);
-			// We never want a 0/4 time signature (hangs Lilypond)
-			int finalBeats = roundedBeats == 0 ? 1 : roundedBeats;
-			// Add time signature information before each verse line.
-			verseText.append(String.format(Locale.US, " \\time %d/4 ", finalBeats)).append(verseLine);
+			// insert time signatures for the line
+			List<String> timeSignatures = new ArrayList<>();
+			for (float duration : lineMeasureLengths) {
+				timeSignatures.add(generateTimeSignature(duration));
+			}
+			// Add any leftover beats for final time signature.
+			timeSignatures.add(generateTimeSignature(lineBeats));
+			String verseLineWithTimeSignatures = String.format(verseLine.toString(), timeSignatures.toArray());
+
+			verseText.append(verseLineWithTimeSignatures);
 
 			// Add a barline after each verse line
 			parts[PART_SOPRANO] += " \\bar \"|\"";
@@ -588,6 +607,21 @@ public class LilyPondInterface {
 		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
+	}
+
+	// Generates LilyPond time signature notation for a x/4 time signature with given total duration.
+	private static String generateTimeSignature(float measure_duration) {
+		// Ceil the beat total because we never want time signatures with fractional parts.
+		// Using ceil here instead of floor because LilyPond won't change the time signature until the current bar is completed.
+		// If a bar ends before we want it to we may be stuck without a bar reset (for accidentals and such) for a very long time
+		// depending on the length of the previous measure. It seems better to overshoot a little so any accidental engraving errors may be
+		// kept to a minimum and hopefully occur only at the start of a measure.
+		int roundedBeats = (int) Math.ceil(measure_duration);
+		// We never want a 0/4 time signature (hangs Lilypond)
+		int finalBeats = roundedBeats == 0 ? 1 : roundedBeats;
+		// Add time signature information before each verse line.
+
+		return String.format(Locale.US, "\\time %d/4", finalBeats);
 	}
 
 	// Takes two notes in LilyPond syntax (which ought to have the same pitch) and returns their combination as if next to each other on a single syllable.
