@@ -43,6 +43,55 @@ public class LilyPondInterface {
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
 	private static final Map<String, List<ChantChordController>> pendingChordControllers = new HashMap<>();
 
+	// Renders chord previews for the tone UI
+	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
+		String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
+				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
+		if (!uniqueChordRenders.containsKey(chordID)) {
+			// First time we're seeing this chord
+			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
+
+			uniqueChordRenders.put(chordID, null);
+
+			String[] parts = chordView.getFields().split("-");
+
+			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+
+			lines.set(10, "  \\key " + keySignatureToLilyPond(keySignature));
+			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
+			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
+			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
+			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
+			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
+			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+
+			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
+			outputFile.deleteOnExit();
+			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
+			midiFile.deleteOnExit();
+			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
+			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
+			psFile.deleteOnExit();
+
+			File[] results = new File[] {outputFile, midiFile};
+			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
+			executePlatformSpecificLPRender(lilypondFile, true, () -> {
+				uniqueChordRenders.put(chordID, results);
+				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
+					controller.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
+				}
+			});
+		} else if (uniqueChordRenders.get(chordID) == null) {
+			// Render already started; automatically acquire the render when it's finished.
+			pendingChordControllers.get(chordID).add(chordView);
+		} else {
+			// Chord already rendered; use existing files.
+			chordView.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
+		}
+
+	}
+
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
 	                                  MainSceneController[] items, String paperSize) throws IOException {
@@ -539,54 +588,6 @@ public class LilyPondInterface {
 		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
-	}
-
-	public static void renderChord(String fields, String keySignature, ChantChordController chordView) throws IOException {
-		String chordID = fields.replace("<", "(").replace(">", ")") + "-"
-				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
-		if (!uniqueChordRenders.containsKey(chordID)) {
-			// First time we're seeing this chord
-			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
-
-			uniqueChordRenders.put(chordID, null);
-
-			String[] parts = fields.split("-");
-
-			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
-
-			lines.set(10, "  \\key " + keySignatureToLilyPond(keySignature));
-			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
-			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
-			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
-			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
-			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
-
-			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-			outputFile.deleteOnExit();
-			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-			midiFile.deleteOnExit();
-			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-			psFile.deleteOnExit();
-
-			File[] results = new File[] {outputFile, midiFile};
-			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
-			executePlatformSpecificLPRender(lilypondFile, true, () -> {
-				uniqueChordRenders.put(chordID, results);
-				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
-					controller.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
-				}
-			});
-		} else if (uniqueChordRenders.get(chordID) == null) {
-			// Render already started; automatically acquire the render when it's finished.
-			pendingChordControllers.get(chordID).add(chordView);
-		} else {
-			// Chord already rendered; use existing files.
-			chordView.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
-		}
-
 	}
 
 	// Takes two notes in LilyPond syntax (which ought to have the same pitch) and returns their combination as if next to each other on a single syllable.

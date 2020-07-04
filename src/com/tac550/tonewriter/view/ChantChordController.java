@@ -179,7 +179,7 @@ public abstract class ChantChordController implements CommentableView {
 		}
 
 		try {
-			LilyPondInterface.renderChord(getFields(), keySignature, this);
+			LilyPondInterface.renderChord(this, keySignature);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
