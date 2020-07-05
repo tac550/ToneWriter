@@ -21,6 +21,8 @@ import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -94,6 +96,7 @@ public class TopSceneController {
 	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/half-note.png").toExternalForm());
 	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/whole-note.png").toExternalForm());
 	private static final List<ImageView> touchItems = new ArrayList<>();
+	private static final Text touchDescriptionText = new Text("Note info");
 	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(0.5, 1, 0.5, 1);
 	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
 	private static final List<String> durationMapping = new ArrayList<>();
@@ -118,13 +121,15 @@ public class TopSceneController {
 		Collections.addAll(touchItems, eighthNoteTouchItem, quarterNoteTouchItem, dottedQuarterNoteTouchItem,
 				halfNoteTouchItem, wholeNoteTouchItem);
 
+		VBox mainBox = new VBox();
+		mainBox.setAlignment(Pos.CENTER);
 		HBox durationTouchBox = new HBox();
-		durationTouchBox.setStyle("-fx-background: #ffffff");
 		durationTouchBox.setAlignment(Pos.CENTER);
 		durationTouchBox.setSpacing(10);
+		mainBox.getChildren().addAll(touchDescriptionText, durationTouchBox);
 
 		durationTouchBox.getChildren().addAll(touchItems);
-		Scene durationTouchScene = new Scene(durationTouchBox);
+		Scene durationTouchScene = new Scene(mainBox);
 
 		for (ImageView item : touchItems) {
 			item.setPreserveRatio(true);
@@ -678,6 +683,8 @@ public class TopSceneController {
 		// Initial state
 		ImageView selectedItem = touchItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex)));
 		selectedItem.setEffect(touchSelectionEffect);
+		touchDescriptionText.setText(noteButton.getText());
+		durationTouchStage.getScene().getRoot().setStyle(noteButton.getStyle());
 
 		// Showing / Positioning
 		double totalWidth = durationTouchStage.getWidth();
