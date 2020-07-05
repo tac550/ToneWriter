@@ -33,8 +33,10 @@ public class MainChord extends ChantChordController {
 		return postChord;
 	}
 
-	public void rotatePrepsOrPosts(ChantChordController source, ChantChordController target) {
-		List<ChantChordController> resultList = new ArrayList<>(prepChords);
+	public void rotatePrepsOrPosts(SubChord source, SubChord target) {
+		if (source.getClass() != target.getClass()) return;
+
+		List<SubChord> resultList = new ArrayList<>(source instanceof PrepChord ? prepChords : postChords);
 
 		int sourceIndex = resultList.indexOf(source);
 		int targetIndex = resultList.indexOf(target);
@@ -45,8 +47,11 @@ public class MainChord extends ChantChordController {
 			Collections.rotate(resultList.subList(targetIndex, sourceIndex + 1), 1);
 		}
 
-		prepChords.clear();
-		resultList.forEach(item -> prepChords.add((PrepChord) item));
+		(source instanceof PrepChord ? prepChords : postChords).clear();
+		if (source instanceof PrepChord)
+			resultList.forEach(item -> prepChords.add((PrepChord) item));
+		else
+			resultList.forEach(item -> postChords.add((PostChord) item));
 	}
 
 	@Override

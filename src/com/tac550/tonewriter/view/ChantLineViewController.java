@@ -416,9 +416,10 @@ public class ChantLineViewController implements CommentableView {
 					chantChordControllers.clear();
 					chantChordControllers.addAll(controllers);
 
-					if (draggingController.get() instanceof SubChord)
+					if (draggingController.get() instanceof SubChord draggingChord
+							&& targetController instanceof SubChord targetChord)
 						draggingController.get().getAssociatedMainChord().rotatePrepsOrPosts(
-								draggingController.get(), targetController);
+								draggingChord, targetChord);
 
 					recalcCHNames();
 					edited();
