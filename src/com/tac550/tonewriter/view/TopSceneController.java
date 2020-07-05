@@ -9,6 +9,7 @@ import javafx.collections.ListChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
@@ -155,7 +156,10 @@ public class TopSceneController {
 		double totalWidth = durationTouchStage.getWidth();
 		double stepSize = totalWidth / touchItems.size();
 
-		int index = Math.min(Math.max(0, (int) (event.getTouchPoint().getSceneX() / stepSize)), touchItems.size() - 1);
+		Point2D touchPoint = durationTouchStage.getScene().getRoot()
+				.screenToLocal(event.getTouchPoint().getScreenX(), event.getTouchPoint().getScreenY());
+
+		int index = Math.min(Math.max(0, (int) (touchPoint.getX() / stepSize)), touchItems.size() - 1);
 		touchItems.get(index).setEffect(touchSelectionEffect);
 	}
 
@@ -679,13 +683,13 @@ public class TopSceneController {
 		double totalWidth = durationTouchStage.getWidth();
 		double stepSize = totalWidth / touchItems.size();
 
-		durationTouchStage.show();
-		Platform.runLater(() -> {
-			durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
-					- (stepSize / 2));
-			durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
-		});
+		touchEvent.getTouchPoint().ungrab();
+		touchEvent.getTouchPoint().grab(durationTouchStage.getScene());
 
+		durationTouchStage.show();
+		durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
+				- (stepSize / 2));
+		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
 	}
 
 }
