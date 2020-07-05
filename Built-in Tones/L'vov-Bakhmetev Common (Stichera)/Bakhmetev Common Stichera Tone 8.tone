@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: F major
 Tone: Tone 8
 Composer: L'vov/Bakhmetev - Obikhod
@@ -29,7 +29,7 @@ C
 	Prep: g-e-c-g
 END: e-c-g,-c
 
-Cadence
+Final
 1: bf-g-d-<g g,>
 2: a-f-d-<a a,>
 3: g-e-cs-<a a,>

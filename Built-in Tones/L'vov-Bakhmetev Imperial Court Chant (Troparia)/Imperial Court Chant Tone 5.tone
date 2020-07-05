@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: G major
 Tone: Tone 5
 Composer: L'vov/Bakhmetev - Imperial Court Chant
@@ -21,7 +21,7 @@ C
 END: e-b,-g,-e
 	Prep: fs-d-a,-d
 
-Cadence
+Final
 1: b-g-d-g
 	Post: a-d-c-fs
 2: g-d-b,-g

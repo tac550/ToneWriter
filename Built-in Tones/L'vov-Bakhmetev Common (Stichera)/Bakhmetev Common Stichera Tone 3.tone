@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: C major
 Tone: Tone 3
 Composer: L'vov/Bakhmetev - Obikhod
@@ -15,7 +15,7 @@ B
 END: e-c-g,-c
 	Prep: f-d-b,-g,
 
-Cadence
+Final
 1: a-f-c-f
 	Post: f-d-g,-c
 	Post: e-c-g,-c

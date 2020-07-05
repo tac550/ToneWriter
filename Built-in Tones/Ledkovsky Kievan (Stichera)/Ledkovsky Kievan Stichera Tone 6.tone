@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: G major
 Tone: Tone 6
 Composer: B. Ledkovsky - Kievan Chant
@@ -28,7 +28,7 @@ END: g-d-b,-g
 	Prep: b-g-d-g
 	Prep: a-g-c-g
 
-Cadence
+Final
 1: a-e-c-a
 	Post: b-g-d-g
 2: c'-g-e-c

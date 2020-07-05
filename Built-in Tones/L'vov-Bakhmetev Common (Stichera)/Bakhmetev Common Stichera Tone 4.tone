@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: F major
 Tone: Tone 4
 Composer: L'vov/Bakhmetev - Obikhod
@@ -42,7 +42,7 @@ F
 2: bf-g-c-c
 END: a-f-c-f
 
-Cadence
+Final
 1: bf-g-c-c
 2: a-f-c-f
 	Prep: g-e-c-c

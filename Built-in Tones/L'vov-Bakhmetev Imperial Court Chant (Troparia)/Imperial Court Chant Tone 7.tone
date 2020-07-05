@@ -1,4 +1,4 @@
-VERSION: 0.6
+VERSION: 0.7
 Key Signature: F major
 Tone: Tone 7
 Composer: L'vov/Bakhmetev - Imperial Court Chant
@@ -17,7 +17,7 @@ B
 1: bf-f-d-<bf bf,>
 2: a-f-c-f
 
-Cadence
+Final
 1: bf-f-d-<bf bf,>
 2: a-f-c-f
 	Post: f-c-a,-f
