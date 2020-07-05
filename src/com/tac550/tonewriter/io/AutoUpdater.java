@@ -146,7 +146,7 @@ public class AutoUpdater {
 					updateAlert.initModality(Modality.NONE);
 					((Stage) updateAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 					updateAlert.setTitle("Update");
-					updateAlert.setHeaderText("Checking for update...");
+					updateAlert.setHeaderText("Checking for updates...");
 					updateAlert.getButtonTypes().set(0, ButtonType.CANCEL);
 					((Button) updateAlert.getDialogPane().lookupButton(ButtonType.CANCEL)).setDefaultButton(true);
 
