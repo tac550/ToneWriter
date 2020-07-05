@@ -39,7 +39,7 @@ public class LilyPondInterface {
 	private static final int PART_TENOR = 2;
 	private static final int PART_BASS = 3;
 
-	private static final int measureBreakBeatThreshold = 20;
+	private static final int measureBreakBeatThreshold = 10;
 
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
@@ -193,6 +193,7 @@ public class LilyPondInterface {
 						"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
 						"      defaultBarType = \"\" % Hides any auto-generated barlines",
 						"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
+						"      \\accidentalStyle neo-modern-voice",
 						"    }", "  }", "}\n");
 			else
 				Collections.addAll(lines, "\\lyricmode {}",
