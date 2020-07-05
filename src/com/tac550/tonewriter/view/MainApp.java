@@ -6,7 +6,6 @@ import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;

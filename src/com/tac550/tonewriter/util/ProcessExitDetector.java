@@ -27,11 +27,6 @@ public class ProcessExitDetector extends Thread {
 		}
 	}
 
-//	/** @return the process that it is watched by this detector. */
-//	public Process getProcess() {
-//		return process;
-//	}
-
 	public void run() {
 		try {
 			// wait for the process to finish
@@ -51,10 +46,4 @@ public class ProcessExitDetector extends Thread {
 		listeners.add(listener);
 	}
 
-//	/** Removes a process listener.
-//	 * @param listener the listener to be removed
-//	 */
-//	public void removeProcessListener(ProcessListener listener) {
-//		listeners.remove(listener);
-//	}
 }
