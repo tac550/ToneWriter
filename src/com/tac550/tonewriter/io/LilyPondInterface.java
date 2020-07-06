@@ -193,7 +193,7 @@ public class LilyPondInterface {
 						"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
 						"      defaultBarType = \"\" % Hides any auto-generated barlines",
 						"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
-						"      \\accidentalStyle neo-modern-voice",
+						"      \\accidentalStyle neo-modern-voice-cautionary",
 						"    }", "  }", "}\n");
 			else
 				Collections.addAll(lines, "\\lyricmode {}",
