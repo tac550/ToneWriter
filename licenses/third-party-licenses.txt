@@ -1,5 +1,5 @@
 ToneWriter is distributed with unmodified LilyPond binaries.
-The source code is available at http://lilypond.org/source.html and https://github.com/tac550/ToneWriter/releases
+The source code is available at http://lilypond.org/source.html
 LilyPond is published under the GNU General Public License included below.
 
                     GNU GENERAL PUBLIC LICENSE
