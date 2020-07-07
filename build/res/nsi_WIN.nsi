@@ -52,8 +52,12 @@ Section "ToneWriter" Section1
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
 	File "..\win\ToneWriter.exe"
+	; Delete any existing license files
+    RMDir /r "$INSTDIR\licenses\"
 	SetOutPath "$INSTDIR\licenses\"
 	File "..\win\licenses\third-party-licenses.txt"
+	; Delete any existing builtin LilyPond
+    RMDir /r "$INSTDIR\lilypond\"
 	SetOutPath "$INSTDIR\lilypond\"
 	File /r "..\..\lilypond\"
 	CreateShortCut "$DESKTOP\ToneWriter.lnk" "$INSTDIR\ToneWriter.exe"
