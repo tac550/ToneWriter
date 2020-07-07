@@ -521,6 +521,8 @@ public class MainSceneController {
 			toneFile = saveFile;
 
 			menuState.saveToneMenuItemDisabled = false;
+			menuState.saveToneAsMenuItemDisabled = false;
+			menuState.editMenuDisabled = false;
 			topSceneController.setMenuState(menuState);
 
 			return true;
