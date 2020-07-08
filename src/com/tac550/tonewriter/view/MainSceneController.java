@@ -523,7 +523,7 @@ public class MainSceneController {
 			menuState.saveToneMenuItemDisabled = false;
 			menuState.saveToneAsMenuItemDisabled = false;
 			menuState.editMenuDisabled = false;
-			topSceneController.setMenuState(menuState);
+			applyMenuState();
 
 			return true;
 		} else {
