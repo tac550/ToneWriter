@@ -679,7 +679,7 @@ Public License instead of this License.  But first, please read
 
 
 ToneWriter uses Apache Commons, Apache HttpComponents,
-	htmlunit, Xalan-Java, Xerces2 Java Parser, Apache XML Commons, PDFBox, and Eclipse Jetty.
+	htmlunit, Xalan-Java, Xerces2 Java Parser, Apache XML Commons, and Eclipse Jetty.
 	
 These libraries are licensed under the Apache License Version 2.0, included below.
 
@@ -689,7 +689,6 @@ http://htmlunit.sourceforge.net/
 http://xml.apache.org/xalan-j/
 http://xerces.apache.org/xerces2-j/
 http://xerces.apache.org/xml-commons/
-https://pdfbox.apache.org/
 https://www.eclipse.org/jetty/
 
                                  Apache License
