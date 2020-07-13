@@ -83,6 +83,7 @@ public class LilyPondInterface {
 				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
 					controller.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
 				}
+				pendingChordControllers.remove(chordID);
 			});
 		} else if (uniqueChordRenders.get(chordID) == null) {
 			// Render already started; automatically acquire the render when it's finished.
