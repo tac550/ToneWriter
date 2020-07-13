@@ -47,7 +47,7 @@ public class LilyPondInterface {
 
 	// Renders chord previews for the tone UI
 	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
-		String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
+		final String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
 				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
 		if (!uniqueChordRenders.containsKey(chordID)) {
 			// First time we're seeing this chord
@@ -305,8 +305,7 @@ public class LilyPondInterface {
 					// adding to the final text any syllable that has no associated chords.
 					if (chordList.indexOf(chordData) == 0) {
 
-						// Make any double quotes in the text understandable to LilyPond.
-						// Throw away any (presumably leading) hyphens beforehand.
+						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
 						syllableTextBuffer.append(escapeDoubleQuotes(chordData.getSyllable().replace("-", "")));
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
@@ -698,8 +697,8 @@ public class LilyPondInterface {
 
 	}
 
+	// Returns reformatted version of input such that double quotes display correctly in LilyPond output.
 	private static String escapeDoubleQuotes(String input) {
-
 		StringBuilder outputBuffer = new StringBuilder();
 
 		// Delimiters are included to enable rebuilding the entire string with whitespace
