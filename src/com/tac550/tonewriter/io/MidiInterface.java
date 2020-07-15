@@ -30,7 +30,8 @@ public class MidiInterface {
 				String previousFields = null;
 				for (SyllableText syllable : syllables) {
 					for (AssignedChordData chord : syllable.getAssociatedChords()) {
-						if (chord.getChordController().getFields().equals(previousFields)) {
+						if (chord.getChordController().getFields().equals(previousFields)
+								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
 							chordMap.get(key).add(chord);
 						} else {
 							chordMap.put(++key, new ArrayList<>(Collections.singletonList(chord)));
@@ -45,8 +46,8 @@ public class MidiInterface {
 				while (chordMap.containsKey(key)) {
 					for (AssignedChordData chord : chordMap.get(key)) {
 						chord.getChordController().playMidi();
-						Thread.sleep(1000 / Integer.parseInt(chord.getDuration())
-								/ chordMap.get(key).size()); // TODO: Need better duration control
+						Thread.sleep(1000 / Integer.parseInt(chord.getDuration().replace("4.", "3"))
+								/ chordMap.get(key).size());
 					}
 					key++;
 				}
