@@ -29,9 +29,6 @@ public class VerseLine {
 	public String getLine() {
 		return line;
 	}
-	public void setLine(String line) {
-		refreshLine(line);
-	}
 	public String[] getSyllables() {
 		return syllables;
 	}
