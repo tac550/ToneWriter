@@ -146,6 +146,9 @@ public class MainApp extends Application {
 		}
 	}
 
+	/*
+	 * This fixes the application not closing correctly if the user played midi.
+	 */
 	@Override
 	public void stop() {
 		MidiInterface.closeMidiSystem();

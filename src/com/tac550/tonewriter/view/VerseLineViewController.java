@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
+import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
@@ -73,6 +74,8 @@ public class VerseLineViewController {
 	private boolean view_expanded = false;
 	private double defaultHeight;
 
+	@FXML private Button playButton;
+
 	private boolean changingAssignments = false;
 
 	private int nextChordIndex = 0; // Index of the next chord to be assigned
@@ -103,8 +106,9 @@ public class VerseLineViewController {
 		minusIcon.setFitHeight(iconSize);
 		minusIcon.setFitWidth(iconSize);
 
-		// Button's initial state
+		// Buttons' initial states
 		expandButton.setGraphic(plusIcon);
+		playButton.setText("\u25B6");
 
 		// Default height used when toggling Expand off.
 		defaultHeight = mainContentPane.getPrefHeight();
@@ -586,6 +590,10 @@ public class VerseLineViewController {
 
 			view_expanded = true;
 		}
+	}
+
+	@FXML private void handlePlay() {
+		MidiInterface.playAssignedPhrase(getSyllables());
 	}
 
 	@FXML private void editSyllables() {

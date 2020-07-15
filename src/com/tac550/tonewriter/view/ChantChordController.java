@@ -215,7 +215,7 @@ public abstract class ChantChordController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		MidiInterface.playMidi(midiFile, playButton);
+		MidiInterface.playChord(midiFile, playButton);
 	}
 	@FXML private void editComment() {
 

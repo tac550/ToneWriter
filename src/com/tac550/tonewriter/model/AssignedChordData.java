@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.model;
 
 import com.tac550.tonewriter.io.LilyPondInterface;
+import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.VerseLineViewController;
 
 public class AssignedChordData {
@@ -27,6 +28,10 @@ public class AssignedChordData {
 	}
 	public String getDuration() {
 		return duration;
+	}
+
+	public ChantChordController getChordController() {
+		return lineController.getChordByIndex(chordIndex);
 	}
 
 	public String getPart(int part_index) {
