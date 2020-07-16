@@ -16,8 +16,10 @@ public class MidiInterface {
 
 	private static Sequencer sequencer = null;
 
-	public static void playAssignedPhrase(SyllableText[] syllables) {
+	public static void playAssignedPhrase(SyllableText[] syllables, Button playButton) {
 		if (sequencer == null) return;
+
+		playButton.setDisable(true);
 
 		Task<Void> midiTask = new Task<>() {
 			@Override
@@ -64,6 +66,7 @@ public class MidiInterface {
 					key++;
 				}
 
+				playButton.setDisable(false);
 				return null;
 			}
 		};
