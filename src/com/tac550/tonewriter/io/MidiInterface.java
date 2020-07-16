@@ -92,7 +92,7 @@ public class MidiInterface {
 		midiThread.start();
 	}
 
-	public static void setUpMidiSystem() {
+	public static void setUpMidiSystem() { // TODO: Hangs app on Linux if run after resuming from suspend
 		// Set up sequencer if not already done
 		try {
 			if (sequencer == null) {
@@ -102,7 +102,7 @@ public class MidiInterface {
 			sequencer.open();
 		} catch (MidiUnavailableException e) {
 			e.printStackTrace();
-			TWUtils.showAlert(AlertType.ERROR, "Error", "MIDI system unavailable!", true);
+			TWUtils.showError("MIDI system unavailable!", true);
 		}
 	}
 
