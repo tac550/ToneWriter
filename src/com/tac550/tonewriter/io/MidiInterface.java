@@ -23,11 +23,14 @@ public class MidiInterface {
 			@Override
 			protected Void call() throws Exception {
 				// Setup before playing
+				List<Button> buttons = new ArrayList<>();
 				Map<Integer, List<AssignedChordData>> chordMap = new HashMap<>();
 				int key = -1;
 
 				String previousFieldsAndDur = null;
 				for (SyllableText syllable : syllables) {
+					buttons.addAll(syllable.getAssociatedButtons());
+
 					for (AssignedChordData chord : syllable.getAssociatedChords()) {
 						String fieldsAndDur = chord.getChordController().getFields() + chord.getDuration();
 						if (fieldsAndDur.equals(previousFieldsAndDur)
@@ -42,14 +45,21 @@ public class MidiInterface {
 				}
 
 				// Playing loop
+				int buttonIndex = 0;
 				key = 0;
 				while (chordMap.containsKey(key)) {
 					for (AssignedChordData chord : chordMap.get(key)) {
+						Button currentButton = buttons.get(buttonIndex);
+						String oldStyle = currentButton.getStyle();
+						currentButton.setStyle("-fx-base: #fffa61");
 						chord.getChordController().playMidi();
 						//noinspection BusyWait
 						Thread.sleep(1000
 								/ (chordMap.get(key).size() > 3 ? chordMap.get(key).size()
 								: Integer.parseInt(chord.getDuration().replace("4.", "3"))));
+
+						currentButton.setStyle(oldStyle);
+						buttonIndex++;
 					}
 					key++;
 				}

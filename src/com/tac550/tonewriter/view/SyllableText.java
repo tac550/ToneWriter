@@ -119,7 +119,7 @@ public class SyllableText extends Text {
 	public AssignedChordData[] getAssociatedChords() {
 		return associatedChords.toArray(new AssignedChordData[] {});
 	}
-	List<Button> getAssociatedButtons() {
+	public List<Button> getAssociatedButtons() {
 		return associatedButtons;
 	}
 	
