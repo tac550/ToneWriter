@@ -47,7 +47,7 @@ public class MidiInterface {
 					for (AssignedChordData chord : chordMap.get(key)) {
 						chord.getChordController().playMidi();
 						Thread.sleep(1000
-								/ (chordMap.get(key).size() > 2 ? chordMap.get(key).size()
+								/ (chordMap.get(key).size() > 3 ? chordMap.get(key).size()
 								: Integer.parseInt(chord.getDuration().replace("4.", "3"))));
 					}
 					key++;
