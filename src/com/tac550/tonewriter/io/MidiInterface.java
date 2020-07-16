@@ -26,17 +26,18 @@ public class MidiInterface {
 				Map<Integer, List<AssignedChordData>> chordMap = new HashMap<>();
 				int key = -1;
 
-				String previousFields = null;
+				String previousFieldsAndDur = null;
 				for (SyllableText syllable : syllables) {
 					for (AssignedChordData chord : syllable.getAssociatedChords()) {
-						if (chord.getChordController().getFields().equals(previousFields)
+						String fieldsAndDur = chord.getChordController().getFields() + chord.getDuration();
+						if (fieldsAndDur.equals(previousFieldsAndDur)
 								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
 							chordMap.get(key).add(chord);
 						} else {
 							chordMap.put(++key, new ArrayList<>(Collections.singletonList(chord)));
 						}
 
-						previousFields = chord.getChordController().getFields();
+						previousFieldsAndDur = fieldsAndDur;
 					}
 				}
 
