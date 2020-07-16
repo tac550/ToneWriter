@@ -5,7 +5,6 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.SyllableText;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
 import javax.sound.midi.MidiUnavailableException;
