@@ -6,15 +6,17 @@ Manually Assign Phrases: false
 
 
 A
-1: b-g-d-g
-	Prep: c'-g-e-c: This chord is skipped on all but the first line of the verse.
-2: c'-g-e-c
+1: a-e-c-a: Skipped on all but especially long opening phrases.
+	Post: b-g-d-g: Skipped on all but the first phrase./n/nThis chord begins the first phrase only if the second syllable/nis stressed.
+2: b-g-d-g
+	Prep: c'-g-e-c: Skipped on all but the first phrase./n/n/nThis chord begins the phrase only if the first syllable is stressed.
+3: c'-g-e-c
 	Post: b-g-d-g
 END: a-e-c-a
 
 B
-1: c'-g-e-g
-	Prep: a-e-c-a
+1: c'-g-e-g: Skipped on very short phrases.
+	Prep: a-e-c-a: Skipped on very short phrases.
 	Prep: b-g-d-g
 	Prep: c'-g-e-g
 	Prep: d'-g-f-g
@@ -36,12 +38,14 @@ C
 END: g-d-b,-g
 
 Final
-1: a-e-c-a
-	Post: b-g-d-g
+1: a-e-c-a: Skipped on shorter phrases.
+	Post: b-g-d-g: Skipped on shorter phrases.
 2: c'-g-e-c
-	Post: b-g-d-g
-	Post: d'-g-f-g
+	Post: c'-g-e-c: Skipped on longer phrases which use the first two chords./n/nExtremely short phrases may begin here with an accented syllable.
+	Post: b-g-d-g: Skipped on longer phrases which use the first two chords.
 3: c'-g-e-c
+	Prep: d'-g-f-g
+	Prep: b-g-d-g
 4: b-g-d-g
 END: a-e-c-a
 
