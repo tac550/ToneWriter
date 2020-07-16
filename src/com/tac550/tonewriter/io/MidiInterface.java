@@ -57,7 +57,7 @@ public class MidiInterface {
 						chord.getChordController().playMidi();
 						//noinspection BusyWait
 						Thread.sleep(1000
-								/ (chordMap.get(key).size() > 3 ? chordMap.get(key).size()
+								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 8)
 								: Integer.parseInt(chord.getDuration().replace("4.", "3"))));
 
 						currentButton.setStyle(oldStyle);
