@@ -28,8 +28,8 @@ END: b-g-d-g
 
 C
 1: c'-g-e-c
-	Prep: a-e-c-a
-	Prep: b-g-d-g
+	Prep: a-e-c-a: Commonly skipped on shorter phrases
+	Prep: b-g-d-g: Commonly skipped on shorter phrases.
 	Post: b-g-d-g
 2: a-g-c-e
 	Post: c'-g-e-c
