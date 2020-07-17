@@ -88,17 +88,15 @@ public class MidiInterface {
 				sequencer.start();
 
 				// Thread which highlights and unhighlights the play button.
-				Thread stopThread = new Thread(() -> {
+				new Thread(() -> {
 					Platform.runLater(() -> playButton.setStyle("-fx-base: #fffa61"));
 					try {
 						Thread.sleep(1000);
 						Platform.runLater(() -> playButton.setStyle(""));
-						Thread.sleep(2000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				});
-				stopThread.start();
+				}).start();
 
 				return null;
 			}
