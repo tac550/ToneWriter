@@ -31,10 +31,12 @@ public class MidiInterface {
 
 				String previousFieldsAndDur = null;
 				for (SyllableText syllable : syllables) {
+					// Place all the buttons into the buttons list in the order they occur
 					buttons.addAll(syllable.getAssociatedButtons());
 
 					for (AssignedChordData chord : syllable.getAssociatedChords()) {
 						String fieldsAndDur = chord.getChordController().getFields() + chord.getDuration();
+						// Group elements together in sequential lists in map if notes are same and duration is quarter.
 						if (fieldsAndDur.equals(previousFieldsAndDur)
 								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
 							chordMap.get(key).add(chord);
@@ -55,7 +57,10 @@ public class MidiInterface {
 						String oldStyle = currentButton.getStyle();
 						currentButton.setStyle("-fx-base: #fffa61");
 						chord.getChordController().playMidi();
-						//noinspection BusyWait
+						// This sleep determines for how long the note plays.
+						// Speeds recitative of more than 3 repeated notes up to a minimum value.
+						// For non-recitative, bases speed on note value, adjusting some manually.
+						// noinspection BusyWait
 						Thread.sleep(1000
 								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 8)
 								: Integer.parseInt(chord.getDuration()
