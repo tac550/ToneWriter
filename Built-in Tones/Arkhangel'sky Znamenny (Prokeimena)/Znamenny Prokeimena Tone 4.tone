@@ -1,0 +1,30 @@
+VERSION: 0.7
+Key Signature: G major
+Tone: Tone 4
+Composer: A. Arkhangel'sky - Znamenny Chant
+Manually Assign Phrases: false
+
+
+A
+1: g-d-b,-g
+2: a-e-c-a
+	Prep: g-e-b,-e
+END: b-g-d-g
+	Prep: a-fs-d-d
+
+Final
+1: b-g-d-g
+	Post: b-g-d-g
+	Post: a-e-c-a
+2: b-g-d-g
+	Prep: c'-g-e-c
+	Prep: c'-g-e-e
+	Post: b-g-d-b,
+	Post: b-g-d-g,
+END: g-d-b,-g
+	Prep: a-fs-d-d
+	Prep: b-fs-d-d
+	Prep: a-fs-d-d
+
+
+First Repeated: 
