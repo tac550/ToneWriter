@@ -3,7 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.*;
 import com.tac550.tonewriter.model.MenuState;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.MainSceneController.OutputMode;
+import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -73,6 +73,8 @@ public class TopSceneController {
 	static final String keyIconPath = "/media/key.png";
 	static final String bookIconPath = "/media/book.png";
 
+	// File names and directories are kept separately to make exporting multiple items with the same name
+	// and different extensions easier.
 	String projectOutputFileName;
 	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
@@ -424,7 +426,7 @@ public class TopSceneController {
 					});
 
 					// Propagate project output mode if it's active on the previous tab.
-					if (prevTabController.getOutputMode() == OutputMode.PROJECT)
+					if (prevTabController.getExportMode() == ExportMode.PROJECT)
 						newTabController.setProjectOutputMode();
 
 					// Increment any verses used from the built-in verse finder data.

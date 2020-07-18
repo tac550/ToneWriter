@@ -72,7 +72,7 @@ Hear me O Lord!
 
 public class MainSceneController {
 
-	enum OutputMode {
+	enum ExportMode {
 		NONE,
 		ITEM,
 		PROJECT
@@ -122,8 +122,10 @@ public class MainSceneController {
 
 	private boolean verseEdited = false;
 
-	private OutputMode outputMode = OutputMode.NONE;
-	private String itemOutputFileName = MainApp.APP_NAME + " Render";
+	private ExportMode exportMode = ExportMode.NONE;
+	// File names and directories are kept separately to make exporting multiple items with the same name
+	// and different extensions easier.
+	private String itemExportFileName = MainApp.APP_NAME + " Render";
 	private File itemSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 		: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
@@ -199,13 +201,13 @@ public class MainSceneController {
 
 		// Title and subtitle field tooltip info reflects current output mode
 		titleTextField.getTooltip().setOnShown(event -> {
-			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
 				((Tooltip) event.getTarget()).setText("Appears on every page (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered above subtitle, appears once (Project export mode)");
 		});
 		subtitleTextField.getTooltip().setOnShown(event -> {
-			if (outputMode == OutputMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
 				((Tooltip) event.getTarget()).setText("First page only (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
@@ -395,8 +397,8 @@ public class MainSceneController {
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Set Verse Confirmation",
 					"Are you sure you want to set this verse text? (changes and chord assignments in the current text will be lost)", true);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) return;
-			if (outputMode == OutputMode.ITEM)
-				outputMode = OutputMode.NONE;
+			if (exportMode == ExportMode.ITEM)
+				exportMode = ExportMode.NONE;
 		}
 
 		clearVerseLines();
@@ -594,9 +596,11 @@ public class MainSceneController {
 	 */
 	void handleExport() {
 
-		if (outputMode != OutputMode.NONE) {
+		// First make sure a filename and output mode are selected and that the target loaction is ready.
+		if (exportMode != ExportMode.NONE) { // If an output mode is already selected for this tab...
+			// Ask whether to keep settings and overwrite or reset export settings
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION,
-					"Overwrite " + (outputMode == OutputMode.ITEM ? "(Single-item mode)" : "(Project mode)"),
+					"Overwrite " + (exportMode == ExportMode.ITEM ? "(Single-item mode)" : "(Project mode)"),
 					"Overwrite the previous output? (Cancel to change output settings)", true,
 					parentStage);
 			if (result.isPresent() && result.get() == ButtonType.CANCEL) {
@@ -615,14 +619,14 @@ public class MainSceneController {
 		}
 
 		try {
-			if (outputMode == OutputMode.ITEM) {
-				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemOutputFileName,
+			if (exportMode == ExportMode.ITEM) {
+				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
 						hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText(),
 						new MainSceneController[] {this}, topSceneController.paperSize)) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
 				}
-			} else if (outputMode == OutputMode.PROJECT) {
+			} else if (exportMode == ExportMode.PROJECT) {
 				topSceneController.exportProject();
 			}
 		} catch (IOException e) {
@@ -662,8 +666,8 @@ public class MainSceneController {
 			resetToneEditedStatus();
 			applyMenuState();
 
-			if (outputMode == OutputMode.ITEM)
-				outputMode = OutputMode.NONE;
+			if (exportMode == ExportMode.ITEM)
+				exportMode = ExportMode.NONE;
 		}
 
 		LoadingTone = false;
@@ -867,7 +871,7 @@ public class MainSceneController {
 
 	private void setNewRenderFilename() throws RenderFormatException {
 
-		OutputMode tempOutputMode;
+		ExportMode tempExportMode;
 
 		if (topSceneController.tabCount() > 1) {
 			ButtonType projectBT = new ButtonType("Entire project");
@@ -879,20 +883,20 @@ public class MainSceneController {
 
 			if (result.isPresent()) {
 				if (result.get() == projectBT) {
-					tempOutputMode = OutputMode.PROJECT;
+					tempExportMode = ExportMode.PROJECT;
 					topSceneController.checkProjectName();
 				} else if (result.get() == itemBT) {
-					tempOutputMode = OutputMode.ITEM;
+					tempExportMode = ExportMode.ITEM;
 				} else throw new RenderFormatException();
 			} else throw new RenderFormatException();
 
 		} else {
-			tempOutputMode = OutputMode.ITEM;
+			tempExportMode = ExportMode.ITEM;
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(tempOutputMode == OutputMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
-		fileChooser.setInitialDirectory(tempOutputMode == OutputMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
+		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
+		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
@@ -902,32 +906,32 @@ public class MainSceneController {
 			throw new RenderFormatException();
 		} else {
 
-			if (tempOutputMode == OutputMode.PROJECT) {
+			if (tempExportMode == ExportMode.PROJECT) {
 				topSceneController.projectOutputFileName = FilenameUtils.removeExtension(PDFFile.getName());
 				topSceneController.projectSavingDirectory = PDFFile.getParentFile();
 
 				topSceneController.propagateProjectOutputSetting();
 			} else {
-				itemOutputFileName = FilenameUtils.removeExtension(PDFFile.getName());
+				itemExportFileName = FilenameUtils.removeExtension(PDFFile.getName());
 				itemSavingDirectory = PDFFile.getParentFile();
 			}
 
-			outputMode = tempOutputMode;
+			exportMode = tempExportMode;
 		}
 	}
 
-	OutputMode getOutputMode() {
-		return outputMode;
+	ExportMode getExportMode() {
+		return exportMode;
 	}
 	void setProjectOutputMode() {
-		outputMode = OutputMode.PROJECT;
+		exportMode = ExportMode.PROJECT;
 	}
 
 	private boolean deletePreviousRender() {
-		boolean item = outputMode == OutputMode.ITEM;
+		boolean item = exportMode == ExportMode.ITEM;
 
 		File lyFile = new File((item ? itemSavingDirectory : topSceneController.projectSavingDirectory) +
-				File.separator + (item ? itemOutputFileName : topSceneController.projectOutputFileName) + ".ly");
+				File.separator + (item ? itemExportFileName : topSceneController.projectOutputFileName) + ".ly");
 		File pdfFile = new File(FilenameUtils.removeExtension(lyFile.getAbsolutePath()) + ".pdf");
 
         return pdfFile.delete() || lyFile.delete();
