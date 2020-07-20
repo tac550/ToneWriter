@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -125,9 +126,13 @@ public class TWUtils {
 
 	// Creates and returns a temp file which will be recognized by the automatic temp cleaner
 	public static File createTWTempFile(String prefix, String suffix) throws IOException {
-		return File.createTempFile(MainApp.APP_NAME + "-" +
+		return Files.createTempFile(MainApp.APP_NAME + "-" +
 				(prefix.isEmpty() ? "" : prefix + "-"),
-				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix);
+				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix).toFile();
+	}
+	public static File createTWTempDir(String prefix) throws IOException {
+		return Files.createTempDirectory(MainApp.APP_NAME + "-" +
+						(prefix.isEmpty() ? "" : prefix + "-")).toFile();
 	}
 
 	public static void cleanUpTempFiles(String with_postfix) {
@@ -135,7 +140,14 @@ public class TWUtils {
 		File[] files = tempDir.listFiles();
 		for (File file : Objects.requireNonNull(files)) {
 			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith(with_postfix)) {
-				if (!file.delete()) {
+				try {
+					if (file.isDirectory())
+						FileUtils.deleteDirectory(file);
+					else
+						if (!file.delete())
+							throw new IOException("(TW) File deletion failed");
+				} catch (IOException e) {
+					e.printStackTrace();
 					TWUtils.showError("Failed to delete temp file " + file.getName(), false);
 				}
 			}
