@@ -14,10 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert.AlertType;
 import org.apache.commons.text.TextStringBuilder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -47,56 +44,65 @@ public class ToneReaderWriter {
 		associatedMainScene = main_scene;
 	}
 
-	public boolean saveTone(File toneFile) {
+	public boolean saveToneToFile(File toneFile) {
+		// Clear out old save data.
+		// noinspection ResultOfMethodCallIgnored
+		toneFile.delete();
+
 		try {
-			// Clear out old save data.
-			// noinspection ResultOfMethodCallIgnored
-			toneFile.delete();
-			if (!toneFile.createNewFile()) {
+
+			// Create new file
+			if (!toneFile.createNewFile())
 				return false;
-			}
 
-			// Set up PrintWriter
+			// Save to the file
 			FileWriter fileWriter = new FileWriter(toneFile);
-			PrintWriter printWriter = new PrintWriter(fileWriter);
-
-			// Header info
-			printWriter.println("VERSION: " + MainApp.APP_VERSION);
-			printWriter.println("Key Signature: " +
-					keySig.replace("\u266F", "s").replace("\u266D", "f"));
-			printWriter.println("Tone: " + poetText);
-			printWriter.println("Composer: " + composerText);
-			printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
-			printWriter.println();
-			printWriter.println();
-
-			// Line name which is marked first repeated. Filled when found.
-			String firstRepeated = "";
-
-			// For each chant line...
-			for (ChantLineViewController chantLine : chantLines) {
-
-				if (chantLine.getFirstRepeated()) {
-					firstRepeated = chantLine.getName();
-				}
-
-				printWriter.println(chantLine.toString());
-
-			}
-
-			// Footer info
-			printWriter.println();
-		    printWriter.println("First Repeated: " + firstRepeated);
-
-			printWriter.close();
+			saveToneTo(fileWriter);
 			fileWriter.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
+	}
+	public void saveToneToStringWriter(StringWriter string_writer) {
+		saveToneTo(string_writer);
+	}
+
+	private void saveToneTo(Writer destination) {
+		PrintWriter printWriter = new PrintWriter(destination);
+
+		// Header info
+		printWriter.println("VERSION: " + MainApp.APP_VERSION);
+		printWriter.println("Key Signature: " +
+				keySig.replace("\u266F", "s").replace("\u266D", "f"));
+		printWriter.println("Tone: " + poetText);
+		printWriter.println("Composer: " + composerText);
+		printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
+		printWriter.println();
+		printWriter.println();
+
+		// Line name which is marked first repeated. Filled when found.
+		String firstRepeated = "";
+
+		// For each chant line...
+		for (ChantLineViewController chantLine : chantLines) {
+
+			if (chantLine.getFirstRepeated()) {
+				firstRepeated = chantLine.getName();
+			}
+
+			printWriter.println(chantLine.toString());
+
+		}
+
+		// Footer info
+		printWriter.println();
+		printWriter.println("First Repeated: " + firstRepeated);
+
+		printWriter.close();
 	}
 
 	public boolean loadTone(MainSceneController main_scene, File toneFile) {
@@ -355,15 +361,18 @@ public class ToneReaderWriter {
 	public static boolean createToneFile(File file_to_create) {
 		if (file_to_create.getParentFile().mkdirs() || file_to_create.getParentFile().exists()) {
 			try {
-				// If the file already exists, delete it first (User already selected to overwrite)
+				// If the file already exists, delete it first (overwrite)
 				if (file_to_create.exists()) {
 					if (!file_to_create.delete()) return false;
 				}
 				return file_to_create.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TWUtils.showError("Failed to create .tone file!", false);
 				return false;
 			}
-		} else return false;
+		} else {
+			TWUtils.showError("Failed to create directory for .tone file!", false);
+			return false;
+		}
 	}
 }

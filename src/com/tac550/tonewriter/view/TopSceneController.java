@@ -79,7 +79,7 @@ public class TopSceneController {
 	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
-	String projectTitle = "";
+	private String projectTitle = "";
 
 	String paperSize = "";
 
@@ -530,6 +530,10 @@ public class TopSceneController {
 		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
 	}
 
+	public String getProjectTitle() {
+		return projectTitle;
+	}
+
 	void setMenuState(MenuState menu_state) {
 		editMenu.setDisable(menu_state.editMenuDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
@@ -576,6 +580,7 @@ public class TopSceneController {
 	}
 
 	@FXML boolean handleSetProjectTitle() {
+		ProjectIO.saveFile(new File("awrigerglnreignre"), this);
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
@@ -649,6 +654,10 @@ public class TopSceneController {
 
 	public int tabCount() {
 		return tabPane.getTabs().size();
+	}
+
+	public Collection<MainSceneController> getTabControllers() {
+		return tabControllerMap.values();
 	}
 
 	static void showNoteMenu(SyllableText syllable, Button noteButton) {

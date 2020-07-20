@@ -43,6 +43,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -557,7 +558,7 @@ public class MainSceneController {
 		if (selectedFile.exists()) {
 			toneFile = selectedFile;
 
-			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, this);
+			ToneReaderWriter toneReader = getToneReader();
 
 			loading = true;
 			if (toneReader.loadTone(this, toneFile)) {
@@ -676,9 +677,8 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, keySignature,
-				leftText, rightText);
-		if (!toneWriter.saveTone(toneFile)) {
+		ToneReaderWriter toneWriter = getToneWriter();
+		if (!toneWriter.saveToneToFile(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
 			resetToneEditedStatus();
@@ -688,6 +688,22 @@ public class MainSceneController {
 	}
 	void handleSaveToneAs() {
 		if (createNewTone()) handleSaveTone();
+	}
+	public String getToneString() {
+		ToneReaderWriter toneWriter = getToneWriter();
+
+		try (StringWriter sw = new StringWriter()) {
+			toneWriter.saveToneToStringWriter(sw);
+			return sw.toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	public ToneReaderWriter getToneWriter() {
+		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
+	}
+	private ToneReaderWriter getToneReader() {
+		return new ToneReaderWriter(chantLineControllers, this);
 	}
 
 	/*
@@ -895,7 +911,7 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
+		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle());
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -988,7 +1004,7 @@ public class MainSceneController {
 		setVersePane.setMouseTransparent(false);
 	}
 
-	File getToneFile() {
+	public File getToneFile() {
 		return toneFile;
 	}
 
