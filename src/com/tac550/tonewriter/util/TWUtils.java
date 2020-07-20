@@ -135,6 +135,9 @@ public class TWUtils {
 						(prefix.isEmpty() ? "" : prefix + "-")).toFile();
 	}
 
+	public static void cleanUpTempFiles() {
+		cleanUpTempFiles("");
+	}
 	public static void cleanUpTempFiles(String with_postfix) {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		File[] files = tempDir.listFiles();

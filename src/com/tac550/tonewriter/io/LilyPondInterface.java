@@ -68,13 +68,8 @@ public class LilyPondInterface {
 			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-			outputFile.deleteOnExit();
 			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
 					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-			midiFile.deleteOnExit();
-			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-			psFile.deleteOnExit();
 
 			File[] results = new File[] {outputFile, midiFile};
 			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
@@ -860,7 +855,6 @@ public class LilyPondInterface {
 		try {
 			// Create the temporary file to hold the lilypond markup
 			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
-			tempFile.deleteOnExit();
 
 			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
 		} catch (Exception e) {

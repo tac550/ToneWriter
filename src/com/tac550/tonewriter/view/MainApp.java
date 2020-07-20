@@ -97,7 +97,7 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		TWUtils.cleanUpTempFiles("");
+		TWUtils.cleanUpTempFiles();
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
@@ -151,6 +151,7 @@ public class MainApp extends Application {
 	 */
 	@Override
 	public void stop() {
+		TWUtils.cleanUpTempFiles();
 		MidiInterface.closeMidiSystem();
 	}
 
@@ -225,11 +226,6 @@ public class MainApp extends Application {
 	private void runLilyPondStartup(Runnable final_actions) throws IOException {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
-		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
-		File outputFile2 = new File(lilypondFile.getAbsolutePath().replace(".ly", getPlatformSpecificMidiExtension()));
-		lilypondFile.deleteOnExit();
-		outputFile.deleteOnExit();
-		outputFile2.deleteOnExit();
 
 		try {
 			TWUtils.exportIOResource("chordTemplate.ly", lilypondFile);
