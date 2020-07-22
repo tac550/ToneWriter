@@ -96,8 +96,10 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
+	@FXML private ToggleGroup titleOptions;
 	@FXML private RadioMenuItem largeTitleMenuItem;
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
+
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 	@FXML private CheckMenuItem pageBreakMenuItem;
 
@@ -1039,6 +1041,9 @@ public class MainSceneController {
 	}
 	public boolean getLargeTitle() {
 		return largeTitleMenuItem.isSelected();
+	}
+	public RadioMenuItem getSelectedTitleOption() {
+		return (RadioMenuItem) titleOptions.getSelectedToggle();
 	}
 	boolean getHideToneHeader() {
 		return hideToneHeaderMenuItem.isSelected();

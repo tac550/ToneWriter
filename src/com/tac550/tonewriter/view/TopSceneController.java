@@ -602,13 +602,8 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 
-		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
-		for (int i = 0; i < tabPane.getTabs().size(); i++) {
-			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
-		}
-
 		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
-				mainControllers, paperSize);
+				getTabControllers(), paperSize);
 
 	}
 
@@ -656,8 +651,13 @@ public class TopSceneController {
 		return tabPane.getTabs().size();
 	}
 
-	public Collection<MainSceneController> getTabControllers() {
-		return tabControllerMap.values();
+	public MainSceneController[] getTabControllers() {
+		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
+		for (int i = 0; i < tabPane.getTabs().size(); i++) {
+			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
+		}
+
+		return mainControllers;
 	}
 
 	static void showNoteMenu(SyllableText syllable, Button noteButton) {

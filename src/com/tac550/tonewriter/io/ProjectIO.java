@@ -20,7 +20,7 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Add info file to save project metadata
+		// Add info file and save project metadata into it
 		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
 
@@ -32,7 +32,6 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Collect tone strings and hashes.
 		Set<String> uniqueHashes = new HashSet<>();
 
 		// Iterate through all the tabs
@@ -44,7 +43,7 @@ public class ProjectIO {
 				ToneReaderWriter toneWriter = controller.getToneWriter();
 				String toneHash = toneWriter.getToneHash();
 
-				// Save each tone file into project directory if unique.
+				// Save each unique tone file into "tones" directory.
 				if (!uniqueHashes.contains(toneHash)) {
 					uniqueHashes.add(toneHash);
 
@@ -54,16 +53,14 @@ public class ProjectIO {
 					if (ToneReaderWriter.createToneFile(toneSaveFile)) {
 						toneWriter.saveToneToFile(toneSaveFile);
 					}
-
 				}
-
-				// Place each item in a file in "items" directory named by index.
-				File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
-						+ File.separator + index);
-
-				saveItemToFile(itemSaveFile, controller);
-
 			}
+
+			// Place each item in a file in "items" directory and named by tab index.
+			File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
+					+ File.separator + index);
+
+			saveItemToFile(itemSaveFile, controller);
 
 			index++;
 		}
@@ -110,6 +107,7 @@ public class ProjectIO {
 
 		// General item metadata
 		printWriter.println(controller.getTitle() + "\t" + controller.getSubtitle());
+		printWriter.println(controller.getSelectedTitleOption().getText());
 
 		printWriter.close();
 	}
