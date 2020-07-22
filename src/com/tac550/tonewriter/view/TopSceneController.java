@@ -278,7 +278,8 @@ public class TopSceneController {
 
 	}
 	@FXML private void handleSaveProject() {
-		ProjectIO.saveProject(new File(System.getProperty("user.home") + File.separator + "Downloads"), this);
+		ProjectIO.saveProject(new File(System.getProperty("user.home") + File.separator + "Downloads"
+				+ File.separator + projectTitle + ".twproj"), this);
 	}
 	@FXML private void handleSaveProjectAs() {
 
