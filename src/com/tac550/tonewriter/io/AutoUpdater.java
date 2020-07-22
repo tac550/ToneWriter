@@ -205,7 +205,7 @@ public class AutoUpdater {
 				} catch (FailingHttpStatusCodeException e) {
 					e.printStackTrace();
 					Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Connection Error",
-							"Internet connection failure! Unable to download update.", true));
+							"Internet connection failure! Unable to download the update.", true));
 					return false;
 				} catch (IOException e) {
 					e.printStackTrace();
