@@ -580,7 +580,6 @@ public class TopSceneController {
 	}
 
 	@FXML boolean handleSetProjectTitle() {
-		ProjectIO.saveProject(new File("awrigerglnreignre"), this);
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
@@ -596,6 +595,7 @@ public class TopSceneController {
 
 		if (result.isPresent()) {
 			projectTitle = result.get();
+			ProjectIO.saveProject(new File("awrigerglnreignre"), this);
 			return true;
 		} else return false;
 	}
