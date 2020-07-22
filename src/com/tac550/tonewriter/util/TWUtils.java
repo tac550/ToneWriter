@@ -64,6 +64,7 @@ public class TWUtils {
 	 *         The result is zero if the strings are equal.
 	 */
 
+	// Used to compare LilyPond versions, not ToneWriter versions, which are comparable using floating point math.
 	public static int versionCompare(String v1, String v2) {
 
 		int v1Len = StringUtils.countMatches(v1,".");
@@ -135,6 +136,7 @@ public class TWUtils {
 						(prefix.isEmpty() ? "" : prefix + "-")).toFile();
 	}
 
+	// Cleans up all ToneWriter temp files
 	public static void cleanUpTempFiles() {
 		cleanUpTempFiles("");
 	}
