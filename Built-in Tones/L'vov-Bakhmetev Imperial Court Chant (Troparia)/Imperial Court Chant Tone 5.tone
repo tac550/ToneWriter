@@ -27,8 +27,8 @@ Final
 2: g-d-b,-g
 3: fs-d-a,-d
 END: e-b,-g,-e
-	Prep: g-d-b,-g
-	Prep: fs-d-a,-d
+	Prep: g-d-b,-d
+	Prep: fs-ds-a,-b,
 
 
 First Repeated: 
