@@ -17,6 +17,8 @@ import org.apache.commons.text.TextStringBuilder;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -67,9 +69,6 @@ public class ToneReaderWriter {
 
 		return true;
 	}
-	public void saveToneToStringWriter(StringWriter string_writer) {
-		saveToneTo(string_writer);
-	}
 
 	private void saveToneTo(Writer destination) {
 		PrintWriter printWriter = new PrintWriter(destination);
@@ -103,6 +102,32 @@ public class ToneReaderWriter {
 		printWriter.println("First Repeated: " + firstRepeated);
 
 		printWriter.close();
+	}
+
+	public String getToneString() {
+		try (StringWriter sw = new StringWriter()) {
+			saveToneTo(sw);
+			return sw.toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	public String getToneHash() {
+		StringBuilder hashBuilder = new StringBuilder();
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			// Record MD5 hash of the current tone data (what its file would contain if saved)
+			byte[] hashBytes = md.digest(getToneString().getBytes());
+			for (byte b : hashBytes)
+				hashBuilder.append(String.format("%02x", b));
+
+		} catch (NoSuchAlgorithmException e) {
+			TWUtils.showError("Platform does not support MD5 algorithm!", true);
+			return null;
+		}
+
+		return hashBuilder.toString();
 	}
 
 	public boolean loadTone(MainSceneController main_scene, File toneFile) {

@@ -43,7 +43,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -202,13 +201,13 @@ public class MainSceneController {
 
 		// Title and subtitle field tooltip info reflects current output mode
 		titleTextField.getTooltip().setOnShown(event -> {
-			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.getTabCount() == 1)
 				((Tooltip) event.getTarget()).setText("Appears on every page (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered above subtitle, appears once (Project export mode)");
 		});
 		subtitleTextField.getTooltip().setOnShown(event -> {
-			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.getTabCount() == 1)
 				((Tooltip) event.getTarget()).setText("First page only (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
@@ -689,16 +688,7 @@ public class MainSceneController {
 	void handleSaveToneAs() {
 		if (createNewTone()) handleSaveTone();
 	}
-	public String getToneString() {
-		ToneReaderWriter toneWriter = getToneWriter();
 
-		try (StringWriter sw = new StringWriter()) {
-			toneWriter.saveToneToStringWriter(sw);
-			return sw.toString();
-		} catch (IOException e) {
-			return null;
-		}
-	}
 	public ToneReaderWriter getToneWriter() {
 		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
 	}
@@ -889,7 +879,7 @@ public class MainSceneController {
 
 		ExportMode tempExportMode;
 
-		if (topSceneController.tabCount() > 1) {
+		if (topSceneController.getTabCount() > 1) {
 			ButtonType projectBT = new ButtonType("Entire project");
 			ButtonType itemBT = new ButtonType("Current item only");
 

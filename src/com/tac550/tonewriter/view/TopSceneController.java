@@ -580,7 +580,7 @@ public class TopSceneController {
 	}
 
 	@FXML boolean handleSetProjectTitle() {
-		ProjectIO.saveFile(new File("awrigerglnreignre"), this);
+		ProjectIO.saveProject(new File("awrigerglnreignre"), this);
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
@@ -652,7 +652,7 @@ public class TopSceneController {
 		return getSelectedTabScene() == controller;
 	}
 
-	public int tabCount() {
+	public int getTabCount() {
 		return tabPane.getTabs().size();
 	}
 

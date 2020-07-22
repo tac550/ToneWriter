@@ -4,26 +4,13 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController;
 import com.tac550.tonewriter.view.TopSceneController;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProjectIO {
 
-	public static boolean saveFile(File project_file, TopSceneController project_scene) {
-		// Delete previous save file, if one exists.
-		if (project_file.exists()) {
-			if (!project_file.delete()) {
-				TWUtils.showError("Failed to overwrite previous save file!"
-						+ "Do you have write permission in that location?", true);
-				return false;
-			}
-		}
-
+	public static boolean saveProject(File project_file, TopSceneController project_scene) {
 		// Create temp directory in which to construct the final compressed project file.
 		File tempDirectory;
 		try {
@@ -33,56 +20,101 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Collect tone strings and hashes.
-		Map<String, ToneReaderWriter> MD5ToToneFiles;
-		try {
-			MD5ToToneFiles = collectUniqueOpenToneData(project_scene.getTabControllers());
-		} catch (NoSuchAlgorithmException e) {
-			TWUtils.showError("Platform does not support MD5 algorithm!", true);
+		// Add info file to save project metadata
+		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
+
+			writer.write(project_scene.getProjectTitle() + "\n");
+			writer.write(project_scene.getTabCount() + "\n");
+
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create project metadata file!", true);
 			return false;
 		}
-		// Save each unique tone file into project directory.
-		MD5ToToneFiles.forEach((hash, readerWriter) -> {
-			File toneFile = new File(tempDirectory.getAbsolutePath() + File.separator + "tones"
-					+ File.separator + hash + File.separator + "Unsaved.tone");
 
-			if (ToneReaderWriter.createToneFile(toneFile)) {
-				readerWriter.saveToneToFile(toneFile);
+		// Collect tone strings and hashes.
+		Set<String> uniqueHashes = new HashSet<>();
+
+		// Iterate through all the tabs
+		int index = 0;
+		for (MainSceneController controller : project_scene.getTabControllers()) {
+			File toneFile = controller.getToneFile();
+			if (toneFile != null) { // If the tab has a tone loaded...
+
+				ToneReaderWriter toneWriter = controller.getToneWriter();
+				String toneHash = toneWriter.getToneHash();
+
+				// Save each tone file into project directory if unique.
+				if (!uniqueHashes.contains(toneHash)) {
+					uniqueHashes.add(toneHash);
+
+					File toneSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "tones"
+							+ File.separator + toneHash + File.separator + "unsaved.tone");
+
+					if (ToneReaderWriter.createToneFile(toneSaveFile)) {
+						toneWriter.saveToneToFile(toneSaveFile);
+					}
+
+				}
+
+				// Place each item in a file in "items" directory named by index.
+				File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
+						+ File.separator + index);
+
+				saveItemToFile(itemSaveFile, controller);
+
 			}
 
-		});
+			index++;
+		}
+
+		// Compress the temp directory. (and rename it?)
+
+		// Delete previous save file, if one exists.
+		if (project_file.exists()) {
+			if (!project_file.delete()) {
+				TWUtils.showError("Failed to overwrite previous save file!"
+						+ "Do you have write permission in that location?", true);
+				return false;
+			}
+		}
+
+		// Move (and rename?) temp project file to final location.
 
 		return true;
 	}
 
-	private static Map<String, ToneReaderWriter> collectUniqueOpenToneData(Collection<MainSceneController> tab_controllers)
-			throws NoSuchAlgorithmException {
-		Map<String, ToneReaderWriter> MD5ToToneString = new HashMap<>();
-
-		// Iterate through all open tabs.
-		for (MainSceneController controller : tab_controllers) {
-			File toneFile = controller.getToneFile();
-			if (toneFile != null) { // If the tab has a tone loaded...
-				MessageDigest md = MessageDigest.getInstance("MD5");
-
-				String toneString = controller.getToneString();
-
-				// Record MD5 hash of the current tone data (what its file would contain if saved)
-				byte[] hashBytes = md.digest(toneString.getBytes());
-				StringBuilder hashBuilder = new StringBuilder();
-				for (byte b : hashBytes)
-					hashBuilder.append(String.format("%02x", b));
-
-				// Map hash to the controller's ToneWriter object for easier saving later.
-				MD5ToToneString.put(hashBuilder.toString(), controller.getToneWriter());
-
+	private static void saveItemToFile(File save_file, MainSceneController controller) {
+		try {
+			// Create new file
+			if (save_file.getParentFile().mkdirs() || save_file.getParentFile().exists()) {
+				if (!save_file.createNewFile())
+					throw new IOException("File creation failed");
+			} else {
+				throw new IOException("Directory creation failed");
 			}
-		}
 
-		return MD5ToToneString;
+			// Save to the file
+			FileWriter fileWriter = new FileWriter(save_file);
+			saveItemTo(fileWriter, controller);
+			fileWriter.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to save item \"" + controller.getTitle() + "\"", false);
+		}
 	}
 
-	public static boolean openFile(File project_file) {
+	private static void saveItemTo(Writer destination, MainSceneController controller) {
+		PrintWriter printWriter = new PrintWriter(destination);
+
+		// General item metadata
+		printWriter.println(controller.getTitle() + "\t" + controller.getSubtitle());
+
+		printWriter.close();
+	}
+
+	public static boolean openProject(File project_file) {
 
 		return true;
 	}
