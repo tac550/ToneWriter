@@ -108,7 +108,7 @@ public class ChantLineViewController implements CommentableView {
 		// First repeated line status should not be available for "prime" lines
 		nameChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
 			if (new_val.equals(0)) {
-				if (!nameChoice.getItems().get(0).equals("A")) {
+				if (!nameChoice.getItems().get(0).endsWith("A")) {
 					setFirstRepeatedAvailable(true);
 				}
 			} else {
@@ -176,12 +176,8 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	private void setFirstRepeatedAvailable(boolean available) {
-		if (available) {
-			firstRepeatedButton.setDisable(false);
-		} else {
-			resetFRState();
-			firstRepeatedButton.setDisable(true);
-		}
+		resetFRState();
+		firstRepeatedButton.setDisable(!available);
 	}
 	private void decideSelection(int previousSelection) {
 		
