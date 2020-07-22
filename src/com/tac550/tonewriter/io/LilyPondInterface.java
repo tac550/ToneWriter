@@ -111,7 +111,7 @@ public class LilyPondInterface {
 
 		// Copy the render template file to the output path.
 		try {
-			TWUtils.exportIOResource("outputTemplate.ly", lilypondFile);
+			TWUtils.exportFSResource("outputTemplate.ly", lilypondFile);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -123,7 +123,7 @@ public class LilyPondInterface {
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitleIfNotHidden() + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -148,7 +148,7 @@ public class LilyPondInterface {
 
 			// Score header
 			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitle()),
+					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitleIfNotHidden()),
 					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
 					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
 					String.format("    opus = \"%s\"", item.getRightHeaderText()),
@@ -856,7 +856,7 @@ public class LilyPondInterface {
 			// Create the temporary file to hold the lilypond markup
 			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
 
-			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
+			TWUtils.exportFSResource("chordTemplate.ly", tempFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

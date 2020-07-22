@@ -476,7 +476,7 @@ public class MainSceneController {
 	/*
 	 * Returns false if the user chooses cancel or closes. This should halt any impending file related functions.
 	 */
-	boolean checkSave() {
+	boolean checkSaveTone() {
 		if (toneFile == null
 				|| !toneEdited
 				|| !isToneSavable()) {
@@ -643,7 +643,7 @@ public class MainSceneController {
 	 * Tone Menu Actions
 	 */
 	void handleNewTone() {
-		if (checkSave() && createNewTone()) {
+		if (checkSaveTone() && createNewTone()) {
 			clearChantLines();
 			menuState.editMenuDisabled = false;
 			menuState.saveToneAsMenuItemDisabled = false;
@@ -659,7 +659,7 @@ public class MainSceneController {
 	}
 	void handleOpenTone(File selectedFile, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSave()) && loadTone(selectedFile, selectHideToneHeader)) {
+		if ((auto_load || checkSaveTone()) && loadTone(selectedFile, selectHideToneHeader)) {
 			menuState.editMenuDisabled = false;
 			menuState.saveToneMenuItemDisabled = false;
 			menuState.saveToneAsMenuItemDisabled = false;
@@ -1027,6 +1027,9 @@ public class MainSceneController {
 	public void setTopVerse(String verse) {
 		topVerseField.setText(verse);
 	}
+	public String getVerseAreaText() {
+		return verseArea.getText();
+	}
 	public String getBottomVerseChoice() {
 		return bottomVerseChoice.getValue();
 	}
@@ -1045,14 +1048,17 @@ public class MainSceneController {
 	public RadioMenuItem getSelectedTitleOption() {
 		return (RadioMenuItem) titleOptions.getSelectedToggle();
 	}
-	boolean getHideToneHeader() {
+	public boolean getHideToneHeader() {
 		return hideToneHeaderMenuItem.isSelected();
 	}
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
-	public String getTitle() {
+	public String getTitleIfNotHidden() {
 		return hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText();
+	}
+	public String getTitle() {
+		return titleTextField.getText();
 	}
 	public String getSubtitle() {
 		return subtitleTextField.getText();

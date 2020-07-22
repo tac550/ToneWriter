@@ -228,7 +228,7 @@ public class MainApp extends Application {
 		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
 
 		try {
-			TWUtils.exportIOResource("chordTemplate.ly", lilypondFile);
+			TWUtils.exportFSResource("chordTemplate.ly", lilypondFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

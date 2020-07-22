@@ -7,6 +7,8 @@ import com.tac550.tonewriter.view.TopSceneController;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
@@ -38,10 +40,11 @@ public class ProjectIO {
 		int index = 0;
 		for (MainSceneController controller : project_scene.getTabControllers()) {
 			File toneFile = controller.getToneFile();
+			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
 
 				ToneReaderWriter toneWriter = controller.getToneWriter();
-				String toneHash = toneWriter.getToneHash();
+				toneHash = toneWriter.getToneHash();
 
 				// Save each unique tone file into "tones" directory.
 				if (!uniqueHashes.contains(toneHash)) {
@@ -60,12 +63,10 @@ public class ProjectIO {
 			File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
 					+ File.separator + index);
 
-			saveItemToFile(itemSaveFile, controller);
+			saveItemToFile(itemSaveFile, controller, toneHash);
 
 			index++;
 		}
-
-		// Compress the temp directory. (and rename it?)
 
 		// Delete previous save file, if one exists.
 		if (project_file.exists()) {
@@ -76,12 +77,33 @@ public class ProjectIO {
 			}
 		}
 
-		// Move (and rename?) temp project file to final location.
+        // Compress the temp directory and save to the final location.
+        try (FileOutputStream fos = new FileOutputStream(project_file);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
 
-		return true;
+            byte[] buffer = new byte[1024];
+
+            for (String filePath : TWUtils.generateFileList(tempDirectory)) {
+                ZipEntry ze = new ZipEntry(filePath.substring(tempDirectory.getAbsolutePath().length() + 1));
+                zos.putNextEntry(ze);
+                try (FileInputStream in = new FileInputStream(filePath)) {
+                    int len;
+                    while ((len = in.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            TWUtils.showError("Failed to compress and save project file!", true);
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
 	}
 
-	private static void saveItemToFile(File save_file, MainSceneController controller) {
+	private static void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
 		try {
 			// Create new file
 			if (save_file.getParentFile().mkdirs() || save_file.getParentFile().exists()) {
@@ -93,7 +115,7 @@ public class ProjectIO {
 
 			// Save to the file
 			FileWriter fileWriter = new FileWriter(save_file);
-			saveItemTo(fileWriter, controller);
+			saveItemTo(fileWriter, controller, tone_hash);
 			fileWriter.close();
 
 		} catch (IOException e) {
@@ -102,12 +124,21 @@ public class ProjectIO {
 		}
 	}
 
-	private static void saveItemTo(Writer destination, MainSceneController controller) {
+	private static void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) {
 		PrintWriter printWriter = new PrintWriter(destination);
 
-		// General item metadata
-		printWriter.println(controller.getTitle() + "\t" + controller.getSubtitle());
-		printWriter.println(controller.getSelectedTitleOption().getText());
+		// General item data
+		File toneFile = controller.getToneFile();
+		printWriter.println(toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
+        printWriter.println(tone_hash); // Tone hash (may be empty if no tone loaded)
+		printWriter.println(controller.getTitle() + "\t" + controller.getSubtitle()); // Title + subtitle
+		printWriter.println(controller.getSelectedTitleOption().getText() + "\t" + controller.getHideToneHeader()
+                + "\t" + controller.getPageBreak()); // Options line
+        printWriter.println(controller.getTopVerseChoice() + "\t" + controller.getTopVerse()); // Top verse
+        printWriter.println(controller.getVerseAreaText()); // Verse area text
+        printWriter.println(controller.getBottomVerseChoice() + "\t" + controller.getBottomVerse()); // Bottom verse
+
+        // Syllables and assignment data
 
 		printWriter.close();
 	}

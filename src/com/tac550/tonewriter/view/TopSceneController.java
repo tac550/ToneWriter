@@ -262,7 +262,7 @@ public class TopSceneController {
 		menu_item.setGraphic(imageView);
 	}
 
-	private void setPaperSize(String size) {
+	private void setDefaultPaperSize(String size) {
 		paperSize = size;
 
 		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
@@ -271,6 +271,18 @@ public class TopSceneController {
 	/*
 	 * Project Menu Actions
 	 */
+	@FXML private void handleNewProject() {
+
+	}
+	@FXML private void handleOpenProject() {
+
+	}
+	@FXML private void handleSaveProject() {
+		ProjectIO.saveProject(new File(System.getProperty("user.home") + File.separator + "Downloads"), this);
+	}
+	@FXML private void handleSaveProjectAs() {
+
+	}
 	@FXML private void handleExport() {
 		getSelectedTabScene().handleExport();
 	}
@@ -321,7 +333,7 @@ public class TopSceneController {
 	@FXML private void handleResetLilyPondDir() {
 		MainApp.resetLilyPondDir(false);
 	}
-	@FXML private void handleSetPaperSize() {
+	@FXML private void handleSetDefaultPaperSize() {
 		List<String> choices = new ArrayList<>();
 
 		choices.add("a4 (210 x 297 mm)");
@@ -334,12 +346,12 @@ public class TopSceneController {
 		choices.add("17x11 (17.0 x 11.0 in)");
 
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
-		dialog.setTitle("Paper sizes");
-		dialog.setHeaderText("Choose a paper size");
+		dialog.setTitle("Default Paper Size");
+		dialog.setHeaderText("Set the default paper size");
 		dialog.initOwner(parentStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(this::setPaperSize);
+		result.ifPresent(this::setDefaultPaperSize);
 	}
 	@FXML private void handleResetMidi() {
 		MidiInterface.resetMidiSystem();
@@ -400,7 +412,7 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSave()) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSaveTone()) {
 					event.consume();
 				} else {
 					cleanUpTabForRemoval(tab);
@@ -563,7 +575,7 @@ public class TopSceneController {
 			double prevPosition = controller.getDividerPosition();
 			controller.setDividerPosition(1.0);
 
-			boolean saveCancelled = !controller.checkSave();
+			boolean saveCancelled = !controller.checkSaveTone();
 
 			controller.setDividerPosition(prevPosition);
 
@@ -595,7 +607,6 @@ public class TopSceneController {
 
 		if (result.isPresent()) {
 			projectTitle = result.get();
-			ProjectIO.saveProject(new File("awrigerglnreignre"), this);
 			return true;
 		} else return false;
 	}

@@ -16,9 +16,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class TWUtils {
 
@@ -46,9 +44,6 @@ public class TWUtils {
     }
 
 	// Strings
-//	public static int countOccurrences(String string, String single_character) {
-//		return string.length() - string.replace(single_character, "").length();
-//	}
 
 	/**
 	 * Compares two version strings.
@@ -117,7 +112,7 @@ public class TWUtils {
 		return -1;
 	}
 
-	// I/O
+	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -160,7 +155,7 @@ public class TWUtils {
 	}
 
 	// Copies file from io package to an external location.
-	public static void exportIOResource(String resource_name, File out_file) throws Exception {
+	public static void exportFSResource(String resource_name, File out_file) throws Exception {
 		InputStream stream = null;
 		OutputStream resStreamOut = null;
 		try {
@@ -184,6 +179,25 @@ public class TWUtils {
 			}
 		}
 
+	}
+
+	// Recursively traverse directories to return a list of all (non-directory) files contained within root_dir.
+	public static List<String> generateFileList(File root_dir) {
+		List<String> fileList = new ArrayList<>();
+		generateFileList(fileList, root_dir);
+		return fileList;
+	}
+	private static void generateFileList(List<String> file_list, File node) {
+		if (node.isFile()) {
+			file_list.add(node.getAbsolutePath());
+		}
+
+		if (node.isDirectory()) {
+			String[] subNode = node.list();
+			for (String filename : Objects.requireNonNull(subNode)) {
+				generateFileList(file_list, new File(node, filename));
+			}
+		}
 	}
 
 	// UI
