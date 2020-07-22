@@ -155,33 +155,27 @@ public class ToneReaderWriter {
 
 				return false;
 			}
-			
+
 			// Loading chant lines
 			if (chantLineStrings != null) {
-				int i;
-				for (i = 0; i < chantLineStrings.length; i++) {
-					if (i < chantLines.size()) {
-						if (!chantLines.get(i).toString().replaceAll("\\s+","")
-								.equals(chantLineStrings[i].replaceAll("\\s+",""))) {
-							// If the lines are identical we do nothing.
-							if (chantLines.get(i).isSimilarTo(chantLineStrings[i])) {
-								// Don't reload any GUI if chant line is similar
-								readChantLine(i, chantLineStrings[i], chantLines.get(i));
-							} else {
-								// Replace old chant line if not similar
-								mainScene.removeChantLine(chantLines.get(i));
-								readChantLine(i, chantLineStrings[i]);
-							}
+
+				if (tonesSimilar(chantLineStrings)) { // Tones have same structure; don't reload any UI
+					for (int i = 0; i < chantLineStrings.length; i++) {
+						if (!chantLines.get(i).toString().replaceAll("\\s+", "")
+								.equals(chantLineStrings[i].replaceAll("\\s+", ""))) {
+							// If the lines are not identical, modify to match new values.
+							modifyChantLine(chantLineStrings[i], chantLines.get(i));
 						}
-					} else {
-						// If we're out of existing chant lines, make new ones instead.
-						readChantLine(i, chantLineStrings[i]);
+					}
+
+				} else { // Tones don't have same structure; do a full reload.
+					main_scene.clearChantLines();
+
+					for (int i = 0; i < chantLineStrings.length; i++) {
+						loadChantLine(i, chantLineStrings[i]);
 					}
 				}
-				// Remove any leftover chant lines
-				for (; i < chantLines.size(); i++) {
-					mainScene.removeChantLine(chantLines.get(i));
-				}
+
 			} else {
 				// No chant lines found in file
 				mainScene.clearChantLines();
@@ -208,6 +202,21 @@ public class ToneReaderWriter {
 		return true;
 	}
 
+	private boolean tonesSimilar(String[] new_lines) {
+		if (new_lines.length != chantLines.size())
+			return false;
+
+		int i = 0;
+		for (String line : new_lines) {
+			if (!chantLines.get(i).isSimilarTo(line))
+				return false;
+
+			i++;
+		}
+
+		return true;
+	}
+
 	private String tryReadingLine(String[] section, int line_index, String default_value) {
 
 		if (line_index < section.length && section[line_index].contains(":")) {
@@ -220,25 +229,20 @@ public class ToneReaderWriter {
 		return default_value;
 	}
 
-	private void readChantLine(int index, String chantLine) throws IOException {
-		readChantLine(index, chantLine, null);
-	}
+	// TODO: Clean this and following method to reduce repetition
+	private void loadChantLine(int index, String chant_line) throws IOException {
 
-	private void readChantLine(int index, String chantLine, ChantLineViewController similar) throws IOException {
-
-		ChantLineViewController currentChantLine = similar;
-		Scanner chantLineScanner = new Scanner(chantLine);
+		ChantLineViewController currentChantLine = null;
+		Scanner chantLineScanner = new Scanner(chant_line);
 		String chantLineLine;
 
-		if (currentChantLine == null) { // No similar chant line provided
-			Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(index, false);
-			try {
-				currentChantLine = currentChantLineLoader.get().getController();
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
-			assert currentChantLine != null;
+		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(index, false);
+		try {
+			currentChantLine = currentChantLineLoader.get().getController();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
 		}
+		assert currentChantLine != null;
 
 		// Name / CL type parsing
 		String chantLineName = chantLineScanner.nextLine();
@@ -248,12 +252,7 @@ public class ToneReaderWriter {
 			currentChantLine.makeAlternate();
 		}
 
-		// For building new chant line
 		ChantChordController currentMainChord = null;
-		// For similar chant line replacement
-		int assigning = 0;
-		String[] mainChord = null;
-		Stack<String[]> postChords = new Stack<>();
 
 		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
 			// Apply chant line comment
@@ -268,83 +267,89 @@ public class ToneReaderWriter {
 			String fields = chordData[1];
 			String comment = extractComment(chordData, 2);
 
-			if (similar == null) {
-				// Add the appropriate chord type.
-				if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
-					currentMainChord = currentChantLine.addRecitingChord();
-					currentMainChord.setFields(fields);
-					currentMainChord.setComment(comment);
-				} else if (chantLineLine.contains("Post")) {
-					assert currentMainChord != null;
-					PostChord postChord = null;
-					if (currentMainChord instanceof RecitingChord rMainChord)
-						postChord = rMainChord.addPostChord(fields);
-					assert postChord != null;
-					postChord.setComment(comment);
-				} else if (chantLineLine.contains("Prep")) {
-					assert currentMainChord != null;
-					PrepChord prepChord;
-					if (currentMainChord instanceof EndChord eMainChord)
-						prepChord = eMainChord.addPrepChord(fields);
-					else
-						prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
-					assert prepChord != null;
-					prepChord.setComment(comment);
-				} else if (chantLineLine.contains("END")) {
-					currentMainChord = currentChantLine.addEndChord();
-					currentMainChord.setFields(fields);
-					currentMainChord.setComment(comment);
-				}
-			} else { // TODO: Needs serious cleanup
-
-				if (!chantLineLine.startsWith("\t")) {
-					if (mainChord != null) {
-						currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
-						currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
-						assigning++;
-					}
-					while (!postChords.isEmpty()) {
-						String[] postChord = postChords.pop();
-						currentChantLine.getChords().get(assigning).setFields(postChord[0]);
-						currentChantLine.getChords().get(assigning).setComment(postChord[1]);
-						assigning++;
-					}
-					mainChord = new String[] {fields, comment};
-				} else if (chantLineLine.contains("Prep")) {
-					currentChantLine.getChords().get(assigning).setFields(fields);
-					currentChantLine.getChords().get(assigning).setComment(comment);
-					assigning++;
-				} else if (chantLine.contains("Post")) {
-					if (mainChord != null) {
-						currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
-						currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
-						assigning++;
-
-						mainChord = null;
-					}
-
-					postChords.push(new String[] {fields, comment});
-				}
-
-
-			}
-		}
-
-		if (similar != null) {
-			if (mainChord != null) {
-				currentChantLine.getChords().get(assigning).setFields(mainChord[0]);
-				currentChantLine.getChords().get(assigning).setComment(mainChord[1]);
-				assigning++;
-			}
-			while (!postChords.isEmpty()) {
-				String[] postChord = postChords.pop();
-				currentChantLine.getChords().get(assigning).setFields(postChord[0]);
-				currentChantLine.getChords().get(assigning).setComment(postChord[1]);
-				assigning++;
+			// Add the appropriate chord type.
+			if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
+				currentMainChord = currentChantLine.addRecitingChord();
+				currentMainChord.setFields(fields);
+				currentMainChord.setComment(comment);
+			} else if (chantLineLine.contains("Post")) {
+				assert currentMainChord != null;
+				PostChord postChord = null;
+				if (currentMainChord instanceof RecitingChord rMainChord)
+					postChord = rMainChord.addPostChord(fields);
+				assert postChord != null;
+				postChord.setComment(comment);
+			} else if (chantLineLine.contains("Prep")) {
+				assert currentMainChord != null;
+				PrepChord prepChord;
+				if (currentMainChord instanceof EndChord eMainChord)
+					prepChord = eMainChord.addPrepChord(fields);
+				else
+					prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
+				assert prepChord != null;
+				prepChord.setComment(comment);
+			} else if (chantLineLine.contains("END")) {
+				currentMainChord = currentChantLine.addEndChord();
+				currentMainChord.setFields(fields);
+				currentMainChord.setComment(comment);
 			}
 		}
 
 		chantLineScanner.close();
+	}
+
+	private void modifyChantLine(String chant_line, ChantLineViewController existing_line) {
+		Scanner chantLineScanner = new Scanner(chant_line);
+		String chantLineLine;
+
+		int assigning = 0;
+		String[] mainChord = null;
+		Stack<String[]> postChords = new Stack<>();
+
+		chantLineScanner.nextLine(); // Skip over name line
+
+		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+			// Apply chant line comment
+			if (chantLineLine.startsWith("Comment: ")) {
+				String[] commentData = chantLineLine.split(": ");
+				existing_line.setComment(extractComment(commentData, 1));
+
+				continue;
+			}
+
+			String[] chordData = chantLineLine.split(": ");
+			String fields = chordData[1];
+			String comment = extractComment(chordData, 2);
+
+			if (!chantLineLine.startsWith("\t")) {
+				if (mainChord != null) {
+					existing_line.getChords().get(assigning).setFields(mainChord[0]);
+					existing_line.getChords().get(assigning).setComment(mainChord[1]);
+					assigning++;
+				}
+				while (!postChords.isEmpty()) {
+					String[] postChord = postChords.pop();
+					existing_line.getChords().get(assigning).setFields(postChord[0]);
+					existing_line.getChords().get(assigning).setComment(postChord[1]);
+					assigning++;
+				}
+				mainChord = new String[]{fields, comment};
+			} else if (chantLineLine.contains("Prep")) {
+				existing_line.getChords().get(assigning).setFields(fields);
+				existing_line.getChords().get(assigning).setComment(comment);
+				assigning++;
+			} else if (chant_line.contains("Post")) {
+				if (mainChord != null) {
+					existing_line.getChords().get(assigning).setFields(mainChord[0]);
+					existing_line.getChords().get(assigning).setComment(mainChord[1]);
+					assigning++;
+
+					mainChord = null;
+				}
+
+				postChords.push(new String[]{fields, comment});
+			}
+		}
 	}
 
 	private String extractComment(String[] split_input, int comment_start_offset) {
