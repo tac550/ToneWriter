@@ -125,18 +125,19 @@ public class ChantLineViewController implements CommentableView {
 	
 	void setName(char new_letter, boolean previous_is_prime, int next_alternate) {
 		int previousSelection = nameChoice.getSelectionModel().getSelectedIndex();
-		if (new_letter == 'A' || previous_is_prime) {
+		if (new_letter == 'A') {
 			nameChoice.setItems(FXCollections.observableArrayList(
-					"Phrase " + new_letter)
-				);
+					"Phrase " + new_letter));
 			
 			setFirstRepeatedAvailable(false);
 			upButton.setDisable(true);
+		} else if (previous_is_prime) {
+			nameChoice.setItems(FXCollections.observableArrayList(
+					"Phrase " + new_letter));
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
 				    "Phrase " + new_letter, --new_letter + "'",
-					new_letter + " alternate " + next_alternate)
-				);
+					new_letter + " alternate " + next_alternate));
 			
 			setFirstRepeatedAvailable(true);
 			upButton.setDisable(false);
