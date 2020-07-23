@@ -23,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -79,7 +80,8 @@ public class TopSceneController {
 	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
-	private String projectTitle = "";
+	private File projectFile;
+	private String projectTitle = "Unnamed Project";
 
 	String paperSize = "";
 
@@ -278,10 +280,29 @@ public class TopSceneController {
 
 	}
 	@FXML private void handleSaveProject() {
-		ProjectIO.saveProject(new File(System.getProperty("user.home") + File.separator + "Downloads"
-				+ File.separator + projectTitle + ".twproj"), this);
+		if (projectFile != null)
+			ProjectIO.saveProject(projectFile, this);
+		else
+			handleSaveProjectAs();
 	}
 	@FXML private void handleSaveProjectAs() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName(projectTitle + ".twproj");
+		if (projectFile != null)
+			fileChooser.setInitialDirectory(projectFile.getParentFile());
+		else
+			fileChooser.setInitialDirectory(projectSavingDirectory);
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
+		File saveFile = fileChooser.showSaveDialog(parentStage);
+		if (saveFile == null) return;
+
+		if (!saveFile.getName().endsWith(".twproj")) {
+			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
+		}
+
+		if (ProjectIO.saveProject(saveFile, this)) {
+			projectFile = saveFile;
+		}
 
 	}
 	@FXML private void handleExport() {

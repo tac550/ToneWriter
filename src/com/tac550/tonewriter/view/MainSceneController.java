@@ -507,12 +507,14 @@ public class MainSceneController {
 
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName(".tone");
 		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
-		if (toneFile != null && isToneSavable()) {
+		if (toneFile != null && isToneSavable())
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
-		} else {
-			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
-		}
+		else
+			fileChooser.setInitialDirectory(MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+					: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return false;
