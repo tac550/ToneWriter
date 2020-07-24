@@ -474,21 +474,18 @@ public class MainSceneController {
 	}
 
 	/*
-	 * Returns false if the user chooses cancel or closes. This should halt any impending file related functions.
+	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
 	 */
 	boolean checkSaveTone() {
-		if (toneFile == null
-				|| !toneEdited
-				|| !isToneSavable()) {
+		if (toneFile == null || !toneEdited || !isToneSavable())
 			return true;
-		}
 
 		ButtonType saveButton = new ButtonType("Save");
 		ButtonType dontSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
-		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
-				"Save changes to \"" + toneFile.getName() + "\"?", true, parentStage,
+		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Tone Save Confirmation",
+				"Save changes to tone \"" + toneFile.getName() + "\"?", true, parentStage,
 				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
 
 		if (result.isPresent()) {
@@ -586,8 +583,12 @@ public class MainSceneController {
 
 	void updateStageTitle() {
 		if (topSceneController.isActiveTab(this)) {
+			String projectTitle = topSceneController.getProjectTitle();
 			// Update stage title to show loaded tone name and edit status
-			parentStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
+			parentStage.setTitle((topSceneController.getProjectEdited() ? "*" : "")
+					+ (!projectTitle.isEmpty() ? topSceneController.getProjectTitle() + " - " : "")
+					+ MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : "")
+					+ (toneEdited ? "*" : ""));
 		}
 	}
 
@@ -982,13 +983,15 @@ public class MainSceneController {
 			toneEdited = true;
 			updateStageTitle();
 		}
+
+		topSceneController.projectEdited();
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
 	}
-	boolean isToneUnedited() {
-		return !toneEdited;
+	boolean getToneEdited() {
+		return toneEdited;
 	}
 
 	void verseEdited() {

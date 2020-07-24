@@ -162,7 +162,7 @@ public class MainApp extends Application {
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest(ev -> topSceneController.requestExit(ev));
+		mainStage.setOnCloseRequest(ev -> topSceneController.requestClose(ev));
 
 		// Show the stage (required for the next operation to work)
 		mainStage.show();

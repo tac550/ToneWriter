@@ -23,10 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -73,6 +70,8 @@ public class TopSceneController {
 	static final String headerIconPath = "/media/profile.png";
 	static final String keyIconPath = "/media/key.png";
 	static final String bookIconPath = "/media/book.png";
+
+	private boolean projectEdited = true;
 
 	// File names and directories are kept separately to make exporting multiple items with the same name
 	// and different extensions easier.
@@ -236,6 +235,7 @@ public class TopSceneController {
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
 			MainSceneController selectedController = getSelectedTabScene();
+			if (selectedController == null) return;
 			selectedController.updateStageTitle();
 			selectedController.applyMenuState();
 		});
@@ -274,6 +274,19 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML private void handleNewProject() {
+		// Open new project in existing window
+		Event event = new Event(null, null, null);
+		requestClose(event);
+		if (event.isConsumed())
+			return;
+
+		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
+			forceCloseTab(tab);
+
+		projectTitle = "Unnamed Project";
+		projectFile = null;
+
+		addTab();
 
 	}
 	@FXML private void handleOpenProject() {
@@ -309,9 +322,8 @@ public class TopSceneController {
 		getSelectedTabScene().handleExport();
 	}
 	@FXML private void handleExit() {
-		Event event = new Event(null, null, null);
-		requestExit(event);
-		if (!event.isConsumed()) Platform.exit();
+		Window window = parentStage.getScene().getWindow();
+		window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
 
 	/*
@@ -436,8 +448,6 @@ public class TopSceneController {
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
 				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSaveTone()) {
 					event.consume();
-				} else {
-					cleanUpTabForRemoval(tab);
 				}
 
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
@@ -537,16 +547,20 @@ public class TopSceneController {
 		});
 	}
 
+	private void forceCloseTab(Tab tab) {
+		cleanUpTabForRemoval(tab);
+		tabPane.getTabs().remove(tab);
+	}
 	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
 		EventHandler<Event> handler = tab.getOnCloseRequest();
-		if (handler != null) {
-			Event event = new Event(null, null, null);
-			handler.handle(event);
-			if (event.isConsumed()) return;
-		}
+		Event event = new Event(null, null, null);
+		handler.handle(event);
+		if (event.isConsumed())
+			return;
 
+		cleanUpTabForRemoval(tab);
 		tabPane.getTabs().remove(tab);
 	}
 	void closeSelectedTab() {
@@ -568,6 +582,14 @@ public class TopSceneController {
 		return projectTitle;
 	}
 
+	void projectEdited() {
+		projectEdited = true;
+	}
+
+	boolean getProjectEdited() {
+		return projectEdited;
+	}
+
 	void setMenuState(MenuState menu_state) {
 		editMenu.setDisable(menu_state.editMenuDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
@@ -586,12 +608,43 @@ public class TopSceneController {
 		return hoverHighlightMenuItem.isSelected();
 	}
 
-	void requestExit(Event ev) {
+	void requestClose(Event ev) {
+		if (!checkSaveProject() || !checkAllToneSaves()) {
+			ev.consume();
+		}
+	}
+
+	/*
+	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
+	 */
+	private boolean checkSaveProject() {
+		if (!projectEdited)
+			return true;
+
+		ButtonType saveButton = new ButtonType("Save");
+		ButtonType dontSaveButton = new ButtonType("Don't Save");
+		ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+		Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Project Save Confirmation",
+				"Save changes to project \"" + projectTitle + "\"?", true, parentStage,
+				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
+
+		if (result.isPresent()) {
+			if (result.get() == saveButton) {
+				handleSaveProject();
+				return true;
+			} else return result.get() == dontSaveButton;
+		} else {
+			// Not returning true, so no save will occur and the prompt will appear again next time.
+			return false;
+		}
+	}
+
+	boolean checkAllToneSaves() {
 		Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
 
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
-			if (controller.isToneUnedited()) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();
@@ -602,15 +655,14 @@ public class TopSceneController {
 			controller.setDividerPosition(prevPosition);
 
 			if (saveCancelled) {
-				ev.consume();
-				break;
-			} else if (controller.isToneUnedited()) {
+				tabPane.getSelectionModel().select(prevTab);
+				return false;
+			} else if (!controller.getToneEdited()) { // The user selected Save; update other open instances.
 				refreshToneInstances(controller.getToneFile(), controller);
 			}
-
 		}
 
-		tabPane.getSelectionModel().select(prevTab);
+		return true;
 	}
 
 	@FXML boolean handleSetProjectTitle() {
