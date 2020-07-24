@@ -3,6 +3,7 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController;
 import com.tac550.tonewriter.view.TopSceneController;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.HashSet;
@@ -100,7 +101,14 @@ public class ProjectIO {
             return false;
         }
 
-        return true;
+        // Try to delete the temporary directory created in the proecess
+		try {
+			FileUtils.deleteDirectory(tempDirectory);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return true;
 	}
 
 	private static void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
