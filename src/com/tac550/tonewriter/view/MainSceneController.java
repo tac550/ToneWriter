@@ -4,7 +4,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
-import com.tac550.tonewriter.model.MenuState;
+import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
@@ -101,7 +101,7 @@ public class MainSceneController {
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 	@FXML private CheckMenuItem pageBreakMenuItem;
 
-	private final MenuState menuState = new MenuState();
+	private final ToneMenuState toneMenuState = new ToneMenuState();
 
 	private Robot robot;
 
@@ -529,10 +529,10 @@ public class MainSceneController {
 		if (ToneReaderWriter.createToneFile(saveFile)) {
 			toneFile = saveFile;
 
-			menuState.saveToneMenuItemDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-			menuState.editMenuDisabled = false;
-			applyMenuState();
+			toneMenuState.saveToneMenuItemDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.editMenuDisabled = false;
+			applyToneMenuState();
 
 			return true;
 		} else {
@@ -598,11 +598,11 @@ public class MainSceneController {
 		}
 	}
 
-	void applyMenuState() {
-		topSceneController.setMenuState(menuState);
+	void applyToneMenuState() {
+		topSceneController.setMenuState(toneMenuState);
 
-		openToneHintPane.setVisible(menuState.editMenuDisabled);
-		openToneHintPane.setMouseTransparent(!menuState.editMenuDisabled);
+		openToneHintPane.setVisible(toneMenuState.editMenuDisabled);
+		openToneHintPane.setMouseTransparent(!toneMenuState.editMenuDisabled);
 	}
 
 	/*
@@ -657,13 +657,13 @@ public class MainSceneController {
 	void handleNewTone() {
 		if (checkSaveTone() && createNewTone()) {
 			clearChantLines();
-			menuState.editMenuDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.editMenuDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
 			setHeaderText("", "");
 			keySignature = "C major";
-			menuState.manualCLAssignmentSelected = false;
+			toneMenuState.manualCLAssignmentSelected = false;
 
 			Task<FXMLLoader> loaderTask = createChantLine(0, true);
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
@@ -672,13 +672,13 @@ public class MainSceneController {
 	void handleOpenTone(File selectedFile, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((auto_load || checkSaveTone()) && loadTone(selectedFile, selectHideToneHeader)) {
-			menuState.editMenuDisabled = false;
-			menuState.saveToneMenuItemDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-			menuState.saveToneMenuItemDisabled = !isToneSavable();
+			toneMenuState.editMenuDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = !isToneSavable();
 
 			resetToneEditedStatus();
-			applyMenuState();
+			applyToneMenuState();
 
 			if (exportMode == ExportMode.ITEM)
 				exportMode = ExportMode.NONE;
@@ -804,8 +804,8 @@ public class MainSceneController {
 		return topSceneController.manualCLAssignmentEnabled();
 	}
 	public void setManualCLAssignmentSilently(boolean enable) { // Doesn't trigger tone edited status
-		menuState.manualCLAssignmentSelected = enable;
-		topSceneController.setMenuState(menuState);
+		toneMenuState.manualCLAssignmentSelected = enable;
+		topSceneController.setMenuState(toneMenuState);
 	}
 
 	private void refreshChordKeySignatures(String key) {

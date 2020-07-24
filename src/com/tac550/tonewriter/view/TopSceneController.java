@@ -1,7 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
-import com.tac550.tonewriter.model.MenuState;
+import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
@@ -237,7 +237,7 @@ public class TopSceneController {
 			MainSceneController selectedController = getSelectedTabScene();
 			if (selectedController == null) return;
 			selectedController.updateStageTitle();
-			selectedController.applyMenuState();
+			selectedController.applyToneMenuState();
 		});
 
 		// Add button initialization
@@ -590,7 +590,7 @@ public class TopSceneController {
 		return projectEdited;
 	}
 
-	void setMenuState(MenuState menu_state) {
+	void setMenuState(ToneMenuState menu_state) {
 		editMenu.setDisable(menu_state.editMenuDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
 		saveToneAsMenuItem.setDisable(menu_state.saveToneAsMenuItemDisabled);
