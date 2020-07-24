@@ -17,17 +17,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
@@ -37,7 +32,7 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -82,6 +77,9 @@ public class MainSceneController {
 	private TopSceneController topSceneController;
 
 	@FXML private SplitPane mainSplitPane;
+
+	@FXML private StackPane openToneHintPane;
+	@FXML private Button openToneHintButton;
 
 	@FXML private ChoiceBox<String> topVerseChoice;
 	@FXML private TextField topVerseField;
@@ -215,6 +213,10 @@ public class MainSceneController {
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
 		});
 
+		// Set up the stack pane to behave like the whole thing extends the clickable area of the button.
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_ENTERED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#57969c, #61a2b1);"));
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_EXITED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#61a2b1, #61b0b1);"));
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> openToneHintButton.fire());
 	}
 
 	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
@@ -391,6 +393,10 @@ public class MainSceneController {
 	private void clearVerseLines() {
 		verseLineControllers.clear();
 		verseLineBox.getChildren().clear();
+	}
+
+	@FXML private void handleOpenToneHint() {
+		handleOpenTone(null, false, false);
 	}
 
 	@FXML private void handleSetVerse() {
@@ -594,6 +600,9 @@ public class MainSceneController {
 
 	void applyMenuState() {
 		topSceneController.setMenuState(menuState);
+
+		openToneHintPane.setVisible(menuState.editMenuDisabled);
+		openToneHintPane.setMouseTransparent(!menuState.editMenuDisabled);
 	}
 
 	/*
