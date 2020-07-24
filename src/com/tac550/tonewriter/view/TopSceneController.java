@@ -681,6 +681,7 @@ public class TopSceneController {
 
 		if (result.isPresent()) {
 			projectTitle = result.get();
+			getSelectedTabScene().updateStageTitle();
 			return true;
 		} else return false;
 	}
