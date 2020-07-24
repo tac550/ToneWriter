@@ -293,12 +293,16 @@ public class TopSceneController {
 
 	}
 	@FXML private void handleSaveProject() {
-		if (projectFile != null)
-			ProjectIO.saveProject(projectFile, this);
-		else
-			handleSaveProjectAs();
+		if (projectFile != null) {
+			if (!ProjectIO.saveProject(projectFile, this))
+				return;
+		} else {
+			if (!handleSaveProjectAs())
+				return;
+		}
+		resetProjectEditedStatus();
 	}
-	@FXML private void handleSaveProjectAs() {
+	@FXML private boolean handleSaveProjectAs() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(projectTitle + ".twproj");
 		if (projectFile != null)
@@ -307,16 +311,18 @@ public class TopSceneController {
 			fileChooser.setInitialDirectory(projectSavingDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
-		if (saveFile == null) return;
+		if (saveFile == null) return false;
 
 		if (!saveFile.getName().endsWith(".twproj")) {
 			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
 		}
 
-		if (ProjectIO.saveProject(saveFile, this)) {
+		boolean success = ProjectIO.saveProject(saveFile, this);
+		if (success) {
 			projectFile = saveFile;
 		}
 
+		return success;
 	}
 	@FXML private void handleExport() {
 		getSelectedTabScene().handleExport();
@@ -584,6 +590,10 @@ public class TopSceneController {
 
 	void projectEdited() {
 		projectEdited = true;
+	}
+	void resetProjectEditedStatus() {
+		projectEdited = false;
+		getSelectedTabScene().updateStageTitle();
 	}
 
 	boolean getProjectEdited() {
