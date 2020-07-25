@@ -5,7 +5,10 @@ import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -30,6 +33,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -88,6 +92,9 @@ public class TopSceneController {
 	private String projectTitle = "Unnamed Project";
 
 	String paperSize = "";
+
+	// TODO: Consider switching to this kind of system for loading tones to allow threading CL loads.
+	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
 	// Note duration menu elements are re-used to save memory
 	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
@@ -256,6 +263,12 @@ public class TopSceneController {
 		addTabButton.setGraphic(addImageView);
 		if (MainApp.OS_NAME.startsWith("mac")) addTabButton.getTooltip().setText("Add item (\u2318T)");
 
+		// Behavior for adding asynchronously loading tabs
+		tabsToAdd.addListener((MapChangeListener<Integer, Tab>) change -> {
+			if (change.wasAdded())
+				addNextPendingTabs();
+		});
+
 	}
 
 	void performSetup(Stage parent_stage, File arg_file) {
@@ -264,7 +277,7 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(arg_file);
+				addTab(arg_file, 0, null);
 			else
 				openProject(arg_file);
 		} else {
@@ -286,11 +299,27 @@ public class TopSceneController {
 		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
 	}
 
+	private void addNextPendingTabs() {
+		// Add the next pending tabs in an uninterrupted sequence.
+		int addingIndex = tabPane.getTabs().size();
+		while (tabsToAdd.containsKey(addingIndex)) {
+			tabPane.getTabs().add(addingIndex, tabsToAdd.get(addingIndex));
+
+			addingIndex++;
+		}
+
+		// Clean up current + lower index pending tabs.
+		for (int key : new HashSet<>(tabsToAdd.keySet())) {
+			if (key <= addingIndex)
+				tabsToAdd.remove(key);
+		}
+	}
+
 	/*
 	 * Project Menu Actions
 	 */
 	@FXML void addTab() {
-		addTab(null);
+		addTab(null, -1, null);
 	}
 	@FXML boolean handleSetProjectTitle() {
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
@@ -320,8 +349,7 @@ public class TopSceneController {
 		if (event.isConsumed())
 			return;
 
-		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
-			forceCloseTab(tab);
+		clearAllTabs();
 
 		projectTitle = "Unnamed Project";
 		projectFile = null;
@@ -345,8 +373,7 @@ public class TopSceneController {
 		if (event.isConsumed())
 			return;
 
-		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
-			forceCloseTab(tab);
+		clearAllTabs();
 
 		openProject(selectedFile);
 	}
@@ -479,7 +506,7 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	public void addTab(File with_tone) {
+	public void addTab(File with_tone, int at_index, Consumer<MainSceneController> loading_actions) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -595,14 +622,31 @@ public class TopSceneController {
 
 				}
 
-				// Add the tab after the selected one, if any.
-				if (prevTabController != null) {
-					tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
+				// If there is a specified index...
+				if (at_index != -1) {
+					if (at_index >= tabPane.getTabs().size())
+//						new Thread(() -> tabsToAdd.put(at_index, tab)).start();
+						tabsToAdd.put(at_index, tab);
+					else
+						tabPane.getTabs().add(at_index, tab);
 				} else {
-					tabPane.getTabs().add(tab);
+
+					// Add the tab after the selected one, if any.
+					if (prevTabController != null) {
+						tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
+					} else {
+						tabPane.getTabs().add(tab);
+					}
+					tabPane.getSelectionModel().select(tab);
+					tab.getContent().requestFocus();
+
 				}
-				tabPane.getSelectionModel().select(tab);
-				tab.getContent().requestFocus();
+
+				// Perform any loading operations last.
+				if (loading_actions != null) {
+					loading_actions.accept(newTabController);
+					resetProjectEditedStatus();
+				}
 			});
 		});
 	}
@@ -625,6 +669,10 @@ public class TopSceneController {
 	}
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
+	}
+	void clearAllTabs() {
+		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
+			forceCloseTab(tab);
 	}
 
 	void cleanUpTabForRemoval(Tab tab) {
@@ -651,8 +699,12 @@ public class TopSceneController {
 	}
 
 	void openProject(File selected_file) {
-		if (selected_file.exists() && ProjectIO.openProject(selected_file, this))
-			resetProjectEditedStatus();
+		if (selected_file.exists()) {
+			if (!ProjectIO.openProject(selected_file, this)) {
+				clearAllTabs();
+				addTab();
+			}
+		}
 	}
 
 	boolean getProjectEdited() {

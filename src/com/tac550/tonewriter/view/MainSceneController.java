@@ -1017,7 +1017,7 @@ public class MainSceneController {
 	ObservableStringValue getTitleTextProperty() {
 		return titleTextField.textProperty();
 	}
-	void setTitleText(String title) {
+	public void setTitleText(String title) {
 		titleTextField.setText(title);
 	}
 
