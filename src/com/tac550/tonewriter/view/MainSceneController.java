@@ -94,6 +94,7 @@ public class MainSceneController {
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
 
+	@FXML private MenuButton optionsButton;
 	@FXML private ToggleGroup titleOptions;
 	@FXML private RadioMenuItem largeTitleMenuItem;
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
@@ -190,6 +191,8 @@ public class MainSceneController {
 			boolean visible = !newVal.equals(lastVerseSet) || verseEdited;
 			setVerseButton.setVisible(visible);
 			setVersePane.setMouseTransparent(!visible);
+
+			topSceneController.projectEdited();
 		});
 		verseAreaPane.getChildren().add(0, verseArea);
 		AnchorPane.setLeftAnchor(verseArea, 0.0); AnchorPane.setRightAnchor(verseArea, 0.0);
@@ -217,6 +220,23 @@ public class MainSceneController {
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_ENTERED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#57969c, #61a2b1);"));
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_EXITED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#61a2b1, #61b0b1);"));
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> openToneHintButton.fire());
+
+		// listeners for triggering project edited status
+		titleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
+		subtitleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
+		topVerseChoice.valueProperty().addListener(change -> topSceneController.projectEdited());
+		topVerseField.textProperty().addListener(change -> topSceneController.projectEdited());
+		bottomVerseChoice.valueProperty().addListener(change -> topSceneController.projectEdited());
+		bottomVerseField.textProperty().addListener(change -> topSceneController.projectEdited());
+
+		for (Toggle item : titleOptions.getToggles())
+			item.selectedProperty().addListener(change -> topSceneController.projectEdited());
+
+		for (MenuItem item : optionsButton.getItems()) {
+			if (item instanceof CheckMenuItem checkItem)
+				checkItem.selectedProperty().addListener(change -> topSceneController.projectEdited());
+		}
+
 	}
 
 	void setStageAndTopScene(Stage stage, TopSceneController top_scene) {
@@ -417,6 +437,8 @@ public class MainSceneController {
 		if (lastVerseSet.isEmpty()) {
 			setVerseButton.setVisible(false);
 			setVersePane.setMouseTransparent(true);
+
+			topSceneController.projectEdited();
 			return;
 		}
 
@@ -459,6 +481,8 @@ public class MainSceneController {
 					// Hide working indicator
 					setVerseProgressBox.setVisible(false);
 					setVersePane.setMouseTransparent(true);
+
+					topSceneController.projectEdited();
 				});
 				return null;
 			}
@@ -1008,6 +1032,8 @@ public class MainSceneController {
 
 		setVerseButton.setVisible(true);
 		setVersePane.setMouseTransparent(false);
+
+		topSceneController.projectEdited();
 	}
 
 	public File getToneFile() {

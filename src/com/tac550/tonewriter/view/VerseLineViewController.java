@@ -291,10 +291,9 @@ public class VerseLineViewController {
 
 	}
 
-	@FXML private void undo() {
-		if (undoActions.empty()) {
-			return;
-		}
+	@FXML private void handleUndo() {
+		if (undoActions.empty()) return;
+
 		AssignmentAction action = undoActions.pop();
 
 		for (Button button : action.buttons) {
@@ -374,6 +373,8 @@ public class VerseLineViewController {
 				((SyllableText) syllable).deactivate();
 			}
 		}
+
+		topController.projectEdited();
 	}
 
 	void deactivateAll() {
@@ -545,13 +546,13 @@ public class VerseLineViewController {
 		noteButton.setPadding(Insets.EMPTY);
 
 		noteButton.setOnTouchPressed(te ->
-				TopSceneController.showTouchNoteMenu(syllable, noteButton, te));
+				topController.showTouchNoteMenu(syllable, noteButton, te));
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
 					syllable.setNoteDuration(LilyPondInterface.NOTE_HALF, buttonIndex);
 				}
-				TopSceneController.showNoteMenu(syllable, noteButton);
+				topController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button
 				getChordByIndex(chordIdex).playMidi();
 			}
@@ -596,7 +597,7 @@ public class VerseLineViewController {
 		MidiInterface.playAssignedPhrase(getSyllables(), playButton);
 	}
 
-	@FXML private void editSyllables() {
+	@FXML private void handleEditSyllables() {
 
 		FXMLLoaderIO.loadFXMLLayoutAsync("syllableEditView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();

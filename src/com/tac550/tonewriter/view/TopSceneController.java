@@ -269,6 +269,9 @@ public class TopSceneController {
 				addNextPendingTabs();
 		});
 
+		// listeners for triggering project edited status
+		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> projectEdited());
+
 	}
 
 	void performSetup(Stage parent_stage, File arg_file) {
@@ -691,7 +694,10 @@ public class TopSceneController {
 	}
 
 	void projectEdited() {
-		projectEdited = true;
+		if (!projectEdited) {
+			projectEdited = true;
+			getSelectedTabScene().updateStageTitle();
+		}
 	}
 	void resetProjectEditedStatus() {
 		projectEdited = false;
@@ -846,13 +852,15 @@ public class TopSceneController {
 		return mainControllers;
 	}
 
-	static void showNoteMenu(SyllableText syllable, Button noteButton) {
+	void showNoteMenu(SyllableText syllable, Button noteButton) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
 		// Behavior
 		for (RadioMenuItem item : clickItems) {
-			item.setOnAction(event ->
-					syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex));
+			item.setOnAction(event -> {
+				syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex);
+				projectEdited();
+			});
 		}
 
 		// Initial state
@@ -864,7 +872,7 @@ public class TopSceneController {
 						* VerseLineViewController.NOTE_BUTTON_HEIGHT.get());
 	}
 
-	static void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
+	void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
 		// Behavior
@@ -872,6 +880,7 @@ public class TopSceneController {
 			for (ImageView item : touchItems) {
 				if (item.getEffect() != null) {
 					syllable.setNoteDuration(durationMapping.get(touchItems.indexOf(item)), noteButtonIndex);
+					projectEdited();
 					item.setEffect(null);
 				}
 			}
