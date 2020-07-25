@@ -543,8 +543,8 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean loadTone(File selectedFile, boolean selectHideToneHeader) {
-		if (selectedFile == null) {
+	private boolean loadTone(File selected_file, boolean selectHideToneHeader) {
+		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
 			if (toneFile != null) {
 				if (builtInToneLoaded()) fileChooser.setInitialDirectory(builtInDir);
@@ -557,12 +557,12 @@ public class MainSceneController {
 				}
 			}
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-			selectedFile = fileChooser.showOpenDialog(parentStage);
+			selected_file = fileChooser.showOpenDialog(parentStage);
 		}
-		if (selectedFile == null) return false;
+		if (selected_file == null) return false;
 
-		if (selectedFile.exists()) {
-			toneFile = selectedFile;
+		if (selected_file.exists()) {
+			toneFile = selected_file;
 
 			ToneReaderWriter toneReader = getToneReader();
 
@@ -669,9 +669,9 @@ public class MainSceneController {
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
-	void handleOpenTone(File selectedFile, boolean auto_load, boolean selectHideToneHeader) {
+	void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSaveTone()) && loadTone(selectedFile, selectHideToneHeader)) {
+		if ((auto_load || checkSaveTone()) && loadTone(tone_file, selectHideToneHeader)) {
 			toneMenuState.editMenuDisabled = false;
 			toneMenuState.saveToneMenuItemDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;

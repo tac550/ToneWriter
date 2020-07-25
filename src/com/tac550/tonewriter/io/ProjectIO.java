@@ -151,9 +151,11 @@ public class ProjectIO {
 		printWriter.close();
 	}
 
-	public static boolean openProject(File project_file) {
+	// TODO: Tabs are loaded asynchronously. Need to record their proper order and sort them later based on that order.
+	// TODO: Also need to fix resetProjectEditedStatus() error thrown because it's called too early (no tabs)
+	public static boolean openProject(File project_file, TopSceneController top_scene) {
 
-
+		top_scene.addTab(null);
 
 		return true;
 	}

@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -249,15 +250,22 @@ public class TopSceneController {
 
 	}
 
-	void performSetup(Stage parent_stage, File openWithFile) {
+	void performSetup(Stage parent_stage, File arg_file) {
 		parentStage = parent_stage;
 
-		// Concluding setup process
-		addTab(openWithFile);
+		// Check type of file in arguments
+		if (arg_file != null) {
+			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
+				addTab(arg_file);
+			else
+				openProject(arg_file);
+		} else {
+			addTab();
+		}
 	}
 
-	private static void setMenuIcon(MenuItem menu_item, String imagePath) {
-		ImageView imageView = new ImageView(TopSceneController.class.getResource(imagePath).toExternalForm());
+	private static void setMenuIcon(MenuItem menu_item, String image_path) {
+		ImageView imageView = new ImageView(TopSceneController.class.getResource(image_path).toExternalForm());
 		double menuIconSize = 30;
 		imageView.setFitHeight(menuIconSize);
 		imageView.setFitWidth(menuIconSize);
@@ -273,8 +281,32 @@ public class TopSceneController {
 	/*
 	 * Project Menu Actions
 	 */
+	@FXML void addTab() {
+		addTab(null);
+	}
+	@FXML boolean handleSetProjectTitle() {
+		TextInputDialog dialog = new TextInputDialog(projectTitle);
+		dialog.setTitle("Project Title");
+		dialog.setHeaderText("Enter project title");
+		dialog.setContentText("This appears on the top of every page of a project export");
+		dialog.getEditor().setPrefWidth(250);
+		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
+		bookIcon.setFitHeight(50);
+		bookIcon.setFitWidth(50);
+		dialog.setGraphic(bookIcon);
+		dialog.initOwner(parentStage);
+
+		Optional<String> result = dialog.showAndWait();
+
+		if (result.isPresent()) {
+			projectTitle = result.get();
+			getSelectedTabScene().updateStageTitle();
+			return true;
+		} else return false;
+	}
+
 	@FXML private void handleNewProject() {
-		// Open new project in existing window
+		// Create new project in existing window
 		Event event = new Event(null, null, null);
 		requestClose(event);
 		if (event.isConsumed())
@@ -290,7 +322,25 @@ public class TopSceneController {
 
 	}
 	@FXML private void handleOpenProject() {
+		FileChooser fileChooser = new FileChooser();
+		if (projectFile != null)
+			fileChooser.setInitialDirectory(projectFile.getParentFile());
+		else
+			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
+		File selectedFile = fileChooser.showOpenDialog(parentStage);
+		if (selectedFile == null) return;
 
+		// Open project in existing window
+		Event event = new Event(null, null, null);
+		requestClose(event);
+		if (event.isConsumed())
+			return;
+
+		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
+			forceCloseTab(tab);
+
+		openProject(selectedFile);
 	}
 	@FXML private void handleSaveProject() {
 		if (projectFile != null) {
@@ -421,11 +471,7 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	@FXML void addTab() {
-		addTab(null);
-	}
-
-	public void addTab(File openWithFile) {
+	public void addTab(File with_tone) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -535,8 +581,8 @@ public class TopSceneController {
 					// Title text for the first tab created (at startup)
 					newTabController.setTitleText("Item 1");
 
-					if (openWithFile != null) {
-						newTabController.handleOpenTone(openWithFile, true, false);
+					if (with_tone != null) {
+						newTabController.handleOpenTone(with_tone, true, false);
 					}
 
 				}
@@ -594,6 +640,11 @@ public class TopSceneController {
 	void resetProjectEditedStatus() {
 		projectEdited = false;
 		getSelectedTabScene().updateStageTitle();
+	}
+
+	void openProject(File selected_file) {
+		if (selected_file.exists() && ProjectIO.openProject(selected_file, this))
+			resetProjectEditedStatus();
 	}
 
 	boolean getProjectEdited() {
@@ -673,27 +724,6 @@ public class TopSceneController {
 		}
 
 		return true;
-	}
-
-	@FXML boolean handleSetProjectTitle() {
-		TextInputDialog dialog = new TextInputDialog(projectTitle);
-		dialog.setTitle("Project Title");
-		dialog.setHeaderText("Enter project title");
-		dialog.setContentText("This appears on the top of every page of a project export");
-		dialog.getEditor().setPrefWidth(250);
-		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
-		bookIcon.setFitHeight(50);
-		bookIcon.setFitWidth(50);
-		dialog.setGraphic(bookIcon);
-		dialog.initOwner(parentStage);
-
-		Optional<String> result = dialog.showAndWait();
-
-		if (result.isPresent()) {
-			projectTitle = result.get();
-			getSelectedTabScene().updateStageTitle();
-			return true;
-		} else return false;
 	}
 
 	void exportProject() throws IOException {
