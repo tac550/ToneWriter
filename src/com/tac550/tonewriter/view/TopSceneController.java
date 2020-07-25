@@ -39,6 +39,10 @@ public class TopSceneController {
 
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
+	@FXML private MenuItem newProjectMenuItem;
+	@FXML private MenuItem openProjectMenuItem;
+	@FXML private MenuItem saveProjectMenuItem;
+	@FXML private MenuItem saveProjectAsMenuItem;
 	@FXML private MenuItem exportPDFMenuItem;
 	@FXML private MenuItem exitMenuItem;
 
@@ -177,6 +181,10 @@ public class TopSceneController {
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
+		setMenuIcon(newProjectMenuItem, "/media/file-sound.png");
+		setMenuIcon(openProjectMenuItem, "/media/folder.png");
+		setMenuIcon(saveProjectMenuItem, "/media/floppy.png");
+		setMenuIcon(saveProjectAsMenuItem, "/media/floppy-add.png");
 		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
 		setMenuIcon(exitMenuItem, "/media/sign-error.png");
 		setMenuIcon(newToneMenuItem, "/media/file-text.png");

@@ -34,22 +34,22 @@
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" onAction="#handleNewProject" text="New Project">
+                  <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" onAction="#handleNewProject" text="New Project">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" onAction="#handleOpenProject" text="Open Project...">
+                  <MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" onAction="#handleOpenProject" text="Open Project...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" onAction="#handleSaveProject" text="Save Project">
+                  <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#handleSaveProject" text="Save Project">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
-                  <MenuItem mnemonicParsing="false" onAction="#handleSaveProjectAs" text="Save Project As...">
+                  <MenuItem fx:id="saveProjectAsMenuItem" mnemonicParsing="false" onAction="#handleSaveProjectAs" text="Save Project As...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                      </accelerator>
