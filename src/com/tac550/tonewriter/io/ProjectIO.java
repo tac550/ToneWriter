@@ -170,7 +170,7 @@ public class ProjectIO {
 
 			ZipEntry zipEntry = zis.getNextEntry();
 			while (zipEntry != null) {
-				File unzippedFile = new File(tempDirectory, zipEntry.getName());
+				File unzippedFile = checkExtractedFile(tempDirectory, zipEntry);
 				if (!unzippedFile.mkdirs() && !unzippedFile.getParentFile().exists()) {
 					TWUtils.showError("Failed to construct internal temp directory!", true);
 					return false;
@@ -209,6 +209,20 @@ public class ProjectIO {
 		project_scene.addTab(null, 4, controller -> controller.setTitleText("Loaded 5"));
 
 		return true;
+	}
+
+	// Guards against a known Zip vulnerability
+	private static File checkExtractedFile(File dest_dir, ZipEntry zip_entry) throws IOException {
+		File destFile = new File(dest_dir, zip_entry.getName());
+
+		String destDirPath = dest_dir.getCanonicalPath();
+		String destFilePath = destFile.getCanonicalPath();
+
+		if (!destFilePath.startsWith(destDirPath + File.separator)) {
+			throw new IOException("Entry is outside of the target dir: " + zip_entry.getName());
+		}
+
+		return destFile;
 	}
 
 	private static List<String> tryReadingLine(String line) {
