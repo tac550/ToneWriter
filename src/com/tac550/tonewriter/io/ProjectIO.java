@@ -171,7 +171,7 @@ public class ProjectIO {
 			ZipEntry zipEntry = zis.getNextEntry();
 			while (zipEntry != null) {
 				File unzippedFile = checkExtractedFile(tempDirectory, zipEntry);
-				if (!unzippedFile.mkdirs() && !unzippedFile.getParentFile().exists()) {
+				if (!unzippedFile.getParentFile().mkdirs() && !unzippedFile.getParentFile().exists()) {
 					TWUtils.showError("Failed to construct internal temp directory!", true);
 					return false;
 				}
