@@ -7,19 +7,21 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
 	public static boolean saveProject(File project_file, TopSceneController project_scene) {
-		// Create temp directory in which to construct the final compressed project file.
+		// Create temp directory in which to construct the final compressed project file
 		File tempDirectory;
 		try {
 			tempDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_scene.getProjectTitle());
 		} catch (IOException e) {
-			TWUtils.showError("Failed to create folder for constructing project save!", true);
+			TWUtils.showError("Failed to create temp directory for project save!", true);
 			return false;
 		}
 
@@ -47,7 +49,7 @@ public class ProjectIO {
 				ToneReaderWriter toneWriter = controller.getToneWriter();
 				toneHash = toneWriter.getToneHash();
 
-				// Save each unique tone file into "tones" directory.
+				// Save each unique tone file into "tones" directory
 				if (!uniqueHashes.contains(toneHash)) {
 					uniqueHashes.add(toneHash);
 
@@ -60,7 +62,7 @@ public class ProjectIO {
 				}
 			}
 
-			// Place each item in a file in "items" directory and named by tab index.
+			// Place each item in a file in "items" directory and named by tab index
 			File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
 					+ File.separator + index);
 
@@ -69,7 +71,7 @@ public class ProjectIO {
 			index++;
 		}
 
-		// Delete previous save file, if one exists.
+		// Delete previous save file, if one exists
 		if (project_file.exists()) {
 			if (!project_file.delete()) {
 				TWUtils.showError("Failed to overwrite previous save file!"
@@ -78,10 +80,9 @@ public class ProjectIO {
 			}
 		}
 
-        // Compress the temp directory and save to the final location.
+        // Compress the temp directory and save to the final location
         try (FileOutputStream fos = new FileOutputStream(project_file);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
-
             byte[] buffer = new byte[1024];
 
             for (String filePath : TWUtils.generateFileList(tempDirectory)) {
@@ -151,15 +152,67 @@ public class ProjectIO {
 		printWriter.close();
 	}
 
-	public static boolean openProject(File project_file, TopSceneController top_scene) {
+	public static boolean openProject(File project_file, TopSceneController project_scene) {
 
-		top_scene.addTab(null, 0, controller -> controller.setTitleText("Loaded 1"));
-		top_scene.addTab(null, 1, controller -> controller.setTitleText("Loaded 2"));
-		top_scene.addTab(null, 2, controller -> controller.setTitleText("Loaded 3"));
-		top_scene.addTab(null, 3, controller -> controller.setTitleText("Loaded 4"));
-		top_scene.addTab(null, 4, controller -> controller.setTitleText("Loaded 5"));
+		// Create temp directory to unzip project into
+		File tempDirectory;
+		try {
+			tempDirectory = TWUtils.createTWTempDir("ProjectLoad-" + project_scene.getProjectTitle());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temp directory for project load!", true);
+			return false;
+		}
+
+		// Unzip the project file
+		try (FileInputStream fis = new FileInputStream(project_file);
+		     ZipInputStream zis = new ZipInputStream(fis)) {
+			byte[] buffer = new byte[1024];
+
+			ZipEntry zipEntry = zis.getNextEntry();
+			while (zipEntry != null) {
+				File unzippedFile = new File(tempDirectory, zipEntry.getName());
+				if (!unzippedFile.mkdirs() && !unzippedFile.getParentFile().exists()) {
+					TWUtils.showError("Failed to construct internal temp directory!", true);
+					return false;
+				}
+				try (FileOutputStream fos = new FileOutputStream(unzippedFile)) {
+					int len;
+					while ((len = zis.read(buffer)) > 0)
+						fos.write(buffer, 0, len);
+				} catch (IOException e) {
+					e.printStackTrace();
+					TWUtils.showError("Failed to extract file " + zipEntry.getName(), true);
+				}
+
+				zipEntry = zis.getNextEntry();
+			}
+
+		} catch (IOException e) {
+			TWUtils.showError("Failed to extract project file!", true);
+			return false;
+		}
+
+		// Gather project metadata from info file
+		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
+		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
+			System.out.println(reader.readLine());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to read project metadata file!", true);
+			return false;
+		}
+
+
+		project_scene.addTab(null, 0, controller -> controller.setTitleText("Loaded 1"));
+		project_scene.addTab(null, 1, controller -> controller.setTitleText("Loaded 2"));
+		project_scene.addTab(null, 2, controller -> controller.setTitleText("Loaded 3"));
+		project_scene.addTab(null, 3, controller -> controller.setTitleText("Loaded 4"));
+		project_scene.addTab(null, 4, controller -> controller.setTitleText("Loaded 5"));
 
 		return true;
+	}
+
+	private static List<String> tryReadingLine(String line) {
+		return List.of(line.split("\t"));
 	}
 
 }

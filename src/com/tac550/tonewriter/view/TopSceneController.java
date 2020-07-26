@@ -243,7 +243,7 @@ public class TopSceneController {
 
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
-			if (tabPane.getTabs().size() == 1) {
+			if (getTabCount() == 1) {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 			} else {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
@@ -304,7 +304,7 @@ public class TopSceneController {
 
 	private void addNextPendingTabs() {
 		// Add the next pending tabs in an uninterrupted sequence.
-		int addingIndex = tabPane.getTabs().size();
+		int addingIndex = getTabCount();
 		while (tabsToAdd.containsKey(addingIndex)) {
 			tabPane.getTabs().add(addingIndex, tabsToAdd.get(addingIndex));
 
@@ -612,7 +612,7 @@ public class TopSceneController {
 							newTabController.setTitleText(prevTitle.substring(0, numIndex) + nextNum);
 						}
 					} else {
-						newTabController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
+						newTabController.setTitleText("Item " + (getTabCount() + 1));
 					}
 
 				} else {
@@ -627,7 +627,7 @@ public class TopSceneController {
 
 				// If there is a specified index...
 				if (at_index != -1) {
-					if (at_index >= tabPane.getTabs().size())
+					if (at_index >= getTabCount())
 //						new Thread(() -> tabsToAdd.put(at_index, tab)).start();
 						tabsToAdd.put(at_index, tab);
 					else
@@ -693,26 +693,29 @@ public class TopSceneController {
 		return projectTitle;
 	}
 
-	void projectEdited() {
-		if (!projectEdited) {
-			projectEdited = true;
-			getSelectedTabScene().updateStageTitle();
-		}
-	}
-	void resetProjectEditedStatus() {
-		projectEdited = false;
-		getSelectedTabScene().updateStageTitle();
-	}
-
 	void openProject(File selected_file) {
 		if (selected_file.exists()) {
-			if (!ProjectIO.openProject(selected_file, this)) {
+			if (ProjectIO.openProject(selected_file, this)) {
+				projectFile = selected_file;
+			} else {
 				clearAllTabs();
 				addTab();
 			}
 		}
 	}
 
+	void projectEdited() {
+		if (!projectEdited) {
+			projectEdited = true;
+			if (getTabCount() > 0)
+				getSelectedTabScene().updateStageTitle();
+		}
+	}
+	void resetProjectEditedStatus() {
+		projectEdited = false;
+		if (getTabCount() > 0)
+			getSelectedTabScene().updateStageTitle();
+	}
 	boolean getProjectEdited() {
 		return projectEdited;
 	}
@@ -844,8 +847,10 @@ public class TopSceneController {
 	}
 
 	public MainSceneController[] getTabControllers() {
-		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
-		for (int i = 0; i < tabPane.getTabs().size(); i++) {
+		int tabCount = getTabCount();
+
+		MainSceneController[] mainControllers = new MainSceneController[tabCount];
+		for (int i = 0; i < tabCount; i++) {
 			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
 		}
 
