@@ -102,7 +102,7 @@ public class ProjectIO {
             return false;
         }
 
-        // Try to delete the temporary directory created in the proecess
+        // Try to delete the temporary directory created in the process
 		try {
 			FileUtils.deleteDirectory(tempDirectory);
 		} catch (IOException e) {
@@ -201,6 +201,13 @@ public class ProjectIO {
 			return false;
 		}
 
+
+		// Try to delete the temporary directory created in the process
+		try {
+			FileUtils.deleteDirectory(tempDirectory);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		project_scene.addTab(null, 0, controller -> controller.setTitleText("Loaded 1"));
 		project_scene.addTab(null, 1, controller -> controller.setTitleText("Loaded 2"));
