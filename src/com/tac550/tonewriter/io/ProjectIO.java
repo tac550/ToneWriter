@@ -6,6 +6,7 @@ import com.tac550.tonewriter.view.TopSceneController;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +30,8 @@ public class ProjectIO {
 		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
 
-			writer.write(project_scene.getProjectTitle() + "\n");
-			writer.write(project_scene.getTabCount() + "\n");
+			writeLine(writer, project_scene.getProjectTitle());
+			writeLine(writer, project_scene.getTabCount());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -80,29 +81,29 @@ public class ProjectIO {
 			}
 		}
 
-        // Compress the temp directory and save to the final location
-        try (FileOutputStream fos = new FileOutputStream(project_file);
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
-            byte[] buffer = new byte[1024];
+		// Compress the temp directory and save to the final location
+		try (FileOutputStream fos = new FileOutputStream(project_file);
+		     ZipOutputStream zos = new ZipOutputStream(fos)) {
+			byte[] buffer = new byte[1024];
 
-            for (String filePath : TWUtils.generateFileList(tempDirectory)) {
-                ZipEntry ze = new ZipEntry(filePath.substring(tempDirectory.getAbsolutePath().length() + 1));
-                zos.putNextEntry(ze);
-                try (FileInputStream in = new FileInputStream(filePath)) {
-                    int len;
-                    while ((len = in.read(buffer)) > 0) {
-                        zos.write(buffer, 0, len);
-                    }
-                }
-            }
+			for (String filePath : TWUtils.generateFileList(tempDirectory)) {
+				ZipEntry ze = new ZipEntry(filePath.substring(tempDirectory.getAbsolutePath().length() + 1));
+				zos.putNextEntry(ze);
+				try (FileInputStream in = new FileInputStream(filePath)) {
+					int len;
+					while ((len = in.read(buffer)) > 0) {
+						zos.write(buffer, 0, len);
+					}
+				}
+			}
 
-        } catch (IOException e) {
-            TWUtils.showError("Failed to compress and save project file!", true);
-            e.printStackTrace();
-            return false;
-        }
+		} catch (IOException e) {
+			TWUtils.showError("Failed to compress and save project file!", true);
+			e.printStackTrace();
+			return false;
+		}
 
-        // Try to delete the temporary directory created in the process
+		// Try to delete the temporary directory created in the process
 		try {
 			FileUtils.deleteDirectory(tempDirectory);
 		} catch (IOException e) {
@@ -123,9 +124,9 @@ public class ProjectIO {
 			}
 
 			// Save to the file
-			FileWriter fileWriter = new FileWriter(save_file);
-			saveItemTo(fileWriter, controller, tone_hash);
-			fileWriter.close();
+			try (FileWriter fileWriter = new FileWriter(save_file)) {
+				saveItemTo(fileWriter, controller, tone_hash);
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -133,23 +134,23 @@ public class ProjectIO {
 		}
 	}
 
-	private static void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) {
-		PrintWriter printWriter = new PrintWriter(destination);
+	private static void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) throws IOException {
+		try (PrintWriter writer = new PrintWriter(destination)) {
 
-		// General item data
-		File toneFile = controller.getToneFile();
-		printWriter.println(toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
-        printWriter.println(tone_hash); // Tone hash (may be empty if no tone loaded)
-		printWriter.println(controller.getTitle() + "\t" + controller.getSubtitle()); // Title + subtitle
-		printWriter.println(controller.getSelectedTitleOption().getText() + "\t" + controller.getHideToneHeader()
-                + "\t" + controller.getPageBreak()); // Options line
-        printWriter.println(controller.getTopVerseChoice() + "\t" + controller.getTopVerse()); // Top verse
-        printWriter.println(controller.getVerseAreaText()); // Verse area text
-        printWriter.println(controller.getBottomVerseChoice() + "\t" + controller.getBottomVerse()); // Bottom verse
+			// General item data
+			File toneFile = controller.getToneFile();
+			writeLine(writer, toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
+			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
+			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
+			writeLine(writer, controller.getSelectedTitleOption().getText(),
+					controller.getHideToneHeader(), controller.getPageBreak()); // Options line
+			writeLine(writer, controller.getTopVerseChoice(), controller.getTopVerse()); // Top verse
+			writeLine(writer, controller.getVerseAreaText()); // Verse area text
+			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
 
-        // Syllables and assignment data
+			// Syllables and assignment data
 
-		printWriter.close();
+		}
 	}
 
 	public static boolean openProject(File project_file, TopSceneController project_scene) {
@@ -192,15 +193,25 @@ public class ProjectIO {
 			return false;
 		}
 
+		int numItems;
+
 		// Gather project metadata from info file
 		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
-			System.out.println(reader.readLine());
+
+			project_scene.setProjectTitle(readLine(reader).get(0));
+			numItems = Integer.parseInt(readLine(reader).get(0));
+
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);
 			return false;
 		}
 
+		// Load however many items are in the save file
+		for (int i = 0; i < numItems; i++) {
+			int finalI = i;
+			project_scene.addTab(null, i, ctr -> ctr.setTitleText("Loaded " + (finalI + 1)));
+		}
 
 		// Try to delete the temporary directory created in the process
 		try {
@@ -208,12 +219,6 @@ public class ProjectIO {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		project_scene.addTab(null, 0, controller -> controller.setTitleText("Loaded 1"));
-		project_scene.addTab(null, 1, controller -> controller.setTitleText("Loaded 2"));
-		project_scene.addTab(null, 2, controller -> controller.setTitleText("Loaded 3"));
-		project_scene.addTab(null, 3, controller -> controller.setTitleText("Loaded 4"));
-		project_scene.addTab(null, 4, controller -> controller.setTitleText("Loaded 5"));
 
 		return true;
 	}
@@ -232,8 +237,17 @@ public class ProjectIO {
 		return destFile;
 	}
 
-	private static List<String> tryReadingLine(String line) {
-		return List.of(line.split("\t"));
+	private static List<String> readLine(BufferedReader reader) throws IOException {
+		String line;
+		if ((line = reader.readLine()) != null)
+			return List.of(line.split("\t", -1));
+		else
+			return List.of("");
+	}
+
+	private static void writeLine(Writer writer, Object... items) throws IOException {
+		writer.write(String.join("\t", Arrays.stream(items).map(String::valueOf).toArray(String[]::new))
+				+ "\n");
 	}
 
 }

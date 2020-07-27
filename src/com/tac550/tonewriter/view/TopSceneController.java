@@ -339,7 +339,7 @@ public class TopSceneController {
 		Optional<String> result = dialog.showAndWait();
 
 		if (result.isPresent()) {
-			projectTitle = result.get();
+			setProjectTitle(result.get());
 			getSelectedTabScene().updateStageTitle();
 			return true;
 		} else return false;
@@ -354,7 +354,7 @@ public class TopSceneController {
 
 		clearAllTabs();
 
-		projectTitle = "Unnamed Project";
+		setProjectTitle("Unnamed Project");
 		projectFile = null;
 
 		addTab();
@@ -691,6 +691,10 @@ public class TopSceneController {
 
 	public String getProjectTitle() {
 		return projectTitle;
+	}
+
+	public void setProjectTitle(String title) {
+		projectTitle = title;
 	}
 
 	void openProject(File selected_file) {
