@@ -426,18 +426,17 @@ public class MainApp extends Application {
 							Thread.sleep(1000);
 							String line;
 							Process p = Runtime.getRuntime().exec
-									(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
-							BufferedReader input =
-									new BufferedReader(new InputStreamReader(p.getInputStream()));
-							while ((line = input.readLine()) != null) {
-								if (line.startsWith("Au_.exe ")) {
-									loops = 0;
-									input.close();
-									break;
+									(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
+							try (BufferedReader input =
+									new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+								while ((line = input.readLine()) != null) {
+									if (line.startsWith("Au_.exe ")) {
+										loops = 0;
+										break;
+									}
 								}
+								loops++;
 							}
-							loops++;
-							input.close();
 						}
 
 					} else return;

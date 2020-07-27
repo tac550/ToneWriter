@@ -144,29 +144,20 @@ public class TWUtils {
 
 	// Copies file from io package to an external location.
 	public static void exportIOResource(String resource_name, File out_file) throws Exception {
-		InputStream stream = null;
-		OutputStream resStreamOut = null;
-		try {
-			stream = LilyPondInterface.class.getResourceAsStream(resource_name);
-			if (stream == null) {
+		try (InputStream inputStream = LilyPondInterface.class.getResourceAsStream(resource_name);
+		     OutputStream outputStream = new FileOutputStream(out_file)) {
+
+			if (inputStream == null) {
 				throw new Exception("Cannot get resource \"" + resource_name + "\" from Jar file.");
 			}
 
 			int readBytes;
 			byte[] buffer = new byte[4096];
-			resStreamOut = new FileOutputStream(out_file);
-			while ((readBytes = stream.read(buffer)) > 0) {
-				resStreamOut.write(buffer, 0, readBytes);
+			while ((readBytes = inputStream.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, readBytes);
 			}
-		} finally {
-			if (stream != null) {
-				stream.close();
-			}
-			if (resStreamOut != null) {
-				resStreamOut.close();
-			}
-		}
 
+		}
 	}
 
 	// UI

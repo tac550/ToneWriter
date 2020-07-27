@@ -57,40 +57,37 @@ public class ToneReaderWriter {
 			}
 
 			// Set up PrintWriter
-			FileWriter fileWriter = new FileWriter(toneFile);
-			PrintWriter printWriter = new PrintWriter(fileWriter);
+			try (FileWriter fileWriter = new FileWriter(toneFile);
+			     PrintWriter printWriter = new PrintWriter(fileWriter)) {
 
-			// Header info
-			printWriter.println("VERSION: " + MainApp.APP_VERSION);
-			printWriter.println("Key Signature: " +
-					keySig.replace("\u266F", "s").replace("\u266D", "f"));
-			printWriter.println("Tone: " + poetText);
-			printWriter.println("Composer: " + composerText);
-			printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
-			printWriter.println();
-			printWriter.println();
+				// Header info
+				printWriter.println("VERSION: " + MainApp.APP_VERSION);
+				printWriter.println("Key Signature: " +
+						keySig.replace("\u266F", "s").replace("\u266D", "f"));
+				printWriter.println("Tone: " + poetText);
+				printWriter.println("Composer: " + composerText);
+				printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
+				printWriter.println();
+				printWriter.println();
 
-			// Line name which is marked first repeated. Filled when found.
-			String firstRepeated = "";
+				// Line name which is marked first repeated. Filled when found.
+				String firstRepeated = "";
 
-			// For each chant line...
-			for (ChantLineViewController chantLine : chantLines) {
+				// For each chant line...
+				for (ChantLineViewController chantLine : chantLines) {
 
-				if (chantLine.getFirstRepeated()) {
-					firstRepeated = chantLine.getName();
+					if (chantLine.getFirstRepeated()) {
+						firstRepeated = chantLine.getName();
+					}
+
+					printWriter.println(chantLine.toString());
+
 				}
 
-				printWriter.println(chantLine.toString());
-
+				// Footer info
+				printWriter.println();
+				printWriter.println("First Repeated: " + firstRepeated);
 			}
-
-			// Footer info
-			printWriter.println();
-		    printWriter.println("First Repeated: " + firstRepeated);
-
-			printWriter.close();
-			fileWriter.close();
-
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -232,70 +229,70 @@ public class ToneReaderWriter {
 	// TODO: Clean this and following method to reduce repetition
 	private void loadChantLine(int index, String chant_line) throws IOException {
 
-		ChantLineViewController currentChantLine = null;
-		Scanner chantLineScanner = new Scanner(chant_line);
-		String chantLineLine;
+		try (Scanner chantLineScanner = new Scanner(chant_line)) {
+			ChantLineViewController currentChantLine = null;
+			String chantLineLine;
 
-		Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(index, false);
-		try {
-			currentChantLine = currentChantLineLoader.get().getController();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-		assert currentChantLine != null;
+			Task<FXMLLoader> currentChantLineLoader = mainScene.createChantLine(index, false);
+			try {
+				currentChantLine = currentChantLineLoader.get().getController();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+			assert currentChantLine != null;
 
-		// Name / CL type parsing
-		String chantLineName = chantLineScanner.nextLine();
-		if (chantLineName.contains("'")) {
-			currentChantLine.makePrime();
-		} else if (chantLineName.contains("alt")) {
-			currentChantLine.makeAlternate();
-		}
-
-		ChantChordController currentMainChord = null;
-
-		while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
-			// Apply chant line comment
-			if (chantLineLine.startsWith("Comment: ")) {
-				String[] commentData = chantLineLine.split(": ");
-				currentChantLine.setComment(extractComment(commentData, 1));
-
-				continue;
+			// Name / CL type parsing
+			String chantLineName = chantLineScanner.nextLine();
+			if (chantLineName.contains("'")) {
+				currentChantLine.makePrime();
+			} else if (chantLineName.contains("alt")) {
+				currentChantLine.makeAlternate();
 			}
 
-			String[] chordData = chantLineLine.split(": ");
-			String fields = chordData[1];
-			String comment = extractComment(chordData, 2);
+			ChantChordController currentMainChord = null;
 
-			// Add the appropriate chord type.
-			if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
-				currentMainChord = currentChantLine.addRecitingChord();
-				currentMainChord.setFields(fields);
-				currentMainChord.setComment(comment);
-			} else if (chantLineLine.contains("Post")) {
-				assert currentMainChord != null;
-				PostChord postChord = null;
-				if (currentMainChord instanceof RecitingChord rMainChord)
-					postChord = rMainChord.addPostChord(fields);
-				assert postChord != null;
-				postChord.setComment(comment);
-			} else if (chantLineLine.contains("Prep")) {
-				assert currentMainChord != null;
-				PrepChord prepChord;
-				if (currentMainChord instanceof EndChord eMainChord)
-					prepChord = eMainChord.addPrepChord(fields);
-				else
-					prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
-				assert prepChord != null;
-				prepChord.setComment(comment);
-			} else if (chantLineLine.contains("END")) {
-				currentMainChord = currentChantLine.addEndChord();
-				currentMainChord.setFields(fields);
-				currentMainChord.setComment(comment);
+			while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+				// Apply chant line comment
+				if (chantLineLine.startsWith("Comment: ")) {
+					String[] commentData = chantLineLine.split(": ");
+					currentChantLine.setComment(extractComment(commentData, 1));
+
+					continue;
+				}
+
+				String[] chordData = chantLineLine.split(": ");
+				String fields = chordData[1];
+				String comment = extractComment(chordData, 2);
+
+				// Add the appropriate chord type.
+				if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
+					currentMainChord = currentChantLine.addRecitingChord();
+					currentMainChord.setFields(fields);
+					currentMainChord.setComment(comment);
+				} else if (chantLineLine.contains("Post")) {
+					assert currentMainChord != null;
+					PostChord postChord = null;
+					if (currentMainChord instanceof RecitingChord rMainChord)
+						postChord = rMainChord.addPostChord(fields);
+					assert postChord != null;
+					postChord.setComment(comment);
+				} else if (chantLineLine.contains("Prep")) {
+					assert currentMainChord != null;
+					PrepChord prepChord;
+					if (currentMainChord instanceof EndChord eMainChord)
+						prepChord = eMainChord.addPrepChord(fields);
+					else
+						prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
+					assert prepChord != null;
+					prepChord.setComment(comment);
+				} else if (chantLineLine.contains("END")) {
+					currentMainChord = currentChantLine.addEndChord();
+					currentMainChord.setFields(fields);
+					currentMainChord.setComment(comment);
+				}
 			}
 		}
 
-		chantLineScanner.close();
 	}
 
 	private void modifyChantLine(String chant_line, ChantLineViewController existing_line) {
