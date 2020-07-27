@@ -14,21 +14,17 @@ public class QuickVerseIO {
 	public static List<String> getBuiltinVerses() throws IOException {
 		List<String> finalList = new ArrayList<>();
 
-		InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
+		try (InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
 		InputStreamReader inputReader = new InputStreamReader(stream);
-		BufferedReader bufferedReader = new BufferedReader(inputReader);
+		BufferedReader bufferedReader = new BufferedReader(inputReader)) {
+			String line;
 
-		String line;
-
-		while ((line = bufferedReader.readLine()) != null) {
-			if (!line.isEmpty() && !line.startsWith("#")) {
-				finalList.add(line);
+			while ((line = bufferedReader.readLine()) != null) {
+				if (!line.isEmpty() && !line.startsWith("#")) {
+					finalList.add(line);
+				}
 			}
 		}
-
-		bufferedReader.close();
-		inputReader.close();
-		stream.close();
 
 		return finalList;
 	}
@@ -43,19 +39,16 @@ public class QuickVerseIO {
 			return finalList;
 		}
 
-		FileReader fileReader = new FileReader(verseFile);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		try (FileReader fileReader = new FileReader(verseFile);
+		     BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+			String line;
 
-		String line;
-
-		while ((line = bufferedReader.readLine()) != null) {
-			if (!line.isEmpty() && !line.startsWith("#")) {
-				finalList.add(line);
+			while ((line = bufferedReader.readLine()) != null) {
+				if (!line.isEmpty() && !line.startsWith("#")) {
+					finalList.add(line);
+				}
 			}
 		}
-
-		bufferedReader.close();
-		fileReader.close();
 
 		return finalList;
 	}
@@ -91,22 +84,19 @@ public class QuickVerseIO {
 
 		File tempFile = new File(verseFile.getParent() + File.separator + "TEMP");
 
-		BufferedReader reader = new BufferedReader(new FileReader(verseFile));
-		BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-
-		// Only skip the removed line once (only one is removed even if there are multiple lines with same text).
-		String currentLine;
 		boolean removed = false;
-		while ((currentLine = reader.readLine()) != null) {
-		    if (currentLine.trim().equals(verse.trim()) && !removed) {
-		    	removed = true;
-		    	continue; // Skips the following writer.write() line for the item to be removed (removes only one line)
-		    }
-		    writer.write(currentLine + System.getProperty("line.separator"));
+		try (BufferedReader reader = new BufferedReader(new FileReader(verseFile));
+		     BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+			// Only skip the removed line once (only one is removed even if there are multiple lines with same text).
+			String currentLine;
+			while ((currentLine = reader.readLine()) != null) {
+				if (currentLine.trim().equals(verse.trim()) && !removed) {
+					removed = true;
+					continue; // Skips the following writer.write() line for the item to be removed (removes only one line)
+				}
+				writer.write(currentLine + System.getProperty("line.separator"));
+			}
 		}
-
-		writer.close();
-		reader.close();
 
 		if (!(verseFile.delete() && tempFile.renameTo(verseFile))) {
 			throw new IOException("Failed to delete or rename verse file!");
