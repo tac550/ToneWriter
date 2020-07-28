@@ -93,6 +93,7 @@ public class MainSceneController {
 	@FXML private StackPane setVersePane;
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
+	@FXML private StackPane verseTextHintPane;
 
 	@FXML private MenuButton optionsButton;
 	@FXML private ToggleGroup titleOptions;
@@ -188,9 +189,11 @@ public class MainSceneController {
 			}
 		});
 		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
-			boolean visible = !newVal.equals(lastVerseSet) || verseEdited;
-			setVerseButton.setVisible(visible);
-			setVersePane.setMouseTransparent(!visible);
+			verseTextHintPane.setVisible(newVal.isEmpty());
+
+			boolean showSetVerse = !newVal.equals(lastVerseSet) || verseEdited;
+			setVerseButton.setVisible(showSetVerse);
+			setVersePane.setMouseTransparent(!showSetVerse);
 
 			topSceneController.projectEdited();
 		});

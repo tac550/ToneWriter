@@ -113,10 +113,10 @@ public class TWUtils {
 	}
 
 	public static String encodeNewLines(String original) {
-		return original.replaceAll("\n", "/n");
+		return original.replaceAll("/", "<%47>").replaceAll("\n", "/n");
 	}
 	public static String decodeNewLines(String encoded) {
-		return encoded.replaceAll("/n", "\n");
+		return encoded.replaceAll("/n", "\n").replaceAll("<%47>", "/");
 	}
 
 	// Filesystem
