@@ -656,13 +656,13 @@ public class ChantLineViewController implements CommentableView {
 	}
 	
 	public String getEncodedComment() {
-		return commentString.replaceAll("\n", "/n");
+		return TWUtils.encodeNewLines(commentString);
 	}
 	public void setComment(String comment) {
 		if (commentString.equals(comment)) return;
 
 		mainController.toneEdited();
-		commentString = comment.replaceAll("/n", "\n");
+		commentString = TWUtils.decodeNewLines(comment);
 		if (!comment.isEmpty()) {
 			applyCommentGraphic(activeBubbleImage);
 		} else {

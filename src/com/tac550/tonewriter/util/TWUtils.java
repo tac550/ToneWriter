@@ -112,6 +112,13 @@ public class TWUtils {
 		return -1;
 	}
 
+	public static String encodeNewLines(String original) {
+		return original.replaceAll("\n", "/n");
+	}
+	public static String decodeNewLines(String encoded) {
+		return encoded.replaceAll("/n", "\n");
+	}
+
 	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {

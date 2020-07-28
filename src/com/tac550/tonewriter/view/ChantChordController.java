@@ -133,7 +133,7 @@ public abstract class ChantChordController implements CommentableView {
 				BField.getText().isEmpty() ? " " : BField.getText());
 	}
 	public String getEncodedComment() {
-		return commentString.replaceAll("\n", "/n");
+		return TWUtils.encodeNewLines(commentString);
 	}
 	public boolean hasComment() {
 		return !commentString.isEmpty();
@@ -155,7 +155,7 @@ public abstract class ChantChordController implements CommentableView {
 		if (commentString.equals(comment)) return;
 
 		chantLineController.edited();
-		commentString = comment.replaceAll("/n", "\n");
+		commentString = TWUtils.decodeNewLines(comment);
 		if (!comment.isEmpty()) {
 			applyCommentGraphic(activeBubbleImage);
 		} else {

@@ -143,7 +143,7 @@ public class ProjectIO {
 			writeLine(writer, controller.getSelectedTitleOption().getText(),
 					controller.getHideToneHeader(), controller.getPageBreak()); // Options line
 			writeLine(writer, controller.getTopVerseChoice(), controller.getTopVerse()); // Top verse
-			writeLine(writer, controller.getVerseAreaText()); // Verse area text
+			writeLine(writer, TWUtils.encodeNewLines(controller.getVerseAreaText())); // Verse area text
 			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
 
 			// Syllables and assignment data
@@ -228,7 +228,7 @@ public class ProjectIO {
 				List<String> titleSubtitle = readLine(reader);
 				List<String> options = readLine(reader);
 				List<String> topVerse = readLine(reader);
-				String verseAreaText = readLine(reader).get(0);
+				String verseAreaText = TWUtils.decodeNewLines(readLine(reader).get(0));
 				List<String> bottomVerse = readLine(reader);
 
 				// Create and set up item tab
