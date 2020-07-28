@@ -1077,6 +1077,9 @@ public class MainSceneController {
 	public String getVerseAreaText() {
 		return verseArea.getText();
 	}
+	public void setVerseAreaText(String text) {
+		verseArea.setText(text);
+	}
 	public String getBottomVerseChoice() {
 		return bottomVerseChoice.getValue();
 	}
@@ -1115,6 +1118,12 @@ public class MainSceneController {
 	}
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
+	}
+	public void setOptions(String title_format, boolean hide_header, boolean page_break) {
+		titleOptions.selectToggle(titleOptions.getToggles().stream()
+				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_format)).toArray(Toggle[]::new)[0]);
+		hideToneHeaderMenuItem.setSelected(hide_header);
+		pageBreakMenuItem.setSelected(page_break);
 	}
 	public String getLeftHeaderText() {
 		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;

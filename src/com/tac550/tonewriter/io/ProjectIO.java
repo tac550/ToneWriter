@@ -226,6 +226,10 @@ public class ProjectIO {
 				String toneHash = readLine(reader).get(0);
 				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);
+				List<String> options = readLine(reader);
+				List<String> topVerse = readLine(reader);
+				String verseAreaText = readLine(reader).get(0);
+				List<String> bottomVerse = readLine(reader);
 
 				// Create and set up item tab
 				project_scene.addTab(toneHash.isEmpty() ? null : hashtoToneFile.get(toneHash), i, ctr -> {
@@ -237,6 +241,14 @@ public class ProjectIO {
 					ctr.setTitle(titleSubtitle.get(0));
 					ctr.setSubtitle(titleSubtitle.get(1));
 
+					ctr.setOptions(options.get(0), Boolean.parseBoolean(options.get(1)),
+							Boolean.parseBoolean(options.get(2)));
+
+					ctr.setTopVerseChoice(topVerse.get(0));
+					ctr.setTopVerse(topVerse.get(1));
+					ctr.setVerseAreaText(verseAreaText);
+					ctr.setBottomVerseChoice(bottomVerse.get(0));
+					ctr.setBottomVerse(bottomVerse.get(1));
 
 				});
 
