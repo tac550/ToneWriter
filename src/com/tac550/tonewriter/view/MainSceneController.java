@@ -611,6 +611,13 @@ public class MainSceneController {
 		}
 	}
 
+	public void tryChangeToneFile(File tone_file) {
+		if (!tone_file.exists())
+			return;
+
+		toneFile = tone_file;
+	}
+
 	void updateStageTitle() {
 		if (topSceneController.isActiveTab(this)) {
 			String projectTitle = topSceneController.getProjectTitle();
@@ -709,7 +716,7 @@ public class MainSceneController {
 		}
 
 		LoadingTone = false;
-		refreshAllChordPreviews(); // TODO: Fix this being called for every tone loaded with project
+		refreshToneChordPreviews();
 	}
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
@@ -837,7 +844,7 @@ public class MainSceneController {
 	    	chantLineController.setKeySignature(key);
 	    }
 	}
-	void refreshAllChordPreviews() {
+	void refreshToneChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
 		for (ChantLineViewController chantLineController : chantLineControllers) {
@@ -1011,18 +1018,22 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
+		toneEdited(true);
+	}
+	public void toneEdited(boolean project_edited) {
 		if (!toneEdited && isToneSavable() && !loading) {
 			toneEdited = true;
 			updateStageTitle();
 		}
 
-		topSceneController.projectEdited();
+		if (project_edited)
+			topSceneController.projectEdited();
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
 	}
-	boolean getToneEdited() {
+	public boolean getToneEdited() {
 		return toneEdited;
 	}
 

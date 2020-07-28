@@ -138,6 +138,7 @@ public class ProjectIO {
 			File toneFile = controller.getToneFile();
 			writeLine(writer, toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
+			writeLine(writer, controller.getToneEdited()); // Tone edited status
 			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
 			writeLine(writer, controller.getSelectedTitleOption().getText(),
 					controller.getHideToneHeader(), controller.getPageBreak()); // Options line
@@ -223,10 +224,16 @@ public class ProjectIO {
 				// Read in file data
 				File originalToneFile = new File(readLine(reader).get(0));
 				String toneHash = readLine(reader).get(0);
+				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);
 
 				// Create and set up item tab
 				project_scene.addTab(toneHash.isEmpty() ? null : hashtoToneFile.get(toneHash), i, ctr -> {
+
+					ctr.tryChangeToneFile(originalToneFile);
+					if (edited)
+						ctr.toneEdited(false);
+
 					ctr.setTitle(titleSubtitle.get(0));
 					ctr.setSubtitle(titleSubtitle.get(1));
 

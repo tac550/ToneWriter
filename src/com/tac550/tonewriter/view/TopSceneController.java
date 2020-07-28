@@ -817,7 +817,7 @@ public class TopSceneController {
 
 	void refreshAllChordPreviews() {
 		for (Tab tab : tabPane.getTabs()) {
-			tabControllerMap.get(tab).refreshAllChordPreviews();
+			tabControllerMap.get(tab).refreshToneChordPreviews();
 		}
 	}
 
