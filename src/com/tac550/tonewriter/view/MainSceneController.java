@@ -928,7 +928,6 @@ public class MainSceneController {
 			if (result.isPresent()) {
 				if (result.get() == projectBT) {
 					tempExportMode = ExportMode.PROJECT;
-					topSceneController.checkProjectName();
 				} else if (result.get() == itemBT) {
 					tempExportMode = ExportMode.ITEM;
 				} else throw new RenderFormatException();

@@ -324,7 +324,7 @@ public class TopSceneController {
 	@FXML void addTab() {
 		addTab(null, -1, null);
 	}
-	@FXML boolean handleSetProjectTitle() {
+	@FXML void handleSetProjectTitle() {
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
@@ -341,8 +341,7 @@ public class TopSceneController {
 		if (result.isPresent()) {
 			setProjectTitle(result.get());
 			getSelectedTabScene().updateStageTitle();
-			return true;
-		} else return false;
+		}
 	}
 
 	@FXML private void handleNewProject() {
@@ -800,12 +799,6 @@ public class TopSceneController {
 		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
 				getTabControllers(), paperSize);
 
-	}
-
-	void checkProjectName() {
-		while (true) {
-			if (!projectTitle.isBlank() || !handleSetProjectTitle()) break;
-		}
 	}
 
 	void propagateProjectOutputSetting() {
