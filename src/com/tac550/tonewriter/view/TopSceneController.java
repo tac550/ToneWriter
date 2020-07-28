@@ -604,15 +604,15 @@ public class TopSceneController {
 							int numIndex = matcher.start();
 							int nextNum = Integer.parseInt(prevNum) + 1;
 
-							newTabController.setTitleText(prevTitle.substring(0, numIndex) + nextNum);
+							newTabController.setTitle(prevTitle.substring(0, numIndex) + nextNum);
 						}
 					} else {
-						newTabController.setTitleText("Item " + (getTabCount() + 1));
+						newTabController.setTitle("Item " + (getTabCount() + 1));
 					}
 
 				} else {
 					// Title text for the first tab created (at startup)
-					newTabController.setTitleText("Item 1");
+					newTabController.setTitle("Item 1");
 
 					if (with_tone != null) {
 						newTabController.handleOpenTone(with_tone, true, false);

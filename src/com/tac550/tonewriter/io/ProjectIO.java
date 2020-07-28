@@ -6,10 +6,7 @@ import com.tac550.tonewriter.view.TopSceneController;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -40,7 +37,7 @@ public class ProjectIO {
 
 		Set<String> uniqueHashes = new HashSet<>();
 
-		// Iterate through all the tabs
+		// Iterate through all the tabs, saving their configurations and saving tones if unique
 		int index = 0;
 		for (MainSceneController controller : project_scene.getTabControllers()) {
 			File toneFile = controller.getToneFile();
@@ -193,9 +190,8 @@ public class ProjectIO {
 			return false;
 		}
 
-		int numItems;
-
 		// Gather project metadata from info file
+		int numItems;
 		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
 
@@ -207,17 +203,41 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Load however many items are in the save file
-		for (int i = 0; i < numItems; i++) {
-			int finalI = i;
-			project_scene.addTab(null, i, ctr -> ctr.setTitleText("Loaded " + (finalI + 1)));
+		// Gather references to tone files
+		Map<String, File> hashtoToneFile = new HashMap<>();
+		File tonesDir = new File(tempDirectory.getAbsolutePath() + File.separator + "tones");
+		File[] toneDirs = tonesDir.listFiles();
+		if (tonesDir.exists() && toneDirs != null) {
+			for (File toneDir : toneDirs) {
+				hashtoToneFile.put(toneDir.getName(), new File(toneDir.getAbsolutePath()
+						+ File.separator + "unsaved.tone"));
+			}
 		}
 
-		// Try to delete the temporary directory created in the process
-		try {
-			FileUtils.deleteDirectory(tempDirectory);
-		} catch (IOException e) {
-			e.printStackTrace();
+		// Load however many items are in the save file
+		for (int i = 0; i < numItems; i++) {
+			File itemFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
+					+ File.separator + i);
+			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile)))) {
+
+				// Read in file data
+				File originalToneFile = new File(readLine(reader).get(0));
+				String toneHash = readLine(reader).get(0);
+				List<String> titleSubtitle = readLine(reader);
+
+				// Create and set up item tab
+				project_scene.addTab(toneHash.isEmpty() ? null : hashtoToneFile.get(toneHash), i, ctr -> {
+					ctr.setTitle(titleSubtitle.get(0));
+					ctr.setSubtitle(titleSubtitle.get(1));
+
+
+				});
+
+			} catch (IOException e) {
+				TWUtils.showError("Failed to read item file " + i, true);
+				return false;
+			}
+
 		}
 
 		return true;

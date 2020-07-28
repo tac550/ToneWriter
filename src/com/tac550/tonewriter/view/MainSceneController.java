@@ -709,7 +709,7 @@ public class MainSceneController {
 		}
 
 		LoadingTone = false;
-		refreshAllChordPreviews();
+		refreshAllChordPreviews(); // TODO: Fix this being called for every tone loaded with project
 	}
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
@@ -1042,9 +1042,6 @@ public class MainSceneController {
 	ObservableStringValue getTitleTextProperty() {
 		return titleTextField.textProperty();
 	}
-	public void setTitleText(String title) {
-		titleTextField.setText(title);
-	}
 
 	void setDividerPosition(double position) {
 		mainSplitPane.setDividerPosition(0, position);
@@ -1099,8 +1096,14 @@ public class MainSceneController {
 	public String getTitle() {
 		return titleTextField.getText();
 	}
+	public void setTitle(String title) {
+		titleTextField.setText(title);
+	}
 	public String getSubtitle() {
 		return subtitleTextField.getText();
+	}
+	public void setSubtitle(String subtitle) {
+		subtitleTextField.setText(subtitle);
 	}
 	public String getLeftHeaderText() {
 		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;
