@@ -80,7 +80,7 @@ public class SyllableText extends Text {
 
 		nextNoteButtonYPos += VerseLineViewController.NOTE_BUTTON_HEIGHT.get();
 		
-		associatedChords.add(new AssignedChordData(getText(), chord_index, parentController));
+		associatedChords.add(new AssignedChordData(chord_index, parentController));
 		associatedButtons.add(note_button);
 		
 		setColor(chord_color);

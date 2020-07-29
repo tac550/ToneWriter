@@ -1,12 +1,19 @@
 package com.tac550.tonewriter.io;
 
+import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController;
+import com.tac550.tonewriter.view.SyllableText;
 import com.tac550.tonewriter.view.TopSceneController;
+import com.tac550.tonewriter.view.VerseLineViewController;
+import javafx.concurrent.Task;
+import javafx.fxml.FXMLLoader;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -147,6 +154,24 @@ public class ProjectIO {
 			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
 
 			// Syllables and assignment data
+			for (VerseLineViewController vLine : controller.getVerseLineControllers()) {
+				StringBuilder line = new StringBuilder("+");
+
+				if (vLine.isSeparator()) {
+					line.append("--------");
+				}
+
+				for (SyllableText syllable : vLine.getSyllables()) {
+					line.append("|").append(syllable.getText().strip()).append(" ");
+
+					for (AssignedChordData chordData : syllable.getAssociatedChords()) {
+						line.append(chordData.getChordIndex()).append("-").append(chordData.getDuration()).append(";");
+					}
+				}
+
+//				System.out.println(List.of(line.toString().split(" ")));
+				writeLine(writer, line);
+			}
 
 		}
 	}
@@ -231,6 +256,30 @@ public class ProjectIO {
 				String verseAreaText = TWUtils.decodeNewLines(readLine(reader).get(0));
 				List<String> bottomVerse = readLine(reader);
 
+				List<List<String>> syllables = new ArrayList<>();
+				List<List<String>> assignments = new ArrayList<>();
+
+				String assignmentLine;
+				while ((assignmentLine = readLine(reader).get(0)).startsWith("+")) {
+					List<String> lineSyllables = new ArrayList<>();
+					List<String> lineAssignments = new ArrayList<>();
+
+					String[] data = assignmentLine.split("\\|");
+					for (int j = 1; j < data.length; j++) {
+						String[] parts = data[j].split(" ");
+						String syllable = parts[0];
+						if (!syllable.startsWith("-"))
+							syllable = " " + syllable;
+						String assignment = parts.length > 1 ? parts[1] : "";
+
+						lineSyllables.add(syllable);
+						lineAssignments.add(assignment);
+					}
+
+					syllables.add(lineSyllables);
+					assignments.add(lineAssignments);
+				}
+
 				// Create and set up item tab
 				project_scene.addTab(toneHash.isEmpty() ? null : hashtoToneFile.get(toneHash), i, ctr -> {
 
@@ -250,6 +299,27 @@ public class ProjectIO {
 					ctr.setBottomVerseChoice(bottomVerse.get(0));
 					ctr.setBottomVerse(bottomVerse.get(1));
 
+					for (int j = 0; j < syllables.size(); j++) {
+						List<String> sylls = syllables.get(j);
+						List<String> assigns = assignments.get(j);
+
+						// Create verse line with provided syllable data and save a reference to its controller
+						Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("", sylls));
+						VerseLineViewController currentVerseLine = null;
+						try {
+							currentVerseLine = verseLineLoader.get().getController();
+						} catch (InterruptedException | ExecutionException e) {
+							e.printStackTrace();
+						}
+						assert currentVerseLine != null;
+
+						// Add assignments
+						for (int k = 0; k < sylls.size(); k++) {
+							System.out.println(sylls.get(k) + " gets " + assigns.get(k));
+						}
+					}
+
+					ctr.applyLoadedVerses();
 				});
 
 			} catch (IOException e) {
@@ -285,8 +355,7 @@ public class ProjectIO {
 	}
 
 	private static void writeLine(Writer writer, Object... items) throws IOException {
-		writer.write(String.join("\t", Arrays.stream(items).map(String::valueOf).toArray(String[]::new))
-				+ "\n");
+		writer.write(Arrays.stream(items).map(String::valueOf).collect(Collectors.joining("\t")) + "\n");
 	}
 
 }

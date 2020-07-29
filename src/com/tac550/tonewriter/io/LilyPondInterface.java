@@ -273,7 +273,7 @@ public class LilyPondInterface {
 			float lineBeats = 0;
 
 			// For each syllable in the line...
-			for (SyllableText syllableData : syllableList) {
+			for (SyllableText syllable : syllableList) {
 				// Note buffers for this syllable.           S   A   T   B
 				String[] syllableNoteBuffers = new String[]{"", "", "", ""};
 				// Buffer for the syllable's text.
@@ -289,7 +289,7 @@ public class LilyPondInterface {
 				// Gets set if a note was combined on the last chord.
 				String[] tempCurrentNotes = new String[]{"", "", "", ""};
 
-				List<AssignedChordData> chordList = Arrays.asList(syllableData.getAssociatedChords());
+				List<AssignedChordData> chordList = Arrays.asList(syllable.getAssociatedChords());
 				// For each chord assigned to the syllable...
 				for (AssignedChordData chordData : chordList) {
 
@@ -301,13 +301,13 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == 0) {
 
 						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-						syllableTextBuffer.append(escapeDoubleQuotes(chordData.getSyllable().replace("-", "")));
+						syllableTextBuffer.append(escapeDoubleQuotes(syllable.getText().replace("-", "")));
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
-						if (syllableList.indexOf(syllableData) < syllableList.size() - 1) {
+						if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
 							// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
 							// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-							if (syllableList.get(syllableList.indexOf(syllableData) + 1).getText().startsWith("-")) {
+							if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
 								syllableTextBuffer.append(" -- ");
 							}
 						}
@@ -342,12 +342,12 @@ public class LilyPondInterface {
 						// If this is the first chord associated with this syllable...
 						if (chordList.indexOf(chordData) == 0) {
 							// And if this is the first syllable in the whole text...
-							if (syllableList.indexOf(syllableData) == 0) {
+							if (syllableList.indexOf(syllable) == 0) {
 								// Then we know we need to show the chord. It'll be the first chord on the page!
 								hideThisChord = false;
 							} else {
 								// The previous note is the note from the last chord from the previous syllable.
-								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllableData) - 1).getAssociatedChords();
+								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssociatedChords();
 								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
 							}
 						} else {
@@ -370,10 +370,10 @@ public class LilyPondInterface {
 						// If this is the last chord associated with this syllable...
 						if (chordList.indexOf(chordData) == chordList.size() - 1) {
 							// And if this isn't the last syllable with chords on it...
-							if (syllableList.indexOf(syllableData) < syllableList.size() - 1
-									&& syllableList.get(syllableList.indexOf(syllableData) + 1).getAssociatedChords().length > 0) {
+							if (syllableList.indexOf(syllable) < syllableList.size() - 1
+									&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords().length > 0) {
 								// Then the next note is the note from the first chord of the next syllable.
-								nextNote = syllableList.get(syllableList.indexOf(syllableData) + 1).getAssociatedChords()[0].getPart(i);
+								nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i);
 							} else {
 								// This is the last chord associated with the last syllable with chords on it,
 								// so we definitely do not want to hide it (it's the last chord on the page!)

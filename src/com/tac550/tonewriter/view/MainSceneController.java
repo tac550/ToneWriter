@@ -140,6 +140,7 @@ public class MainSceneController {
 
 	@FXML private VBox verseLineBox;
 	private final List<VerseLineViewController> verseLineControllers = new ArrayList<>();
+	List<Task<FXMLLoader>> verseLineLoaders = new ArrayList<>();
 
 	@FXML private void initialize() {
 
@@ -257,16 +258,17 @@ public class MainSceneController {
 		rightText = right;
 	}
 
-	private Task<FXMLLoader> createVerseLine(String line) {
+	public Task<FXMLLoader> createVerseLine(String line) {
 
-		return FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentControllers(this, topSceneController);
 
 			controller.setVerseLine(line);
-
 		});
+		verseLineLoaders.add(loaderTask);
 
+		return loaderTask;
 	}
 	public Task<FXMLLoader> createChantLine(int index, boolean recalculateNames) {
 
@@ -281,9 +283,28 @@ public class MainSceneController {
 				chantLineBox.getChildren().add(index, chantLineLayout);
 				if (recalculateNames) recalcCLNames();
 			});
-
 		});
+	}
 
+	public void applyLoadedVerses() {
+		Platform.runLater(() -> {
+			for (Task<FXMLLoader> loader : verseLineLoaders) {
+				try {
+					verseLineControllers.add(loader.get().getController());
+					verseLineBox.getChildren().add(loader.get().getRoot());
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+
+			syncCVLMapping();
+
+			// Hide working indicator
+			setVerseProgressBox.setVisible(false);
+			setVersePane.setMouseTransparent(true);
+
+			topSceneController.projectEdited();
+		});
 	}
 
 	public void recalcCLNames() {
@@ -463,30 +484,11 @@ public class MainSceneController {
 					return null;
 				}
 
-				List<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
-
 				for (String line : lines) {
-					lineLoaders.add(createVerseLine(line));
+					createVerseLine(line);
 				}
 
-				Platform.runLater(() -> {
-					for (Task<FXMLLoader> loader : lineLoaders) {
-						try {
-							verseLineControllers.add(loader.get().getController());
-							verseLineBox.getChildren().add(loader.get().getRoot());
-						} catch (InterruptedException | ExecutionException e) {
-							e.printStackTrace();
-						}
-					}
-
-					syncCVLMapping();
-
-					// Hide working indicator
-					setVerseProgressBox.setVisible(false);
-					setVersePane.setMouseTransparent(true);
-
-					topSceneController.projectEdited();
-				});
+				applyLoadedVerses();
 				return null;
 			}
 		};

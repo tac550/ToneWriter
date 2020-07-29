@@ -630,7 +630,7 @@ public class VerseLineViewController {
 		return infoList.toArray(new SyllableText[] {});
 	}
 
-	boolean isSeparator() {
+	public boolean isSeparator() {
 		return isSeparatorLine;
 	}
 

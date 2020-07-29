@@ -178,7 +178,7 @@
                                     </StackPane>
                                     <StackPane fx:id="verseTextHintPane" mouseTransparent="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <Text fill="#61a2b1" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter text here">
+                                          <Text fill="#4dc7e2" strokeType="OUTSIDE" strokeWidth="0.0" text="Enter text here">
                                              <font>
                                                 <Font size="24.0" />
                                              </font>
