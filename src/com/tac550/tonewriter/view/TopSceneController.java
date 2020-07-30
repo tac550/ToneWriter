@@ -614,11 +614,11 @@ public class TopSceneController {
 					// Title text for the first tab created (at startup)
 					newTabController.setTitle("Item 1");
 
-					if (with_tone != null) {
-						newTabController.handleOpenTone(with_tone, true, false);
-					}
-
 				}
+
+				// If there is a specified tone...
+				if (with_tone != null)
+					newTabController.handleOpenTone(with_tone, true, false);
 
 				// If there is a specified index...
 				if (at_index != -1) {

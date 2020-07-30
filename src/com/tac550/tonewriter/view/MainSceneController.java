@@ -296,14 +296,6 @@ public class MainSceneController {
 					e.printStackTrace();
 				}
 			}
-
-			syncCVLMapping();
-
-			// Hide working indicator
-			setVerseProgressBox.setVisible(false);
-			setVersePane.setMouseTransparent(true);
-
-			topSceneController.projectEdited();
 		});
 	}
 
@@ -489,6 +481,15 @@ public class MainSceneController {
 				}
 
 				applyLoadedVerses();
+
+				syncCVLMapping();
+
+				// Hide working indicator
+				setVerseProgressBox.setVisible(false);
+				setVersePane.setMouseTransparent(true);
+
+				topSceneController.projectEdited();
+
 				return null;
 			}
 		};
@@ -629,7 +630,7 @@ public class MainSceneController {
 			// Update stage title to show loaded tone name and edit status
 			parentStage.setTitle((topSceneController.getProjectEdited() ? "*" : "")
 					+ (!projectTitle.isEmpty() ? topSceneController.getProjectTitle() + " - " : "")
-					+ MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : "")
+					+ MainApp.APP_NAME + (toneFile != null ? " - " + FilenameUtils.removeExtension(toneFile.getName()) : "")
 					+ (toneEdited ? "*" : ""));
 		}
 	}

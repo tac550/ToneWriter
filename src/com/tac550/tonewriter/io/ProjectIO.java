@@ -313,10 +313,6 @@ public class ProjectIO {
 						}
 						assert currentVerseLine != null;
 
-						// Add assignments
-						for (int k = 0; k < sylls.size(); k++) {
-							System.out.println(sylls.get(k) + " gets " + assigns.get(k));
-						}
 					}
 
 					ctr.applyLoadedVerses();
