@@ -112,6 +112,7 @@ public class MainSceneController {
 	private String keySignature = "C major";
 	private String leftText = "";
 	private String rightText = "";
+	private boolean manualCLAssignment = false;
 
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
@@ -834,13 +835,16 @@ public class MainSceneController {
 
 	}
 	void handleToggleManualCLAssignment() {
+		manualCLAssignment = topSceneController.getManualCLAssignmentStatus();
+
 		toneEdited();
 		syncCVLMapping();
 	}
 	public boolean manualCLAssignmentEnabled() {
-		return topSceneController.manualCLAssignmentEnabled();
+		return manualCLAssignment;
 	}
 	public void setManualCLAssignmentSilently(boolean enable) { // Doesn't trigger tone edited status
+		manualCLAssignment = enable;
 		toneMenuState.manualCLAssignmentSelected = enable;
 		topSceneController.setMenuState(toneMenuState);
 	}

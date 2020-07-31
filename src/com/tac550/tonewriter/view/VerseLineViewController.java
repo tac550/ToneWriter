@@ -55,7 +55,7 @@ public class VerseLineViewController {
 	private int selectedChantLine = 0;
 	String previousChantLine = "";
 
-	@FXML private ChoiceBox<String> chantLineChoice;
+	@FXML private ChoiceBox<String> tonePhraseChoice;
 	@FXML private TextFlow lineTextFlow;
 	@FXML private RowConstraints textRow;
 
@@ -85,7 +85,7 @@ public class VerseLineViewController {
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
 	@FXML private void initialize() {
-		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
+		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
 			if (changingAssignments) return;
 
 			selectedChantLine = new_val.intValue();
@@ -217,14 +217,14 @@ public class VerseLineViewController {
 	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
 
-		int previousSelection = chantLineChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
-				chantLineChoice.getSelectionModel().getSelectedIndex();
+		int previousSelection = tonePhraseChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
+				tonePhraseChoice.getSelectionModel().getSelectedIndex();
 
 		// Load in new chant line choices
 		associatedChantLines = chant_lines;
-		chantLineChoice.getItems().clear();
+		tonePhraseChoice.getItems().clear();
 		for (ChantLineViewController chantLine : associatedChantLines) {
-			chantLineChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
+			tonePhraseChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
 		}
 
 		// Determine initial chant line selection.
@@ -255,13 +255,13 @@ public class VerseLineViewController {
 			// If we're not in manual assignment mode, just select the first by default.
 			selectedChantLine = 0;
 		}
-		chantLineChoice.getSelectionModel().select(selectedChantLine);
+		tonePhraseChoice.getSelectionModel().select(selectedChantLine);
 
 		// ChoiceBox highlighting if choices are available
-		if (chantLineChoice.getItems().size() > 1) {
-			chantLineChoice.setStyle("-fx-base: #fcfc2f");
+		if (tonePhraseChoice.getItems().size() > 1) {
+			tonePhraseChoice.setStyle("-fx-base: #fcfc2f");
 		} else {
-			chantLineChoice.setStyle("");
+			tonePhraseChoice.setStyle("");
 		}
 
 		// Only reset chord assignments if the new chant line selection is structurally different from the previous one
@@ -628,6 +628,13 @@ public class VerseLineViewController {
 		}
 
 		return infoList.toArray(new SyllableText[] {});
+	}
+
+	public String getTonePhraseChoice() {
+		return tonePhraseChoice.getValue();
+	}
+	public void setTonePhraseChoice(String choice) {
+		tonePhraseChoice.setValue(choice);
 	}
 
 	public boolean isSeparator() {

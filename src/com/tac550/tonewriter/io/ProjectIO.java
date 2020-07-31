@@ -159,6 +159,8 @@ public class ProjectIO {
 
 				if (vLine.isSeparator()) {
 					line.append("--------");
+				} else {
+					line.append(vLine.getTonePhraseChoice());
 				}
 
 				for (SyllableText syllable : vLine.getSyllables()) {
@@ -169,7 +171,6 @@ public class ProjectIO {
 					}
 				}
 
-//				System.out.println(List.of(line.toString().split(" ")));
 				writeLine(writer, line);
 			}
 
@@ -256,6 +257,7 @@ public class ProjectIO {
 				String verseAreaText = TWUtils.decodeNewLines(readLine(reader).get(0));
 				List<String> bottomVerse = readLine(reader);
 
+				List<String> assignedPhrases = new ArrayList<>();
 				List<List<String>> syllables = new ArrayList<>();
 				List<List<String>> assignments = new ArrayList<>();
 
@@ -265,6 +267,11 @@ public class ProjectIO {
 					List<String> lineAssignments = new ArrayList<>();
 
 					String[] data = assignmentLine.split("\\|");
+
+					// data[0] contains meta info about the line.
+					assignedPhrases.add(data[0].substring(1));
+
+					// Iterate through data[1] -> data[data.length - 1]
 					for (int j = 1; j < data.length; j++) {
 						String[] parts = data[j].split(" ");
 						String syllable = parts[0];
@@ -312,6 +319,8 @@ public class ProjectIO {
 							e.printStackTrace();
 						}
 						assert currentVerseLine != null;
+
+						currentVerseLine.setTonePhraseChoice(assignedPhrases.get(j));
 
 					}
 

@@ -726,7 +726,7 @@ public class TopSceneController {
 		manualCLAssignmentMenuItem.setSelected(menu_state.manualCLAssignmentSelected);
 	}
 
-	boolean manualCLAssignmentEnabled() {
+	boolean getManualCLAssignmentStatus() {
 		return manualCLAssignmentMenuItem.isSelected();
 	}
 
