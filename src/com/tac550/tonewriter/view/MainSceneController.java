@@ -296,6 +296,8 @@ public class MainSceneController {
 					e.printStackTrace();
 				}
 			}
+
+			syncCVLMapping();
 		});
 	}
 
@@ -481,8 +483,6 @@ public class MainSceneController {
 				}
 
 				applyLoadedVerses();
-
-				syncCVLMapping();
 
 				// Hide working indicator
 				setVerseProgressBox.setVisible(false);
