@@ -312,17 +312,15 @@ public class ProjectIO {
 
 						// Create verse line with provided syllable data and save a reference to its controller
 						Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("", sylls));
-						VerseLineViewController currentVerseLine = null;
+						VerseLineViewController verseLine = null;
 						try {
-							currentVerseLine = verseLineLoader.get().getController();
+							verseLine = verseLineLoader.get().getController();
 						} catch (InterruptedException | ExecutionException e) {
 							e.printStackTrace();
 						}
-						assert currentVerseLine != null;
+						assert verseLine != null;
 
-//						System.out.println(assignedPhrases.get(j));
-						// Not working; needs to happen after added.
-						currentVerseLine.setTonePhraseChoice(assignedPhrases.get(j));
+						verseLine.setTonePhraseChoice(assignedPhrases.get(j));
 
 					}
 

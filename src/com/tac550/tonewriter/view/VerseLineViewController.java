@@ -28,8 +28,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -308,7 +306,6 @@ public class VerseLineViewController {
 		lastSyllableAssigned = action.previousLastSyllableAssigned;
 		nextChordIndex = action.previousChordIndex;
 		nextChordAssignment();
-
 	}
 
 	@FXML private void remove() {
@@ -621,13 +618,7 @@ public class VerseLineViewController {
 	}
 
 	public SyllableText[] getSyllables() {
-		List<SyllableText> infoList = new ArrayList<>();
-
-		for (Node node : lineTextFlow.getChildren()) {
-			infoList.add((SyllableText) node);
-		}
-
-		return infoList.toArray(new SyllableText[] {});
+		return lineTextFlow.getChildren().stream().map(node -> (SyllableText) node).toArray(SyllableText[]::new);
 	}
 
 	public String getTonePhraseChoice() {
