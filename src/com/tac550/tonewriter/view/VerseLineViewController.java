@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 
 import java.util.Locale;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 public class VerseLineViewController {
 
@@ -81,6 +82,8 @@ public class VerseLineViewController {
 	private boolean doneAssigning = false;
 
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
+
+	private Consumer<VerseLineViewController> pendingActions;
 
 	@FXML private void initialize() {
 		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -273,6 +276,16 @@ public class VerseLineViewController {
 		// Save chant line information for later.
 		previousChantLine = associatedChantLines[selectedChantLine].toString();
 
+		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
+		if (pendingActions != null) {
+			pendingActions.accept(this);
+
+			pendingActions = null;
+		}
+	}
+
+	public void setPendingActions(Consumer<VerseLineViewController> actions) {
+		pendingActions = actions;
 	}
 
 	private void resetChordAssignment() {
@@ -477,9 +490,15 @@ public class VerseLineViewController {
 		nextChordAssignment();
 	}
 
-	private void assignChord(int firstSyllable, int lastSyllable) {
+	public void assignChordSilently(int first_syll, int last_syll) {
+		assignChord(first_syll, last_syll, true);
+	}
+	private void assignChord(int first_syll, int last_syll) {
+		assignChord(first_syll, last_syll, false);
+	}
+	private void assignChord(int first_syll, int last_syll, boolean silent) {
 		// First, play the chord if chord playing is on.
-		if (topController.playMidiAsAssigned()) {
+		if (!silent && topController.playMidiAsAssigned()) {
 			getCurrentChord().playMidi();
 		}
 
@@ -488,14 +507,14 @@ public class VerseLineViewController {
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = nextChordIndex - 1;
 
-		for (int i = firstSyllable; i <= lastSyllable; i++) {
+		for (int i = first_syll; i <= last_syll; i++) {
 			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
 			undoFrame.syllableTexts.add(currentText);
 
 			Button noteButton;
 
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
-					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
+					&& i == last_syll) { // Final instance of the last chord in the chant line gets special duration.
 				if (mainController.isLastVerseLineOfSection(this)) {
 					noteButton = createNoteButton(currentText, getCurrentChord());
 
@@ -520,7 +539,7 @@ public class VerseLineViewController {
 
 		}
 
-		lastSyllableAssigned = lastSyllable;
+		lastSyllableAssigned = last_syll;
 		nextChordAssignment();
 
 		undoActions.push(undoFrame);
@@ -627,14 +646,6 @@ public class VerseLineViewController {
 	public void setTonePhraseChoice(String choice) {
 		if (tonePhraseChoice.getItems().contains(choice)) {
 			tonePhraseChoice.getSelectionModel().select(choice);
-		} else {
-			tonePhraseChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
-				@Override
-				public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-					setTonePhraseChoice(choice);
-					tonePhraseChoice.getSelectionModel().selectedItemProperty().removeListener(this);
-				}
-			});
 		}
 	}
 

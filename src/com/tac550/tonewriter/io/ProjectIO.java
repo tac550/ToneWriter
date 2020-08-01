@@ -320,7 +320,11 @@ public class ProjectIO {
 						}
 						assert verseLine != null;
 
-						verseLine.setTonePhraseChoice(assignedPhrases.get(j));
+						int finalJ = j;
+						verseLine.setPendingActions(vLine -> {
+							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
+
+						});
 
 					}
 
