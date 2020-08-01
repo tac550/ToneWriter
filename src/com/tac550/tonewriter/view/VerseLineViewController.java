@@ -634,7 +634,17 @@ public class VerseLineViewController {
 		return tonePhraseChoice.getValue();
 	}
 	public void setTonePhraseChoice(String choice) {
-		tonePhraseChoice.setValue(choice);
+		if (tonePhraseChoice.getItems().contains(choice)) {
+			tonePhraseChoice.getSelectionModel().select(choice);
+		} else {
+			tonePhraseChoice.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
+				@Override
+				public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+					setTonePhraseChoice(choice);
+					tonePhraseChoice.getSelectionModel().selectedItemProperty().removeListener(this);
+				}
+			});
+		}
 	}
 
 	public boolean isSeparator() {

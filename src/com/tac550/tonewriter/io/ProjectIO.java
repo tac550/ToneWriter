@@ -320,6 +320,8 @@ public class ProjectIO {
 						}
 						assert currentVerseLine != null;
 
+//						System.out.println(assignedPhrases.get(j));
+						// Not working; needs to happen after added.
 						currentVerseLine.setTonePhraseChoice(assignedPhrases.get(j));
 
 					}
