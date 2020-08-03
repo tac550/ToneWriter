@@ -92,7 +92,7 @@
                <items>
                   <MenuItem fx:id="addCLMenuItem" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
                   <MenuItem fx:id="setKeyMenuItem" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
-                  <MenuItem fx:id="editHeaderInfoMenuItem" mnemonicParsing="false" onAction="#handleEditHeaderInfo" text="Edit Header Info..." />
+                  <MenuItem fx:id="editHeaderInfoMenuItem" mnemonicParsing="false" onAction="#handleSetHeaderInfo" text="Edit Header Info..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <CheckMenuItem fx:id="manualCLAssignmentMenuItem" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />
                </items>

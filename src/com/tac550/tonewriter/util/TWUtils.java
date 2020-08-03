@@ -152,7 +152,7 @@ public class TWUtils {
 						FileUtils.deleteDirectory(file);
 					else
 						if (!file.delete())
-							throw new IOException("(TW) File deletion failed");
+							throw new IOException("(TW) File deletion failed for file " + file.getAbsolutePath());
 				} catch (IOException e) {
 					e.printStackTrace();
 					TWUtils.showError("Failed to delete temp file " + file.getName(), false);

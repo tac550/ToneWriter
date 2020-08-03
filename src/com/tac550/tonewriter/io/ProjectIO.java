@@ -177,12 +177,12 @@ public class ProjectIO {
 		}
 	}
 
-	public static boolean openProject(File project_file, TopSceneController project_scene) {
+	public static boolean openProject(File project_file, TopSceneController top_controller) {
 
 		// Create temp directory to unzip project into
 		File tempDirectory;
 		try {
-			tempDirectory = TWUtils.createTWTempDir("ProjectLoad-" + project_scene.getProjectTitle());
+			tempDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create temp directory for project load!", true);
 			return false;
@@ -222,7 +222,7 @@ public class ProjectIO {
 		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
 
-			project_scene.setProjectTitle(readLine(reader).get(0));
+			top_controller.setProjectTitle(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
 
 		} catch (IOException e) {
@@ -288,13 +288,16 @@ public class ProjectIO {
 				}
 
 				// Create and set up item tab
-				project_scene.addTab(toneHash.isEmpty() ? null : hashtoToneFile.get(toneHash), i, ctr -> {
+				top_controller.addTab(titleSubtitle.get(0), i, ctr -> {
+					final boolean projectEditedState = top_controller.getProjectEdited();
+					System.out.println("Project edited state: " + projectEditedState);
 
-					ctr.tryChangeToneFile(originalToneFile);
-					if (edited)
+					if (!toneHash.isEmpty())
+						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
+
+					if (ctr.tryChangeToneFile(originalToneFile) && edited)
 						ctr.toneEdited(false);
 
-					ctr.setTitle(titleSubtitle.get(0));
 					ctr.setSubtitle(titleSubtitle.get(1));
 
 					ctr.setOptions(options.get(0), Boolean.parseBoolean(options.get(1)),
@@ -334,9 +337,7 @@ public class ProjectIO {
 							for (int k = 0; k < assigns.size(); k++) {
 								String currAssigns = assigns.get(k);
 								if (currAssigns.isEmpty()) {
-									System.out.println("Empty assignment slot!");
 									if (!prevWasEmpty) {
-										System.out.println("Previous not empty!");
 										vLine.assignChordSilently(startSyll, k - 1);
 										startSyll = k;
 										lastChordIndex++;
@@ -352,20 +353,17 @@ public class ProjectIO {
 								String[] chords = currAssigns.split(";");
 								int chordNum = 0;
 								for (String chord : chords) {
-									System.out.println("Checking chord " + chord);
 									String[] ind_dur = chord.split("-");
 									int chordIndex = Integer.parseInt(ind_dur[0]);
 									String duration = ind_dur[1];
 									if (chordIndex > lastChordIndex) {
 
-										System.out.println(chordIndex + " is greater than " + lastChordIndex);
 
 										while (lastChordIndex < lastAssignedChordIndex) {
 											vLine.skipChord();
 											lastChordIndex++;
 										}
 
-										System.out.println("Now second is " + lastChordIndex);
 
 										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
 												&& Integer.parseInt(chords[chordNum-1].split("-")[0]) - lastChordIndex < 1 ? k : k - 1);
@@ -375,7 +373,6 @@ public class ProjectIO {
 
 									}
 									if (chordNum == chords.length - 1 && assigns.stream().skip(k+1).allMatch(String::isEmpty)) {
-										System.out.println("Test for final assignment PASSES");
 										while (lastChordIndex < chordIndex) {
 											vLine.skipChord();
 											lastChordIndex++;
@@ -390,7 +387,7 @@ public class ProjectIO {
 						});
 					}
 
-					ctr.applyLoadedVerses();
+					ctr.applyLoadedVerses(projectEditedState);
 				});
 
 			} catch (IOException e) {

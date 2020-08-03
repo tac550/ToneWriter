@@ -252,6 +252,10 @@ public class TopSceneController {
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
 			MainSceneController selectedController = getSelectedTabScene();
 			if (selectedController == null) return;
+
+			// Finish loading the tab if not already done.
+			selectedController.runPendingLoadActions();
+
 			selectedController.updateStageTitle();
 			selectedController.applyToneMenuState();
 		});
@@ -269,8 +273,13 @@ public class TopSceneController {
 				addNextPendingTabs();
 		});
 
-		// listeners for triggering project edited status
-		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> projectEdited());
+		// listener which triggers project edited status when tabs reordered or removed
+		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
+			while (change.next()) {
+				if (change.wasPermutated() || change.wasRemoved())
+					projectEdited();
+			}
+		});
 
 	}
 
@@ -280,7 +289,7 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(arg_file, 0, null);
+				addTab(null, 0, ctr -> ctr.handleOpenTone(arg_file, true, false));
 			else
 				openProject(arg_file);
 		} else {
@@ -323,6 +332,7 @@ public class TopSceneController {
 	 */
 	@FXML void addTab() {
 		addTab(null, -1, null);
+		projectEdited();
 	}
 	@FXML void handleSetProjectTitle() {
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
@@ -440,7 +450,7 @@ public class TopSceneController {
 	@FXML private void handleSetKeySignature() {
 		getSelectedTabScene().handleSetKeySignature();
 	}
-	@FXML private void handleEditHeaderInfo() {
+	@FXML private void handleSetHeaderInfo() {
 		getSelectedTabScene().handleEditHeaderInfo();
 	}
 	@FXML private void handleToggleManualCLAssignment() {
@@ -504,7 +514,7 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	public void addTab(File with_tone, int at_index, Consumer<MainSceneController> loading_actions) {
+	public void addTab(String with_title, int at_index, Consumer<MainSceneController> loading_actions) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -548,7 +558,7 @@ public class TopSceneController {
 
 				if (prevTabController != null) {
 					newTabController.setDividerPosition(prevTabController.getDividerPosition());
-					if (prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
+					if (loading_actions == null && prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 							"Open tone \"" + prevTabController.getToneFile().getName() + "\" for new item?",
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
 						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true, true);
@@ -610,15 +620,10 @@ public class TopSceneController {
 						newTabController.setTitle("Item " + (getTabCount() + 1));
 					}
 
-				} else {
-					// Title text for the first tab created (at startup)
-					newTabController.setTitle("Item 1");
-
 				}
 
-				// If there is a specified tone...
-				if (with_tone != null)
-					newTabController.handleOpenTone(with_tone, true, false);
+				// Title text for the first tab created (at startup)
+				newTabController.setTitle(Objects.requireNonNullElse(with_title, "Item 1"));
 
 				// If there is a specified index...
 				if (at_index != -1) {
@@ -640,10 +645,11 @@ public class TopSceneController {
 
 				}
 
-				// Perform any loading operations last.
-				if (loading_actions != null) {
-					loading_actions.accept(newTabController);
-				}
+				// Save any loading operations for later (when the user switches to the tab or exports the project).
+				newTabController.setPendingLoadActions(loading_actions);
+				// If this is the first tab, run them now (since this tab will be autoselected).
+				if (at_index == 0)
+					newTabController.runPendingLoadActions();
 			});
 		});
 	}
@@ -710,12 +716,15 @@ public class TopSceneController {
 		}
 	}
 	public void resetProjectEditedStatus() {
-		projectEdited = false;
+		setProjectEdited(false);
+	}
+	public boolean getProjectEdited() {
+		return projectEdited;
+	}
+	void setProjectEdited(boolean edited) {
+		projectEdited = edited;
 		if (getTabCount() > 0)
 			getSelectedTabScene().updateStageTitle();
-	}
-	boolean getProjectEdited() {
-		return projectEdited;
 	}
 
 	void setMenuState(ToneMenuState menu_state) {
@@ -773,6 +782,9 @@ public class TopSceneController {
 
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
+
+			// Don't check for tabs that haven't been fully loaded
+			if (controller.getPendingLoadActions() != null) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();

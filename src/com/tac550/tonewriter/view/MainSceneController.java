@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -104,6 +105,9 @@ public class MainSceneController {
 	@FXML private CheckMenuItem pageBreakMenuItem;
 
 	private final ToneMenuState toneMenuState = new ToneMenuState();
+
+	// TODO: Make sure these all fire before a project export, if project edited!
+	private Consumer<MainSceneController> pendingLoadActions;
 
 	private Robot robot;
 
@@ -287,7 +291,7 @@ public class MainSceneController {
 		});
 	}
 
-	public void applyLoadedVerses() {
+	public void applyLoadedVerses(boolean project_edited_state_after) {
 		Platform.runLater(() -> {
 			for (Task<FXMLLoader> loader : verseLineLoaders) {
 				try {
@@ -301,6 +305,8 @@ public class MainSceneController {
 			verseLineLoaders.clear();
 
 			syncCVLMapping();
+
+			topSceneController.setProjectEdited(project_edited_state_after);
 		});
 	}
 
@@ -485,13 +491,11 @@ public class MainSceneController {
 					createVerseLine(line);
 				}
 
-				applyLoadedVerses();
+				applyLoadedVerses(true);
 
 				// Hide working indicator
 				setVerseProgressBox.setVisible(false);
 				setVersePane.setMouseTransparent(true);
-
-				topSceneController.projectEdited();
 
 				return null;
 			}
@@ -620,11 +624,12 @@ public class MainSceneController {
 		}
 	}
 
-	public void tryChangeToneFile(File tone_file) {
+	public boolean tryChangeToneFile(File tone_file) {
 		if (!tone_file.exists())
-			return;
+			return false;
 
 		toneFile = tone_file;
+		return true;
 	}
 
 	void updateStageTitle() {
@@ -709,7 +714,7 @@ public class MainSceneController {
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
-	void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
+	public void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((auto_load || checkSaveTone()) && loadTone(tone_file, selectHideToneHeader)) {
 			toneMenuState.editMenuDisabled = false;
@@ -1056,6 +1061,19 @@ public class MainSceneController {
 		setVersePane.setMouseTransparent(false);
 
 		topSceneController.projectEdited();
+	}
+
+	public void runPendingLoadActions() {
+		if (pendingLoadActions != null) {
+			pendingLoadActions.accept(this);
+			pendingLoadActions = null;
+		}
+	}
+	public Consumer<MainSceneController> getPendingLoadActions() {
+		return pendingLoadActions;
+	}
+	public void setPendingLoadActions(Consumer<MainSceneController> pendingLoadActions) {
+		this.pendingLoadActions = pendingLoadActions;
 	}
 
 	public File getToneFile() {
