@@ -278,9 +278,13 @@ public class VerseLineViewController {
 
 		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
 		if (pendingActions != null) {
-			pendingActions.accept(this);
+			Platform.runLater(() -> {
+				lineTextFlow.layout();
+				pendingActions.accept(this);
 
-			pendingActions = null;
+				pendingActions = null;
+				topController.resetProjectEditedStatus();
+			});
 		}
 	}
 
@@ -480,8 +484,9 @@ public class VerseLineViewController {
 
 	}
 
-	@FXML private void skipChord() {
+	@FXML public void skipChord() {
 		// Set up an undo action frame to store what happens.
+		System.out.println("Skipping chord " + (nextChordIndex - 1));
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = nextChordIndex - 1;
@@ -501,6 +506,8 @@ public class VerseLineViewController {
 		if (!silent && topController.playMidiAsAssigned()) {
 			getCurrentChord().playMidi();
 		}
+
+		System.out.println("Assigning chord " + (nextChordIndex - 1) + " from " + first_syll + " to " + last_syll);
 
 		// Set up an undo action frame to store what happens.
 		AssignmentAction undoFrame = new AssignmentAction();

@@ -324,8 +324,64 @@ public class ProjectIO {
 						verseLine.setPendingActions(vLine -> {
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
 
-						});
+							// Assign and/or skip chords as would be done by a user.
+							int startSyll = 0;
+							int lastChordIndex = 0;
+							boolean prevWasEmpty = true;
 
+							outer:
+							for (int k = 0; k < assigns.size(); k++) {
+								String currAssigns = assigns.get(k);
+								if (currAssigns.isEmpty()) {
+									System.out.println("Empty assignment slot!");
+									if (!prevWasEmpty) {
+										System.out.println("Previous not empty!");
+										vLine.assignChordSilently(startSyll, k - 1);
+										startSyll = k;
+										lastChordIndex++;
+									}
+
+									startSyll++;
+									prevWasEmpty = true;
+									continue;
+								} else {
+									prevWasEmpty = false;
+								}
+
+								String[] chords = currAssigns.split(";");
+								int chordNum = 0;
+								for (String chord : chords) {
+									System.out.println("Checking chord " + chord);
+									String[] ind_dur = chord.split("-");
+									int chordIndex = Integer.parseInt(ind_dur[0]);
+									String duration = ind_dur[1];
+									if (chordIndex > lastChordIndex) {
+
+										System.out.println(chordIndex + " is greater than " + lastChordIndex);
+
+										while (lastChordIndex < chordIndex - 1) { // TODO: Skipping not working
+											vLine.skipChord();
+											lastChordIndex++;
+										}
+
+										System.out.println("Now second is " + lastChordIndex);
+
+										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
+												&& Integer.parseInt(chords[chordNum-1].split("-")[0]) - lastChordIndex < 1 ? k : k - 1);
+										lastChordIndex++;
+										startSyll = k;
+
+									}
+									if (chordNum == chords.length - 1 && assigns.stream().skip(k+1).allMatch(String::isEmpty)) {
+										System.out.println("Test for final assignment PASSES");
+										vLine.assignChordSilently(startSyll, k);
+										break outer;
+									}
+
+									chordNum++;
+								}
+							}
+						});
 					}
 
 					ctr.applyLoadedVerses();

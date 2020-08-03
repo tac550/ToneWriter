@@ -643,7 +643,6 @@ public class TopSceneController {
 				// Perform any loading operations last.
 				if (loading_actions != null) {
 					loading_actions.accept(newTabController);
-					resetProjectEditedStatus();
 				}
 			});
 		});
@@ -710,7 +709,7 @@ public class TopSceneController {
 				getSelectedTabScene().updateStageTitle();
 		}
 	}
-	void resetProjectEditedStatus() {
+	public void resetProjectEditedStatus() {
 		projectEdited = false;
 		if (getTabCount() > 0)
 			getSelectedTabScene().updateStageTitle();

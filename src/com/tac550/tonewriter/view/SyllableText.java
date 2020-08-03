@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SyllableText extends Text {
 
-	private VerseLineViewController parentController;
+	private VerseLineViewController verseController;
 	
 	private final List<AssignedChordData> associatedChords = new ArrayList<>();
 	private final List<Button> associatedButtons = new ArrayList<>();
@@ -25,7 +25,7 @@ public class SyllableText extends Text {
 	private static final Color highlightColor = Color.DARKCYAN;
 	
 	void setParent(VerseLineViewController controller) {
-		parentController = controller;
+		verseController = controller;
 	}
 	
 	SyllableText(String text) {
@@ -37,10 +37,10 @@ public class SyllableText extends Text {
 			if (active) {
 				if (new_val) {
 					setFill(highlightColor);
-					parentController.syllableHovered();
+					verseController.syllableHovered();
 				} else {
 					setFill(defaultColor);
-					parentController.syllableUnHovered();
+					verseController.syllableUnHovered();
 				}
 			}
 		});
@@ -48,30 +48,30 @@ public class SyllableText extends Text {
 		setOnMouseClicked(event -> {
 			if (active) {
 				if (event.getButton() == MouseButton.PRIMARY) {
-					parentController.syllableUnHovered();
+					verseController.syllableUnHovered();
 
 					clicked = true;
-					parentController.syllableClicked(this);
+					verseController.syllableClicked(this);
 
-					parentController.syllableHovered();
+					verseController.syllableHovered();
 				} else {
-					parentController.syllableAltClicked();
+					verseController.syllableAltClicked();
 				}
 			}
 		});
 
 		// Drag assignment events
 		setOnMouseDragReleased(event -> {
-			if (active) parentController.syllableDragCompleted(this);
+			if (active) verseController.syllableDragCompleted(this);
 		});
 		setOnDragDetected(event -> {
-			if (active) parentController.syllableDragStarted(this);
+			if (active) verseController.syllableDragStarted(this);
 		});
 		setOnMouseDragEntered(event -> {
-			if (active) parentController.syllableDragEntered(this);
+			if (active) verseController.syllableDragEntered(this);
 		});
-		setOnMouseDragExited(event -> parentController.syllableDragExited());
-		setOnMouseReleased(event -> parentController.syllableDragReleased());
+		setOnMouseDragExited(event -> verseController.syllableDragExited());
+		setOnMouseReleased(event -> verseController.syllableDragReleased());
 
 	}
 	
@@ -80,7 +80,7 @@ public class SyllableText extends Text {
 
 		nextNoteButtonYPos += VerseLineViewController.NOTE_BUTTON_HEIGHT.get();
 		
-		associatedChords.add(new AssignedChordData(chord_index, parentController));
+		associatedChords.add(new AssignedChordData(chord_index, verseController));
 		associatedButtons.add(note_button);
 		
 		setColor(chord_color);
