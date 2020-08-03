@@ -298,6 +298,8 @@ public class MainSceneController {
 				}
 			}
 
+			verseLineLoaders.clear();
+
 			syncCVLMapping();
 		});
 	}
