@@ -327,6 +327,7 @@ public class ProjectIO {
 							// Assign and/or skip chords as would be done by a user.
 							int startSyll = 0;
 							int lastChordIndex = 0;
+							int lastAssignedChordIndex = 0;
 							boolean prevWasEmpty = true;
 
 							outer:
@@ -359,7 +360,7 @@ public class ProjectIO {
 
 										System.out.println(chordIndex + " is greater than " + lastChordIndex);
 
-										while (lastChordIndex < chordIndex - 1) { // TODO: Skipping not working
+										while (lastChordIndex < lastAssignedChordIndex) {
 											vLine.skipChord();
 											lastChordIndex++;
 										}
@@ -368,12 +369,17 @@ public class ProjectIO {
 
 										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
 												&& Integer.parseInt(chords[chordNum-1].split("-")[0]) - lastChordIndex < 1 ? k : k - 1);
+										lastAssignedChordIndex = chordIndex;
 										lastChordIndex++;
 										startSyll = k;
 
 									}
 									if (chordNum == chords.length - 1 && assigns.stream().skip(k+1).allMatch(String::isEmpty)) {
 										System.out.println("Test for final assignment PASSES");
+										while (lastChordIndex < chordIndex) {
+											vLine.skipChord();
+											lastChordIndex++;
+										}
 										vLine.assignChordSilently(startSyll, k);
 										break outer;
 									}
