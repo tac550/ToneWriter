@@ -93,7 +93,7 @@ public class TopSceneController {
 	private File projectFile;
 	private String projectTitle = "Unnamed Project";
 
-	String paperSize = "";
+	private String paperSize = "";
 
 	// TODO: Consider switching to this kind of system for loading tones to allow threading CL loads.
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
@@ -850,6 +850,10 @@ public class TopSceneController {
 
 	public int getTabCount() {
 		return tabPane.getTabs().size();
+	}
+
+	public String getPaperSize() {
+		return paperSize;
 	}
 
 	public MainSceneController[] getTabControllers() {

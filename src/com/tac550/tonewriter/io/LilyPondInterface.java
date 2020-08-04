@@ -93,32 +93,72 @@ public class LilyPondInterface {
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
 	                                  MainSceneController[] items, String paperSize) throws IOException {
-
-		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (lilypondFile.exists()) {
+		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize))
+			return false;
+
+		if (MainApp.lilyPondAvailable()) {
+			executePlatformSpecificLPRender(lilypondFile, false, () -> {
+				try {
+					// After the render is complete, ask the OS to open the resulting PDF file.
+					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+
+					// Delete the lilypond file if the option to save it isn't set
+					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
+						if (!lilypondFile.delete()) {
+							TWUtils.showError("Failed to delete LilyPond file, continuing...", false);
+						}
+					}
+
+				} catch (Exception e) {
+					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
+					// if it's not set to be saved).
+					try {
+						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+		} else {
+			try {
+				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+
+		return true;
+	}
+
+	public static boolean saveToLilyPondFile(File lilypond_file, String project_title,
+	                                       MainSceneController[] items, String paperSize) throws IOException {
+
+		// Create the LilyPond output file, and if it already exists, delete the old one.
+		if (lilypond_file.exists()) {
 			// Have to do this because MacOS doesn't like overwriting existing files
-			if (!lilypondFile.delete()) {
+			if (!lilypond_file.delete()) {
 				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
 			}
 		}
 
-		if (!lilypondFile.createNewFile()) {
-			TWUtils.showError("Failed to create new file", true);
+		if (!lilypond_file.createNewFile()) {
+			TWUtils.showError("Failed to create new LilyPond file", true);
 			return false;
 		}
 
 		// Copy the render template file to the output path.
 		try {
-			TWUtils.exportFSResource("outputTemplate.ly", lilypondFile);
+			TWUtils.exportFSResource("outputTemplate.ly", lilypond_file);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
 		}
 
 		// The buffer in which we'll store the output file as we build it.
-		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+		List<String> lines = Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8);
 
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
@@ -213,39 +253,7 @@ public class LilyPondInterface {
 		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replace("\n", ""));
 
 		// Write the file back out.
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
-
-		if (MainApp.lilyPondAvailable()) {
-			executePlatformSpecificLPRender(lilypondFile, false, () -> {
-				try {
-					// After the render is complete, ask the OS to open the resulting PDF file.
-					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
-
-					// Delete the lilypond file if the option to save it isn't set
-					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
-						if (!lilypondFile.delete()) {
-							TWUtils.showError("Failed to delete LilyPond file, continuing...", false);
-						}
-					}
-
-				} catch (Exception e) {
-					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
-					// if it's not set to be saved).
-					try {
-						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-			});
-		} else {
-			try {
-				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
+		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
 
 		return true;
 	}

@@ -21,11 +21,11 @@ public class ProjectIO {
 
 	File tempProjectDirectory;
 
-	public boolean saveProject(File project_file, TopSceneController project_scene) {
+	public boolean saveProject(File project_file, TopSceneController top_controller) {
 		// Create temp directory in which to construct the final compressed project file
 		if (tempProjectDirectory == null) {
 			try {
-				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_scene.getProjectTitle());
+				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + top_controller.getProjectTitle());
 			} catch (IOException e) {
 				TWUtils.showError("Failed to create temp directory for project save!", true);
 				return false;
@@ -36,8 +36,8 @@ public class ProjectIO {
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
 
-			writeLine(writer, project_scene.getProjectTitle());
-			writeLine(writer, project_scene.getTabCount());
+			writeLine(writer, top_controller.getProjectTitle());
+			writeLine(writer, top_controller.getTabCount());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -48,7 +48,7 @@ public class ProjectIO {
 
 		// Iterate through all the tabs, saving their configurations and saving tones if unique
 		int index = 0;
-		for (MainSceneController controller : project_scene.getTabControllers()) {
+		for (MainSceneController controller : top_controller.getTabControllers()) {
 			File toneFile = controller.getToneFile();
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
@@ -79,6 +79,16 @@ public class ProjectIO {
 			}
 
 			index++;
+		}
+
+		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
+
+		try {
+			LilyPondInterface.saveToLilyPondFile(lilypondFile, top_controller.getProjectTitle(),
+					top_controller.getTabControllers(), top_controller.getPaperSize());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to save project render!", true);
+			return false;
 		}
 
 		// Delete previous save file, if one exists
