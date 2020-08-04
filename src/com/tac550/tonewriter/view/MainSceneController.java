@@ -1075,6 +1075,9 @@ public class MainSceneController {
 	public void setPendingLoadActions(Consumer<MainSceneController> pendingLoadActions) {
 		this.pendingLoadActions = pendingLoadActions;
 	}
+	public boolean fullyLoaded() {
+		return getPendingLoadActions() == null;
+	}
 
 	public File getToneFile() {
 		return toneFile;

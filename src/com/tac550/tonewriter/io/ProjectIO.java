@@ -8,7 +8,6 @@ import com.tac550.tonewriter.view.TopSceneController;
 import com.tac550.tonewriter.view.VerseLineViewController;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.util.*;
@@ -20,18 +19,21 @@ import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
-	public static boolean saveProject(File project_file, TopSceneController project_scene) {
+	File tempProjectDirectory;
+
+	public boolean saveProject(File project_file, TopSceneController project_scene) {
 		// Create temp directory in which to construct the final compressed project file
-		File tempDirectory;
-		try {
-			tempDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_scene.getProjectTitle());
-		} catch (IOException e) {
-			TWUtils.showError("Failed to create temp directory for project save!", true);
-			return false;
+		if (tempProjectDirectory == null) {
+			try {
+				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_scene.getProjectTitle());
+			} catch (IOException e) {
+				TWUtils.showError("Failed to create temp directory for project save!", true);
+				return false;
+			}
 		}
 
 		// Add info file and save project metadata into it
-		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
+		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
 
 			writeLine(writer, project_scene.getProjectTitle());
@@ -58,7 +60,7 @@ public class ProjectIO {
 				if (!uniqueHashes.contains(toneHash)) {
 					uniqueHashes.add(toneHash);
 
-					File toneSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "tones"
+					File toneSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones"
 							+ File.separator + toneHash + File.separator + "unsaved.tone");
 
 					if (ToneReaderWriter.createToneFile(toneSaveFile)) {
@@ -67,11 +69,14 @@ public class ProjectIO {
 				}
 			}
 
-			// Place each item in a file in "items" directory and named by tab index
-			File itemSaveFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
-					+ File.separator + index);
+			// Place each item in a file in "items" directory and named by tab index, but only if the item
+			// has been loaded in the UI (otherwise leave the existing entry as is)
+			if (controller.fullyLoaded()) {
+				File itemSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
+						+ File.separator + index);
 
-			saveItemToFile(itemSaveFile, controller, toneHash);
+				saveItemToFile(itemSaveFile, controller, toneHash);
+			}
 
 			index++;
 		}
@@ -90,8 +95,8 @@ public class ProjectIO {
 		     ZipOutputStream zos = new ZipOutputStream(fos)) {
 			byte[] buffer = new byte[1024];
 
-			for (String filePath : TWUtils.generateFileList(tempDirectory)) {
-				ZipEntry ze = new ZipEntry(filePath.substring(tempDirectory.getAbsolutePath().length() + 1));
+			for (String filePath : TWUtils.generateFileList(tempProjectDirectory)) {
+				ZipEntry ze = new ZipEntry(filePath.substring(tempProjectDirectory.getAbsolutePath().length() + 1));
 				zos.putNextEntry(ze);
 				try (FileInputStream in = new FileInputStream(filePath)) {
 					int len;
@@ -107,24 +112,22 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Try to delete the temporary directory created in the process
-		try {
-			FileUtils.deleteDirectory(tempDirectory);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		return true;
 	}
 
-	private static void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
+	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
 		try {
 			// Create new file
-			if (save_file.getParentFile().mkdirs() || save_file.getParentFile().exists()) {
-				if (!save_file.createNewFile())
-					throw new IOException("File creation failed");
+			if (!save_file.exists()) {
+				if (save_file.getParentFile().mkdirs() || save_file.getParentFile().exists()) {
+					if (!save_file.createNewFile())
+						throw new IOException("File creation failed");
+				} else {
+					throw new IOException("Directory creation failed");
+				}
 			} else {
-				throw new IOException("Directory creation failed");
+				if (!save_file.delete())
+					throw new IOException("Failed to replace old item save file");
 			}
 
 			// Save to the file
@@ -138,7 +141,7 @@ public class ProjectIO {
 		}
 	}
 
-	private static void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) throws IOException {
+	private void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) throws IOException {
 		try (PrintWriter writer = new PrintWriter(destination)) {
 
 			// General item data
@@ -177,12 +180,11 @@ public class ProjectIO {
 		}
 	}
 
-	public static boolean openProject(File project_file, TopSceneController top_controller) {
+	public boolean openProject(File project_file, TopSceneController top_controller) {
 
 		// Create temp directory to unzip project into
-		File tempDirectory;
 		try {
-			tempDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
+			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create temp directory for project load!", true);
 			return false;
@@ -195,7 +197,7 @@ public class ProjectIO {
 
 			ZipEntry zipEntry = zis.getNextEntry();
 			while (zipEntry != null) {
-				File unzippedFile = checkExtractionDestination(tempDirectory, zipEntry);
+				File unzippedFile = checkExtractionDestination(tempProjectDirectory, zipEntry);
 				if (!unzippedFile.getParentFile().mkdirs() && !unzippedFile.getParentFile().exists()) {
 					TWUtils.showError("Failed to construct internal temp directory!", true);
 					return false;
@@ -219,7 +221,7 @@ public class ProjectIO {
 
 		// Gather project metadata from info file
 		int numItems;
-		File projectInfoFile = new File(tempDirectory.getAbsolutePath() + File.separator + "project");
+		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
 
 			top_controller.setProjectTitle(readLine(reader).get(0));
@@ -232,7 +234,7 @@ public class ProjectIO {
 
 		// Gather references to tone files
 		Map<String, File> hashtoToneFile = new HashMap<>();
-		File tonesDir = new File(tempDirectory.getAbsolutePath() + File.separator + "tones");
+		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
 		File[] toneDirs = tonesDir.listFiles();
 		if (tonesDir.exists() && toneDirs != null) {
 			for (File toneDir : toneDirs) {
@@ -243,7 +245,7 @@ public class ProjectIO {
 
 		// Load however many items are in the save file
 		for (int i = 0; i < numItems; i++) {
-			File itemFile = new File(tempDirectory.getAbsolutePath() + File.separator + "items"
+			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
 					+ File.separator + i);
 			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile)))) {
 
@@ -290,7 +292,6 @@ public class ProjectIO {
 				// Create and set up item tab
 				top_controller.addTab(titleSubtitle.get(0), i, ctr -> {
 					final boolean projectEditedState = top_controller.getProjectEdited();
-					System.out.println("Project edited state: " + projectEditedState);
 
 					if (!toneHash.isEmpty())
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
@@ -401,7 +402,7 @@ public class ProjectIO {
 	}
 
 	// Guards against a known Zip vulnerability
-	private static File checkExtractionDestination(File dest_dir, ZipEntry zip_entry) throws IOException {
+	private File checkExtractionDestination(File dest_dir, ZipEntry zip_entry) throws IOException {
 		File destFile = new File(dest_dir, zip_entry.getName());
 
 		String destDirPath = dest_dir.getCanonicalPath();
@@ -414,7 +415,7 @@ public class ProjectIO {
 		return destFile;
 	}
 
-	private static List<String> readLine(BufferedReader reader) throws IOException {
+	private List<String> readLine(BufferedReader reader) throws IOException {
 		String line;
 		if ((line = reader.readLine()) != null)
 			return List.of(line.split("\t", -1));
@@ -422,7 +423,7 @@ public class ProjectIO {
 			return List.of("");
 	}
 
-	private static void writeLine(Writer writer, Object... items) throws IOException {
+	private void writeLine(Writer writer, Object... items) throws IOException {
 		writer.write(Arrays.stream(items).map(String::valueOf).collect(Collectors.joining("\t")) + "\n");
 	}
 

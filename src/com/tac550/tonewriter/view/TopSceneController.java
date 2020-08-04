@@ -41,6 +41,8 @@ public class TopSceneController {
 
 	private Stage parentStage;
 
+	private final ProjectIO projectIO = new ProjectIO();
+
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
 	@FXML private MenuItem newProjectMenuItem;
@@ -391,7 +393,7 @@ public class TopSceneController {
 	}
 	@FXML private void handleSaveProject() {
 		if (projectFile != null) {
-			if (ProjectIO.saveProject(projectFile, this))
+			if (projectIO.saveProject(projectFile, this))
 				resetProjectEditedStatus();
 		} else {
 			handleSaveProjectAs();
@@ -412,7 +414,7 @@ public class TopSceneController {
 			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
 		}
 
-		if (ProjectIO.saveProject(saveFile, this)) {
+		if (projectIO.saveProject(saveFile, this)) {
 			projectFile = saveFile;
 			resetProjectEditedStatus();
 		}
@@ -699,7 +701,7 @@ public class TopSceneController {
 
 	void openProject(File selected_file) {
 		if (selected_file.exists()) {
-			if (ProjectIO.openProject(selected_file, this)) {
+			if (projectIO.openProject(selected_file, this)) {
 				projectFile = selected_file;
 			} else {
 				clearAllTabs();
@@ -784,7 +786,7 @@ public class TopSceneController {
 			MainSceneController controller = tabControllerMap.get(tab);
 
 			// Don't check for tabs that haven't been fully loaded
-			if (controller.getPendingLoadActions() != null) continue;
+			if (!controller.fullyLoaded()) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();
