@@ -621,11 +621,13 @@ public class TopSceneController {
 					} else {
 						newTabController.setTitle("Item " + (getTabCount() + 1));
 					}
-
+				} else {
+					newTabController.setTitle("Item 1");
 				}
 
 				// Title text for the first tab created (at startup)
-				newTabController.setTitle(Objects.requireNonNullElse(with_title, "Item 1"));
+				if (with_title != null)
+					newTabController.setTitle(with_title);
 
 				// If there is a specified index...
 				if (at_index != -1) {
@@ -676,7 +678,10 @@ public class TopSceneController {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
 	}
 	void clearAllTabs() {
-		for (Tab tab : new ArrayList<>(tabPane.getTabs()))
+		List<Tab> tabs = new ArrayList<>(tabPane.getTabs());
+		Collections.reverse(tabs);
+
+		for (Tab tab : tabs)
 			forceCloseTab(tab);
 	}
 
