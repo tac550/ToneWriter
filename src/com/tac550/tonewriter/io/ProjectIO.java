@@ -99,12 +99,17 @@ public class ProjectIO {
 		}
 
 		// Delete any leftover items (necessary if items have been removed since last save/load)
-		File leftoverItemFile;
-		while ((leftoverItemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
-				+ File.separator + index)).exists()) {
-			if (!leftoverItemFile.delete()) {
-				TWUtils.showError("Failed to delete leftover item entry!", false);
-			}
+		try {
+			int finalIndex = index;
+			Files.list(new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items").toPath())
+					.filter(path -> Integer.parseInt(path.getFileName().toString()) >= finalIndex)
+					.forEach(path -> {
+						try { Files.delete(path); } catch (IOException e) { e.printStackTrace();
+							TWUtils.showError("Failed to delete leftover item " + path, false); }
+					});
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to delete leftover item entries!", false);
 		}
 
 		// Delete items_old directroy as it is no longer needed and doesn't belong in the final project file
@@ -297,6 +302,17 @@ public class ProjectIO {
 			}
 		}
 
+		// Collect each item's LilyPond source output
+		File lilyPondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
+		String LPSource;
+		try {
+			LPSource = Files.readString(lilyPondFile.toPath());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to read saved LilyPond render!", true);
+			return false;
+		}
+		String[] itemSources = LPSource.split("(?=\n%.*\n)");
+
 		// Load however many items are in the save file
 		for (int i = 0; i < numItems; i++) {
 			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
@@ -344,7 +360,7 @@ public class ProjectIO {
 				}
 
 				// Create and set up item tab
-				top_controller.addTab(titleSubtitle.get(0), i, ctr -> {
+				top_controller.addTab(titleSubtitle.get(0), i, itemSources[i + 1], ctr -> {
 					final boolean projectEditedState = top_controller.getProjectEdited();
 
 					if (!toneHash.isEmpty())

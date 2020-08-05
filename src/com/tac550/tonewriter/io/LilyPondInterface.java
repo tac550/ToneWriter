@@ -129,12 +129,11 @@ public class LilyPondInterface {
 			}
 		}
 
-
 		return true;
 	}
 
 	public static boolean saveToLilyPondFile(File lilypond_file, String project_title,
-	                                       MainSceneController[] items, String paperSize) throws IOException {
+											 MainSceneController[] items, String paperSize) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		if (lilypond_file.exists()) {
@@ -158,12 +157,12 @@ public class LilyPondInterface {
 		}
 
 		// The buffer in which we'll store the output file as we build it.
-		List<String> lines = Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8);
+		List<String> lines = new ArrayList<>(Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8));
 
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitleIfNotHidden() + "\"" : "\"" + project_title + "\""));
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -172,85 +171,19 @@ public class LilyPondInterface {
 		// Add a blank line before scores begin
 		lines.add("");
 
+		int index = 0;
 		for (MainSceneController item : items) {
+			lines.add(item.getLilyPondSource());
 
-			// Page break if requested, but only if this item is not the first.
-			if (items[0] != item && item.getPageBreak())
-				lines.add("\\pageBreak\n");
+			// Remove page break at beginning of item listing, if present.
+			if (index == 0)
+				lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceFirst("\n\\\\pageBreak\n", ""));
 
-			// Top verse, if any
-			if (!item.getTopVerse().isEmpty()) {
-				Collections.addAll(lines, "\\markup \\column {",
-						String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
-								item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
-						"}\n", "\\noPageBreak\n");
-			}
-
-			// Score header
-			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitleIfNotHidden()),
-					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
-					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
-					String.format("    opus = \"%s\"", item.getRightHeaderText()),
-					"    instrument = \"\"",
-					"  }\n");
-
-			// Perform layout process
-			String[] results = buildMusicLayout(item.getVerseLineControllers());
-
-			// Create staff only if note data is present
-			boolean createStaff = false;
-
-			// Pattern which matches valid LilyPond notes
-			Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
-			// Check all four parts for any note data
-			for (String result : results) {
-				if (noteDataPattern.matcher(result).find()) {
-					createStaff = true;
-					break;
-				}
-			}
-
-			if (createStaff)
-				Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
-						"      midiInstrument = #\"choir aahs\"", "    } <<",
-						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-						"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
-						"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
-						"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
-						"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
-						"    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-						"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
-						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-						"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
-						"      defaultBarType = \"\" % Hides any auto-generated barlines",
-						"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
-						"      \\accidentalStyle neo-modern-voice-cautionary",
-						"    }", "  }", "}\n");
-			else
-				Collections.addAll(lines, "\\lyricmode {}",
-						"}\n");
-
-			// Bottom verse, if any
-			if (!item.getBottomVerse().isEmpty()) {
-				Collections.addAll(lines, "\\noPageBreak\n",
-						"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
-						String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
-								item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
-						"}\n");
-			}
-
-			if (!createStaff)
-				lines.add("\\markup \\column {\\vspace #0.5 }\n");
-
+			index++;
 		}
 
 		// Remove extra newline at end of file (result is one blank line)
-		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replace("\n", ""));
+		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceAll("\n$", ""));
 
 		// Write the file back out.
 		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
@@ -258,7 +191,89 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	private static String[] buildMusicLayout(List<VerseLineViewController> verse_lines) {
+	public static String generateItemSource(MainSceneController item) {
+		List<String> lines = new ArrayList<>();
+
+		// Comment for purposes of future parsing of output (for internal project file renders)
+		lines.add("% " + item.getTitle() + "\n");
+
+		// Page break if requested, but only if this item is not the first.
+		if (item.getPageBreak())
+			lines.add("\\pageBreak\n");
+
+		// Top verse, if any
+		if (!item.getTopVerse().isEmpty()) {
+			Collections.addAll(lines, "\\markup \\column {",
+					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
+							item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
+					"}\n", "\\noPageBreak\n");
+		}
+
+		// Score header
+		Collections.addAll(lines, "\\score {\n", "  \\header {",
+				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", item.getfinalTitleContent()),
+				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
+				String.format("    piece = \"%s\"", item.getLeftHeaderText()),
+				String.format("    opus = \"%s\"", item.getRightHeaderText()),
+				"    instrument = \"\"",
+				"  }\n");
+
+		// Perform layout process
+		String[] results = computeNotationSource(item.getVerseLineControllers());
+
+		// Create staff only if note data is present
+		boolean createStaff = false;
+
+		// Pattern which matches valid LilyPond notes
+		Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
+		// Check all four parts for any note data
+		for (String result : results) {
+			if (noteDataPattern.matcher(result).find()) {
+				createStaff = true;
+				break;
+			}
+		}
+
+		if (createStaff)
+			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
+					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
+					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
+					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
+					"    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+					"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
+					"      defaultBarType = \"\" % Hides any auto-generated barlines",
+					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
+					"      \\accidentalStyle neo-modern-voice-cautionary",
+					"    }", "  }", "}\n");
+		else
+			Collections.addAll(lines, "\\lyricmode {}",
+					"}\n");
+
+		// Bottom verse, if any
+		if (!item.getBottomVerse().isEmpty()) {
+			Collections.addAll(lines, "\\noPageBreak\n",
+					"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
+					String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
+							item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
+					"}\n");
+		}
+
+		if (!createStaff)
+			lines.add("\\markup \\column {\\vspace #0.5 }\n");
+
+		return String.join("\n", lines);
+	}
+
+	private static String[] computeNotationSource(List<VerseLineViewController> verse_lines) {
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.

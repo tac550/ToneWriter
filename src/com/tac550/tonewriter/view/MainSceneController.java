@@ -106,13 +106,13 @@ public class MainSceneController {
 
 	private final ToneMenuState toneMenuState = new ToneMenuState();
 
-	// TODO: Make sure these all fire before a project export, if project edited!
 	private Consumer<MainSceneController> pendingLoadActions;
 
 	private Robot robot;
 
 	private File toneFile;
 	private int originalIndex;
+	private String lilyPondItem = "";
 
 	private String keySignature = "C major";
 	private String leftText = "";
@@ -1089,6 +1089,16 @@ public class MainSceneController {
 	public void setOriginalIndex(int index) {
 		originalIndex = index;
 	}
+	public String getLilyPondSource() {
+		if (fullyLoaded())
+			lilyPondItem = LilyPondInterface.generateItemSource(this);
+
+		return lilyPondItem;
+	}
+	void setLilyPondSource(String source) {
+		// Removes any leading whitespace
+		lilyPondItem = source.replaceAll("^\\s+", "");
+	}
 
 	ObservableStringValue getTitleTextProperty() {
 		return titleTextField.textProperty();
@@ -1144,8 +1154,9 @@ public class MainSceneController {
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
-	public String getTitleIfNotHidden() {
-		return hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText();
+	public String getfinalTitleContent() {
+		return hiddenTitleMenuItem.isSelected() || topSceneController.getTabCount() == 1 ?
+				"" : titleTextField.getText();
 	}
 	public String getTitle() {
 		return titleTextField.getText();

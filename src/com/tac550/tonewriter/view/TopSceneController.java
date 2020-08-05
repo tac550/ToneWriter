@@ -291,7 +291,8 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(null, 0, ctr -> ctr.handleOpenTone(arg_file, true, false));
+				addTab(null, 0, null,
+						ctr -> ctr.handleOpenTone(arg_file, true, false));
 			else
 				openProject(arg_file);
 		} else {
@@ -333,7 +334,7 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML void addTab() {
-		addTab(null, -1, null);
+		addTab(null, -1, null, null);
 		projectEdited();
 	}
 	@FXML void handleSetProjectTitle() {
@@ -516,7 +517,8 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	public void addTab(String with_title, int at_index, Consumer<MainSceneController> loading_actions) {
+	public void addTab(String with_title, int at_index, String precomp_source,
+					   Consumer<MainSceneController> loading_actions) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -634,12 +636,10 @@ public class TopSceneController {
 				// If there is a specified index...
 				if (at_index != -1) {
 					if (at_index >= getTabCount())
-//						new Thread(() -> tabsToAdd.put(at_index, tab)).start();
 						tabsToAdd.put(at_index, tab);
 					else
 						tabPane.getTabs().add(at_index, tab);
 				} else {
-
 					// Add the tab after the selected one, if any.
 					if (prevTabController != null) {
 						tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
@@ -648,8 +648,10 @@ public class TopSceneController {
 					}
 					tabPane.getSelectionModel().select(tab);
 					tab.getContent().requestFocus();
-
 				}
+
+				if (precomp_source != null)
+					newTabController.setLilyPondSource(precomp_source);
 
 				// Save any loading operations for later (when the user switches to the tab or exports the project).
 				newTabController.setPendingLoadActions(loading_actions);
@@ -679,7 +681,7 @@ public class TopSceneController {
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
 	}
-	void clearAllTabs() {
+	void clearAllTabs() { // TODO: This isn't totally fiexd! (Consider tab other than 0 is selected)
 		List<Tab> tabs = new ArrayList<>(tabPane.getTabs());
 		Collections.reverse(tabs);
 
