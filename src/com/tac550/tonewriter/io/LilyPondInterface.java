@@ -351,9 +351,13 @@ public class LilyPondInterface {
 								// Then we know we need to show the chord. It'll be the first chord on the page!
 								hideThisChord = false;
 							} else {
-								// The previous note is the note from the last chord from the previous syllable.
 								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllableData) - 1).getAssociatedChords();
-								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
+								if (previousSyllableChords.length == 0)
+									// If the previous syllable has no chords assigned, then we know we shouldn't be hiding this one.
+									hideThisChord = false;
+								else
+									// Otherwise, the previous note is the note from the last chord from the previous syllable.
+									previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
 							}
 						} else {
 							// The previous note is the note just before this one on this same syllable.
