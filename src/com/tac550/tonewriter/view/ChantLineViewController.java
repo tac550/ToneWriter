@@ -543,7 +543,7 @@ public class ChantLineViewController implements CommentableView {
 			}
 		}
 
-		if (!mainController.isLoading()) {
+		if (!mainController.isLoadingTone()) {
 			mainController.syncCVLMapping();
 		}
 	}

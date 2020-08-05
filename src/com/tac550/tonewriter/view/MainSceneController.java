@@ -112,6 +112,7 @@ public class MainSceneController {
 	private Robot robot;
 
 	private File toneFile;
+	private int originalIndex;
 
 	private String keySignature = "C major";
 	private String leftText = "";
@@ -139,7 +140,7 @@ public class MainSceneController {
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
 	private final List<ChantLineViewController> chantLineControllers = new ArrayList<>();
-	private boolean loading = false;
+	private boolean loadingTone = false;
 
 	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
@@ -603,18 +604,18 @@ public class MainSceneController {
 
 			ToneReaderWriter toneReader = getToneReader();
 
-			loading = true;
+			loadingTone = true;
 			if (toneReader.loadTone(this, toneFile)) {
 				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
 
-				loading = false;
+				loadingTone = false;
 				return true;
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
 
-				loading = false;
+				loadingTone = false;
 				return false;
 			}
 
@@ -1038,7 +1039,7 @@ public class MainSceneController {
 		toneEdited(true);
 	}
 	public void toneEdited(boolean project_edited) {
-		if (!toneEdited && isToneSavable() && !loading) {
+		if (!toneEdited && isToneSavable() && !loadingTone) {
 			toneEdited = true;
 			updateStageTitle();
 		}
@@ -1081,6 +1082,12 @@ public class MainSceneController {
 
 	public File getToneFile() {
 		return toneFile;
+	}
+	public int getOriginalIndex() {
+		return originalIndex;
+	}
+	public void setOriginalIndex(int index) {
+		originalIndex = index;
 	}
 
 	ObservableStringValue getTitleTextProperty() {
@@ -1170,8 +1177,8 @@ public class MainSceneController {
 	public String getKeySignature() {
 		return keySignature;
 	}
-	boolean isLoading() {
-		return loading;
+	boolean isLoadingTone() {
+		return loadingTone;
 	}
 
 	private static class RenderFormatException extends Exception {}

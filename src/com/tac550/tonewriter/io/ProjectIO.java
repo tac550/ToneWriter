@@ -8,8 +8,12 @@ import com.tac550.tonewriter.view.TopSceneController;
 import com.tac550.tonewriter.view.VerseLineViewController;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -28,6 +32,14 @@ public class ProjectIO {
 				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + top_controller.getProjectTitle());
 			} catch (IOException e) {
 				TWUtils.showError("Failed to create temp directory for project save!", true);
+				return false;
+			}
+		} else {
+			try {
+				FileUtils.copyDirectory(new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"),
+						new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"));
+			} catch (IOException e) {
+				TWUtils.showError("Failed to copy old items!", true);
 				return false;
 			}
 		}
@@ -70,15 +82,39 @@ public class ProjectIO {
 			}
 
 			// Place each item in a file in "items" directory and named by tab index, but only if the item
-			// has been loaded in the UI (otherwise leave the existing entry as is)
-			if (controller.fullyLoaded()) {
-				File itemSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
-						+ File.separator + index);
+			// has been loaded in the UI (otherwise copy its old entry into the file instead)
+			File itemSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
+					+ File.separator + index);
 
+			if (controller.fullyLoaded()) {
 				saveItemToFile(itemSaveFile, controller, toneHash);
+			} else {
+				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
+						+ File.separator + controller.getOriginalIndex());
+
+				saveItemToFile(itemSaveFile.toPath(), oldItem.toPath());
 			}
 
 			index++;
+		}
+
+		// Delete any leftover items (necessary if items have been removed since last save/load)
+		File leftoverItemFile;
+		while ((leftoverItemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
+				+ File.separator + index)).exists()) {
+			if (!leftoverItemFile.delete()) {
+				TWUtils.showError("Failed to delete leftover item entry!", false);
+			}
+		}
+
+		// Delete items_old directroy as it is no longer needed and doesn't belong in the final project file
+		try {
+			File oldItemsDir = new File(tempProjectDirectory.getAbsolutePath()
+					+ File.separator + "items_old");
+			if (oldItemsDir.exists())
+				FileUtils.deleteDirectory(oldItemsDir);
+		} catch (IOException e) {
+			TWUtils.showError("Failed to remove old items directory!", false);
 		}
 
 		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
@@ -125,6 +161,14 @@ public class ProjectIO {
 		return true;
 	}
 
+	private void saveItemToFile(Path save_file, Path source_file) {
+		try {
+			Files.copy(source_file, save_file, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to save item from backup!", false);
+		}
+	}
 	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
 		try {
 			// Create new file

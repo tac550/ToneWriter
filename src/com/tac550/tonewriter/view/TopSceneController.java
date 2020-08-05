@@ -524,6 +524,8 @@ public class TopSceneController {
 			MainSceneController newTabController = loader.getController();
 			newTabController.setStageAndTopScene(parentStage, this);
 
+			newTabController.setOriginalIndex(at_index);
+
 			Tab tab = new Tab();
 
 			tab.textProperty().bind(newTabController.getTitleTextProperty());
