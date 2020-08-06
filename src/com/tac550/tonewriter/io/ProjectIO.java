@@ -361,6 +361,7 @@ public class ProjectIO {
 				}
 
 				// Create and set up item tab
+				int finalI = i;
 				top_controller.addTab(titleSubtitle.get(0), i, itemSources[i + 1], ctr -> {
 					final boolean projectEditedState = top_controller.getProjectEdited();
 
@@ -396,7 +397,7 @@ public class ProjectIO {
 						assert verseLine != null;
 
 						int finalJ = j;
-						verseLine.setPendingActions(vLine -> {
+						verseLine.setPendingActions(finalI == 0, vLine -> {
 							List<String> durations = new ArrayList<>();
 
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));

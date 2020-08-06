@@ -86,6 +86,7 @@ public class VerseLineViewController {
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
 	private Consumer<VerseLineViewController> pendingActions;
+	private boolean firstTab = false;
 
 	@FXML private void initialize() {
 		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
@@ -279,19 +280,25 @@ public class VerseLineViewController {
 		previousChantLine = associatedChantLines[selectedChantLine].toString();
 
 		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
-		// Preserve existing project edited state.
+		// Preserve existing project edited state if not first tab, otherwise reset it.
 		if (pendingActions != null) {
 			Platform.runLater(() -> {
-				lineTextFlow.layout();
-				pendingActions.accept(this);
+				boolean wasEdited = topController.getProjectEdited();
 
+				lineTextFlow.layout();
+				(firstTab ? pendingActions.andThen(ctr -> topController.resetProjectEditedStatus())
+						: pendingActions).accept(this);
 				pendingActions = null;
+
+				if (!firstTab)
+					topController.setProjectEdited(wasEdited);
 			});
 		}
 	}
 
-	public void setPendingActions(Consumer<VerseLineViewController> actions) {
+	public void setPendingActions(boolean first_tab, Consumer<VerseLineViewController> actions) {
 		pendingActions = actions;
+		firstTab = first_tab;
 	}
 
 	private void resetChordAssignment() {
