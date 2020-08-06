@@ -17,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -92,17 +93,17 @@ public class ProjectIO {
 				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
 						+ File.separator + controller.getOriginalIndex());
 
-				saveItemToFile(itemSaveFile.toPath(), oldItem.toPath());
+				copyFile(itemSaveFile.toPath(), oldItem.toPath());
 			}
 
 			index++;
 		}
 
 		// Delete any leftover items (necessary if items have been removed since last save/load)
-		try {
+		try (Stream<Path> files = Files.list(new File(tempProjectDirectory.getAbsolutePath()
+				+ File.separator + "items").toPath())) {
 			int finalIndex = index;
-			Files.list(new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items").toPath())
-					.filter(path -> Integer.parseInt(path.getFileName().toString()) >= finalIndex)
+			files.filter(path -> Integer.parseInt(path.getFileName().toString()) >= finalIndex)
 					.forEach(path -> {
 						try { Files.delete(path); } catch (IOException e) { e.printStackTrace();
 							TWUtils.showError("Failed to delete leftover item " + path, false); }
@@ -166,7 +167,7 @@ public class ProjectIO {
 		return true;
 	}
 
-	private void saveItemToFile(Path save_file, Path source_file) {
+	private void copyFile(Path save_file, Path source_file) {
 		try {
 			Files.copy(source_file, save_file, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
