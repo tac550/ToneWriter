@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
@@ -28,6 +29,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -650,6 +652,16 @@ public class VerseLineViewController {
 	public void setTonePhraseChoice(String choice) {
 		if (tonePhraseChoice.getItems().contains(choice)) {
 			tonePhraseChoice.getSelectionModel().select(choice);
+		}
+	}
+
+	public void setAssignmentDurations(List<String> durations) {
+		int i = 0;
+		for (SyllableText syllable : getSyllables()) {
+			for (AssignedChordData chordData : syllable.getAssociatedChords()) {
+				chordData.setDuration(durations.get(i));
+				i++;
+			}
 		}
 	}
 

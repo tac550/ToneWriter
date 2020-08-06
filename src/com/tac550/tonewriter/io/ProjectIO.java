@@ -331,8 +331,8 @@ public class ProjectIO {
 				List<String> bottomVerse = readLine(reader);
 
 				List<String> assignedPhrases = new ArrayList<>();
-				List<List<String>> syllables = new ArrayList<>();
-				List<List<String>> assignments = new ArrayList<>();
+				List<List<String>> syllableLines = new ArrayList<>();
+				List<List<String>> assignmentLines = new ArrayList<>();
 
 				String assignmentLine;
 				while ((assignmentLine = readLine(reader).get(0)).startsWith("+")) {
@@ -356,8 +356,8 @@ public class ProjectIO {
 						lineAssignments.add(assignment);
 					}
 
-					syllables.add(lineSyllables);
-					assignments.add(lineAssignments);
+					syllableLines.add(lineSyllables);
+					assignmentLines.add(lineAssignments);
 				}
 
 				// Create and set up item tab
@@ -381,9 +381,9 @@ public class ProjectIO {
 					ctr.setBottomVerseChoice(bottomVerse.get(0));
 					ctr.setBottomVerse(bottomVerse.get(1));
 
-					for (int j = 0; j < syllables.size(); j++) {
-						List<String> sylls = syllables.get(j);
-						List<String> assigns = assignments.get(j);
+					for (int j = 0; j < syllableLines.size(); j++) {
+						List<String> sylls = syllableLines.get(j);
+						List<String> assigns = assignmentLines.get(j);
 
 						// Create verse line with provided syllable data and save a reference to its controller
 						Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("", sylls));
@@ -397,6 +397,8 @@ public class ProjectIO {
 
 						int finalJ = j;
 						verseLine.setPendingActions(vLine -> {
+							List<String> durations = new ArrayList<>();
+
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
 
 							// Assign and/or skip chords as would be done by a user.
@@ -427,24 +429,24 @@ public class ProjectIO {
 								for (String chord : chords) {
 									String[] ind_dur = chord.split("-");
 									int chordIndex = Integer.parseInt(ind_dur[0]);
-									String duration = ind_dur[1];
+									durations.add(ind_dur[1]);
 									if (chordIndex > lastChordIndex) {
-
 
 										while (lastChordIndex < lastAssignedChordIndex) {
 											vLine.skipChord();
 											lastChordIndex++;
 										}
 
-
 										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
-												&& Integer.parseInt(chords[chordNum-1].split("-")[0]) - lastChordIndex < 1 ? k : k - 1);
+												&& Integer.parseInt(chords[chordNum - 1].split("-")[0])
+												- lastChordIndex < 1 ? k : k - 1);
 										lastAssignedChordIndex = chordIndex;
 										lastChordIndex++;
 										startSyll = k;
 
 									}
-									if (chordNum == chords.length - 1 && assigns.stream().skip(k+1).allMatch(String::isEmpty)) {
+									if (chordNum == chords.length - 1 && assigns.stream()
+											.skip(k + 1).allMatch(String::isEmpty)) {
 										while (lastChordIndex < chordIndex) {
 											vLine.skipChord();
 											lastChordIndex++;
@@ -456,6 +458,8 @@ public class ProjectIO {
 									chordNum++;
 								}
 							}
+
+							vLine.setAssignmentDurations(durations);
 						});
 					}
 
