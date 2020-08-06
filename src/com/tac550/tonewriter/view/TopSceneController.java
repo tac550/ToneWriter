@@ -295,7 +295,7 @@ public class TopSceneController {
 			else
 				openProject(arg_file);
 		} else {
-			addTab();
+			addTab(null, 0, null, null);
 		}
 	}
 
@@ -655,8 +655,15 @@ public class TopSceneController {
 				// Save any loading operations for later (when the user switches to the tab or exports the project).
 				newTabController.setPendingLoadActions(loading_actions);
 				// If this is the first tab, run them now (since this tab will be autoselected).
-				if (at_index == 0)
-					newTabController.runPendingLoadActions();
+				if (at_index == 0) {
+					// If already fully loaded (because there were no pending actions)...
+					if (newTabController.fullyLoaded())
+						// Reset project edited status now.
+						resetProjectEditedStatus();
+					else
+						// Otherwise, run the loading actions immediately. This should reset project edited also.
+						newTabController.runPendingLoadActions();
+				}
 			});
 		});
 	}
