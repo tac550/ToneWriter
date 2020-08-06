@@ -95,7 +95,6 @@ public class TopSceneController {
 
 	private String paperSize = "";
 
-	// TODO: Consider switching to this kind of system for loading tones to allow threading CL loads.
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
 	// Note duration menu elements are re-used to save memory
@@ -681,9 +680,12 @@ public class TopSceneController {
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
 	}
-	void clearAllTabs() { // TODO: This isn't totally fiexd! (Consider tab other than 0 is selected)
+	void clearAllTabs() {
 		List<Tab> tabs = new ArrayList<>(tabPane.getTabs());
 		Collections.reverse(tabs);
+
+		// Prevents tabs from automatically being sequentially selected (and loaded) after the selected one closes
+		tabPane.getSelectionModel().select(0);
 
 		for (Tab tab : tabs)
 			forceCloseTab(tab);
@@ -727,15 +729,12 @@ public class TopSceneController {
 		}
 	}
 	public void resetProjectEditedStatus() {
-		setProjectEdited(false);
+		projectEdited = false;
+		if (getTabCount() > 0)
+			getSelectedTabScene().updateStageTitle();
 	}
 	public boolean getProjectEdited() {
 		return projectEdited;
-	}
-	void setProjectEdited(boolean edited) {
-		projectEdited = edited;
-		if (getTabCount() > 0)
-			getSelectedTabScene().updateStageTitle();
 	}
 
 	void setMenuState(ToneMenuState menu_state) {
@@ -794,8 +793,8 @@ public class TopSceneController {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 
-			// Don't check for tabs that haven't been fully loaded
-			if (!controller.fullyLoaded()) continue;
+			// Don't check for tabs that haven't been edited
+			if (!controller.getToneEdited()) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();

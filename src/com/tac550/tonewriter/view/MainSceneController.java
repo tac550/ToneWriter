@@ -292,7 +292,7 @@ public class MainSceneController {
 		});
 	}
 
-	public void applyLoadedVerses(boolean project_edited_state_after) {
+	public void applyLoadedVerses(boolean project_edited_after) {
 		Platform.runLater(() -> {
 			for (Task<FXMLLoader> loader : verseLineLoaders) {
 				try {
@@ -307,7 +307,10 @@ public class MainSceneController {
 
 			syncCVLMapping();
 
-			topSceneController.setProjectEdited(project_edited_state_after);
+			if (project_edited_after)
+				topSceneController.projectEdited();
+			else
+				topSceneController.resetProjectEditedStatus();
 		});
 	}
 

@@ -290,8 +290,8 @@ public class VerseLineViewController {
 						: pendingActions).accept(this);
 				pendingActions = null;
 
-				if (!firstTab)
-					topController.setProjectEdited(wasEdited);
+				if (!firstTab && !wasEdited)
+					topController.resetProjectEditedStatus();
 			});
 		}
 	}
@@ -529,14 +529,14 @@ public class VerseLineViewController {
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
 					&& i == last_syll) { // Final instance of the last chord in the chant line gets special duration.
 				if (mainController.isLastVerseLineOfSection(this)) {
-					noteButton = createNoteButton(currentText, getCurrentChord());
+					noteButton = createChordButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 					currentText.setNoteDuration(LilyPondInterface.NOTE_WHOLE,
 							currentText.getAssociatedButtons().size() - 1);
 				} else {
-					noteButton = createNoteButton(currentText, getCurrentChord());
+					noteButton = createChordButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
@@ -544,7 +544,7 @@ public class VerseLineViewController {
 							currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
-				noteButton = createNoteButton(currentText, getCurrentChord());
+				noteButton = createChordButton(currentText, getCurrentChord());
 
 				undoFrame.buttons.add(noteButton);
 				currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
@@ -558,7 +558,7 @@ public class VerseLineViewController {
 		undoActions.push(undoFrame);
 	}
 
-	private Button createNoteButton(SyllableText syllable, ChantChordController chord) {
+	private Button createChordButton(SyllableText syllable, ChantChordController chord) {
 		int buttonIndex = syllable.getAssociatedButtons().size();
 		int chordIdex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
 
@@ -579,6 +579,7 @@ public class VerseLineViewController {
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
+					topController.projectEdited();
 					syllable.setNoteDuration(LilyPondInterface.NOTE_HALF, buttonIndex);
 				}
 				topController.showNoteMenu(syllable, noteButton);
@@ -685,7 +686,7 @@ public class VerseLineViewController {
 		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
-	public void edited() {
+	public void verseEdited() {
 		mainController.verseEdited();
 	}
 
