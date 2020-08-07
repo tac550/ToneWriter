@@ -554,10 +554,10 @@ public class MainSceneController {
 		fileChooser.setInitialFileName(".tone");
 		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
 		if (toneFile != null && isToneSavable())
-			fileChooser.setInitialDirectory(toneFile.getParentFile());
+			fileChooser.setInitialDirectory(projectToneLoaded() ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+					: toneFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
-					: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
 
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
@@ -633,6 +633,8 @@ public class MainSceneController {
 			return false;
 
 		toneFile = tone_file;
+		toneMenuState.saveToneMenuItemDisabled = false;
+		applyToneMenuState();
 		return true;
 	}
 
