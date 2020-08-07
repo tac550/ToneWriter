@@ -58,11 +58,11 @@ public class MidiInterface {
 						currentButton.setStyle("-fx-base: #fffa61"); // TODO: Also highlight associated syllables
 						chord.getChordController().playMidi();
 						// This sleep determines for how long the note plays.
-						// Speeds recitative of more than 3 repeated notes up to a minimum value.
+						// Speeds recitative of more than 3 repeated notes up to a maximum value.
 						// For non-recitative, bases speed on note value, adjusting some manually.
 						// noinspection BusyWait
 						Thread.sleep(1000
-								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 8)
+								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 5)
 								: Integer.parseInt(chord.getDuration()
 								.replace("4.", "3").replace("8", "6"))));
 
