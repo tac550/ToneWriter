@@ -546,7 +546,7 @@ public class MainSceneController {
 		}
 	}
 	private boolean isToneSavable() {
-		return !builtInToneLoaded() || MainApp.developerMode;
+		return (!projectToneLoaded() && !builtInToneLoaded()) || MainApp.developerMode;
 	}
 
 	private boolean createNewTone() {
@@ -587,7 +587,7 @@ public class MainSceneController {
 	private boolean loadTone(File selected_file, boolean selectHideToneHeader) {
 		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
-			if (toneFile != null) {
+			if (toneFile != null && !projectToneLoaded()) {
 				if (builtInToneLoaded()) fileChooser.setInitialDirectory(builtInDir);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
@@ -623,7 +623,7 @@ public class MainSceneController {
 			}
 
 		} else {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, parentStage);
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Requested tone file doesn't exist!", true, parentStage);
 			return false;
 		}
 	}
@@ -939,6 +939,10 @@ public class MainSceneController {
 
 	private boolean builtInToneLoaded() {
 		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
+	}
+
+	private boolean projectToneLoaded() {
+		return toneFile.getAbsolutePath().startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath());
 	}
 
 	private void setNewRenderFilename() throws RenderFormatException {

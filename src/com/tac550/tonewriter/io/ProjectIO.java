@@ -74,7 +74,7 @@ public class ProjectIO {
 					uniqueHashes.add(toneHash);
 
 					File toneSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones"
-							+ File.separator + toneHash + File.separator + "unsaved.tone");
+							+ File.separator + toneHash + File.separator + "Unsaved Tone.tone");
 
 					if (ToneReaderWriter.createToneFile(toneSaveFile)) {
 						toneWriter.saveToneToFile(toneSaveFile);
@@ -299,7 +299,7 @@ public class ProjectIO {
 		if (tonesDir.exists() && toneDirs != null) {
 			for (File toneDir : toneDirs) {
 				hashtoToneFile.put(toneDir.getName(), new File(toneDir.getAbsolutePath()
-						+ File.separator + "unsaved.tone"));
+						+ File.separator + "Unsaved Tone.tone"));
 			}
 		}
 
@@ -464,7 +464,7 @@ public class ProjectIO {
 						});
 					}
 
-					ctr.applyLoadedVerses(projectEditedState);
+					ctr.applyLoadedVerses(finalI != 0 && projectEditedState);
 				});
 
 			} catch (IOException e) {
