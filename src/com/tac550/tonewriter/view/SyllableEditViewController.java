@@ -28,7 +28,7 @@ public class SyllableEditViewController {
 		if (!syllableTextField.getText().isEmpty() && !syllableTextField.getText().equals(parentController.getVerseLineText())) {
 			parentController.setVerseLine(syllableTextField.getText());
 
-			parentController.edited();
+			parentController.verseEdited();
 		}
 		
 		closeStage();

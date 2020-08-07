@@ -205,7 +205,7 @@ public class AutoUpdater {
 				} catch (FailingHttpStatusCodeException e) {
 					e.printStackTrace();
 					Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Connection Error",
-							"Internet connection failure! Unable to download update.", true));
+							"Internet connection failure! Unable to download the update.", true));
 					return false;
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -263,7 +263,7 @@ public class AutoUpdater {
 			}
 
 			try {
-				TWUtils.exportIOResource("autoupdate-macOS.sh", scriptFile);
+				TWUtils.exportFSResource("autoupdate-macOS.sh", scriptFile);
 			} catch (Exception e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
@@ -303,7 +303,7 @@ public class AutoUpdater {
 			}
 
 			try {
-				TWUtils.exportIOResource("autoupdate-Linux.sh", scriptFile);
+				TWUtils.exportFSResource("autoupdate-Linux.sh", scriptFile);
 			} catch (Exception e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",

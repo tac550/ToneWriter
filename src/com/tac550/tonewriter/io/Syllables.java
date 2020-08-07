@@ -20,7 +20,6 @@ public class Syllables {
 	// Sends text off to the syllabification engine and returns the resulting lines as an array of strings.
 	public static String[] getSyllabificationLines(String full_verse, Stage main_stage) {
 		
-
 		List<String> lines;
 		
 		try (final WebClient webClient = new WebClient()) {
@@ -48,7 +47,6 @@ public class Syllables {
 		}
 		
 		return lines.toArray(new String[0]);
-		
 	}
 	
 }

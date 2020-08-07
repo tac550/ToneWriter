@@ -1,11 +1,14 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
-import com.tac550.tonewriter.model.MenuState;
+import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,14 +26,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
+import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +41,14 @@ public class TopSceneController {
 
 	private Stage parentStage;
 
+	private final ProjectIO projectIO = new ProjectIO();
+
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
+	@FXML private MenuItem newProjectMenuItem;
+	@FXML private MenuItem openProjectMenuItem;
+	@FXML private MenuItem saveProjectMenuItem;
+	@FXML private MenuItem saveProjectAsMenuItem;
 	@FXML private MenuItem exportPDFMenuItem;
 	@FXML private MenuItem exitMenuItem;
 
@@ -73,15 +82,20 @@ public class TopSceneController {
 	static final String keyIconPath = "/media/key.png";
 	static final String bookIconPath = "/media/book.png";
 
+	private boolean projectEdited = true;
+
 	// File names and directories are kept separately to make exporting multiple items with the same name
 	// and different extensions easier.
 	String projectOutputFileName;
 	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
-	String projectTitle = "";
+	private File projectFile;
+	private String projectTitle = "Unnamed Project";
 
-	String paperSize = "";
+	private String paperSize = "";
+
+	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
 	// Note duration menu elements are re-used to save memory
 	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
@@ -175,6 +189,10 @@ public class TopSceneController {
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
+		setMenuIcon(newProjectMenuItem, "/media/file-sound.png");
+		setMenuIcon(openProjectMenuItem, "/media/folder.png");
+		setMenuIcon(saveProjectMenuItem, "/media/floppy.png");
+		setMenuIcon(saveProjectAsMenuItem, "/media/floppy-add.png");
 		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
 		setMenuIcon(exitMenuItem, "/media/sign-error.png");
 		setMenuIcon(newToneMenuItem, "/media/file-text.png");
@@ -226,7 +244,7 @@ public class TopSceneController {
 
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
-			if (tabPane.getTabs().size() == 1) {
+			if (getTabCount() == 1) {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 			} else {
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
@@ -234,8 +252,13 @@ public class TopSceneController {
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
 			MainSceneController selectedController = getSelectedTabScene();
+			if (selectedController == null) return;
+
+			// Finish loading the tab if not already done.
+			selectedController.runPendingLoadActions();
+
 			selectedController.updateStageTitle();
-			selectedController.applyMenuState();
+			selectedController.applyToneMenuState();
 		});
 
 		// Add button initialization
@@ -245,39 +268,163 @@ public class TopSceneController {
 		addTabButton.setGraphic(addImageView);
 		if (MainApp.OS_NAME.startsWith("mac")) addTabButton.getTooltip().setText("Add item (\u2318T)");
 
+		// Behavior for adding asynchronously loading tabs
+		tabsToAdd.addListener((MapChangeListener<Integer, Tab>) change -> {
+			if (change.wasAdded())
+				addNextPendingTabs();
+		});
+
+		// listener which triggers project edited status when tabs reordered or removed
+		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
+			while (change.next()) {
+				if (change.wasPermutated() || change.wasRemoved())
+					projectEdited();
+			}
+		});
+
 	}
 
-	void performSetup(Stage parent_stage, File openWithFile) {
+	void performSetup(Stage parent_stage, File arg_file) {
 		parentStage = parent_stage;
 
-		// Concluding setup process
-		addTab(openWithFile);
+		// Check type of file in arguments
+		if (arg_file != null) {
+			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
+				addTab(null, 0, null,
+						ctr -> ctr.handleOpenTone(arg_file, true, false));
+			else
+				openProject(arg_file);
+		} else {
+			addTab(null, 0, null, null);
+		}
 	}
 
-	private static void setMenuIcon(MenuItem menu_item, String imagePath) {
-		ImageView imageView = new ImageView(TopSceneController.class.getResource(imagePath).toExternalForm());
+	private static void setMenuIcon(MenuItem menu_item, String image_path) {
+		ImageView imageView = new ImageView(TopSceneController.class.getResource(image_path).toExternalForm());
 		double menuIconSize = 30;
 		imageView.setFitHeight(menuIconSize);
 		imageView.setFitWidth(menuIconSize);
 		menu_item.setGraphic(imageView);
 	}
 
-	private void setPaperSize(String size) {
+	private void setDefaultPaperSize(String size) {
 		paperSize = size;
 
 		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
 	}
 
+	private void addNextPendingTabs() {
+		// Add the next pending tabs in an uninterrupted sequence.
+		int addingIndex = getTabCount();
+		while (tabsToAdd.containsKey(addingIndex)) {
+			tabPane.getTabs().add(addingIndex, tabsToAdd.get(addingIndex));
+
+			addingIndex++;
+		}
+
+		// Clean up current + lower index pending tabs.
+		for (int key : new HashSet<>(tabsToAdd.keySet())) {
+			if (key <= addingIndex)
+				tabsToAdd.remove(key);
+		}
+	}
+
 	/*
 	 * Project Menu Actions
 	 */
+	@FXML void addTab() {
+		addTab(null, -1, null, null);
+		projectEdited();
+	}
+	@FXML void handleSetProjectTitle() {
+		TextInputDialog dialog = new TextInputDialog(projectTitle);
+		dialog.setTitle("Project Title");
+		dialog.setHeaderText("Enter project title");
+		dialog.setContentText("This appears on the top of every page of a project export");
+		dialog.getEditor().setPrefWidth(250);
+		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
+		bookIcon.setFitHeight(50);
+		bookIcon.setFitWidth(50);
+		dialog.setGraphic(bookIcon);
+		dialog.initOwner(parentStage);
+
+		Optional<String> result = dialog.showAndWait();
+
+		if (result.isPresent()) {
+			setProjectTitle(result.get());
+			getSelectedTabScene().updateStageTitle();
+		}
+	}
+
+	@FXML private void handleNewProject() {
+		// Create new project in existing window
+		Event event = new Event(null, null, null);
+		requestClose(event);
+		if (event.isConsumed())
+			return;
+
+		clearAllTabs();
+
+		setProjectTitle("Unnamed Project");
+		projectFile = null;
+
+		addTab();
+
+	}
+	@FXML private void handleOpenProject() {
+		FileChooser fileChooser = new FileChooser();
+		if (projectFile != null)
+			fileChooser.setInitialDirectory(projectFile.getParentFile());
+		else
+			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
+		File selectedFile = fileChooser.showOpenDialog(parentStage);
+		if (selectedFile == null) return;
+
+		// Open project in existing window
+		Event event = new Event(null, null, null);
+		requestClose(event);
+		if (event.isConsumed())
+			return;
+
+		clearAllTabs();
+
+		openProject(selectedFile);
+	}
+	@FXML private void handleSaveProject() {
+		if (projectFile != null) {
+			if (projectIO.saveProject(projectFile, this))
+				resetProjectEditedStatus();
+		} else {
+			handleSaveProjectAs();
+		}
+	}
+	@FXML private void handleSaveProjectAs() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName(projectTitle + ".twproj");
+		if (projectFile != null)
+			fileChooser.setInitialDirectory(projectFile.getParentFile());
+		else
+			fileChooser.setInitialDirectory(projectSavingDirectory);
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
+		File saveFile = fileChooser.showSaveDialog(parentStage);
+		if (saveFile == null) return;
+
+		if (!saveFile.getName().endsWith(".twproj")) {
+			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
+		}
+
+		if (projectIO.saveProject(saveFile, this)) {
+			projectFile = saveFile;
+			resetProjectEditedStatus();
+		}
+	}
 	@FXML private void handleExport() {
 		getSelectedTabScene().handleExport();
 	}
 	@FXML private void handleExit() {
-		Event event = new Event(null, null, null);
-		requestExit(event);
-		if (!event.isConsumed()) Platform.exit();
+		Window window = parentStage.getScene().getWindow();
+		window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
 	}
 
 	/*
@@ -305,7 +452,7 @@ public class TopSceneController {
 	@FXML private void handleSetKeySignature() {
 		getSelectedTabScene().handleSetKeySignature();
 	}
-	@FXML private void handleEditHeaderInfo() {
+	@FXML private void handleSetHeaderInfo() {
 		getSelectedTabScene().handleEditHeaderInfo();
 	}
 	@FXML private void handleToggleManualCLAssignment() {
@@ -321,7 +468,7 @@ public class TopSceneController {
 	@FXML private void handleResetLilyPondDir() {
 		MainApp.resetLilyPondDir(false);
 	}
-	@FXML private void handleSetPaperSize() {
+	@FXML private void handleSetDefaultPaperSize() {
 		List<String> choices = new ArrayList<>();
 
 		choices.add("a4 (210 x 297 mm)");
@@ -334,12 +481,12 @@ public class TopSceneController {
 		choices.add("17x11 (17.0 x 11.0 in)");
 
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
-		dialog.setTitle("Paper sizes");
-		dialog.setHeaderText("Choose a paper size");
+		dialog.setTitle("Default Paper Size");
+		dialog.setHeaderText("Set the default paper size");
 		dialog.initOwner(parentStage);
 		Optional<String> result = dialog.showAndWait();
 
-		result.ifPresent(this::setPaperSize);
+		result.ifPresent(this::setDefaultPaperSize);
 	}
 	@FXML private void handleResetMidi() {
 		MidiInterface.resetMidiSystem();
@@ -369,17 +516,16 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	@FXML void addTab() {
-		addTab(null);
-	}
-
-	public void addTab(File openWithFile) {
+	public void addTab(String with_title, int at_index, String precomp_source,
+					   Consumer<MainSceneController> loading_actions) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
 			SplitPane mainLayout = loader.getRoot();
 			MainSceneController newTabController = loader.getController();
 			newTabController.setStageAndTopScene(parentStage, this);
+
+			newTabController.setOriginalIndex(at_index);
 
 			Tab tab = new Tab();
 
@@ -400,10 +546,8 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSave()) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSaveTone()) {
 					event.consume();
-				} else {
-					cleanUpTabForRemoval(tab);
 				}
 
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
@@ -419,7 +563,7 @@ public class TopSceneController {
 
 				if (prevTabController != null) {
 					newTabController.setDividerPosition(prevTabController.getDividerPosition());
-					if (prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
+					if (loading_actions == null && prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 							"Open tone \"" + prevTabController.getToneFile().getName() + "\" for new item?",
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
 						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true, true);
@@ -475,48 +619,83 @@ public class TopSceneController {
 							int numIndex = matcher.start();
 							int nextNum = Integer.parseInt(prevNum) + 1;
 
-							newTabController.setTitleText(prevTitle.substring(0, numIndex) + nextNum);
+							newTabController.setTitle(prevTitle.substring(0, numIndex) + nextNum);
 						}
 					} else {
-						newTabController.setTitleText("Item " + (tabPane.getTabs().size() + 1));
+						newTabController.setTitle("Item " + (getTabCount() + 1));
 					}
-
 				} else {
-					// Title text for the first tab created (at startup)
-					newTabController.setTitleText("Item 1");
-
-					if (openWithFile != null) {
-						newTabController.handleOpenTone(openWithFile, true, false);
-					}
-
+					newTabController.setTitle("Item 1");
 				}
 
-				// Add the tab after the selected one, if any.
-				if (prevTabController != null) {
-					tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
+				// Title text for the first tab created (at startup)
+				if (with_title != null)
+					newTabController.setTitle(with_title);
+
+				// If there is a specified index...
+				if (at_index != -1) {
+					if (at_index >= getTabCount())
+						tabsToAdd.put(at_index, tab);
+					else
+						tabPane.getTabs().add(at_index, tab);
 				} else {
-					tabPane.getTabs().add(tab);
+					// Add the tab after the selected one, if any.
+					if (prevTabController != null) {
+						tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
+					} else {
+						tabPane.getTabs().add(tab);
+					}
+					tabPane.getSelectionModel().select(tab);
+					tab.getContent().requestFocus();
 				}
-				tabPane.getSelectionModel().select(tab);
-				tab.getContent().requestFocus();
+
+				if (precomp_source != null)
+					newTabController.setLilyPondSource(precomp_source);
+
+				// Save any loading operations for later (when the user switches to the tab or exports the project).
+				newTabController.setPendingLoadActions(loading_actions);
+				// If this is the first tab, run them now (since this tab will be autoselected).
+				if (at_index == 0) {
+					// If already fully loaded (because there were no pending actions)...
+					if (newTabController.fullyLoaded())
+						// Reset project edited status now.
+						resetProjectEditedStatus();
+					else
+						// Otherwise, run the loading actions immediately. This should reset project edited also.
+						newTabController.runPendingLoadActions();
+				}
 			});
 		});
 	}
 
+	private void forceCloseTab(Tab tab) {
+		cleanUpTabForRemoval(tab);
+		tabPane.getTabs().remove(tab);
+	}
 	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
 		EventHandler<Event> handler = tab.getOnCloseRequest();
-		if (handler != null) {
-			Event event = new Event(null, null, null);
-			handler.handle(event);
-			if (event.isConsumed()) return;
-		}
+		Event event = new Event(null, null, null);
+		handler.handle(event);
+		if (event.isConsumed())
+			return;
 
+		cleanUpTabForRemoval(tab);
 		tabPane.getTabs().remove(tab);
 	}
 	void closeSelectedTab() {
 		closeTab(tabPane.getSelectionModel().getSelectedItem());
+	}
+	void clearAllTabs() {
+		List<Tab> tabs = new ArrayList<>(tabPane.getTabs());
+		Collections.reverse(tabs);
+
+		// Prevents tabs from automatically being sequentially selected (and loaded) after the selected one closes
+		tabPane.getSelectionModel().select(0);
+
+		for (Tab tab : tabs)
+			forceCloseTab(tab);
 	}
 
 	void cleanUpTabForRemoval(Tab tab) {
@@ -530,14 +709,49 @@ public class TopSceneController {
 		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
 	}
 
-	void setMenuState(MenuState menu_state) {
+	public String getProjectTitle() {
+		return projectTitle;
+	}
+
+	public void setProjectTitle(String title) {
+		projectTitle = title;
+	}
+
+	void openProject(File selected_file) {
+		if (selected_file.exists()) {
+			if (projectIO.openProject(selected_file, this)) {
+				projectFile = selected_file;
+			} else {
+				clearAllTabs();
+				addTab();
+			}
+		}
+	}
+
+	void projectEdited() {
+		if (!projectEdited) {
+			projectEdited = true;
+			if (getTabCount() > 0)
+				getSelectedTabScene().updateStageTitle();
+		}
+	}
+	public void resetProjectEditedStatus() {
+		projectEdited = false;
+		if (getTabCount() > 0)
+			getSelectedTabScene().updateStageTitle();
+	}
+	public boolean getProjectEdited() {
+		return projectEdited;
+	}
+
+	void setMenuState(ToneMenuState menu_state) {
 		editMenu.setDisable(menu_state.editMenuDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
 		saveToneAsMenuItem.setDisable(menu_state.saveToneAsMenuItemDisabled);
 		manualCLAssignmentMenuItem.setSelected(menu_state.manualCLAssignmentSelected);
 	}
 
-	boolean manualCLAssignmentEnabled() {
+	boolean getManualCLAssignmentStatus() {
 		return manualCLAssignmentMenuItem.isSelected();
 	}
 
@@ -548,69 +762,71 @@ public class TopSceneController {
 		return hoverHighlightMenuItem.isSelected();
 	}
 
-	void requestExit(Event ev) {
+	void requestClose(Event ev) {
+		if (!checkSaveProject() || !checkAllToneSaves()) {
+			ev.consume();
+		}
+	}
+
+	/*
+	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
+	 */
+	private boolean checkSaveProject() {
+		if (!projectEdited)
+			return true;
+
+		ButtonType saveButton = new ButtonType("Save");
+		ButtonType dontSaveButton = new ButtonType("Don't Save");
+		ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+		Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Project Save Confirmation",
+				"Save changes to project \"" + projectTitle + "\"?", true, parentStage,
+				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
+
+		if (result.isPresent()) {
+			if (result.get() == saveButton) {
+				handleSaveProject();
+				return true;
+			} else return result.get() == dontSaveButton;
+		} else {
+			// Not returning true, so no save will occur and the prompt will appear again next time.
+			return false;
+		}
+	}
+
+	boolean checkAllToneSaves() {
 		Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
 
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
-			if (controller.isToneUnedited()) continue;
+
+			// Don't check for tabs that haven't been edited
+			if (!controller.getToneEdited()) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();
 			controller.setDividerPosition(1.0);
 
-			boolean saveCancelled = !controller.checkSave();
+			boolean saveCancelled = !controller.checkSaveTone();
 
 			controller.setDividerPosition(prevPosition);
 
 			if (saveCancelled) {
-				ev.consume();
-				break;
-			} else if (controller.isToneUnedited()) {
+				tabPane.getSelectionModel().select(prevTab);
+				return false;
+			} else if (!controller.getToneEdited()) { // The user selected Save; update other open instances.
 				refreshToneInstances(controller.getToneFile(), controller);
 			}
-
 		}
 
-		tabPane.getSelectionModel().select(prevTab);
-	}
-
-	@FXML boolean handleSetProjectTitle() {
-		TextInputDialog dialog = new TextInputDialog(projectTitle);
-		dialog.setTitle("Project Title");
-		dialog.setHeaderText("Enter project title");
-		dialog.setContentText("This appears on the top of every page of a project export");
-		dialog.getEditor().setPrefWidth(250);
-		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
-		bookIcon.setFitHeight(50);
-		bookIcon.setFitWidth(50);
-		dialog.setGraphic(bookIcon);
-		dialog.initOwner(parentStage);
-
-		Optional<String> result = dialog.showAndWait();
-
-		if (result.isPresent()) {
-			projectTitle = result.get();
-			return true;
-		} else return false;
+		return true;
 	}
 
 	void exportProject() throws IOException {
 
-		MainSceneController[] mainControllers = new MainSceneController[tabPane.getTabs().size()];
-		for (int i = 0; i < tabPane.getTabs().size(); i++) {
-			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
-		}
-
 		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
-				mainControllers, paperSize);
+				getTabControllers(), paperSize);
 
-	}
-
-	void checkProjectName() {
-		while (true) {
-			if (!projectTitle.isBlank() || !handleSetProjectTitle()) break;
-		}
 	}
 
 	void propagateProjectOutputSetting() {
@@ -629,7 +845,7 @@ public class TopSceneController {
 
 	void refreshAllChordPreviews() {
 		for (Tab tab : tabPane.getTabs()) {
-			tabControllerMap.get(tab).refreshAllChordPreviews();
+			tabControllerMap.get(tab).refreshToneChordPreviews();
 		}
 	}
 
@@ -647,17 +863,34 @@ public class TopSceneController {
 		return getSelectedTabScene() == controller;
 	}
 
-	public int tabCount() {
+	public int getTabCount() {
 		return tabPane.getTabs().size();
 	}
 
-	static void showNoteMenu(SyllableText syllable, Button noteButton) {
+	public String getPaperSize() {
+		return paperSize;
+	}
+
+	public MainSceneController[] getTabControllers() {
+		int tabCount = getTabCount();
+
+		MainSceneController[] mainControllers = new MainSceneController[tabCount];
+		for (int i = 0; i < tabCount; i++) {
+			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
+		}
+
+		return mainControllers;
+	}
+
+	void showNoteMenu(SyllableText syllable, Button noteButton) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
 		// Behavior
 		for (RadioMenuItem item : clickItems) {
-			item.setOnAction(event ->
-					syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex));
+			item.setOnAction(event -> {
+				syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex);
+				projectEdited();
+			});
 		}
 
 		// Initial state
@@ -669,7 +902,7 @@ public class TopSceneController {
 						* VerseLineViewController.NOTE_BUTTON_HEIGHT.get());
 	}
 
-	static void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
+	void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
 		// Behavior
@@ -677,6 +910,7 @@ public class TopSceneController {
 			for (ImageView item : touchItems) {
 				if (item.getEffect() != null) {
 					syllable.setNoteDuration(durationMapping.get(touchItems.indexOf(item)), noteButtonIndex);
+					projectEdited();
 					item.setEffect(null);
 				}
 			}

@@ -4,7 +4,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.Syllables;
 import com.tac550.tonewriter.io.ToneReaderWriter;
-import com.tac550.tonewriter.model.MenuState;
+import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
@@ -17,17 +17,12 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
@@ -37,7 +32,7 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -48,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -83,6 +79,9 @@ public class MainSceneController {
 
 	@FXML private SplitPane mainSplitPane;
 
+	@FXML private StackPane openToneHintPane;
+	@FXML private Button openToneHintButton;
+
 	@FXML private ChoiceBox<String> topVerseChoice;
 	@FXML private TextField topVerseField;
 	@FXML private Button topVerseButton;
@@ -95,21 +94,30 @@ public class MainSceneController {
 	@FXML private StackPane setVersePane;
 	@FXML private Button setVerseButton;
 	@FXML private HBox setVerseProgressBox;
+	@FXML private StackPane verseTextHintPane;
 
+	@FXML private MenuButton optionsButton;
+	@FXML private ToggleGroup titleOptions;
 	@FXML private RadioMenuItem largeTitleMenuItem;
 	@FXML private RadioMenuItem hiddenTitleMenuItem;
+
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 	@FXML private CheckMenuItem pageBreakMenuItem;
 
-	private final MenuState menuState = new MenuState();
+	private final ToneMenuState toneMenuState = new ToneMenuState();
+
+	private Consumer<MainSceneController> pendingLoadActions;
 
 	private Robot robot;
 
 	private File toneFile;
+	private int originalIndex;
+	private String lilyPondItem = "";
 
 	private String keySignature = "C major";
 	private String leftText = "";
 	private String rightText = "";
+	private boolean manualCLAssignment = false;
 
 	static boolean LoadingTone = false;
 	static String copiedChord = "";
@@ -132,12 +140,13 @@ public class MainSceneController {
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
 	private final List<ChantLineViewController> chantLineControllers = new ArrayList<>();
-	private boolean loading = false;
+	private boolean loadingTone = false;
 
 	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
 
 	@FXML private VBox verseLineBox;
 	private final List<VerseLineViewController> verseLineControllers = new ArrayList<>();
+	List<Task<FXMLLoader>> verseLineLoaders = new ArrayList<>();
 
 	@FXML private void initialize() {
 
@@ -187,9 +196,13 @@ public class MainSceneController {
 			}
 		});
 		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
-			boolean visible = !newVal.equals(lastVerseSet) || verseEdited;
-			setVerseButton.setVisible(visible);
-			setVersePane.setMouseTransparent(!visible);
+			verseTextHintPane.setVisible(newVal.isEmpty());
+
+			boolean showSetVerse = !newVal.equals(lastVerseSet) || verseEdited;
+			setVerseButton.setVisible(showSetVerse);
+			setVersePane.setMouseTransparent(!showSetVerse);
+
+			topSceneController.projectEdited();
 		});
 		verseAreaPane.getChildren().add(0, verseArea);
 		AnchorPane.setLeftAnchor(verseArea, 0.0); AnchorPane.setRightAnchor(verseArea, 0.0);
@@ -201,17 +214,38 @@ public class MainSceneController {
 
 		// Title and subtitle field tooltip info reflects current output mode
 		titleTextField.getTooltip().setOnShown(event -> {
-			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.getTabCount() == 1)
 				((Tooltip) event.getTarget()).setText("Appears on every page (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered above subtitle, appears once (Project export mode)");
 		});
 		subtitleTextField.getTooltip().setOnShown(event -> {
-			if (exportMode == ExportMode.ITEM || topSceneController.tabCount() == 1)
+			if (exportMode == ExportMode.ITEM || topSceneController.getTabCount() == 1)
 				((Tooltip) event.getTarget()).setText("First page only (Single-item export mode)");
 			else
 				((Tooltip) event.getTarget()).setText("Centered below title, appears once (Project export mode)");
 		});
+
+		// Set up the stack pane to behave like the whole thing extends the clickable area of the button.
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_ENTERED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#57969c, #61a2b1);"));
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_EXITED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#61a2b1, #61b0b1);"));
+		openToneHintPane.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> openToneHintButton.fire());
+
+		// listeners for triggering project edited status
+		titleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
+		subtitleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
+		topVerseChoice.valueProperty().addListener(change -> topSceneController.projectEdited());
+		topVerseField.textProperty().addListener(change -> topSceneController.projectEdited());
+		bottomVerseChoice.valueProperty().addListener(change -> topSceneController.projectEdited());
+		bottomVerseField.textProperty().addListener(change -> topSceneController.projectEdited());
+
+		for (Toggle item : titleOptions.getToggles())
+			item.selectedProperty().addListener(change -> topSceneController.projectEdited());
+
+		for (MenuItem item : optionsButton.getItems()) {
+			if (item instanceof CheckMenuItem checkItem)
+				checkItem.selectedProperty().addListener(change -> topSceneController.projectEdited());
+		}
 
 	}
 
@@ -230,16 +264,17 @@ public class MainSceneController {
 		rightText = right;
 	}
 
-	private Task<FXMLLoader> createVerseLine(String line) {
+	public Task<FXMLLoader> createVerseLine(String line) {
 
-		return FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
+		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentControllers(this, topSceneController);
 
 			controller.setVerseLine(line);
-
 		});
+		verseLineLoaders.add(loaderTask);
 
+		return loaderTask;
 	}
 	public Task<FXMLLoader> createChantLine(int index, boolean recalculateNames) {
 
@@ -254,9 +289,29 @@ public class MainSceneController {
 				chantLineBox.getChildren().add(index, chantLineLayout);
 				if (recalculateNames) recalcCLNames();
 			});
-
 		});
+	}
 
+	public void applyLoadedVerses(boolean project_edited_after) {
+		Platform.runLater(() -> {
+			for (Task<FXMLLoader> loader : verseLineLoaders) {
+				try {
+					verseLineControllers.add(loader.get().getController());
+					verseLineBox.getChildren().add(loader.get().getRoot());
+				} catch (InterruptedException | ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+
+			verseLineLoaders.clear();
+
+			syncCVLMapping();
+
+			if (project_edited_after)
+				topSceneController.projectEdited();
+			else
+				topSceneController.resetProjectEditedStatus();
+		});
 	}
 
 	public void recalcCLNames() {
@@ -391,6 +446,10 @@ public class MainSceneController {
 		verseLineBox.getChildren().clear();
 	}
 
+	@FXML private void handleOpenToneHint() {
+		handleOpenTone(null, false, false);
+	}
+
 	@FXML private void handleSetVerse() {
 
 		if (!verseLineControllers.isEmpty()) {
@@ -409,6 +468,8 @@ public class MainSceneController {
 		if (lastVerseSet.isEmpty()) {
 			setVerseButton.setVisible(false);
 			setVersePane.setMouseTransparent(true);
+
+			topSceneController.projectEdited();
 			return;
 		}
 
@@ -430,28 +491,16 @@ public class MainSceneController {
 					return null;
 				}
 
-				List<Task<FXMLLoader>> lineLoaders = new ArrayList<>();
-
 				for (String line : lines) {
-					lineLoaders.add(createVerseLine(line));
+					createVerseLine(line);
 				}
 
-				Platform.runLater(() -> {
-					for (Task<FXMLLoader> loader : lineLoaders) {
-						try {
-							verseLineControllers.add(loader.get().getController());
-							verseLineBox.getChildren().add(loader.get().getRoot());
-						} catch (InterruptedException | ExecutionException e) {
-							e.printStackTrace();
-						}
-					}
+				applyLoadedVerses(true);
 
-					syncCVLMapping();
+				// Hide working indicator
+				setVerseProgressBox.setVisible(false);
+				setVersePane.setMouseTransparent(true);
 
-					// Hide working indicator
-					setVerseProgressBox.setVisible(false);
-					setVersePane.setMouseTransparent(true);
-				});
 				return null;
 			}
 		};
@@ -472,21 +521,18 @@ public class MainSceneController {
 	}
 
 	/*
-	 * Returns false if the user chooses cancel or closes. This should halt any impending file related functions.
+	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
 	 */
-	boolean checkSave() {
-		if (toneFile == null
-				|| !toneEdited
-				|| !isToneSavable()) {
+	boolean checkSaveTone() {
+		if (toneFile == null || !toneEdited || !isToneSavable())
 			return true;
-		}
 
 		ButtonType saveButton = new ButtonType("Save");
 		ButtonType dontSaveButton = new ButtonType("Don't Save");
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
-		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Save Confirmation",
-				"Save changes to \"" + toneFile.getName() + "\"?", true, parentStage,
+		Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Tone Save Confirmation",
+				"Save changes to tone \"" + toneFile.getName() + "\"?", true, parentStage,
 				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
 
 		if (result.isPresent()) {
@@ -500,17 +546,19 @@ public class MainSceneController {
 		}
 	}
 	private boolean isToneSavable() {
-		return !builtInToneLoaded() || MainApp.developerMode;
+		return (!projectToneLoaded() && !builtInToneLoaded()) || MainApp.developerMode;
 	}
 
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName(".tone");
 		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
-		if (toneFile != null && isToneSavable()) {
-			fileChooser.setInitialDirectory(toneFile.getParentFile());
-		} else {
+		if (toneFile != null && isToneSavable())
+			fileChooser.setInitialDirectory(projectToneLoaded() ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+					: toneFile.getParentFile());
+		else
 			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
-		}
+
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return false;
@@ -522,10 +570,10 @@ public class MainSceneController {
 		if (ToneReaderWriter.createToneFile(saveFile)) {
 			toneFile = saveFile;
 
-			menuState.saveToneMenuItemDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-			menuState.editMenuDisabled = false;
-			applyMenuState();
+			toneMenuState.saveToneMenuItemDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.editMenuDisabled = false;
+			applyToneMenuState();
 
 			return true;
 		} else {
@@ -536,10 +584,10 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean loadTone(File selectedFile, boolean selectHideToneHeader) {
-		if (selectedFile == null) {
+	private boolean loadTone(File selected_file, boolean selectHideToneHeader) {
+		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
-			if (toneFile != null) {
+			if (toneFile != null && !projectToneLoaded()) {
 				if (builtInToneLoaded()) fileChooser.setInitialDirectory(builtInDir);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
@@ -550,45 +598,62 @@ public class MainSceneController {
 				}
 			}
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-			selectedFile = fileChooser.showOpenDialog(parentStage);
+			selected_file = fileChooser.showOpenDialog(parentStage);
 		}
-		if (selectedFile == null) return false;
+		if (selected_file == null) return false;
 
-		if (selectedFile.exists()) {
-			toneFile = selectedFile;
+		if (selected_file.exists()) {
+			toneFile = selected_file;
 
-			ToneReaderWriter toneReader = new ToneReaderWriter(chantLineControllers, this);
+			ToneReaderWriter toneReader = getToneReader();
 
-			loading = true;
+			loadingTone = true;
 			if (toneReader.loadTone(this, toneFile)) {
 				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
 
-				loading = false;
+				loadingTone = false;
 				return true;
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
 				// Since a tone was not loaded (or at least, not correctly),
 				toneFile = null;
 
-				loading = false;
+				loadingTone = false;
 				return false;
 			}
 
 		} else {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "That file doesn't exist!", true, parentStage);
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Requested tone file doesn't exist!", true, parentStage);
 			return false;
 		}
 	}
 
+	public boolean tryChangeToneFile(File tone_file) {
+		if (!tone_file.exists())
+			return false;
+
+		toneFile = tone_file;
+		toneMenuState.saveToneMenuItemDisabled = false;
+		applyToneMenuState();
+		return true;
+	}
+
 	void updateStageTitle() {
 		if (topSceneController.isActiveTab(this)) {
+			String projectTitle = topSceneController.getProjectTitle();
 			// Update stage title to show loaded tone name and edit status
-			parentStage.setTitle((toneEdited ? "*" : "") + MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : ""));
+			parentStage.setTitle((topSceneController.getProjectEdited() ? "*" : "")
+					+ (!projectTitle.isEmpty() ? topSceneController.getProjectTitle() + " - " : "")
+					+ MainApp.APP_NAME + (toneFile != null ? " - " + FilenameUtils.removeExtension(toneFile.getName()) : "")
+					+ (toneEdited ? "*" : ""));
 		}
 	}
 
-	void applyMenuState() {
-		topSceneController.setMenuState(menuState);
+	void applyToneMenuState() {
+		topSceneController.setMenuState(toneMenuState);
+
+		openToneHintPane.setVisible(toneMenuState.editMenuDisabled);
+		openToneHintPane.setMouseTransparent(!toneMenuState.editMenuDisabled);
 	}
 
 	/*
@@ -622,7 +687,7 @@ public class MainSceneController {
 			if (exportMode == ExportMode.ITEM) {
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
 						hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText(),
-						new MainSceneController[] {this}, topSceneController.paperSize)) {
+						new MainSceneController[] {this}, topSceneController.getPaperSize())) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
 				}
@@ -641,44 +706,43 @@ public class MainSceneController {
 	 * Tone Menu Actions
 	 */
 	void handleNewTone() {
-		if (checkSave() && createNewTone()) {
+		if (checkSaveTone() && createNewTone()) {
 			clearChantLines();
-			menuState.editMenuDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.editMenuDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
 			setHeaderText("", "");
 			keySignature = "C major";
-			menuState.manualCLAssignmentSelected = false;
+			toneMenuState.manualCLAssignmentSelected = false;
 
 			Task<FXMLLoader> loaderTask = createChantLine(0, true);
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
-	void handleOpenTone(File selectedFile, boolean auto_load, boolean selectHideToneHeader) {
+	public void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSave()) && loadTone(selectedFile, selectHideToneHeader)) {
-			menuState.editMenuDisabled = false;
-			menuState.saveToneMenuItemDisabled = false;
-			menuState.saveToneAsMenuItemDisabled = false;
-			menuState.saveToneMenuItemDisabled = !isToneSavable();
+		if ((auto_load || checkSaveTone()) && loadTone(tone_file, selectHideToneHeader)) {
+			toneMenuState.editMenuDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = !isToneSavable();
 
 			resetToneEditedStatus();
-			applyMenuState();
+			applyToneMenuState();
 
 			if (exportMode == ExportMode.ITEM)
 				exportMode = ExportMode.NONE;
 		}
 
 		LoadingTone = false;
-		refreshAllChordPreviews();
+		refreshToneChordPreviews();
 	}
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = new ToneReaderWriter(chantLineControllers, this, keySignature,
-				leftText, rightText);
-		if (!toneWriter.saveTone(toneFile)) {
+		ToneReaderWriter toneWriter = getToneWriter();
+		if (!toneWriter.saveToneToFile(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
 			resetToneEditedStatus();
@@ -688,6 +752,13 @@ public class MainSceneController {
 	}
 	void handleSaveToneAs() {
 		if (createNewTone()) handleSaveTone();
+	}
+
+	public ToneReaderWriter getToneWriter() {
+		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
+	}
+	private ToneReaderWriter getToneReader() {
+		return new ToneReaderWriter(chantLineControllers, this);
 	}
 
 	/*
@@ -777,15 +848,18 @@ public class MainSceneController {
 
 	}
 	void handleToggleManualCLAssignment() {
+		manualCLAssignment = topSceneController.getManualCLAssignmentStatus();
+
 		toneEdited();
 		syncCVLMapping();
 	}
 	public boolean manualCLAssignmentEnabled() {
-		return topSceneController.manualCLAssignmentEnabled();
+		return manualCLAssignment;
 	}
 	public void setManualCLAssignmentSilently(boolean enable) { // Doesn't trigger tone edited status
-		menuState.manualCLAssignmentSelected = enable;
-		topSceneController.setMenuState(menuState);
+		manualCLAssignment = enable;
+		toneMenuState.manualCLAssignmentSelected = enable;
+		topSceneController.setMenuState(toneMenuState);
 	}
 
 	private void refreshChordKeySignatures(String key) {
@@ -793,7 +867,7 @@ public class MainSceneController {
 	    	chantLineController.setKeySignature(key);
 	    }
 	}
-	void refreshAllChordPreviews() {
+	void refreshToneChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
 		for (ChantLineViewController chantLineController : chantLineControllers) {
@@ -869,11 +943,15 @@ public class MainSceneController {
 		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
 	}
 
+	private boolean projectToneLoaded() {
+		return toneFile.getAbsolutePath().startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath());
+	}
+
 	private void setNewRenderFilename() throws RenderFormatException {
 
 		ExportMode tempExportMode;
 
-		if (topSceneController.tabCount() > 1) {
+		if (topSceneController.getTabCount() > 1) {
 			ButtonType projectBT = new ButtonType("Entire project");
 			ButtonType itemBT = new ButtonType("Current item only");
 
@@ -884,7 +962,6 @@ public class MainSceneController {
 			if (result.isPresent()) {
 				if (result.get() == projectBT) {
 					tempExportMode = ExportMode.PROJECT;
-					topSceneController.checkProjectName();
 				} else if (result.get() == itemBT) {
 					tempExportMode = ExportMode.ITEM;
 				} else throw new RenderFormatException();
@@ -895,7 +972,7 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.projectTitle);
+		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle());
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -968,17 +1045,23 @@ public class MainSceneController {
 	}
 
 	void toneEdited() {
-		if (!toneEdited && isToneSavable() && !loading) {
+		toneEdited(true);
+	}
+	public void toneEdited(boolean project_edited) {
+		if (!toneEdited && isToneSavable() && !loadingTone) {
 			toneEdited = true;
 			updateStageTitle();
 		}
+
+		if (project_edited)
+			topSceneController.projectEdited();
 	}
 	void resetToneEditedStatus() {
 		toneEdited = false;
 		updateStageTitle();
 	}
-	boolean isToneUnedited() {
-		return !toneEdited;
+	public boolean getToneEdited() {
+		return toneEdited;
 	}
 
 	void verseEdited() {
@@ -986,17 +1069,48 @@ public class MainSceneController {
 
 		setVerseButton.setVisible(true);
 		setVersePane.setMouseTransparent(false);
+
+		topSceneController.projectEdited();
 	}
 
-	File getToneFile() {
+	public void runPendingLoadActions() {
+		if (pendingLoadActions != null) {
+			pendingLoadActions.accept(this);
+			pendingLoadActions = null;
+		}
+	}
+	public Consumer<MainSceneController> getPendingLoadActions() {
+		return pendingLoadActions;
+	}
+	public void setPendingLoadActions(Consumer<MainSceneController> pendingLoadActions) {
+		this.pendingLoadActions = pendingLoadActions;
+	}
+	public boolean fullyLoaded() {
+		return getPendingLoadActions() == null;
+	}
+
+	public File getToneFile() {
 		return toneFile;
+	}
+	public int getOriginalIndex() {
+		return originalIndex;
+	}
+	public void setOriginalIndex(int index) {
+		originalIndex = index;
+	}
+	public String getLilyPondSource() {
+		if (fullyLoaded())
+			lilyPondItem = LilyPondInterface.generateItemSource(this);
+
+		return lilyPondItem;
+	}
+	void setLilyPondSource(String source) {
+		// Removes any leading whitespace
+		lilyPondItem = source.replaceAll("^\\s+", "");
 	}
 
 	ObservableStringValue getTitleTextProperty() {
 		return titleTextField.textProperty();
-	}
-	void setTitleText(String title) {
-		titleTextField.setText(title);
 	}
 
 	void setDividerPosition(double position) {
@@ -1019,6 +1133,12 @@ public class MainSceneController {
 	public void setTopVerse(String verse) {
 		topVerseField.setText(verse);
 	}
+	public String getVerseAreaText() {
+		return verseArea.getText();
+	}
+	public void setVerseAreaText(String text) {
+		verseArea.setText(text);
+	}
 	public String getBottomVerseChoice() {
 		return bottomVerseChoice.getValue();
 	}
@@ -1034,17 +1154,36 @@ public class MainSceneController {
 	public boolean getLargeTitle() {
 		return largeTitleMenuItem.isSelected();
 	}
-	boolean getHideToneHeader() {
+	public RadioMenuItem getSelectedTitleOption() {
+		return (RadioMenuItem) titleOptions.getSelectedToggle();
+	}
+	public boolean getHideToneHeader() {
 		return hideToneHeaderMenuItem.isSelected();
 	}
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
+	public String getfinalTitleContent() {
+		return hiddenTitleMenuItem.isSelected() || topSceneController.getTabCount() == 1 ?
+				"" : titleTextField.getText();
+	}
 	public String getTitle() {
-		return hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText();
+		return titleTextField.getText();
+	}
+	public void setTitle(String title) {
+		titleTextField.setText(title);
 	}
 	public String getSubtitle() {
 		return subtitleTextField.getText();
+	}
+	public void setSubtitle(String subtitle) {
+		subtitleTextField.setText(subtitle);
+	}
+	public void setOptions(String title_format, boolean hide_header, boolean page_break) {
+		titleOptions.selectToggle(titleOptions.getToggles().stream()
+				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_format)).toArray(Toggle[]::new)[0]);
+		hideToneHeaderMenuItem.setSelected(hide_header);
+		pageBreakMenuItem.setSelected(page_break);
 	}
 	public String getLeftHeaderText() {
 		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;
@@ -1058,8 +1197,8 @@ public class MainSceneController {
 	public String getKeySignature() {
 		return keySignature;
 	}
-	boolean isLoading() {
-		return loading;
+	boolean isLoadingTone() {
+		return loadingTone;
 	}
 
 	private static class RenderFormatException extends Exception {}

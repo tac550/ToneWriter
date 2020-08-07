@@ -68,13 +68,8 @@ public class LilyPondInterface {
 			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-			outputFile.deleteOnExit();
 			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
 					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
-			midiFile.deleteOnExit();
-			// In case of a rendering failure that leaves .ps files in the temp location, delete those files.
-			File psFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".ps"));
-			psFile.deleteOnExit();
 
 			File[] results = new File[] {outputFile, midiFile};
 			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
@@ -98,127 +93,10 @@ public class LilyPondInterface {
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
 	                                  MainSceneController[] items, String paperSize) throws IOException {
-
-		// Create the LilyPond output file, and if it already exists, delete the old one.
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (lilypondFile.exists()) {
-			// Have to do this because MacOS doesn't like overwriting existing files
-			if (!lilypondFile.delete()) {
-				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
-			}
-		}
-
-		if (!lilypondFile.createNewFile()) {
-			TWUtils.showError("Failed to create new file", true);
+		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize))
 			return false;
-		}
-
-		// Copy the render template file to the output path.
-		try {
-			TWUtils.exportIOResource("outputTemplate.ly", lilypondFile);
-		} catch (Exception e2) {
-			e2.printStackTrace();
-			return false;
-		}
-
-		// The buffer in which we'll store the output file as we build it.
-		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
-
-		// Replacing paper size, title, and tagline info.
-		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
-		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
-				.replace("$APPNAME", MainApp.APP_NAME));
-		if (items.length == 1 && items[0].getLargeTitle())
-			lines.set(17, lines.get(17).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
-
-		// Add a blank line before scores begin
-		lines.add("");
-
-		for (MainSceneController item : items) {
-
-			// Page break if requested, but only if this item is not the first.
-			if (items[0] != item && item.getPageBreak())
-				lines.add("\\pageBreak\n");
-
-			// Top verse, if any
-			if (!item.getTopVerse().isEmpty()) {
-				Collections.addAll(lines, "\\markup \\column {",
-						String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
-								item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
-						"}\n", "\\noPageBreak\n");
-			}
-
-			// Score header
-			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", items.length == 1 ? "" : item.getTitle()),
-					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
-					String.format("    piece = \"%s\"", item.getLeftHeaderText()),
-					String.format("    opus = \"%s\"", item.getRightHeaderText()),
-					"    instrument = \"\"",
-					"  }\n");
-
-			// Perform layout process
-			String[] results = buildMusicLayout(item.getVerseLineControllers());
-
-			// Create staff only if note data is present
-			boolean createStaff = false;
-
-			// Pattern which matches valid LilyPond notes
-			Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
-			// Check all four parts for any note data
-			for (String result : results) {
-				if (noteDataPattern.matcher(result).find()) {
-					createStaff = true;
-					break;
-				}
-			}
-
-			if (createStaff)
-				Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
-						"      midiInstrument = #\"choir aahs\"", "    } <<",
-						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-						"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
-						"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
-						"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
-						"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
-						"    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-						"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
-						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-						"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
-						"      defaultBarType = \"\" % Hides any auto-generated barlines",
-						"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
-						"      \\accidentalStyle neo-modern-voice-cautionary",
-						"    }", "  }", "}\n");
-			else
-				Collections.addAll(lines, "\\lyricmode {}",
-						"}\n");
-
-			// Bottom verse, if any
-			if (!item.getBottomVerse().isEmpty()) {
-				Collections.addAll(lines, "\\noPageBreak\n",
-						"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
-						String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
-								item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
-						"}\n");
-			}
-
-			if (!createStaff)
-				lines.add("\\markup \\column {\\vspace #0.5 }\n");
-
-		}
-
-		// Remove extra newline at end of file (result is one blank line)
-		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replace("\n", ""));
-
-		// Write the file back out.
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 		if (MainApp.lilyPondAvailable()) {
 			executePlatformSpecificLPRender(lilypondFile, false, () -> {
@@ -251,11 +129,151 @@ public class LilyPondInterface {
 			}
 		}
 
+		return true;
+	}
+
+	public static boolean saveToLilyPondFile(File lilypond_file, String project_title,
+											 MainSceneController[] items, String paperSize) throws IOException {
+
+		// Create the LilyPond output file, and if it already exists, delete the old one.
+		if (lilypond_file.exists()) {
+			// Have to do this because MacOS doesn't like overwriting existing files
+			if (!lilypond_file.delete()) {
+				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
+			}
+		}
+
+		if (!lilypond_file.createNewFile()) {
+			TWUtils.showError("Failed to create new LilyPond file", true);
+			return false;
+		}
+
+		// Copy the render template file to the output path.
+		try {
+			TWUtils.exportFSResource("outputTemplate.ly", lilypond_file);
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			return false;
+		}
+
+		// The buffer in which we'll store the output file as we build it.
+		List<String> lines = new ArrayList<>(Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8));
+
+		// Replacing paper size, title, and tagline info.
+		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
+		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
+		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
+				.replace("$APPNAME", MainApp.APP_NAME));
+		if (items.length == 1 && items[0].getLargeTitle())
+			lines.set(17, lines.get(17).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+
+		// Add a blank line before scores begin
+		lines.add("");
+
+		int index = 0;
+		for (MainSceneController item : items) {
+			lines.add(item.getLilyPondSource());
+
+			// Remove page break at beginning of item listing, if present.
+			if (index == 0)
+				lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceFirst("\n\\\\pageBreak\n", ""));
+
+			index++;
+		}
+
+		// Remove extra newline at end of file (result is one blank line)
+		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceAll("\n$", ""));
+
+		// Write the file back out.
+		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
 
 		return true;
 	}
 
-	private static String[] buildMusicLayout(List<VerseLineViewController> verse_lines) {
+	public static String generateItemSource(MainSceneController item) {
+		List<String> lines = new ArrayList<>();
+
+		// Comment for purposes of future parsing of output (for internal project file renders)
+		lines.add("% " + item.getTitle() + "\n");
+
+		// Page break if requested, but only if this item is not the first.
+		if (item.getPageBreak())
+			lines.add("\\pageBreak\n");
+
+		// Top verse, if any
+		if (!item.getTopVerse().isEmpty()) {
+			Collections.addAll(lines, "\\markup \\column {",
+					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
+							item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
+					"}\n", "\\noPageBreak\n");
+		}
+
+		// Score header
+		Collections.addAll(lines, "\\score {\n", "  \\header {",
+				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", item.getfinalTitleContent()),
+				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
+				String.format("    piece = \"%s\"", item.getLeftHeaderText()),
+				String.format("    opus = \"%s\"", item.getRightHeaderText()),
+				"    instrument = \"\"",
+				"  }\n");
+
+		// Perform layout process
+		String[] results = computeNotationSource(item.getVerseLineControllers());
+
+		// Create staff only if note data is present
+		boolean createStaff = false;
+
+		// Pattern which matches valid LilyPond notes
+		Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
+		// Check all four parts for any note data
+		for (String result : results) {
+			if (noteDataPattern.matcher(result).find()) {
+				createStaff = true;
+				break;
+			}
+		}
+
+		if (createStaff)
+			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
+					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
+					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
+					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
+					"    \\new Staff \\with {",
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
+					"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+					"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
+					"      defaultBarType = \"\" % Hides any auto-generated barlines",
+					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
+					"      \\accidentalStyle neo-modern-voice-cautionary",
+					"    }", "  }", "}\n");
+		else
+			Collections.addAll(lines, "\\lyricmode {}",
+					"}\n");
+
+		// Bottom verse, if any
+		if (!item.getBottomVerse().isEmpty()) {
+			Collections.addAll(lines, "\\noPageBreak\n",
+					"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
+					String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
+							item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
+					"}\n");
+		}
+
+		if (!createStaff)
+			lines.add("\\markup \\column {\\vspace #0.5 }\n");
+
+		return String.join("\n", lines);
+	}
+
+	private static String[] computeNotationSource(List<VerseLineViewController> verse_lines) {
 		// Note buffers for the piece. S   A   T   B
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.
@@ -278,7 +296,7 @@ public class LilyPondInterface {
 			float lineBeats = 0;
 
 			// For each syllable in the line...
-			for (SyllableText syllableData : syllableList) {
+			for (SyllableText syllable : syllableList) {
 				// Note buffers for this syllable.           S   A   T   B
 				String[] syllableNoteBuffers = new String[]{"", "", "", ""};
 				// Buffer for the syllable's text.
@@ -294,7 +312,7 @@ public class LilyPondInterface {
 				// Gets set if a note was combined on the last chord.
 				String[] tempCurrentNotes = new String[]{"", "", "", ""};
 
-				List<AssignedChordData> chordList = Arrays.asList(syllableData.getAssociatedChords());
+				List<AssignedChordData> chordList = Arrays.asList(syllable.getAssociatedChords());
 				// For each chord assigned to the syllable...
 				for (AssignedChordData chordData : chordList) {
 
@@ -306,13 +324,13 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == 0) {
 
 						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-						syllableTextBuffer.append(escapeDoubleQuotes(chordData.getSyllable().replace("-", "")));
+						syllableTextBuffer.append(escapeDoubleQuotes(syllable.getText().replace("-", "")));
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
-						if (syllableList.indexOf(syllableData) < syllableList.size() - 1) {
+						if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
 							// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
 							// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-							if (syllableList.get(syllableList.indexOf(syllableData) + 1).getText().startsWith("-")) {
+							if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
 								syllableTextBuffer.append(" -- ");
 							}
 						}
@@ -347,11 +365,11 @@ public class LilyPondInterface {
 						// If this is the first chord associated with this syllable...
 						if (chordList.indexOf(chordData) == 0) {
 							// And if this is the first syllable in the whole text...
-							if (syllableList.indexOf(syllableData) == 0) {
+							if (syllableList.indexOf(syllable) == 0) {
 								// Then we know we need to show the chord. It'll be the first chord on the page!
 								hideThisChord = false;
 							} else {
-								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllableData) - 1).getAssociatedChords();
+								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssociatedChords();
 								if (previousSyllableChords.length == 0)
 									// If the previous syllable has no chords assigned, then we know we shouldn't be hiding this one.
 									hideThisChord = false;
@@ -379,10 +397,10 @@ public class LilyPondInterface {
 						// If this is the last chord associated with this syllable...
 						if (chordList.indexOf(chordData) == chordList.size() - 1) {
 							// And if this isn't the last syllable with chords on it...
-							if (syllableList.indexOf(syllableData) < syllableList.size() - 1
-									&& syllableList.get(syllableList.indexOf(syllableData) + 1).getAssociatedChords().length > 0) {
+							if (syllableList.indexOf(syllable) < syllableList.size() - 1
+									&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords().length > 0) {
 								// Then the next note is the note from the first chord of the next syllable.
-								nextNote = syllableList.get(syllableList.indexOf(syllableData) + 1).getAssociatedChords()[0].getPart(i);
+								nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i);
 							} else {
 								// This is the last chord associated with the last syllable with chords on it,
 								// so we definitely do not want to hide it (it's the last chord on the page!)
@@ -864,9 +882,8 @@ public class LilyPondInterface {
 		try {
 			// Create the temporary file to hold the lilypond markup
 			tempFile = TWUtils.createTWTempFile(FilenameUtils.removeExtension(toneFileName), "chord.ly");
-			tempFile.deleteOnExit();
 
-			TWUtils.exportIOResource("chordTemplate.ly", tempFile);
+			TWUtils.exportFSResource("chordTemplate.ly", tempFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

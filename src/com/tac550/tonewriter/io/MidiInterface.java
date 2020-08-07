@@ -55,7 +55,7 @@ public class MidiInterface {
 					for (AssignedChordData chord : chordMap.get(key)) {
 						Button currentButton = buttons.get(buttonIndex);
 						String oldStyle = currentButton.getStyle();
-						currentButton.setStyle("-fx-base: #fffa61");
+						currentButton.setStyle("-fx-base: #fffa61"); // TODO: Also highlight associated syllables
 						chord.getChordController().playMidi();
 						// This sleep determines for how long the note plays.
 						// Speeds recitative of more than 3 repeated notes up to a minimum value.

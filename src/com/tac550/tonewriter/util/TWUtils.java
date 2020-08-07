@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,9 +16,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class TWUtils {
 
@@ -45,9 +44,6 @@ public class TWUtils {
     }
 
 	// Strings
-//	public static int countOccurrences(String string, String single_character) {
-//		return string.length() - string.replace(single_character, "").length();
-//	}
 
 	/**
 	 * Compares two version strings.
@@ -63,6 +59,7 @@ public class TWUtils {
 	 *         The result is zero if the strings are equal.
 	 */
 
+	// Used to compare LilyPond versions, not ToneWriter versions, which are comparable using floating point math.
 	public static int versionCompare(String v1, String v2) {
 
 		int v1Len = StringUtils.countMatches(v1,".");
@@ -115,7 +112,14 @@ public class TWUtils {
 		return -1;
 	}
 
-	// I/O
+	public static String encodeNewLines(String original) {
+		return original.replaceAll("/", "<%47>").replaceAll("\n", "/n");
+	}
+	public static String decodeNewLines(String encoded) {
+		return encoded.replaceAll("/n", "\n").replaceAll("<%47>", "/");
+	}
+
+	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -125,17 +129,32 @@ public class TWUtils {
 
 	// Creates and returns a temp file which will be recognized by the automatic temp cleaner
 	public static File createTWTempFile(String prefix, String suffix) throws IOException {
-		return File.createTempFile(MainApp.APP_NAME + "-" +
+		return Files.createTempFile(MainApp.APP_NAME + "-" +
 				(prefix.isEmpty() ? "" : prefix + "-"),
-				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix);
+				suffix.isEmpty() ? "" : (suffix.startsWith(".") ? "" : "-") + suffix).toFile();
+	}
+	public static File createTWTempDir(String prefix) throws IOException {
+		return Files.createTempDirectory(MainApp.APP_NAME + "-" +
+						(prefix.isEmpty() ? "" : prefix + "-")).toFile();
 	}
 
+	// Cleans up all ToneWriter temp files
+	public static void cleanUpTempFiles() {
+		cleanUpTempFiles("");
+	}
 	public static void cleanUpTempFiles(String with_postfix) {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		File[] files = tempDir.listFiles();
 		for (File file : Objects.requireNonNull(files)) {
 			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith(with_postfix)) {
-				if (!file.delete()) {
+				try {
+					if (file.isDirectory())
+						FileUtils.deleteDirectory(file);
+					else
+						if (!file.delete())
+							throw new IOException("(TW) File deletion failed for file " + file.getAbsolutePath());
+				} catch (IOException e) {
+					e.printStackTrace();
 					TWUtils.showError("Failed to delete temp file " + file.getName(), false);
 				}
 			}
@@ -143,7 +162,7 @@ public class TWUtils {
 	}
 
 	// Copies file from io package to an external location.
-	public static void exportIOResource(String resource_name, File out_file) throws Exception {
+	public static void exportFSResource(String resource_name, File out_file) throws Exception {
 		try (InputStream inputStream = LilyPondInterface.class.getResourceAsStream(resource_name);
 		     OutputStream outputStream = new FileOutputStream(out_file)) {
 
@@ -157,6 +176,25 @@ public class TWUtils {
 				outputStream.write(buffer, 0, readBytes);
 			}
 
+		}
+	}
+
+	// Recursively traverse directories to return a list of all (non-directory) files contained within root_dir.
+	public static List<String> generateFileList(File root_dir) {
+		List<String> fileList = new ArrayList<>();
+		generateFileList(fileList, root_dir);
+		return fileList;
+	}
+	private static void generateFileList(List<String> file_list, File node) {
+		if (node.isFile()) {
+			file_list.add(node.getAbsolutePath());
+		}
+
+		if (node.isDirectory()) {
+			String[] subNode = node.list();
+			for (String filename : Objects.requireNonNull(subNode)) {
+				generateFileList(file_list, new File(node, filename));
+			}
 		}
 	}
 

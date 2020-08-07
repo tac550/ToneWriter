@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.7";
+	public static final String APP_VERSION = "0.8";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -97,7 +97,7 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		TWUtils.cleanUpTempFiles("");
+		TWUtils.cleanUpTempFiles();
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
@@ -151,6 +151,7 @@ public class MainApp extends Application {
 	 */
 	@Override
 	public void stop() {
+		TWUtils.cleanUpTempFiles();
 		MidiInterface.closeMidiSystem();
 	}
 
@@ -161,7 +162,7 @@ public class MainApp extends Application {
 		loadMainLayout();
 
 		// Ensure that the process exits when the main window is closed
-		mainStage.setOnCloseRequest(ev -> topSceneController.requestExit(ev));
+		mainStage.setOnCloseRequest(ev -> topSceneController.requestClose(ev));
 
 		// Show the stage (required for the next operation to work)
 		mainStage.show();
@@ -225,14 +226,9 @@ public class MainApp extends Application {
 	private void runLilyPondStartup(Runnable final_actions) throws IOException {
 		// Create the temporary file to hold the lilypond markup
 		File lilypondFile = TWUtils.createTWTempFile("", "-STARTUP.ly");
-		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf"));
-		File outputFile2 = new File(lilypondFile.getAbsolutePath().replace(".ly", getPlatformSpecificMidiExtension()));
-		lilypondFile.deleteOnExit();
-		outputFile.deleteOnExit();
-		outputFile2.deleteOnExit();
 
 		try {
-			TWUtils.exportIOResource("chordTemplate.ly", lilypondFile);
+			TWUtils.exportFSResource("chordTemplate.ly", lilypondFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -250,7 +246,7 @@ public class MainApp extends Application {
 			BorderPane rootPane = loader.load();
 			topSceneController = loader.getController();
 
-			// Launching with tone loading TODO: Implement Mac support for this
+			// Launching with tone/project loading TODO: Implement Mac support for this
 			List<String> params = getParameters().getRaw();
 			File fileToOpen = null;
 			if (params.size() > 0) {
@@ -522,16 +518,13 @@ public class MainApp extends Application {
 	private static boolean isLilyPondInstalled() {
 		// First check that LilyPond is available
 		return new File(getLilyPondPath() + getPlatformSpecificLPExecutable()).exists();
-
 	}
 
 	private static boolean isLilyPondVersionCompatible() {
 		return TWUtils.versionCompare(getInstalledLPVersion(), getRequiredLPVersion()) != 2;
-
 	}
 
 	private static String getInstalledLPVersion() {
-
 		if (!isLilyPondInstalled()) return null;
 
 		String installedVersion = null;
@@ -558,7 +551,6 @@ public class MainApp extends Application {
 	}
 
 	private static String getRequiredLPVersion() {
-
 		// Cache the required version so we don't keep checking the file
 		if (requiredLPVersion != null) {
 			return requiredLPVersion;

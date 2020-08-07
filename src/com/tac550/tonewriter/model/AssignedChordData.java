@@ -8,21 +8,16 @@ public class AssignedChordData {
 
 	private final VerseLineViewController lineController;
 
-	private final String syllable;
 	private final int chordIndex;
 	private String duration;
 
-	public AssignedChordData(String syllable_data, int chord_index, VerseLineViewController line_controller) {
+	public AssignedChordData(int chord_index, VerseLineViewController line_controller) {
 		lineController = line_controller;
 
-		syllable = syllable_data;
 		chordIndex = chord_index;
 		duration = "4";
 	}
 
-	public String getSyllable() {
-		return syllable;
-	}
 	public void setDuration(String new_duration) {
 		duration = new_duration;
 	}
@@ -32,6 +27,9 @@ public class AssignedChordData {
 
 	public ChantChordController getChordController() {
 		return lineController.getChordByIndex(chordIndex);
+	}
+	public int getChordIndex() {
+		return chordIndex;
 	}
 
 	public String getPart(int part_index) {

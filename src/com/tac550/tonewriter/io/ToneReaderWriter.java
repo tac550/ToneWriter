@@ -14,12 +14,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert.AlertType;
 import org.apache.commons.text.TextStringBuilder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -47,14 +46,15 @@ public class ToneReaderWriter {
 		associatedMainScene = main_scene;
 	}
 
-	public boolean saveTone(File toneFile) {
+	public boolean saveToneToFile(File toneFile) {
+		// Clear out old save data.
+		// noinspection ResultOfMethodCallIgnored
+		toneFile.delete();
+
 		try {
-			// Clear out old save data.
-			// noinspection ResultOfMethodCallIgnored
-			toneFile.delete();
-			if (!toneFile.createNewFile()) {
+			// Create new file
+			if (!toneFile.createNewFile())
 				return false;
-			}
 
 			// Set up PrintWriter
 			try (FileWriter fileWriter = new FileWriter(toneFile);
@@ -88,12 +88,77 @@ public class ToneReaderWriter {
 				printWriter.println();
 				printWriter.println("First Repeated: " + firstRepeated);
 			}
+
+			// Save to the file
+			FileWriter fileWriter = new FileWriter(toneFile);
+			saveToneTo(fileWriter);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		
+
 		return true;
+	}
+
+	private void saveToneTo(Writer destination) {
+		try (PrintWriter printWriter = new PrintWriter(destination)) {
+
+			// Header info
+			printWriter.println("VERSION: " + MainApp.APP_VERSION);
+			printWriter.println("Key Signature: " +
+					keySig.replace("\u266F", "s").replace("\u266D", "f"));
+			printWriter.println("Tone: " + poetText);
+			printWriter.println("Composer: " + composerText);
+			printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
+			printWriter.println();
+			printWriter.println();
+
+			// Line name which is marked first repeated. Filled when found.
+			String firstRepeated = "";
+
+			// For each chant line...
+			for (ChantLineViewController chantLine : chantLines) {
+
+				if (chantLine.getFirstRepeated()) {
+					firstRepeated = chantLine.getName();
+				}
+
+				printWriter.println(chantLine.toString());
+
+			}
+
+			// Footer info
+			printWriter.println();
+			printWriter.println("First Repeated: " + firstRepeated);
+
+		}
+	}
+
+	public String getToneString() {
+		try (StringWriter sw = new StringWriter()) {
+			saveToneTo(sw);
+			return sw.toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	public String getToneHash() {
+		StringBuilder hashBuilder = new StringBuilder();
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			// Record MD5 hash of the current tone data (what its file would contain if saved)
+			byte[] hashBytes = md.digest(getToneString().getBytes());
+			for (byte b : hashBytes)
+				hashBuilder.append(String.format("%02x", b));
+
+		} catch (NoSuchAlgorithmException e) {
+			TWUtils.showError("Platform does not support MD5 algorithm!", true);
+			return null;
+		}
+
+		return hashBuilder.toString();
 	}
 
 	public boolean loadTone(MainSceneController main_scene, File toneFile) {
@@ -143,8 +208,8 @@ public class ToneReaderWriter {
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
 
 				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
-						"This tone was created with a newer version of %s. Be advised there may be issues.",
-						MainApp.APP_NAME), true);
+						"This tone was created with a newer version of %s (%s). Be advised there may be issues.",
+						MainApp.APP_NAME, versionSaved), true);
 
 			} else if (versionSaved == 0) {
 
@@ -357,15 +422,18 @@ public class ToneReaderWriter {
 	public static boolean createToneFile(File file_to_create) {
 		if (file_to_create.getParentFile().mkdirs() || file_to_create.getParentFile().exists()) {
 			try {
-				// If the file already exists, delete it first (User already selected to overwrite)
+				// If the file already exists, delete it first (overwrite)
 				if (file_to_create.exists()) {
 					if (!file_to_create.delete()) return false;
 				}
 				return file_to_create.createNewFile();
 			} catch (IOException e) {
-				e.printStackTrace();
+				TWUtils.showError("Failed to create .tone file!", false);
 				return false;
 			}
-		} else return false;
+		} else {
+			TWUtils.showError("Failed to create directory for .tone file!", false);
+			return false;
+		}
 	}
 }

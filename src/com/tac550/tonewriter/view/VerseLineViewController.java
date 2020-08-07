@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.model.AssignmentAction;
 import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
@@ -28,10 +29,10 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
+import java.util.function.Consumer;
 
 public class VerseLineViewController {
 
@@ -53,9 +54,9 @@ public class VerseLineViewController {
 
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
-	String previousChantLine = "";
+	private String previousChantLine = "";
 
-	@FXML private ChoiceBox<String> chantLineChoice;
+	@FXML private ChoiceBox<String> tonePhraseChoice;
 	@FXML private TextFlow lineTextFlow;
 	@FXML private RowConstraints textRow;
 
@@ -84,8 +85,11 @@ public class VerseLineViewController {
 
 	private int dragStartIndex = -1; // -1 means no drag has begun on this line
 
+	private Consumer<VerseLineViewController> pendingActions;
+	private boolean firstTab = false;
+
 	@FXML private void initialize() {
-		chantLineChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
+		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
 			if (changingAssignments) return;
 
 			selectedChantLine = new_val.intValue();
@@ -217,14 +221,14 @@ public class VerseLineViewController {
 	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
 
-		int previousSelection = chantLineChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
-				chantLineChoice.getSelectionModel().getSelectedIndex();
+		int previousSelection = tonePhraseChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
+				tonePhraseChoice.getSelectionModel().getSelectedIndex();
 
 		// Load in new chant line choices
 		associatedChantLines = chant_lines;
-		chantLineChoice.getItems().clear();
+		tonePhraseChoice.getItems().clear();
 		for (ChantLineViewController chantLine : associatedChantLines) {
-			chantLineChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
+			tonePhraseChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
 		}
 
 		// Determine initial chant line selection.
@@ -255,13 +259,13 @@ public class VerseLineViewController {
 			// If we're not in manual assignment mode, just select the first by default.
 			selectedChantLine = 0;
 		}
-		chantLineChoice.getSelectionModel().select(selectedChantLine);
+		tonePhraseChoice.getSelectionModel().select(selectedChantLine);
 
 		// ChoiceBox highlighting if choices are available
-		if (chantLineChoice.getItems().size() > 1) {
-			chantLineChoice.setStyle("-fx-base: #fcfc2f");
+		if (tonePhraseChoice.getItems().size() > 1) {
+			tonePhraseChoice.setStyle("-fx-base: #fcfc2f");
 		} else {
-			chantLineChoice.setStyle("");
+			tonePhraseChoice.setStyle("");
 		}
 
 		// Only reset chord assignments if the new chant line selection is structurally different from the previous one
@@ -275,6 +279,26 @@ public class VerseLineViewController {
 		// Save chant line information for later.
 		previousChantLine = associatedChantLines[selectedChantLine].toString();
 
+		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
+		// Preserve existing project edited state if not first tab, otherwise reset it.
+		if (pendingActions != null) {
+			Platform.runLater(() -> {
+				boolean wasEdited = topController.getProjectEdited();
+
+				lineTextFlow.layout();
+				(firstTab ? pendingActions.andThen(ctr -> topController.resetProjectEditedStatus())
+						: pendingActions).accept(this);
+				pendingActions = null;
+
+				if (!firstTab && !wasEdited)
+					topController.resetProjectEditedStatus();
+			});
+		}
+	}
+
+	public void setPendingActions(boolean first_tab, Consumer<VerseLineViewController> actions) {
+		pendingActions = actions;
+		firstTab = first_tab;
 	}
 
 	private void resetChordAssignment() {
@@ -291,10 +315,9 @@ public class VerseLineViewController {
 
 	}
 
-	@FXML private void undo() {
-		if (undoActions.empty()) {
-			return;
-		}
+	@FXML private void handleUndo() {
+		if (undoActions.empty()) return;
+
 		AssignmentAction action = undoActions.pop();
 
 		for (Button button : action.buttons) {
@@ -309,7 +332,6 @@ public class VerseLineViewController {
 		lastSyllableAssigned = action.previousLastSyllableAssigned;
 		nextChordIndex = action.previousChordIndex;
 		nextChordAssignment();
-
 	}
 
 	@FXML private void remove() {
@@ -374,6 +396,8 @@ public class VerseLineViewController {
 				((SyllableText) syllable).deactivate();
 			}
 		}
+
+		topController.projectEdited();
 	}
 
 	void deactivateAll() {
@@ -469,7 +493,7 @@ public class VerseLineViewController {
 
 	}
 
-	@FXML private void skipChord() {
+	@FXML public void skipChord() {
 		// Set up an undo action frame to store what happens.
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
@@ -479,9 +503,15 @@ public class VerseLineViewController {
 		nextChordAssignment();
 	}
 
-	private void assignChord(int firstSyllable, int lastSyllable) {
+	public void assignChordSilently(int first_syll, int last_syll) {
+		assignChord(first_syll, last_syll, true);
+	}
+	private void assignChord(int first_syll, int last_syll) {
+		assignChord(first_syll, last_syll, false);
+	}
+	private void assignChord(int first_syll, int last_syll, boolean silent) {
 		// First, play the chord if chord playing is on.
-		if (topController.playMidiAsAssigned()) {
+		if (!silent && topController.playMidiAsAssigned()) {
 			getCurrentChord().playMidi();
 		}
 
@@ -490,23 +520,23 @@ public class VerseLineViewController {
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = nextChordIndex - 1;
 
-		for (int i = firstSyllable; i <= lastSyllable; i++) {
+		for (int i = first_syll; i <= last_syll; i++) {
 			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
 			undoFrame.syllableTexts.add(currentText);
 
 			Button noteButton;
 
 			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
-					&& i == lastSyllable) { // Final instance of the last chord in the chant line gets special duration.
+					&& i == last_syll) { // Final instance of the last chord in the chant line gets special duration.
 				if (mainController.isLastVerseLineOfSection(this)) {
-					noteButton = createNoteButton(currentText, getCurrentChord());
+					noteButton = createChordButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 					currentText.setNoteDuration(LilyPondInterface.NOTE_WHOLE,
 							currentText.getAssociatedButtons().size() - 1);
 				} else {
-					noteButton = createNoteButton(currentText, getCurrentChord());
+					noteButton = createChordButton(currentText, getCurrentChord());
 
 					undoFrame.buttons.add(noteButton);
 					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
@@ -514,7 +544,7 @@ public class VerseLineViewController {
 							currentText.getAssociatedButtons().size() - 1);
 				}
 			} else {
-				noteButton = createNoteButton(currentText, getCurrentChord());
+				noteButton = createChordButton(currentText, getCurrentChord());
 
 				undoFrame.buttons.add(noteButton);
 				currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
@@ -522,13 +552,13 @@ public class VerseLineViewController {
 
 		}
 
-		lastSyllableAssigned = lastSyllable;
+		lastSyllableAssigned = last_syll;
 		nextChordAssignment();
 
 		undoActions.push(undoFrame);
 	}
 
-	private Button createNoteButton(SyllableText syllable, ChantChordController chord) {
+	private Button createChordButton(SyllableText syllable, ChantChordController chord) {
 		int buttonIndex = syllable.getAssociatedButtons().size();
 		int chordIdex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
 
@@ -545,13 +575,14 @@ public class VerseLineViewController {
 		noteButton.setPadding(Insets.EMPTY);
 
 		noteButton.setOnTouchPressed(te ->
-				TopSceneController.showTouchNoteMenu(syllable, noteButton, te));
+				topController.showTouchNoteMenu(syllable, noteButton, te));
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
+					topController.projectEdited();
 					syllable.setNoteDuration(LilyPondInterface.NOTE_HALF, buttonIndex);
 				}
-				TopSceneController.showNoteMenu(syllable, noteButton);
+				topController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button
 				getChordByIndex(chordIdex).playMidi();
 			}
@@ -596,7 +627,7 @@ public class VerseLineViewController {
 		MidiInterface.playAssignedPhrase(getSyllables(), playButton);
 	}
 
-	@FXML private void editSyllables() {
+	@FXML private void handleEditSyllables() {
 
 		FXMLLoaderIO.loadFXMLLayoutAsync("syllableEditView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
@@ -620,16 +651,29 @@ public class VerseLineViewController {
 	}
 
 	public SyllableText[] getSyllables() {
-		List<SyllableText> infoList = new ArrayList<>();
-
-		for (Node node : lineTextFlow.getChildren()) {
-			infoList.add((SyllableText) node);
-		}
-
-		return infoList.toArray(new SyllableText[] {});
+		return lineTextFlow.getChildren().stream().map(node -> (SyllableText) node).toArray(SyllableText[]::new);
 	}
 
-	boolean isSeparator() {
+	public String getTonePhraseChoice() {
+		return tonePhraseChoice.getValue();
+	}
+	public void setTonePhraseChoice(String choice) {
+		if (tonePhraseChoice.getItems().contains(choice)) {
+			tonePhraseChoice.getSelectionModel().select(choice);
+		}
+	}
+
+	public void setAssignmentDurations(List<String> durations) {
+		int i = 0;
+		for (SyllableText syllable : getSyllables()) {
+			for (AssignedChordData chordData : syllable.getAssociatedChords()) {
+				chordData.setDuration(durations.get(i));
+				i++;
+			}
+		}
+	}
+
+	public boolean isSeparator() {
 		return isSeparatorLine;
 	}
 
@@ -642,7 +686,7 @@ public class VerseLineViewController {
 		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
-	public void edited() {
+	public void verseEdited() {
 		mainController.verseEdited();
 	}
 

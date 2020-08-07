@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.model;
 
-public class MenuState {
+public class ToneMenuState {
 
 	public boolean editMenuDisabled = true;
 
