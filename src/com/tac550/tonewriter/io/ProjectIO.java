@@ -2,12 +2,10 @@ package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.MainSceneController;
-import com.tac550.tonewriter.view.SyllableText;
-import com.tac550.tonewriter.view.TopSceneController;
-import com.tac550.tonewriter.view.VerseLineViewController;
+import com.tac550.tonewriter.view.*;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -49,6 +47,7 @@ public class ProjectIO {
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
 
+			writeLine(writer, MainApp.APP_VERSION);
 			writeLine(writer, top_controller.getProjectTitle());
 			writeLine(writer, top_controller.getTabCount());
 
@@ -281,15 +280,24 @@ public class ProjectIO {
 
 		// Gather project metadata from info file
 		int numItems;
+		String version;
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
 
+			version = readLine(reader).get(0);
 			top_controller.setProjectTitle(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);
 			return false;
+		}
+
+		// Warn if project file was created in a newer version.
+		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
+			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
+					"This project was created with a newer version of %s (%s). Be advised there may be issues.",
+					MainApp.APP_NAME, version), true);
 		}
 
 		// Gather references to tone files

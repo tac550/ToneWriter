@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.7";
+	public static final String APP_VERSION = "0.8";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -519,16 +519,13 @@ public class MainApp extends Application {
 	private static boolean isLilyPondInstalled() {
 		// First check that LilyPond is available
 		return new File(getLilyPondPath() + getPlatformSpecificLPExecutable()).exists();
-
 	}
 
 	private static boolean isLilyPondVersionCompatible() {
 		return TWUtils.versionCompare(getInstalledLPVersion(), getRequiredLPVersion()) != 2;
-
 	}
 
 	private static String getInstalledLPVersion() {
-
 		if (!isLilyPondInstalled()) return null;
 
 		String installedVersion = null;
@@ -555,7 +552,6 @@ public class MainApp extends Application {
 	}
 
 	private static String getRequiredLPVersion() {
-
 		// Cache the required version so we don't keep checking the file
 		if (requiredLPVersion != null) {
 			return requiredLPVersion;

@@ -177,8 +177,8 @@ public class ToneReaderWriter {
 			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
 
 				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
-						"This tone was created with a newer version of %s. Be advised there may be issues.",
-						MainApp.APP_NAME), true);
+						"This tone was created with a newer version of %s (%s). Be advised there may be issues.",
+						MainApp.APP_NAME, versionSaved), true);
 
 			} else if (versionSaved == 0) {
 
