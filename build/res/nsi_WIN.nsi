@@ -71,6 +71,7 @@ Section "ToneWriter" Section1
     File /nonfatal /a /r "..\win\java-runtime\"
 
 	${registerExtension} "$INSTDIR\ToneWriter.exe" ".tone" "TONE File"
+	${registerExtension} "$INSTDIR\ToneWriter.exe" ".twproj" "ToneWriter Project File"
 
 SectionEnd
 
@@ -130,6 +131,7 @@ Section Uninstall
 	RMDir /r "$INSTDIR\"
 
 	${unregisterExtension} ".tone" "TONE File"
+	${unregisterExtension} ".twproj" "ToneWriter Project File"
 
 SectionEnd
 
