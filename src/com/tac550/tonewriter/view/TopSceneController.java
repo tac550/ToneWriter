@@ -290,7 +290,7 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(null, -1, null,
+				addTab(null, 0, null,
 						ctr -> ctr.handleOpenTone(arg_file, true, false));
 			else
 				openProject(arg_file);

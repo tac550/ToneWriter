@@ -246,7 +246,7 @@ public class MainApp extends Application {
 			BorderPane rootPane = loader.load();
 			topSceneController = loader.getController();
 
-			// Launching with tone loading TODO: Implement Mac support for this
+			// Launching with tone/project loading TODO: Implement Mac support for this
 			List<String> params = getParameters().getRaw();
 			File fileToOpen = null;
 			if (params.size() > 0) {
