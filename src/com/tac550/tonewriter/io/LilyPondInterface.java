@@ -162,7 +162,7 @@ public class LilyPondInterface {
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + items[0].getTitle() + "\"" : "\"" + project_title + "\""));
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -205,16 +205,16 @@ public class LilyPondInterface {
 		if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
-							item.getTopVerseChoice(), escapeDoubleQuotes(item.getTopVerse())),
+							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getTopVerse())),
 					"}\n", "\\noPageBreak\n");
 		}
 
 		// Score header
 		Collections.addAll(lines, "\\score {\n", "  \\header {",
-				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", item.getfinalTitleContent()),
-				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", item.getSubtitle()),
-				String.format("    piece = \"%s\"", item.getLeftHeaderText()),
-				String.format("    opus = \"%s\"", item.getRightHeaderText()),
+				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getfinalTitleContent())),
+				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getSubtitle())),
+				String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
+				String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
 				"    instrument = \"\"",
 				"  }\n");
 
@@ -263,7 +263,7 @@ public class LilyPondInterface {
 			Collections.addAll(lines, "\\noPageBreak\n",
 					"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
 					String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
-							item.getBottomVerseChoice(), escapeDoubleQuotes(item.getBottomVerse())),
+							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getBottomVerse())),
 					"}\n");
 		}
 
@@ -324,7 +324,7 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == 0) {
 
 						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-						syllableTextBuffer.append(escapeDoubleQuotes(syllable.getText().replace("-", "")));
+						syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
 
 						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
 						if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
@@ -720,7 +720,7 @@ public class LilyPondInterface {
 	}
 
 	// Returns reformatted version of input such that double quotes display correctly in LilyPond output.
-	private static String escapeDoubleQuotes(String input) {
+	private static String escapeDoubleQuotesForNotation(String input) {
 		StringBuilder outputBuffer = new StringBuilder();
 
 		// Delimiters are included to enable rebuilding the entire string with whitespace
@@ -746,6 +746,9 @@ public class LilyPondInterface {
 		}
 
 		return outputBuffer.toString();
+	}
+	private static String escapeDoubleQuotesForHeaders(String input) {
+		return input.replace("\"", "\\\"");
 	}
 
 	// TODO: Seems to have bugs with note groups of more than 2 notes
