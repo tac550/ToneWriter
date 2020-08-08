@@ -30,10 +30,6 @@ public class CommentViewController {
 		commentTextArea.setText(comment);
 	}
 	
-	@FXML private void initialize() {
-
-	}
-	
 	@FXML private void handleOK() {
 		parentController.setComment(commentTextArea.getText());
 		

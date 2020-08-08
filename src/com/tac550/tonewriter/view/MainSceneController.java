@@ -146,7 +146,7 @@ public class MainSceneController {
 
 	@FXML private VBox verseLineBox;
 	private final List<VerseLineViewController> verseLineControllers = new ArrayList<>();
-	List<Task<FXMLLoader>> verseLineLoaders = new ArrayList<>();
+	final List<Task<FXMLLoader>> verseLineLoaders = new ArrayList<>();
 
 	@FXML private void initialize() {
 

@@ -14,10 +14,6 @@ public class SyllableEditViewController {
 		parentController = controller;
 	}
 	
-	@FXML private void initialize() {
-		
-	}
-	
 	void setSyllableText(String text) {
 		syllableTextField.setText(text);
 	}

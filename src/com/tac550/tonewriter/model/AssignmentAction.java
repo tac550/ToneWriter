@@ -10,7 +10,7 @@ public class AssignmentAction {
 
 	public int previousChordIndex;
 	public int previousLastSyllableAssigned;
-	public List<Button> buttons = new ArrayList<>();
-	public List<SyllableText> syllableTexts = new ArrayList<>();
+	public final List<Button> buttons = new ArrayList<>();
+	public final List<SyllableText> syllableTexts = new ArrayList<>();
 
 }
