@@ -6,6 +6,7 @@ import com.tac550.tonewriter.view.SyllableText;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
+import javafx.scene.paint.Color;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
@@ -51,11 +52,25 @@ public class MidiInterface {
 				// Playing loop
 				int buttonIndex = 0;
 				key = 0;
+				SyllableText lastSyllable = null;
+				Color oldSyllableColor = null;
 				while (chordMap.containsKey(key)) {
 					for (AssignedChordData chord : chordMap.get(key)) {
 						Button currentButton = buttons.get(buttonIndex);
-						String oldStyle = currentButton.getStyle();
-						currentButton.setStyle("-fx-base: #fffa61"); // TODO: Also highlight associated syllables
+						String oldButtonStyle = currentButton.getStyle();
+						Platform.runLater(() -> currentButton.setStyle("-fx-base: #fffa61"));
+
+						for (SyllableText syll : syllables) {
+							if (syll.getAssociatedButtons().contains(currentButton) && syll != lastSyllable) {
+								if (lastSyllable != null)
+									lastSyllable.setColor(oldSyllableColor);
+
+								oldSyllableColor = syll.getColor();
+								Platform.runLater(() -> syll.setColor(Color.web("#fffa61")));
+								lastSyllable = syll;
+							}
+						}
+
 						chord.getChordController().playMidi();
 						// This sleep determines for how long the note plays.
 						// Speeds recitative of more than 3 repeated notes up to a maximum value.
@@ -66,11 +81,13 @@ public class MidiInterface {
 								: Integer.parseInt(chord.getDuration()
 								.replace("4.", "3").replace("8", "6"))));
 
-						currentButton.setStyle(oldStyle);
+						currentButton.setStyle(oldButtonStyle);
 						buttonIndex++;
 					}
 					key++;
 				}
+				if (lastSyllable != null)
+					lastSyllable.setColor(oldSyllableColor);
 
 				playButton.setDisable(false);
 				return null;

@@ -93,8 +93,11 @@ public class SyllableText extends Text {
 		associatedChords.clear();
 		associatedButtons.clear();
 	}
-	
-	private void setColor(Color color) {
+
+	public Color getColor() {
+		return (Color) getFill();
+	}
+	public void setColor(Color color) {
 		defaultColor = color;
 		setFill(color);
 	}
