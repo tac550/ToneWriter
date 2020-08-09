@@ -59,7 +59,7 @@ public class MainApp extends Application {
 	// Splash screen stuff
 	private static final Effect frostEffect =
 			new GaussianBlur(40);
-	private static final Stage splashStage = new Stage();
+	private static Stage splashStage;
 	private static final ImageView splashBackground = new ImageView();
 	private static final StackPane splashPane = new StackPane();
 
@@ -183,6 +183,8 @@ public class MainApp extends Application {
 	}
 
 	private void showSplash() {
+		splashStage = new Stage();
+
 		splashPane.setAlignment(Pos.CENTER);
 		splashPane.getChildren().setAll(createSplashContent());
 		splashPane.setStyle("-fx-background-color: null");
