@@ -933,3 +933,7 @@ http://paomedia.github.io/small-n-flat/
 
 Automatic syllabification system uses
 https://juiciobrennan.com/hyphenator/
+
+-----------------------------------------------------------------------------
+
+Thanks to Mark Yuschak for contributing L'vov-Bakhmetev Common Chant Prokeimenon tones.

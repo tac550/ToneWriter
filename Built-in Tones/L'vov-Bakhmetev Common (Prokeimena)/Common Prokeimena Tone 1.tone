@@ -1,0 +1,30 @@
+VERSION: 0.8
+Key Signature: F major
+Tone: Tone 1
+Composer: L'vov/Bakhmetev - Common Chant
+Manually Assign Phrases: false
+
+
+A
+1: a-f-c-f
+	Post: g-d-bf,-g
+2: fs-d-a,-d
+	Post: g-d-bf,-g
+3: a-f-c-f
+	Post: bf-f-d-<bf bf,>
+END: a-f-c-f
+	Prep: bf-f-d-d
+
+Final
+1: g-e-c-c
+2: a-f-c-f
+	Post: f-d-a,-d
+	Post: g-e-c-c
+3: g-e-c-c
+	Post: a-f-c-f
+END: a-f-c-f
+	Prep: g-e-c-c
+	Prep: bf-g-c-c
+
+
+First Repeated: 
