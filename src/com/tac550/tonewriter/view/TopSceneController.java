@@ -388,8 +388,6 @@ public class TopSceneController {
 		if (event.isConsumed())
 			return;
 
-		clearAllTabs();
-
 		openProject(selectedFile);
 	}
 	@FXML private void handleSaveProject() {
@@ -402,7 +400,7 @@ public class TopSceneController {
 	}
 	@FXML private void handleSaveProjectAs() {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(projectTitle + ".twproj");
+		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
@@ -718,13 +716,14 @@ public class TopSceneController {
 	}
 
 	void autoSaveProjectIfUnsaved() {
+		TWUtils.cleanUpAutosaves();
+
 		if (projectFile != null) return;
 
-		TWUtils.cleanUpTempFiles("-Autosave");
-
 		try {
+			String titleFileName = TWUtils.replaceInvalidFileChars(getProjectTitle(), "_") + "-";
 			projectIO.saveProject(
-					TWUtils.createTWTempFile(new SimpleDateFormat("yyyy,MM,dd 'at' HH.mm.ss z")
+					TWUtils.createTWTempFile(titleFileName + new SimpleDateFormat("yyyy,MM,dd 'at' HH.mm.ss z")
 							.format(new Date(System.currentTimeMillis())), "Autosave.twproj"),
 					this);
 		} catch (IOException e) {
@@ -732,7 +731,9 @@ public class TopSceneController {
 		}
 	}
 
-	void openProject(File selected_file) {
+	private void openProject(File selected_file) {
+		clearAllTabs();
+
 		if (selected_file.exists()) {
 			if (projectIO.openProject(selected_file, this)) {
 				projectFile = selected_file;
@@ -741,6 +742,12 @@ public class TopSceneController {
 				addTab();
 			}
 		}
+	}
+
+	void recoverProject(File selected_file) {
+		openProject(selected_file);
+
+		projectFile = null;
 	}
 
 	void projectEdited() {

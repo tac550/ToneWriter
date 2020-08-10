@@ -25,10 +25,13 @@ public class ProjectIO {
 	File tempProjectDirectory;
 
 	public boolean saveProject(File project_file, TopSceneController top_controller) {
+		TWUtils.cleanUpAutosaves();
+
 		// Create temp directory in which to construct the final compressed project file
 		if (tempProjectDirectory == null) {
 			try {
-				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + top_controller.getProjectTitle());
+				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" +
+						TWUtils.replaceInvalidFileChars(top_controller.getProjectTitle(), "_"));
 			} catch (IOException e) {
 				TWUtils.showError("Failed to create temp directory for project save!", true);
 				return false;
@@ -240,6 +243,7 @@ public class ProjectIO {
 	}
 
 	public boolean openProject(File project_file, TopSceneController top_controller) {
+		TWUtils.cleanUpAutosaves();
 
 		// Create temp directory to unzip project into
 		try {

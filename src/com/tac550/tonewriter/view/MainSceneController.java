@@ -972,7 +972,10 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle());
+		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(
+				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle(),
+				"_"
+		));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory : topSceneController.projectSavingDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));

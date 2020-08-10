@@ -119,6 +119,10 @@ public class TWUtils {
 		return encoded.replaceAll("/n", "\n").replaceAll("<%47>", "/");
 	}
 
+	public static String replaceInvalidFileChars(String original, String replacement) {
+		return original.replaceAll("[\\\\/:*?\"<>|]", replacement);
+	}
+
 	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {
@@ -142,10 +146,13 @@ public class TWUtils {
 	public static void cleanUpTempFiles() {
 		cleanUpTempFiles("");
 	}
+	public static void cleanUpAutosaves() {
+		cleanUpTempFiles("-Autosave");
+	}
 	public static void cleanUpTempFiles(String with_postfix) {
-		File tempDir = new File(System.getProperty("java.io.tmpdir"));
-		File[] files = tempDir.listFiles();
-		for (File file : Objects.requireNonNull(files)) {
+		File[] files = new File(System.getProperty("java.io.tmpdir")).listFiles();
+		if (files == null) return;
+		for (File file : files) {
 			String fileNameNoExtension = FilenameUtils.removeExtension(file.getName());
 			if (fileNameNoExtension.endsWith("-Autosave") && ! with_postfix.equals("-Autosave")) continue;
 			if (file.getName().startsWith(MainApp.APP_NAME) && fileNameNoExtension.endsWith(with_postfix)) {

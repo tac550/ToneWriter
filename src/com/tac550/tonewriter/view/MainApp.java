@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.AutoUpdater;
+import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.util.TWUtils;
@@ -28,10 +29,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -180,6 +178,8 @@ public class MainApp extends Application {
 		// TODO: This issue needs a more comprehensive fix.
 		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
+
+		attemptProjectRecovery();
 	}
 
 	private void showSplash() {
@@ -575,6 +575,28 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void attemptProjectRecovery() {
+		FXMLLoaderIO.loadFXMLLayoutAsync("projectRecoveryView.fxml", loader -> {
+			BorderPane rootLayout = loader.getRoot();
+			ProjectRecoveryViewController controller = loader.getController();
+
+			controller.setTopController(topSceneController);
+
+			Platform.runLater(() -> {
+				Stage recoveryStage = new Stage();
+				recoveryStage.setTitle("Project Recovery");
+				recoveryStage.initModality(Modality.APPLICATION_MODAL);
+				recoveryStage.getIcons().add(APP_ICON);
+				recoveryStage.setScene(new Scene(rootLayout));
+				if (controller.hasAutosavedProject()) {
+					recoveryStage.show();
+					recoveryStage.setMinWidth(recoveryStage.getWidth());
+					recoveryStage.setMinHeight(recoveryStage.getHeight());
+				}
+			});
+		});
 	}
 
 }
