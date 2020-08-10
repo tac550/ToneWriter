@@ -235,7 +235,7 @@ public class VerseLineViewController {
 		if (initial_choice != -1) {
 			selectedChantLine = initial_choice;
 		} else if (mainController.manualCLAssignmentEnabled()) {
-			// If we're in manual assignment mode, try to autoselect a chant line similar to the previous one.
+			// If we're in manual assignment mode, try to auto-select a chant line similar to the previous one.
 			if (!previousChantLine.isEmpty()) {
 				// If we don't find a similar chant line below, default to the previous selection.
 				selectedChantLine = previousSelection;
@@ -562,7 +562,7 @@ public class VerseLineViewController {
 
 	private Button createChordButton(SyllableText syllable, ChantChordController chord) {
 		int buttonIndex = syllable.getAssociatedButtons().size();
-		int chordIdex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
+		int chordIndex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
 
 		Button noteButton = new Button(getCurrentChord().getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(getCurrentChord().getColor())));
@@ -586,15 +586,15 @@ public class VerseLineViewController {
 				}
 				topController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button
-				getChordByIndex(chordIdex).playMidi();
+				getChordByIndex(chordIndex).playMidi();
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
 			if (topController.hoverHighlightEnabled()) {
-				getChordByIndex(chordIdex).setHighlighted(true);
+				getChordByIndex(chordIndex).setHighlighted(true);
 			}
 		});
-		noteButton.setOnMouseExited((me) -> getChordByIndex(chordIdex).setHighlighted(false));
+		noteButton.setOnMouseExited((me) -> getChordByIndex(chordIndex).setHighlighted(false));
 
 		return noteButton;
 	}

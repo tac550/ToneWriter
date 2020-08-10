@@ -176,7 +176,7 @@ public class MainSceneController {
 				}
 
 				if (pastingText == null) { super.paste(); return; }
-				// Replace Replace each tabbed-in newline in pasted text with a single space, eliminate multispaces,
+				// Replace Replace each tabbed-in newline in pasted text with a single space, eliminate multi-spaces,
 				// and replace all tabs with spaces.
 				String editedText = pastingText.replaceAll("\n\t+", " ")
 						.replaceAll(" +", " ")
@@ -663,7 +663,7 @@ public class MainSceneController {
 	 */
 	void handleExport() {
 
-		// First make sure a filename and output mode are selected and that the target loaction is ready.
+		// First make sure a filename and output mode are selected and that the target location is ready.
 		if (exportMode != ExportMode.NONE) { // If an output mode is already selected for this tab...
 			// Ask whether to keep settings and overwrite or reset export settings
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION,
@@ -1168,7 +1168,7 @@ public class MainSceneController {
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
-	public String getfinalTitleContent() {
+	public String getFinalTitleContent() {
 		return hiddenTitleMenuItem.isSelected() || topSceneController.getTabCount() == 1 ?
 				"" : titleTextField.getText();
 	}

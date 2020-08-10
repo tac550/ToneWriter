@@ -13,7 +13,7 @@ import java.util.List;
 public class ProjectRecoveryViewController {
 
 	@FXML private ListView<String> listView;
-	private final List<File> autosaveFiles = new ArrayList<>();
+	private final List<File> autoSaveFiles = new ArrayList<>();
 
 	private TopSceneController topController;
 
@@ -30,7 +30,7 @@ public class ProjectRecoveryViewController {
 		for (File file : fileList) {
 			if (file.getName().endsWith("-Autosave.twproj")) {
 				listView.getItems().add(file.getName());
-				autosaveFiles.add(file);
+				autoSaveFiles.add(file);
 			}
 		}
 
@@ -49,7 +49,7 @@ public class ProjectRecoveryViewController {
 			return;
 		}
 
-		topController.recoverProject(autosaveFiles.get(selectedIndex));
+		topController.recoverProject(autoSaveFiles.get(selectedIndex));
 		handleCancel();
 	}
 

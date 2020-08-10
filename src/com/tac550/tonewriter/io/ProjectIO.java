@@ -115,7 +115,7 @@ public class ProjectIO {
 			TWUtils.showError("Failed to delete leftover item entries!", false);
 		}
 
-		// Delete items_old directroy as it is no longer needed and doesn't belong in the final project file
+		// Delete items_old directory as it is no longer needed and doesn't belong in the final project file
 		try {
 			File oldItemsDir = new File(tempProjectDirectory.getAbsolutePath()
 					+ File.separator + "items_old");

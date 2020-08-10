@@ -211,7 +211,7 @@ public class LilyPondInterface {
 
 		// Score header
 		Collections.addAll(lines, "\\score {\n", "  \\header {",
-				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getfinalTitleContent())),
+				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getFinalTitleContent())),
 				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getSubtitle())),
 				String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
 				String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
