@@ -101,6 +101,19 @@ public class ProjectIO {
 			index++;
 		}
 
+		// Delete any leftover tones (tones required to open the project that are no longer in use)
+		try (Stream<Path> dirs = Files.list(new File(tempProjectDirectory.getAbsolutePath()
+				+ File.separator + "tones").toPath())) {
+			dirs.filter(path -> !uniqueHashes.contains(path.getFileName().toString()))
+					.forEach(path -> {
+						try { FileUtils.deleteDirectory(path.toFile()); } catch (IOException e) { e.printStackTrace();
+							TWUtils.showError("Failed to delete leftover tone " + path, false); }
+					});
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to delete leftover tone entries!", false);
+		}
+
 		// Delete any leftover items (necessary if items have been removed since last save/load)
 		try (Stream<Path> files = Files.list(new File(tempProjectDirectory.getAbsolutePath()
 				+ File.separator + "items").toPath())) {
@@ -125,8 +138,8 @@ public class ProjectIO {
 			TWUtils.showError("Failed to remove old items directory!", false);
 		}
 
+		// Generate a full project source render and save it inside the project
 		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
-
 		try {
 			LilyPondInterface.saveToLilyPondFile(lilypondFile, top_controller.getProjectTitle(),
 					top_controller.getTabControllers(), top_controller.getPaperSize());
