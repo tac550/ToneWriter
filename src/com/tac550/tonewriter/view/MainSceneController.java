@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /*
@@ -176,9 +175,12 @@ public class MainSceneController {
 					e.printStackTrace();
 				}
 
-				// Replace each tabbed-in newline in pasted text with a single space.
-				if (pastingText == null || !Pattern.compile("\n\t+").matcher(pastingText).find()) { super.paste(); return; }
-				String editedText = pastingText.replaceAll("\n\t+", " ").replaceAll(" +", " ");
+				if (pastingText == null) { super.paste(); return; }
+				// Replace Replace each tabbed-in newline in pasted text with a single space, eliminate multispaces,
+				// and replace all tabs with spaces.
+				String editedText = pastingText.replaceAll("\n\t+", " ")
+						.replaceAll(" +", " ")
+						.replaceAll("\t", " ");
 				Toolkit.getDefaultToolkit().getSystemClipboard()
 						.setContents(new StringSelection(editedText), null);
 
