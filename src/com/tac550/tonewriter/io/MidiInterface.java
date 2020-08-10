@@ -66,7 +66,7 @@ public class MidiInterface {
 									lastSyllable.setColor(oldSyllableColor);
 
 								oldSyllableColor = syll.getColor();
-								Platform.runLater(() -> syll.setColor(Color.web("#fffa61")));
+								Platform.runLater(() -> syll.setColor(Color.web("#edbd11")));
 								lastSyllable = syll;
 							}
 						}
