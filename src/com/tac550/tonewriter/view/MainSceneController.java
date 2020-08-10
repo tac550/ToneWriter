@@ -111,7 +111,8 @@ public class MainSceneController {
 
 	private File toneFile;
 	private int originalIndex;
-	private String lilyPondItem = "";
+	private String cachedItemSource = "";
+	private String cachedToneHash = "";
 
 	private String keySignature = "C major";
 	private String leftText = "";
@@ -1105,13 +1106,19 @@ public class MainSceneController {
 	}
 	public String getLilyPondSource() {
 		if (fullyLoaded())
-			lilyPondItem = LilyPondInterface.generateItemSource(this);
+			cachedItemSource = LilyPondInterface.generateItemSource(this);
 
-		return lilyPondItem;
+		return cachedItemSource;
 	}
 	void setLilyPondSource(String source) {
 		// Removes any leading whitespace
-		lilyPondItem = source.replaceAll("^\\s+", "");
+		cachedItemSource = source.replaceAll("^\\s+", "");
+	}
+	public String getCachedToneHash() {
+		return cachedToneHash;
+	}
+	public void setCachedToneHash(String hash) {
+		cachedToneHash = hash;
 	}
 
 	ObservableStringValue getTitleTextProperty() {

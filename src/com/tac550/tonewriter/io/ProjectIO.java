@@ -82,6 +82,8 @@ public class ProjectIO {
 						toneWriter.saveToneToFile(toneSaveFile);
 					}
 				}
+			} else if (controller.getCachedToneHash() != null) {
+				uniqueHashes.add(controller.getCachedToneHash());
 			}
 
 			// Place each item in a file in "items" directory and named by tab index, but only if the item
@@ -387,7 +389,7 @@ public class ProjectIO {
 
 				// Create and set up item tab
 				int finalI = i;
-				top_controller.addTab(titleSubtitle.get(0), i, itemSources[i + 1], ctr -> {
+				top_controller.addTab(titleSubtitle.get(0), i, itemSources[i + 1], toneHash, ctr -> {
 					final boolean projectEditedState = top_controller.getProjectEdited();
 
 					if (!toneHash.isEmpty())

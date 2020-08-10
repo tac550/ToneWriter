@@ -291,12 +291,12 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(null, 0, null,
+				addTab(null, 0, null, null,
 						ctr -> ctr.handleOpenTone(arg_file, true, false));
 			else
 				openProject(arg_file);
 		} else {
-			addTab(null, 0, null, null);
+			addTab(null, 0, null, null, null);
 		}
 	}
 
@@ -334,7 +334,7 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML private void addTab() {
-		addTab(null, -1, null, null);
+		addTab(null, -1, null, null, null);
 		projectEdited();
 	}
 	@FXML private void handleSetProjectTitle() {
@@ -515,7 +515,7 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	public void addTab(String with_title, int at_index, String precomp_source,
+	public void addTab(String with_title, int at_index, String precomp_source, String tone_hash,
 					   Consumer<MainSceneController> loading_actions) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
@@ -650,6 +650,8 @@ public class TopSceneController {
 
 				if (precomp_source != null)
 					newTabController.setLilyPondSource(precomp_source);
+
+				newTabController.setCachedToneHash(tone_hash);
 
 				// Save any loading operations for later (when the user switches to the tab or exports the project).
 				newTabController.setPendingLoadActions(loading_actions);

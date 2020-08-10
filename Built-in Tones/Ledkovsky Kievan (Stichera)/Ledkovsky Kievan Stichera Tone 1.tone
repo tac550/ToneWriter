@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 0.8
 Key Signature: G major
 Tone: Tone 1
 Composer: B. Ledkovsky - Kievan Chant
@@ -7,7 +7,7 @@ Manually Assign Phrases: false
 
 A
 1: a-fs-d-d
-	Post: b-g-d-g
+	Post: b-g-d-a
 2: a-fs-c-d
 	Post: fs-d-a,-d
 3: g-d-b,-g

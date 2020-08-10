@@ -144,6 +144,9 @@ public class ToneReaderWriter {
 		}
 	}
 	public String getToneHash() {
+		if (!associatedMainScene.fullyLoaded())
+			return associatedMainScene.getCachedToneHash();
+
 		StringBuilder hashBuilder = new StringBuilder();
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
