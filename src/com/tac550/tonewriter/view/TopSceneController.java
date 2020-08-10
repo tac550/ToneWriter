@@ -32,6 +32,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -332,11 +333,11 @@ public class TopSceneController {
 	/*
 	 * Project Menu Actions
 	 */
-	@FXML void addTab() {
+	@FXML private void addTab() {
 		addTab(null, -1, null, null);
 		projectEdited();
 	}
-	@FXML void handleSetProjectTitle() {
+	@FXML private void handleSetProjectTitle() {
 		TextInputDialog dialog = new TextInputDialog(projectTitle);
 		dialog.setTitle("Project Title");
 		dialog.setHeaderText("Enter project title");
@@ -430,13 +431,13 @@ public class TopSceneController {
 	/*
 	 * Tone Menu Actions
 	 */
-	@FXML void handleNewTone() {
+	@FXML private void handleNewTone() {
 		getSelectedTabScene().handleNewTone();
 	}
 	@FXML private void handleOpenTone() {
 		getSelectedTabScene().handleOpenTone(null, false, false);
 	}
-	@FXML void handleSaveTone() {
+	@FXML private void handleSaveTone() {
 		getSelectedTabScene().handleSaveTone();
 	}
 	@FXML private void handleSaveToneAs() {
@@ -697,7 +698,6 @@ public class TopSceneController {
 		for (Tab tab : tabs)
 			forceCloseTab(tab);
 	}
-
 	void cleanUpTabForRemoval(Tab tab) {
 		tab.textProperty().unbind();
 		tabControllerMap.remove(tab);
@@ -715,6 +715,19 @@ public class TopSceneController {
 
 	public void setProjectTitle(String title) {
 		projectTitle = title;
+	}
+
+	void autoSaveProject() {
+		TWUtils.cleanUpTempFiles("-Autosave");
+
+		try {
+			projectIO.saveProject(
+					TWUtils.createTWTempFile(new SimpleDateFormat("yyyy-MM-dd 'at' HH-mm-ss z")
+							.format(new Date(System.currentTimeMillis())), "Autosave.twproj"),
+					this);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	void openProject(File selected_file) {

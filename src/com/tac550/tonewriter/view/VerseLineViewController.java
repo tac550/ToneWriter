@@ -385,12 +385,14 @@ public class VerseLineViewController {
 				}
 			}
 
-		} else { // If we have just placed or skipped the last chord
+		} else { // If we have just placed or skipped the last chord for the line
 			doneAssigning = true;
 
 			chordEntryText.setText("Done!");
 			chordEntryText.setFill(Color.BLACK);
 			skipChordButton.setDisable(true);
+
+			topController.autoSaveProject();
 
 			for (Node syllable : lineTextFlow.getChildren()) { // Disable all syllables
 				((SyllableText) syllable).deactivate();
