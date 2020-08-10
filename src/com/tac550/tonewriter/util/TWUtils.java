@@ -146,7 +146,9 @@ public class TWUtils {
 		File tempDir = new File(System.getProperty("java.io.tmpdir"));
 		File[] files = tempDir.listFiles();
 		for (File file : Objects.requireNonNull(files)) {
-			if (file.getName().startsWith(MainApp.APP_NAME) && FilenameUtils.removeExtension(file.getName()).endsWith(with_postfix)) {
+			String fileNameNoExtension = FilenameUtils.removeExtension(file.getName());
+			if (fileNameNoExtension.endsWith("-Autosave") && ! with_postfix.equals("-Autosave")) continue;
+			if (file.getName().startsWith(MainApp.APP_NAME) && fileNameNoExtension.endsWith(with_postfix)) {
 				try {
 					if (file.isDirectory())
 						FileUtils.deleteDirectory(file);

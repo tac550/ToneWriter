@@ -392,7 +392,7 @@ public class VerseLineViewController {
 			chordEntryText.setFill(Color.BLACK);
 			skipChordButton.setDisable(true);
 
-			topController.autoSaveProject();
+			topController.autoSaveProjectIfUnsaved();
 
 			for (Node syllable : lineTextFlow.getChildren()) { // Disable all syllables
 				((SyllableText) syllable).deactivate();

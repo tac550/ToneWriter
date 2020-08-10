@@ -717,12 +717,14 @@ public class TopSceneController {
 		projectTitle = title;
 	}
 
-	void autoSaveProject() {
+	void autoSaveProjectIfUnsaved() {
+		if (projectFile != null) return;
+
 		TWUtils.cleanUpTempFiles("-Autosave");
 
 		try {
 			projectIO.saveProject(
-					TWUtils.createTWTempFile(new SimpleDateFormat("yyyy-MM-dd 'at' HH-mm-ss z")
+					TWUtils.createTWTempFile(new SimpleDateFormat("yyyy,MM,dd 'at' HH.mm.ss z")
 							.format(new Date(System.currentTimeMillis())), "Autosave.twproj"),
 					this);
 		} catch (IOException e) {
