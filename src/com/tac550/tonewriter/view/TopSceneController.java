@@ -717,6 +717,10 @@ public class TopSceneController {
 		projectTitle = title;
 	}
 
+	public String getProjectFileName() {
+		return projectFile != null ? projectFile.getName() : "Unsaved Project";
+	}
+
 	void autoSaveProjectIfUnsaved() {
 		TWUtils.cleanUpAutosaves();
 

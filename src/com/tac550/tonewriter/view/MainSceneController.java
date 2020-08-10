@@ -643,11 +643,10 @@ public class MainSceneController {
 
 	void updateStageTitle() {
 		if (topSceneController.isActiveTab(this)) {
-			String projectTitle = topSceneController.getProjectTitle();
 			// Update stage title to show loaded tone name and edit status
 			parentStage.setTitle((topSceneController.getProjectEdited() ? "*" : "")
-					+ (!projectTitle.isEmpty() ? topSceneController.getProjectTitle() + " - " : "")
-					+ MainApp.APP_NAME + (toneFile != null ? " - " + FilenameUtils.removeExtension(toneFile.getName()) : "")
+					+ topSceneController.getProjectFileName() + " - "
+					+ MainApp.APP_NAME + (toneFile != null ? " - " + toneFile.getName() : "")
 					+ (toneEdited ? "*" : ""));
 		}
 	}
