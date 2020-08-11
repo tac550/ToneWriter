@@ -258,8 +258,6 @@ public class ProjectIO {
 	}
 
 	public boolean openProject(File project_file, TopSceneController top_controller) {
-		TWUtils.cleanUpAutosaves();
-
 		// Create temp directory to unzip project into
 		try {
 			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
@@ -499,6 +497,7 @@ public class ProjectIO {
 
 		}
 
+		TWUtils.cleanUpAutosaves();
 		return true;
 	}
 
