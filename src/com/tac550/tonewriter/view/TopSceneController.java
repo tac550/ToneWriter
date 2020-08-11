@@ -258,7 +258,7 @@ public class TopSceneController {
 			// Finish loading the tab if not already done.
 			selectedController.runPendingLoadActions();
 
-			selectedController.updateStageTitle();
+			updateStageTitleIfPossible();
 			selectedController.applyToneMenuState();
 		});
 
@@ -353,7 +353,7 @@ public class TopSceneController {
 
 		if (result.isPresent()) {
 			setProjectTitle(result.get());
-			getSelectedTabScene().updateStageTitle();
+			updateStageTitleIfPossible();
 		}
 	}
 
@@ -759,17 +759,21 @@ public class TopSceneController {
 	void projectEdited() {
 		if (!projectEdited) {
 			projectEdited = true;
-			if (getTabCount() > 0)
-				getSelectedTabScene().updateStageTitle();
+			updateStageTitleIfPossible();
 		}
 	}
 	public void resetProjectEditedStatus() {
 		projectEdited = false;
-		if (getTabCount() > 0)
-			getSelectedTabScene().updateStageTitle();
+		updateStageTitleIfPossible();
 	}
 	public boolean getProjectEdited() {
 		return projectEdited;
+	}
+
+	private void updateStageTitleIfPossible() {
+		MainSceneController selectedTabScene = getSelectedTabScene();
+		if (selectedTabScene != null)
+			selectedTabScene.updateStageTitle();
 	}
 
 	void setMenuState(ToneMenuState menu_state) {
