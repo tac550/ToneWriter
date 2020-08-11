@@ -10,4 +10,4 @@ cp -r "../../Built-in Tones" "../lin/Built-in Tones" && \
 cp -r ../../licenses ../lin/licenses && \
 cp ToneWriter.sh ../lin && \
 cd .. && \
-zip -r lin/ToneWriter0.7-Linux.zip lin/*
+zip -r lin/ToneWriter0.8-Linux.zip lin/*

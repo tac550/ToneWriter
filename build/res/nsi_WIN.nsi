@@ -5,13 +5,13 @@ Unicode True
 
 ; Define your application name
 !define APPNAME "ToneWriter"
-!define APPNAMEANDVERSION "ToneWriter 0.7"
+!define APPNAMEANDVERSION "ToneWriter 0.8"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES64\ToneWriter"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "..\win\ToneWriter0.7_Setup.exe"
+OutFile "..\win\ToneWriter0.8_Setup.exe"
 
 Function .onInit
         ${If} ${RunningX64}
