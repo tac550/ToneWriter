@@ -38,7 +38,6 @@ public class ProjectRecoveryViewController {
 	}
 
 	@FXML private void handleCancel() {
-		TWUtils.cleanUpAutosaves();
 		((Stage) listView.getScene().getWindow()).close();
 	}
 
