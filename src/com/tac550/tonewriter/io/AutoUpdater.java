@@ -339,7 +339,8 @@ public class AutoUpdater {
 		if (downloadAlert == null) {
 			downloadAlert = new Alert(AlertType.INFORMATION);
 			downloadAlert.setTitle("Download");
-			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time.");
+			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time."
+					+ (MainApp.OS_NAME.startsWith("mac") ? " You will be prompted to enter your password upon completion." : ""));
 			((Stage) downloadAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 			downloadAlert.getButtonTypes().clear();
 			downloadAlert.initModality(Modality.APPLICATION_MODAL);
