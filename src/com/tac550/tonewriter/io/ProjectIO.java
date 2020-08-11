@@ -30,7 +30,7 @@ import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
-	static String RC4Key = "0123456789abcdef";
+	private static final String RC4Key = "0123456789abcdef";
 
 	private File tempProjectDirectory;
 
@@ -199,7 +199,7 @@ public class ProjectIO {
 
 		// Encrypt temp zip file, outputting to final location. This is not meant to be secure, and simply prevents
 		// other programs from detecting that the file is a zip archive and messing with it.
-		if (!applyCipher(tempZip, project_file)) {
+		if (applyCipherFailed(tempZip, project_file)) {
 			TWUtils.showError("Failed to output final project file!", true);
 			return false;
 		}
@@ -294,7 +294,7 @@ public class ProjectIO {
 			TWUtils.showError("Failed to create temporary zip file!", true);
 			return false;
 		}
-		if (!applyCipher(project_file, tempZip)) {
+		if (applyCipherFailed(project_file, tempZip)) {
 			TWUtils.showError("Failed to import raw project file!", true);
 			return false;
 		}
@@ -546,7 +546,7 @@ public class ProjectIO {
 		return true;
 	}
 
-	private static boolean applyCipher(File input, File output) {
+	private static boolean applyCipherFailed(File input, File output) {
 		try (FileInputStream inputStream = new FileInputStream(input);
 		     FileOutputStream outputStream = new FileOutputStream(output)) {
 			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
@@ -562,10 +562,10 @@ public class ProjectIO {
 
 		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| BadPaddingException | IllegalBlockSizeException e) {
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	// Guards against a known Zip vulnerability
