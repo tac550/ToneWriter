@@ -330,7 +330,7 @@ public class AutoUpdater {
 		}
 
 		System.out.println("Now exiting for update installation!");
-		Platform.exit();
+		System.exit(2);
 	}
 
 	private static void showDownloadAlert(String version) {
