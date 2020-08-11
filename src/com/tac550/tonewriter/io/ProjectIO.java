@@ -199,22 +199,7 @@ public class ProjectIO {
 
 		// Encrypt temp zip file, outputting to final location. This is not meant to be secure, and simply prevents
 		// other programs from detecting that the file is a zip archive and messing with it.
-		try (FileInputStream inputStream = new FileInputStream(tempZip);
-		     FileOutputStream outputStream = new FileOutputStream(project_file)) {
-			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
-			Cipher cipher = Cipher.getInstance("RC4");
-			cipher.init(Cipher.ENCRYPT_MODE, key);
-
-			byte[] inputBytes = new byte[(int) tempZip.length()];
-			//noinspection ResultOfMethodCallIgnored
-			inputStream.read(inputBytes);
-
-			byte[] outputBytes = cipher.doFinal(inputBytes);
-			outputStream.write(outputBytes);
-
-		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-				| BadPaddingException | IllegalBlockSizeException e) {
-			e.printStackTrace();
+		if (!applyCipher(tempZip, project_file)) {
 			TWUtils.showError("Failed to output final project file!", true);
 			return false;
 		}
@@ -309,22 +294,7 @@ public class ProjectIO {
 			TWUtils.showError("Failed to create temporary zip file!", true);
 			return false;
 		}
-		try (FileInputStream inputStream = new FileInputStream(project_file);
-		     FileOutputStream outputStream = new FileOutputStream(tempZip)) {
-			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
-			Cipher cipher = Cipher.getInstance("RC4");
-			cipher.init(Cipher.DECRYPT_MODE, key);
-
-			byte[] inputBytes = new byte[(int) project_file.length()];
-			//noinspection ResultOfMethodCallIgnored
-			inputStream.read(inputBytes);
-
-			byte[] outputBytes = cipher.doFinal(inputBytes);
-			outputStream.write(outputBytes);
-
-		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-				| BadPaddingException | IllegalBlockSizeException e) {
-			e.printStackTrace();
+		if (!applyCipher(project_file, tempZip)) {
 			TWUtils.showError("Failed to import raw project file!", true);
 			return false;
 		}
@@ -573,6 +543,28 @@ public class ProjectIO {
 		}
 
 		TWUtils.cleanUpAutosaves();
+		return true;
+	}
+
+	private static boolean applyCipher(File input, File output) {
+		try (FileInputStream inputStream = new FileInputStream(input);
+		     FileOutputStream outputStream = new FileOutputStream(output)) {
+			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
+			Cipher cipher = Cipher.getInstance("RC4");
+			cipher.init(Cipher.DECRYPT_MODE, key);
+
+			byte[] inputBytes = new byte[(int) input.length()];
+			//noinspection ResultOfMethodCallIgnored
+			inputStream.read(inputBytes);
+
+			byte[] outputBytes = cipher.doFinal(inputBytes);
+			outputStream.write(outputBytes);
+
+		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+				| BadPaddingException | IllegalBlockSizeException e) {
+			return false;
+		}
+
 		return true;
 	}
 
