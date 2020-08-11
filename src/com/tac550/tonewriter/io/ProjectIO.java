@@ -8,10 +8,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -22,7 +30,9 @@ import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
-	File tempProjectDirectory;
+	static String RC4Key = "0123456789abcdef";
+
+	private File tempProjectDirectory;
 
 	public boolean saveProject(File project_file, TopSceneController top_controller) {
 		TWUtils.cleanUpAutosaves();
@@ -150,17 +160,15 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Delete previous save file, if one exists
-		if (project_file.exists()) {
-			if (!project_file.delete()) {
-				TWUtils.showError("Failed to overwrite previous save file!"
-						+ "Do you have write permission in that location?", true);
-				return false;
-			}
+		// Compress the temp directory and save to a temp zip file
+		File tempZip;
+		try {
+			tempZip = TWUtils.createTWTempFile("Saving", "in-progress.zip");
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temporary zip file!", true);
+			return false;
 		}
-
-		// Compress the temp directory and save to the final location
-		try (FileOutputStream fos = new FileOutputStream(project_file);
+		try (FileOutputStream fos = new FileOutputStream(tempZip);
 		     ZipOutputStream zos = new ZipOutputStream(fos)) {
 			byte[] buffer = new byte[1024];
 
@@ -174,12 +182,46 @@ public class ProjectIO {
 					}
 				}
 			}
-
 		} catch (IOException e) {
-			TWUtils.showError("Failed to compress and save project file!", true);
+			TWUtils.showError("Failed to compress project file!", true);
 			e.printStackTrace();
 			return false;
 		}
+
+		// Delete previous save file, if one exists
+		if (project_file.exists()) {
+			if (!project_file.delete()) {
+				TWUtils.showError("Failed to overwrite previous save file! "
+						+ "Do you have write permission in that location?", true);
+				return false;
+			}
+		}
+
+		// Encrypt temp zip file, outputting to final location. This is not meant to be secure, and simply prevents
+		// other programs from detecting that the file is a zip archive and messing with it.
+		try (FileInputStream inputStream = new FileInputStream(tempZip);
+		     FileOutputStream outputStream = new FileOutputStream(project_file)) {
+			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
+			Cipher cipher = Cipher.getInstance("RC4");
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+
+			byte[] inputBytes = new byte[(int) tempZip.length()];
+			//noinspection ResultOfMethodCallIgnored
+			inputStream.read(inputBytes);
+
+			byte[] outputBytes = cipher.doFinal(inputBytes);
+			outputStream.write(outputBytes);
+
+		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+				| BadPaddingException | IllegalBlockSizeException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to output final project file!", true);
+			return false;
+		}
+
+		// Delete temp zip file
+		if (!tempZip.delete())
+			TWUtils.showError("Failed to delete temporary zip file!", false);
 
 		return true;
 	}
@@ -258,6 +300,35 @@ public class ProjectIO {
 	}
 
 	public boolean openProject(File project_file, TopSceneController top_controller) {
+		// Decrypt project file, outputting to a temp zip. This is not meant to be secure, and simply prevents
+		// other programs from detecting that the file is a zip archive and messing with it.
+		File tempZip;
+		try {
+			tempZip = TWUtils.createTWTempFile("Loading", "in-progress.zip");
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temporary zip file!", true);
+			return false;
+		}
+		try (FileInputStream inputStream = new FileInputStream(project_file);
+		     FileOutputStream outputStream = new FileOutputStream(tempZip)) {
+			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
+			Cipher cipher = Cipher.getInstance("RC4");
+			cipher.init(Cipher.DECRYPT_MODE, key);
+
+			byte[] inputBytes = new byte[(int) project_file.length()];
+			//noinspection ResultOfMethodCallIgnored
+			inputStream.read(inputBytes);
+
+			byte[] outputBytes = cipher.doFinal(inputBytes);
+			outputStream.write(outputBytes);
+
+		} catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+				| BadPaddingException | IllegalBlockSizeException e) {
+			e.printStackTrace();
+			TWUtils.showError("Failed to import raw project file!", true);
+			return false;
+		}
+
 		// Create temp directory to unzip project into
 		try {
 			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
@@ -267,7 +338,7 @@ public class ProjectIO {
 		}
 
 		// Unzip the project file
-		try (FileInputStream fis = new FileInputStream(project_file);
+		try (FileInputStream fis = new FileInputStream(tempZip);
 		     ZipInputStream zis = new ZipInputStream(fis)) {
 			byte[] buffer = new byte[1024];
 
@@ -294,6 +365,10 @@ public class ProjectIO {
 			TWUtils.showError("Failed to extract project file!", true);
 			return false;
 		}
+
+		// Delete temp zip file
+		if (!tempZip.delete())
+			TWUtils.showError("Failed to delete temporary zip file!", false);
 
 		// Gather project metadata from info file
 		int numItems;
