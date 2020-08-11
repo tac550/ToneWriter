@@ -196,7 +196,7 @@ public class TWUtils {
 	}
 	private static void generateFileList(List<String> file_list, File node) {
 		if (node.isFile()) {
-			file_list.add(node.getAbsolutePath());
+			file_list.add(node.getAbsolutePath().replace("\\", "/"));
 		}
 
 		if (node.isDirectory()) {
