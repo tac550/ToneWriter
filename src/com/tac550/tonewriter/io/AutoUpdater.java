@@ -278,8 +278,10 @@ public class AutoUpdater {
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
-				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid,
-						downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
+				String[] cmdlist = new String[] {"osascript", "-e", String.format("do shell script \"%s\" with administrator privileges", String.join(" ",
+						new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(),
+								userDir.getParentFile().getParentFile().getAbsolutePath()}))};
+				Runtime.getRuntime().exec(cmdlist);
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
