@@ -30,7 +30,7 @@ import java.util.zip.ZipOutputStream;
 
 public class ProjectIO {
 
-	static String RC4Key = "0123456789abcdef";
+	private static final String RC4Key = "0123456789abcdef";
 
 	private File tempProjectDirectory;
 
