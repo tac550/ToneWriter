@@ -278,8 +278,10 @@ public class AutoUpdater {
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
-				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid,
-						downloaded_file.getAbsolutePath(), userDir.getParentFile().getParentFile().getAbsolutePath()});
+				String[] cmdlist = new String[] {"osascript", "-e", String.format("do shell script \"%s\" with administrator privileges", String.join(" ",
+						new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(),
+								userDir.getParentFile().getParentFile().getAbsolutePath()}))};
+				Runtime.getRuntime().exec(cmdlist);
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
@@ -330,14 +332,15 @@ public class AutoUpdater {
 		}
 
 		System.out.println("Now exiting for update installation!");
-		Platform.exit();
+		System.exit(2);
 	}
 
 	private static void showDownloadAlert(String version) {
 		if (downloadAlert == null) {
 			downloadAlert = new Alert(AlertType.INFORMATION);
 			downloadAlert.setTitle("Download");
-			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time.");
+			downloadAlert.setHeaderText("Downloading version " + version + ". This may take some time."
+					+ (MainApp.OS_NAME.startsWith("mac") ? " You will be prompted to enter your password upon completion." : ""));
 			((Stage) downloadAlert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);
 			downloadAlert.getButtonTypes().clear();
 			downloadAlert.initModality(Modality.APPLICATION_MODAL);
