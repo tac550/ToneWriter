@@ -251,6 +251,10 @@ public class ToneReaderWriter {
 			// Clear chant lines if there's an error
 			mainScene.clearChantLines();
 			return false;
+		} catch (NumberFormatException e) {
+			TWUtils.showError(String.format("This tone file was created in a newer version of %s and is not compatible.",
+					MainApp.APP_NAME), true);
+			return false;
 		}
 
 		mainScene.setKeySignature(keySig);
