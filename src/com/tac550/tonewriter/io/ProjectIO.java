@@ -358,7 +358,7 @@ public class ProjectIO {
 		// Warn if project file was created in a newer version.
 		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
-					"This project was created with a newer version of %s (%s). Be advised there may be issues.",
+					"This project was created with a newer version of %s (%s). Be advised you may encouner problems.",
 					MainApp.APP_NAME, version), true);
 		}
 
