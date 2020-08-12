@@ -355,7 +355,8 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Warn if project file was created in a newer version.
+		// Collect project version information and warn if project file was created in a newer version.
+		boolean versionsMatch = TWUtils.versionCompare(version, MainApp.APP_VERSION) == 0;
 		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
 					"This project was created with a newer version of %s (%s). Be advised you may encounter problems.",
@@ -438,8 +439,8 @@ public class ProjectIO {
 					if (!toneHash.isEmpty())
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
 
-					if (ctr.tryChangeToneFile(originalToneFile) && edited)
-						ctr.toneEdited(false);
+					if (versionsMatch && !edited)
+						ctr.tryChangingToneFile(originalToneFile);
 
 					ctr.setSubtitle(titleSubtitle.get(1));
 

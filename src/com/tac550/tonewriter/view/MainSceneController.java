@@ -631,14 +631,13 @@ public class MainSceneController {
 		}
 	}
 
-	public boolean tryChangeToneFile(File tone_file) {
+	public void tryChangingToneFile(File tone_file) {
 		if (!tone_file.exists())
-			return false;
+			return;
 
 		toneFile = tone_file;
-		toneMenuState.saveToneMenuItemDisabled = false;
+		toneMenuState.saveToneMenuItemDisabled = builtInToneLoaded();
 		applyToneMenuState();
-		return true;
 	}
 
 	void updateStageTitle() {
