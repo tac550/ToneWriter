@@ -78,8 +78,8 @@ public class ProjectIO {
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
 
-				ToneReaderWriter toneWriter = controller.getToneWriter();
-				toneHash = toneWriter.getToneHash();
+				ToneReaderWriter toneWriter = controller.getToneRW();
+				toneHash = toneWriter.getCurrentToneHash();
 
 				// Save each unique tone file into "tones" directory
 				if (!uniqueHashes.contains(toneHash)) {
@@ -356,7 +356,6 @@ public class ProjectIO {
 		}
 
 		// Collect project version information and warn if project file was created in a newer version.
-		boolean versionsMatch = TWUtils.versionCompare(version, MainApp.APP_VERSION) == 0;
 		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
 					"This project was created with a newer version of %s (%s). Be advised you may encounter problems.",
@@ -439,8 +438,15 @@ public class ProjectIO {
 					if (!toneHash.isEmpty())
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
 
-					if (versionsMatch && !edited)
-						ctr.tryChangingToneFile(originalToneFile);
+					if (originalToneFile.exists()) {
+						if (!TWUtils.isBuiltinTone(originalToneFile)
+								|| ctr.getToneRW().toneHashMatchesFile(originalToneFile)) {
+							ctr.swapToneFile(originalToneFile);
+						}
+					}
+
+					if (edited)
+						ctr.toneEdited(false);
 
 					ctr.setSubtitle(titleSubtitle.get(1));
 

@@ -207,6 +207,10 @@ public class TWUtils {
 		}
 	}
 
+	public static boolean isBuiltinTone(File tone_file) {
+		return tone_file.getAbsolutePath().contains(File.separator + MainApp.BUILT_IN_TONE_DIR.getName() + File.separator);
+	}
+
 	// UI
 
 	public static void showError(String message, boolean wait) {

@@ -126,7 +126,6 @@ public class MainSceneController {
 	private String lastVerseSet = "";
 
 	private boolean toneEdited = false;
-	private final File builtInDir = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 
 	private boolean verseEdited = false;
 
@@ -591,11 +590,11 @@ public class MainSceneController {
 		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
 			if (toneFile != null && !projectToneLoaded()) {
-				if (builtInToneLoaded()) fileChooser.setInitialDirectory(builtInDir);
+				if (builtInToneLoaded()) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
-				if (builtInDir.exists()) {
-					fileChooser.setInitialDirectory(builtInDir);
+				if (MainApp.BUILT_IN_TONE_DIR.exists()) {
+					fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				} else {
 					fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
 				}
@@ -631,10 +630,7 @@ public class MainSceneController {
 		}
 	}
 
-	public void tryChangingToneFile(File tone_file) {
-		if (!tone_file.exists())
-			return;
-
+	public void swapToneFile(File tone_file) {
 		toneFile = tone_file;
 		toneMenuState.saveToneMenuItemDisabled = builtInToneLoaded();
 		applyToneMenuState();
@@ -742,7 +738,7 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = getToneWriter();
+		ToneReaderWriter toneWriter = getToneRW();
 		if (!toneWriter.saveToneToFile(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
@@ -755,7 +751,7 @@ public class MainSceneController {
 		if (createNewTone()) handleSaveTone();
 	}
 
-	public ToneReaderWriter getToneWriter() {
+	public ToneReaderWriter getToneRW() {
 		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
 	}
 	private ToneReaderWriter getToneReader() {
@@ -941,7 +937,7 @@ public class MainSceneController {
 	}
 
 	private boolean builtInToneLoaded() {
-		return toneFile.getAbsolutePath().startsWith(builtInDir.getAbsolutePath());
+		return TWUtils.isBuiltinTone(toneFile);
 	}
 
 	private boolean projectToneLoaded() {
