@@ -1,6 +1,5 @@
 package com.tac550.tonewriter.io;
 
-import com.sun.prism.shader.Solid_TextureYV12_AlphaTest_Loader;
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
@@ -440,7 +439,8 @@ public class ProjectIO {
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
 
 					try {
-						if (originalToneFile.exists() && ctr.getToneWriter().loadedToneSimilarTo(originalToneFile)) {
+						if (originalToneFile.exists() && (ctr.getToneWriter().loadedToneSimilarTo(originalToneFile)
+							|| edited)) {
 							ctr.swapToneFile(originalToneFile);
 						}
 					} catch (IOException e) {
