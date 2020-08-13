@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.io;
 
+import com.sun.prism.shader.Solid_TextureYV12_AlphaTest_Loader;
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
@@ -78,7 +79,7 @@ public class ProjectIO {
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
 
-				ToneReaderWriter toneWriter = controller.getToneRW();
+				ToneReaderWriter toneWriter = controller.getToneWriter();
 				toneHash = toneWriter.getCurrentToneHash();
 
 				// Save each unique tone file into "tones" directory
@@ -438,11 +439,13 @@ public class ProjectIO {
 					if (!toneHash.isEmpty())
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
 
-					if (originalToneFile.exists()) {
-						if (!TWUtils.isBuiltinTone(originalToneFile)
-								|| ctr.getToneRW().toneHashMatchesFile(originalToneFile)) {
+					try {
+						if (originalToneFile.exists() && ctr.getToneWriter().loadedToneSimilarTo(originalToneFile)) {
 							ctr.swapToneFile(originalToneFile);
 						}
+					} catch (IOException e) {
+						TWUtils.showError("Failed to compare original tone file", false);
+						e.printStackTrace();
 					}
 
 					if (edited)

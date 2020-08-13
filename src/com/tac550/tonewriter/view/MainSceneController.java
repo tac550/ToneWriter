@@ -548,7 +548,7 @@ public class MainSceneController {
 		}
 	}
 	private boolean isToneSavable() {
-		return (!projectToneLoaded() && !builtInToneLoaded()) || MainApp.developerMode;
+		return (!projectToneLoaded() && !TWUtils.isBuiltinTone(toneFile)) || MainApp.developerMode;
 	}
 
 	private boolean createNewTone() {
@@ -590,7 +590,7 @@ public class MainSceneController {
 		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
 			if (toneFile != null && !projectToneLoaded()) {
-				if (builtInToneLoaded()) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
+				if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
 				if (MainApp.BUILT_IN_TONE_DIR.exists()) {
@@ -632,7 +632,7 @@ public class MainSceneController {
 
 	public void swapToneFile(File tone_file) {
 		toneFile = tone_file;
-		toneMenuState.saveToneMenuItemDisabled = builtInToneLoaded();
+		toneMenuState.saveToneMenuItemDisabled = TWUtils.isBuiltinTone(toneFile);
 		applyToneMenuState();
 	}
 
@@ -738,7 +738,7 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = getToneRW();
+		ToneReaderWriter toneWriter = getToneWriter();
 		if (!toneWriter.saveToneToFile(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
@@ -751,7 +751,7 @@ public class MainSceneController {
 		if (createNewTone()) handleSaveTone();
 	}
 
-	public ToneReaderWriter getToneRW() {
+	public ToneReaderWriter getToneWriter() {
 		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
 	}
 	private ToneReaderWriter getToneReader() {
@@ -934,10 +934,6 @@ public class MainSceneController {
 		} else if (maxY >= (scrollPaneHeight - (viewportHeight / 2))) {
 			toneScrollPane.setVvalue(1);
 		}
-	}
-
-	private boolean builtInToneLoaded() {
-		return TWUtils.isBuiltinTone(toneFile);
 	}
 
 	private boolean projectToneLoaded() {

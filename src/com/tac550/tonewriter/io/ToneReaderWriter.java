@@ -144,8 +144,6 @@ public class ToneReaderWriter {
 		}
 	}
 	public String getCurrentToneHash() {
-		if (!associatedMainScene.fullyLoaded())
-			return associatedMainScene.getCachedToneHash();
 
 		StringBuilder hashBuilder = new StringBuilder();
 		try {
@@ -158,26 +156,6 @@ public class ToneReaderWriter {
 
 		} catch (NoSuchAlgorithmException e) {
 			TWUtils.showError("Platform does not support MD5 algorithm!", true);
-			return null;
-		}
-
-		return hashBuilder.toString();
-	}
-	public boolean toneHashMatchesFile(File tone_file) {
-		String currentToneHash = getCurrentToneHash();
-		return currentToneHash.equals(getToneHash(tone_file, "\n"))
-				|| currentToneHash.equals(getToneHash(tone_file, "\r\n"));
-	}
-	private static String getToneHash(File tone_file, String line_endings) {
-		StringBuilder hashBuilder = new StringBuilder();
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-
-			byte[] hashBytes = md.digest(Files.readString(tone_file.toPath()).replaceAll("\\r?\\n", line_endings).getBytes());
-			for (byte b : hashBytes)
-				hashBuilder.append(String.format("%02x", b));
-		} catch (IOException | NoSuchAlgorithmException e) {
-			e.printStackTrace();
 			return null;
 		}
 
@@ -291,12 +269,12 @@ public class ToneReaderWriter {
 		return true;
 	}
 
-	private boolean tonesSimilar(String[] new_lines) {
-		if (new_lines.length != chantLines.size())
+	private boolean tonesSimilar(String[] chant_lines) {
+		if (chant_lines.length != chantLines.size())
 			return false;
 
 		int i = 0;
-		for (String line : new_lines) {
+		for (String line : chant_lines) {
 			if (!chantLines.get(i).isSimilarTo(line))
 				return false;
 
@@ -304,6 +282,13 @@ public class ToneReaderWriter {
 		}
 
 		return true;
+	}
+	public boolean loadedToneSimilarTo(File tone_file) throws IOException {
+		String toneString = Files.readString(tone_file.toPath());
+
+		String[] parts = toneString.split("\\r?\\n\\r?\\n\\r?\\n");
+
+		return tonesSimilar(parts[1].split("\\r?\\n\\r?\\n"));
 	}
 
 	private String tryReadingLine(String[] section, int line_index, String default_value) {
