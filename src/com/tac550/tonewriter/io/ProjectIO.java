@@ -249,7 +249,10 @@ public class ProjectIO {
 		try (PrintWriter writer = new PrintWriter(destination)) {
 
 			// General item data
+			File toneFile = controller.getToneFile();
+			writeLine(writer, toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
+			writeLine(writer, controller.getToneEdited()); // Tone edited status
 			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
 			writeLine(writer, controller.getSelectedTitleOption().getText(),
 					controller.getHideToneHeader(), controller.getPageBreak()); // Options line
@@ -353,7 +356,7 @@ public class ProjectIO {
 		}
 
 		// Collect project version information and warn if project file was created in a newer version.
-		boolean post0_8 = TWUtils.versionCompare(version, "0.8") == 1;
+		boolean versionsMatch = TWUtils.versionCompare(version, MainApp.APP_VERSION) == 0;
 		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
 					"This project was created with a newer version of %s (%s). Be advised you may encounter problems.",
@@ -389,9 +392,9 @@ public class ProjectIO {
 			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile)))) {
 
 				// Read in file data
-				if (!post0_8) readLine(reader);
+				File originalToneFile = new File(readLine(reader).get(0));
 				String toneHash = readLine(reader).get(0);
-				if (!post0_8) readLine(reader);
+				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);
 				List<String> options = readLine(reader);
 				List<String> topVerse = readLine(reader);
@@ -435,6 +438,9 @@ public class ProjectIO {
 
 					if (!toneHash.isEmpty())
 						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
+
+					if (versionsMatch && !edited)
+						ctr.tryChangingToneFile(originalToneFile);
 
 					ctr.setSubtitle(titleSubtitle.get(1));
 
