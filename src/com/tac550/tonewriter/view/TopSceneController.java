@@ -88,7 +88,7 @@ public class TopSceneController {
 	// File names and directories are kept separately to make exporting multiple items with the same name
 	// and different extensions easier.
 	String projectOutputFileName;
-	File projectSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
+	File defaultProjectDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
 			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 
 	private File projectFile;
@@ -378,7 +378,7 @@ public class TopSceneController {
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+			fileChooser.setInitialDirectory(defaultProjectDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File selectedFile = fileChooser.showOpenDialog(parentStage);
 		if (selectedFile == null) return;
@@ -405,7 +405,7 @@ public class TopSceneController {
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(projectSavingDirectory);
+			fileChooser.setInitialDirectory(defaultProjectDirectory);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return;
@@ -857,7 +857,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 
-		LilyPondInterface.exportItems(projectSavingDirectory, projectOutputFileName, projectTitle,
+		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
 				getTabControllers(), paperSize);
 
 	}
