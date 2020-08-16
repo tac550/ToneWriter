@@ -114,17 +114,18 @@ public class ProjectIO {
 		}
 
 		// Delete any leftover tones (tones required to open the project that are no longer in use)
-		try (Stream<Path> dirs = Files.list(new File(tempProjectDirectory.getAbsolutePath()
-				+ File.separator + "tones").toPath())) {
-			dirs.filter(path -> !uniqueHashes.contains(path.getFileName().toString()))
-					.forEach(path -> {
-						try { FileUtils.deleteDirectory(path.toFile()); } catch (IOException e) { e.printStackTrace();
-							TWUtils.showError("Failed to delete leftover tone " + path, false); }
-					});
-		} catch (IOException e) {
-			e.printStackTrace();
-			TWUtils.showError("Failed to delete leftover tone entries!", false);
-		}
+		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
+		if (tonesDir.exists())
+			try (Stream<Path> dirs = Files.list(tonesDir.toPath())) {
+				dirs.filter(path -> !uniqueHashes.contains(path.getFileName().toString()))
+						.forEach(path -> {
+							try { FileUtils.deleteDirectory(path.toFile()); } catch (IOException e) { e.printStackTrace();
+								TWUtils.showError("Failed to delete leftover tone " + path, false); }
+						});
+			} catch (IOException e) {
+				e.printStackTrace();
+				TWUtils.showError("Failed to delete leftover tone entries!", false);
+			}
 
 		// Delete any leftover items (necessary if items have been removed since last save/load)
 		try (Stream<Path> files = Files.list(new File(tempProjectDirectory.getAbsolutePath()
