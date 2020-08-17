@@ -14,6 +14,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -235,8 +236,8 @@ public class ProjectIO {
 			}
 
 			// Save to the file
-			try (FileWriter fileWriter = new FileWriter(save_file)) {
-				saveItemTo(fileWriter, controller, tone_hash);
+			try (OutputStream os = new FileOutputStream(save_file)) {
+				saveItemTo(new OutputStreamWriter(os, StandardCharsets.UTF_8), controller, tone_hash);
 			}
 
 		} catch (IOException e) {
@@ -388,7 +389,7 @@ public class ProjectIO {
 		for (int i = 0; i < numItems; i++) {
 			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
 					+ File.separator + i);
-			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile)))) {
+			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile, StandardCharsets.UTF_8)))) {
 
 				// Read in file data
 				File originalToneFile = new File(readLine(reader).get(0));
