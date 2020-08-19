@@ -59,7 +59,7 @@ public class ProjectIO {
 
 		// Add info file and save project metadata into it
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile, StandardCharsets.UTF_8))) {
 
 			writeLine(writer, MainApp.APP_VERSION);
 			writeLine(writer, top_controller.getProjectTitle());
@@ -346,7 +346,7 @@ public class ProjectIO {
 		int numItems;
 		String version;
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
-		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile))) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile, StandardCharsets.UTF_8))) {
 
 			version = readLine(reader).get(0);
 			top_controller.setProjectTitle(readLine(reader).get(0));
