@@ -1166,7 +1166,7 @@ public class MainSceneController {
 		return pageBreakMenuItem.isSelected();
 	}
 	public String getFinalTitleContent() {
-		return hiddenTitleMenuItem.isSelected() || topSceneController.getTabCount() == 1 ?
+		return hiddenTitleMenuItem.isSelected() || exportMode == ExportMode.ITEM ?
 				"" : titleTextField.getText();
 	}
 	public String getTitle() {
