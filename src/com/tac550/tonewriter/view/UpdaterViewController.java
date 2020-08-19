@@ -25,7 +25,7 @@ public class UpdaterViewController {
 	@FXML private WebView webView;
 
 	@FXML private Text updateStatusText;
-	@FXML private ChoiceBox<Float> versionChoiceBox;
+	@FXML private ChoiceBox<String> versionChoiceBox;
 
 	@FXML private Button updateButton;
 	@FXML private Button laterButton;
@@ -72,7 +72,7 @@ public class UpdaterViewController {
 	}
 
 	@FXML private void handleUpdate() {
-		result = versionChoiceBox.getSelectionModel().getSelectedItem().toString();
+		result = versionChoiceBox.getSelectionModel().getSelectedItem();
 		getStage().close();
 		AutoUpdater.downloadUpdate(result);
 	}
@@ -86,7 +86,7 @@ public class UpdaterViewController {
 		webView.getEngine().loadContent(page_text);
 	}
 
-	public void setVersionChoices(List<Float> versions) {
+	public void setVersionChoices(List<String> versions) {
 		if (versions.size() > 0) {
 			versionChoiceBox.getItems().setAll(versions);
 			versionChoiceBox.getSelectionModel().select(0);

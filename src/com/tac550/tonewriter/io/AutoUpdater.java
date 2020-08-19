@@ -57,7 +57,7 @@ public class AutoUpdater {
 					// Generate the changelog display HTML and store version numbers.
 					List<HtmlDivision> releaseHeaders = releasesPage.getByXPath("//div[@class='release-header']");
 					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
-					List<Float> releaseNumbers = new ArrayList<>();
+					List<String> releaseNumbers = new ArrayList<>();
 
 					StringBuilder finalHTMLBuilder = new StringBuilder();
 
@@ -66,9 +66,11 @@ public class AutoUpdater {
 					for (int i = 0; i < releaseHeaders.size(); i++) {
 						HtmlDivision header = releaseHeaders.get(i);
 						String releaseTitle = header.getElementsByTagName("a").get(0).getTextContent();
-						float releaseNumber = Float.parseFloat(releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", ""));
+						String releaseNumber = releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", "");
 
-						if (releaseNumber >= Float.parseFloat(MainApp.APP_VERSION)) {
+						int versionDiff = TWUtils.versionCompare(releaseNumber, MainApp.APP_VERSION);
+
+						if (versionDiff == 1 || versionDiff == 0) {
 							// Add the version heading to the output
 							finalHTMLBuilder.append("<h1>").append(releaseTitle).append("</h1>");
 
@@ -79,9 +81,8 @@ public class AutoUpdater {
 							finalHTMLBuilder.append(changelog);
 						}
 
-						if (releaseNumber > Float.parseFloat(MainApp.APP_VERSION)) {
+						if (versionDiff == 1)
 							releaseNumbers.add(releaseNumber);
-						}
 
 					}
 
