@@ -166,7 +166,9 @@ public class ToneReaderWriter {
 		this.mainScene = main_scene;
 
 		String firstRepeated = "";
-		float versionSaved;
+		String versionSaved;
+		boolean pre0_6;
+		boolean futureVersion;
 
 		try {
 
@@ -189,30 +191,33 @@ public class ToneReaderWriter {
 				footer = null;
 			}
 
-			versionSaved = Float.parseFloat(tryReadingLine(header, 0, "0"));
+			versionSaved = tryReadingLine(header, 0, "0");
+			pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
+			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION) == 1;
+
 			keySig = tryReadingLine(header, 1, "C major")
 					.replace("s", "\u266F").replace("f", "\u266D");
-			if (versionSaved < 0.6) {
+			if (pre0_6) {
 				composerText = tryReadingLine(header, 2, "");
 			} else {
 				poetText = tryReadingLine(header, 2, "");
 				composerText = tryReadingLine(header, 3, "");
 			}
 			associatedMainScene.setManualCLAssignmentSilently(
-					Boolean.parseBoolean(tryReadingLine(header, versionSaved < 0.6 ? 3 : 4, "false")));
+					Boolean.parseBoolean(tryReadingLine(header, pre0_6 ? 3 : 4, "false")));
 
 			if (footer != null) {
 				firstRepeated = tryReadingLine(footer, 0, "");
 			}
 
 			// Version warning
-			if (versionSaved > Float.parseFloat(MainApp.APP_VERSION)) {
+			if (futureVersion) {
 
 				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
 						"This tone was created with a newer version of %s (%s). Be advised you may encounter problems.",
 						MainApp.APP_NAME, versionSaved), true);
 
-			} else if (versionSaved == 0) {
+			} else if (versionSaved.equals("0")) {
 
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone file; it appears to be corrupted", true);
 
@@ -256,7 +261,7 @@ public class ToneReaderWriter {
 		}
 
 		mainScene.setKeySignature(keySig);
-		if (versionSaved < 0.6) {
+		if (pre0_6) {
 			String[] headerParts = composerText.split("-", 2);
 			mainScene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
 		} else {
