@@ -252,7 +252,14 @@ public class ProjectIO {
 
 			// General item data
 			File toneFile = controller.getToneFile();
-			writeLine(writer, toneFile != null ? controller.getToneFile().getAbsolutePath() : "");
+
+			// Original tone location; relative path if built-in.
+			String tonePath = controller.getToneFile().getAbsolutePath();
+			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
+			if (tonePath.startsWith(builtInPath))
+				tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
+			writeLine(writer, toneFile != null ? tonePath : "");
+
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
 			writeLine(writer, controller.getToneEdited()); // Tone edited status
 			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
@@ -393,7 +400,8 @@ public class ProjectIO {
 			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile, StandardCharsets.UTF_8)))) {
 
 				// Read in file data
-				File originalToneFile = new File(readLine(reader).get(0));
+				File originalToneFile = new File(readLine(reader).get(0)
+						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath()));
 				String toneHash = readLine(reader).get(0);
 				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);
