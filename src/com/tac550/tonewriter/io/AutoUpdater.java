@@ -278,10 +278,13 @@ public class AutoUpdater {
 			String pid = bean.getName().split("@")[0];
 
 			try {
+				String installDest = userDir.getParentFile().getParentFile().getAbsolutePath();
+				if (TWUtils.versionCompare(System.getProperty("os.version"), "10.15.0") < 2)
+					installDest = "/System/Volumes/Data" + installDest;
+
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
 				String[] cmdlist = new String[] {"osascript", "-e", String.format("do shell script \"%s\" with administrator privileges", String.join(" ",
-						new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(),
-								userDir.getParentFile().getParentFile().getAbsolutePath()}))};
+						new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), installDest}))};
 				Runtime.getRuntime().exec(cmdlist);
 			} catch (IOException e) {
 				e.printStackTrace();
