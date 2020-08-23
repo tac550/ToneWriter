@@ -39,7 +39,7 @@ public class ProjectIO {
 		TWUtils.cleanUpAutosaves();
 
 		// Create temp directory in which to construct the final compressed project file
-		if (tempProjectDirectory == null) {
+		if (tempProjectDirectory == null || !tempProjectDirectory.exists()) {
 			try {
 				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" +
 						TWUtils.replaceInvalidFileChars(top_controller.getProjectTitle(), "_"));
