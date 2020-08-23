@@ -162,7 +162,7 @@ public class ToneReaderWriter {
 		return hashBuilder.toString();
 	}
 
-	public boolean loadTone(MainSceneController main_scene, File toneFile) {
+	public boolean loadTone(File toneFile, MainSceneController main_scene) {
 		this.mainScene = main_scene;
 
 		String firstRepeated = "";

@@ -610,7 +610,7 @@ public class MainSceneController {
 			ToneReaderWriter toneReader = getToneReader();
 
 			loadingTone = true;
-			if (toneReader.loadTone(this, toneFile)) {
+			if (toneReader.loadTone(toneFile, this)) {
 				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
 
 				loadingTone = false;
