@@ -725,8 +725,6 @@ public class TopSceneController {
 	void autoSaveProjectIfUnsaved() {
 		TWUtils.cleanUpAutosaves();
 
-		if (projectFile != null) return;
-
 		try {
 			String titleFileName = TWUtils.replaceInvalidFileChars(getProjectTitle(), "_") + "-";
 			projectIO.saveProject(
