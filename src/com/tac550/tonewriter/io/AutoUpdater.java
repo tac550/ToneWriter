@@ -273,7 +273,7 @@ public class AutoUpdater {
 				return;
 			}
 
-			// Get PID representing this process's JVM.
+			// Get PID representing this process's JVM. TODO: Switch to new Process API long pid = ProcessHandle.current().pid();
 			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
 			String pid = bean.getName().split("@")[0];
 
@@ -318,7 +318,7 @@ public class AutoUpdater {
 				return;
 			}
 
-			// Get PID representing this process's JVM.
+			// Get PID representing this process's JVM. TODO: Switch to new Process API long pid = ProcessHandle.current().pid();
 			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
 			String pid = bean.getName().split("@")[0];
 

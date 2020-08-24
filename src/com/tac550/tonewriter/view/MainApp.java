@@ -30,20 +30,25 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class MainApp extends Application {
 
@@ -96,7 +101,12 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		TWUtils.cleanUpTempFiles();
+		if (!isAnotherAppInstanceRunning())
+			TWUtils.cleanUpTempFiles();
+
+		System.out.println(isAnotherAppInstanceRunning());
+		establishFileLock();
+		System.out.println(isAnotherAppInstanceRunning());
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
@@ -150,7 +160,9 @@ public class MainApp extends Application {
 	 */
 	@Override
 	public void stop() {
-		TWUtils.cleanUpTempFiles();
+		if (!isAnotherAppInstanceRunning())
+			TWUtils.cleanUpTempFiles();
+
 		MidiInterface.closeMidiSystem();
 	}
 
@@ -271,7 +283,7 @@ public class MainApp extends Application {
 			Platform.exit();
 		}
 
-		setDarkModeEnabled(darkModeEnabled);
+		initializeDarkMode(darkModeEnabled);
 	}
 
 	public static boolean lilyPondAvailable() {
@@ -335,6 +347,14 @@ public class MainApp extends Application {
 
 		topSceneController.propagateDarkModeSetting();
 
+	}
+	private static void initializeDarkMode(boolean dark_mode) {
+		darkModeEnabled = dark_mode;
+
+		if (dark_mode) setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
+		else setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+
+		topSceneController.propagateDarkModeSetting();
 	}
 
 	private static boolean getSystemDarkMode() {
@@ -598,6 +618,44 @@ public class MainApp extends Application {
 				}
 			});
 		});
+	}
+
+	private static void establishFileLock() {
+		String pid = String.valueOf(ProcessHandle.current().pid());
+
+		try {
+			Files.write(TWUtils.createTWTempFile("", "FileLock").toPath(), List.of(pid));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private static boolean isAnotherAppInstanceRunning() {
+		boolean instanceRunning = false;
+
+		Set<Long> livePIDs = ProcessHandle.allProcesses()
+				.filter(ProcessHandle::isAlive)
+				.map(ProcessHandle::pid)
+				.collect(Collectors.toSet());
+
+		try {
+			Set<Path> fileLocks = Files.list(Path.of(System.getProperty("java.io.tmpdir")))
+					.filter(Files::isRegularFile)
+					.filter(path -> FilenameUtils.removeExtension(path.getFileName().toString()).endsWith("-FileLock"))
+					.collect(Collectors.toSet());
+
+			for (Path path : fileLocks) {
+				long pid = Long.parseLong(Files.readString(path).strip());
+				if (!livePIDs.contains(pid))
+					Files.delete(path);
+				else if (pid != ProcessHandle.current().pid())
+					instanceRunning = true;
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return instanceRunning;
 	}
 
 }
