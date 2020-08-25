@@ -101,7 +101,7 @@ public class MainApp extends Application {
 
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		if (!isAnotherAppInstanceRunning())
+		if (noOtherAppInstanceRunning())
 			TWUtils.cleanUpTempFiles();
 
 		establishFileLock();
@@ -158,7 +158,7 @@ public class MainApp extends Application {
 	 */
 	@Override
 	public void stop() {
-		if (!isAnotherAppInstanceRunning())
+		if (noOtherAppInstanceRunning())
 			TWUtils.cleanUpTempFiles();
 
 		MidiInterface.closeMidiSystem();
@@ -627,7 +627,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 	}
-	private static boolean isAnotherAppInstanceRunning() {
+	private static boolean noOtherAppInstanceRunning() {
 		boolean instanceRunning = false;
 
 		Set<Long> livePIDs = ProcessHandle.allProcesses()
@@ -653,7 +653,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
-		return instanceRunning;
+		return !instanceRunning;
 	}
 
 }
