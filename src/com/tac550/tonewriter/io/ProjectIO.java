@@ -393,6 +393,15 @@ public class ProjectIO {
 		}
 		String[] itemSources = LPSource.split("(?=\n%.*\n)");
 
+		// Adjust loaded cached item sources for changes in output rules
+		// Pre-0.9: Remove negative vspace from bottom verse, if any.
+		if (TWUtils.versionCompare(version, "0.9") == 2)
+			itemSources = Arrays.stream(itemSources)
+					.map(item -> item.replace("  \\vspace #-1", ""))
+					.toArray(String[]::new);
+
+		System.out.println(Arrays.asList(itemSources));
+
 		// Load however many items are in the save file
 		for (int i = 0; i < numItems; i++) {
 			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"

@@ -261,7 +261,7 @@ public class LilyPondInterface {
 		// Bottom verse, if any
 		if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, "\\noPageBreak\n",
-					"\\markup \\column {" + (createStaff ? "\n  \\vspace #-1" : ""),
+					"\\markup \\column {",
 					String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
 							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getBottomVerse())),
 					"}\n");

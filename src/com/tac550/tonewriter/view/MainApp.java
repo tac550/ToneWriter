@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "0.8";
+	public static final String APP_VERSION = "0.9";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -104,9 +104,7 @@ public class MainApp extends Application {
 		if (!isAnotherAppInstanceRunning())
 			TWUtils.cleanUpTempFiles();
 
-		System.out.println(isAnotherAppInstanceRunning());
 		establishFileLock();
-		System.out.println(isAnotherAppInstanceRunning());
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac")) {
