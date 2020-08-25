@@ -400,8 +400,6 @@ public class ProjectIO {
 					.map(item -> item.replace("  \\vspace #-1", ""))
 					.toArray(String[]::new);
 
-		System.out.println(Arrays.asList(itemSources));
-
 		// Load however many items are in the save file
 		for (int i = 0; i < numItems; i++) {
 			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
