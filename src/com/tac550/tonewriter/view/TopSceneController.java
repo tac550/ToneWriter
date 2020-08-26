@@ -258,7 +258,7 @@ public class TopSceneController {
 			// Finish loading the tab if not already done.
 			selectedController.runPendingLoadActions();
 
-			updateStageTitleIfPossible();
+			updateStageTitle();
 			selectedController.applyToneMenuState();
 		});
 
@@ -352,9 +352,9 @@ public class TopSceneController {
 
 		Optional<String> result = dialog.showAndWait();
 
-		if (result.isPresent()) {
+		if (result.isPresent() && !result.get().equals(projectTitle)) {
 			setProjectTitle(result.get());
-			updateStageTitleIfPossible();
+			projectEdited();
 		}
 	}
 
@@ -758,18 +758,18 @@ public class TopSceneController {
 	void projectEdited() {
 		if (!projectEdited) {
 			projectEdited = true;
-			updateStageTitleIfPossible();
+			updateStageTitle();
 		}
 	}
 	public void resetProjectEditedStatus() {
 		projectEdited = false;
-		updateStageTitleIfPossible();
+		updateStageTitle();
 	}
 	public boolean getProjectEdited() {
 		return projectEdited;
 	}
 
-	private void updateStageTitleIfPossible() {
+	private void updateStageTitle() {
 		MainSceneController selectedTabScene = getSelectedTabScene();
 		if (selectedTabScene != null)
 			selectedTabScene.updateStageTitle();
