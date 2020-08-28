@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 0.9
 Key Signature: G major
 Tone: Tone 8
 Composer: L'vov/Bakhmetev - Imperial Court Chant
@@ -22,8 +22,8 @@ Final
 3: c'-g-e-c
 	Post: c'-g-e-e
 4: b-g-d-g
-5: a-fs-c-d
-END: g-d-b,-<g g,>
+5: c'-<a fs>-d-d
+END: b-g-d-<g g,>
 
 
 First Repeated: 
