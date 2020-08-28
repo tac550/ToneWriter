@@ -969,7 +969,8 @@ public class MainSceneController {
 				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle(),
 				"_"
 		));
-		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory : topSceneController.defaultProjectDirectory);
+		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
+				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));

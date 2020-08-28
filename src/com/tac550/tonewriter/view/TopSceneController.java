@@ -718,6 +718,9 @@ public class TopSceneController {
 		projectTitle = title;
 	}
 
+	public File getProjectFile() {
+		return projectFile;
+	}
 	public String getProjectFileName() {
 		return projectFile != null ? projectFile.getName() : "Unsaved Project";
 	}
