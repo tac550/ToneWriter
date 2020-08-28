@@ -15,7 +15,7 @@ noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \
 \paper {
   print-all-headers = ##t
   oddHeaderMarkup = \markup {
-    \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:instrument ""} }
+    \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:instrument "" } }
   evenHeaderMarkup = \oddHeaderMarkup
   ragged-bottom = ##t
 }
