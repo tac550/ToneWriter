@@ -254,11 +254,11 @@ public class ProjectIO {
 			File toneFile = controller.getToneFile();
 
 			// Original tone location; relative path if built-in.
-			String tonePath = controller.getToneFile().getAbsolutePath();
+			String tonePath = toneFile != null ? toneFile.getAbsolutePath() : "";
 			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
 			if (tonePath.startsWith(builtInPath))
 				tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
-			writeLine(writer, toneFile != null ? tonePath : "");
+			writeLine(writer, tonePath);
 
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
 			writeLine(writer, controller.getToneEdited()); // Tone edited status
