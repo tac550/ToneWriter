@@ -157,6 +157,7 @@ public class MainSceneController {
 			box.getItems().add("Reader:");
 			box.getItems().add("Sing:");
 			box.getItems().add("Priest:");
+			box.getItems().add("Deacon:");
 			box.getItems().add("v:");
 			box.getSelectionModel().select(0);
 		});
