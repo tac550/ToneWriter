@@ -899,7 +899,7 @@ public class MainSceneController {
 	}
 	void chantLineDown(ChantLineViewController chantLineViewController) {
 		int i = chantLineControllers.indexOf(chantLineViewController);
-		int j = i+1;
+		int j = i + 1;
 
 		ObservableList<Node> workingCollection = FXCollections.observableArrayList(chantLineBox.getChildren());
 		Collections.swap(workingCollection, i, j);
