@@ -156,6 +156,7 @@ public class MainSceneController {
 		Stream.of(topVerseChoice, bottomVerseChoice).forEach(box -> {
 			box.getItems().add("Reader:");
 			box.getItems().add("Sing:");
+			box.getItems().add("Clergy:");
 			box.getItems().add("Priest:");
 			box.getItems().add("Deacon:");
 			box.getItems().add("v:");
