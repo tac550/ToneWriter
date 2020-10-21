@@ -23,6 +23,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -253,6 +254,9 @@ public class ProjectIO {
 			// General item data
 			File toneFile = controller.getToneFile();
 
+			// Version info
+			writeLine(writer, MainApp.APP_VERSION);
+
 			// Original tone location; relative path if built-in.
 			String tonePath = toneFile != null ? toneFile.getAbsolutePath() : "";
 			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
@@ -263,8 +267,8 @@ public class ProjectIO {
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
 			writeLine(writer, controller.getToneEdited()); // Tone edited status
 			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
-			writeLine(writer, controller.getSelectedTitleOption().getText(),
-					controller.getHideToneHeader(), controller.getPageBreak()); // Options line
+			writeLine(writer, controller.getSelectedTitleOption().getText(), // Options
+					controller.getHideToneHeader(), controller.getPageBreak(), controller.getExtendTextSelection());
 			writeLine(writer, controller.getTopVerseChoice(), controller.getTopVerse()); // Top verse
 			writeLine(writer, TWUtils.encodeNewLines(controller.getVerseAreaText())); // Verse area text
 			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
@@ -351,11 +355,11 @@ public class ProjectIO {
 
 		// Gather project metadata from info file
 		int numItems;
-		String version;
+		String projectVersion;
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile, StandardCharsets.UTF_8))) {
 
-			version = readLine(reader).get(0);
+			projectVersion = readLine(reader).get(0);
 			top_controller.setProjectTitle(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
 
@@ -366,10 +370,10 @@ public class ProjectIO {
 
 		// Opening project files from future versions is unsupported because the lazy saving system is likely to corrupt
 		// project files for users of newer versions.
-		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
+		if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
 					"This project can only be opened in %s version %s or newer.",
-					MainApp.APP_NAME, version), true);
+					MainApp.APP_NAME, projectVersion), true);
 			return false;
 		}
 
@@ -397,7 +401,7 @@ public class ProjectIO {
 
 		// Adjust loaded cached item sources for changes in output rules
 		// Pre-0.9: Remove negative vspace from bottom verse, if any.
-		if (TWUtils.versionCompare(version, "0.9") == 2)
+		if (TWUtils.versionCompare(projectVersion, "0.9") == 2)
 			itemSources = Arrays.stream(itemSources)
 					.map(item -> item.replace("  \\vspace #-1", ""))
 					.toArray(String[]::new);
@@ -408,8 +412,20 @@ public class ProjectIO {
 					+ File.separator + i);
 			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile, StandardCharsets.UTF_8)))) {
 
-				// Read in file data
-				File originalToneFile = new File(readLine(reader).get(0)
+				String itemVersion;
+				String origToneFilePath;
+
+				// If the first entry in the item is not a version number, we have a pre-1.0 project file.
+				String firstLine = readLine(reader).get(0);
+				if (Pattern.compile("^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$").matcher(firstLine).matches()) {
+					itemVersion = firstLine;
+					origToneFilePath = readLine(reader).get(0);
+				} else {
+					itemVersion = "0.9";
+					origToneFilePath = firstLine;
+				}
+
+				File originalToneFile = new File(origToneFilePath
 						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath()));
 				String toneHash = readLine(reader).get(0);
 				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
@@ -472,8 +488,11 @@ public class ProjectIO {
 
 					ctr.setSubtitle(titleSubtitle.get(1));
 
+					// Before 1.0: No extended text option.
+					int extText = TWUtils.versionCompare("1.0", itemVersion) == 1 ? 0 : Integer.parseInt(options.get(3));
+
 					ctr.setOptions(options.get(0), Boolean.parseBoolean(options.get(1)),
-							Boolean.parseBoolean(options.get(2)));
+							Boolean.parseBoolean(options.get(2)), extText);
 
 					ctr.setTopVerseChoice(topVerse.get(0));
 					ctr.setTopVerse(topVerse.get(1));

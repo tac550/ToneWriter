@@ -103,6 +103,9 @@ public class MainSceneController {
 	@FXML private CheckMenuItem hideToneHeaderMenuItem;
 	@FXML private CheckMenuItem pageBreakMenuItem;
 
+	@FXML private CheckMenuItem extendTextTopMenuItem;
+	@FXML private CheckMenuItem extendTextBottomMenuItem;
+
 	private final ToneMenuState toneMenuState = new ToneMenuState();
 
 	private Consumer<MainSceneController> pendingLoadActions;
@@ -234,6 +237,24 @@ public class MainSceneController {
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_ENTERED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#57969c, #61a2b1);"));
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_EXITED, ev -> openToneHintButton.setStyle("-fx-background-color: linear-gradient(#61a2b1, #61b0b1);"));
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> openToneHintButton.fire());
+
+		// Selecting either extended text option deselects the other and highlights verse field it's replacing.
+		extendTextTopMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+			if (newVal) {
+				extendTextBottomMenuItem.setSelected(false);
+				topVerseField.setStyle("-fx-base: #FF0000");
+			} else {
+				topVerseField.setStyle("");
+			}
+		});
+		extendTextBottomMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+			if (newVal) {
+				extendTextTopMenuItem.setSelected(false);
+				bottomVerseField.setStyle("-fx-base: #FF0000");
+			} else {
+				bottomVerseField.setStyle("");
+			}
+		});
 
 		// listeners for triggering project edited status
 		titleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
@@ -1168,6 +1189,9 @@ public class MainSceneController {
 	public boolean getPageBreak() {
 		return pageBreakMenuItem.isSelected();
 	}
+	public int getExtendTextSelection() { // Only one is selected at a time, so 3 = both is not expected.
+		return (extendTextTopMenuItem.isSelected() ? 1 : 0) + (extendTextBottomMenuItem.isSelected() ? 2 : 0);
+	}
 	public String getFinalTitleContent() {
 		return hiddenTitleMenuItem.isSelected() || exportMode == ExportMode.ITEM ?
 				"" : titleTextField.getText();
@@ -1184,11 +1208,15 @@ public class MainSceneController {
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
 	}
-	public void setOptions(String title_format, boolean hide_header, boolean page_break) {
+	public void setOptions(String title_format, boolean hide_header, boolean page_break, int extended_text) {
 		titleOptions.selectToggle(titleOptions.getToggles().stream()
 				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_format)).toArray(Toggle[]::new)[0]);
 		hideToneHeaderMenuItem.setSelected(hide_header);
 		pageBreakMenuItem.setSelected(page_break);
+		switch (extended_text) {
+			case 1 -> extendTextTopMenuItem.setSelected(true);
+			case 2 -> extendTextBottomMenuItem.setSelected(true);
+		}
 	}
 	public String getLeftHeaderText() {
 		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;

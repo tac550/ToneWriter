@@ -118,6 +118,22 @@
                                              </content>
                                           </CustomMenuItem>
                                           <CheckMenuItem fx:id="pageBreakMenuItem" mnemonicParsing="false" text="Page break before item" />
+                                          <CustomMenuItem mnemonicParsing="false" text="Extended Text Separator">
+                                             <content>
+                                                <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
+                                                   <children>
+                                                      <Text fill="#bcbcbc" strokeType="OUTSIDE" strokeWidth="0.0" text="Extended Text" />
+                                                      <Line endX="999.0" stroke="#bcbcbc">
+                                                         <HBox.margin>
+                                                            <Insets left="5.0" right="5.0" />
+                                                         </HBox.margin>
+                                                      </Line>
+                                                   </children>
+                                                </HBox>
+                                             </content>
+                                          </CustomMenuItem>
+                                          <CheckMenuItem fx:id="extendTextTopMenuItem" mnemonicParsing="false" text="Extend top text" />
+                                          <CheckMenuItem fx:id="extendTextBottomMenuItem" mnemonicParsing="false" text="Extend bottom text" />
                                        </items>
                                     </MenuButton>
                                     <TextField fx:id="titleTextField" alignment="CENTER" promptText="Title" HBox.hgrow="ALWAYS">

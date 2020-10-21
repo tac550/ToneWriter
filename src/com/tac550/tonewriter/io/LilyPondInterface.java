@@ -202,10 +202,11 @@ public class LilyPondInterface {
 			lines.add("\\pageBreak\n");
 
 		// Top verse, if any
-		if (!item.getTopVerse().isEmpty()) {
+		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
 			Collections.addAll(lines, "\\markup \\column {",
-					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #0.5",
-							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getTopVerse())),
+					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
+							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 1 ?
+									generateExtendedText(item.getVerseAreaText()) : (item.getTopVerse() + " } "))),
 					"}\n", "\\noPageBreak\n");
 		}
 
@@ -218,7 +219,7 @@ public class LilyPondInterface {
 				"    instrument = \"\"",
 				"  }\n");
 
-		// Perform layout process
+		// Perform layout procedure
 		String[] results = computeNotationSource(item.getVerseLineControllers());
 
 		// Create staff only if note data is present
@@ -259,11 +260,12 @@ public class LilyPondInterface {
 					"}\n");
 
 		// Bottom verse, if any
-		if (!item.getBottomVerse().isEmpty()) {
+		if (!item.getBottomVerse().isEmpty() || item.getExtendTextSelection() == 2) {
 			Collections.addAll(lines, "\\noPageBreak\n",
 					"\\markup \\column {",
-					String.format("  \\justify { \\halign #-1 \\bold {%s} %s} \\vspace #1",
-							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getBottomVerse())),
+					String.format("  \\justify { \\halign #-1 \\bold {%s} %s \\vspace #1",
+							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 2 ?
+									generateExtendedText(item.getVerseAreaText()) : (item.getBottomVerse() + " } "))),
 					"}\n");
 		}
 
@@ -271,6 +273,22 @@ public class LilyPondInterface {
 			lines.add("\\markup \\column {\\vspace #0.5 }\n");
 
 		return String.join("\n", lines);
+	}
+
+	private static String generateExtendedText(String text_area_content) {
+		StringBuilder extendedText = new StringBuilder();
+
+		String[] lines = text_area_content.split("\n");
+
+		for (int i = 0; i < lines.length; i++) {
+			if (lines[i].isEmpty()) {
+				extendedText.append(i == 0 ? "} " : "").append("\\null ");
+			} else {
+				extendedText.append(i == 0 ? "" : "\\justify { ").append(lines[i]).append(" } ");
+			}
+		}
+
+		return extendedText.toString();
 	}
 
 	private static String[] computeNotationSource(List<VerseLineViewController> verse_lines) {
