@@ -364,11 +364,13 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Collect project version information and warn if project file was created in a newer version.
+		// Opening project files from future versions is unsupported because the lazy saving system is likely to corrupt
+		// project files for users of newer versions.
 		if (TWUtils.versionCompare(version, MainApp.APP_VERSION) == 1) {
 			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
-					"This project was created with a newer version of %s (%s). Be advised you may encounter problems.",
+					"This project can only be opened in %s version %s or newer.",
 					MainApp.APP_NAME, version), true);
+			return false;
 		}
 
 		// Gather references to tone files
