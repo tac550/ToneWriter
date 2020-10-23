@@ -6,12 +6,11 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import org.apache.commons.io.FilenameUtils;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -201,24 +200,6 @@ public class LilyPondInterface {
 		if (item.getPageBreak())
 			lines.add("\\pageBreak\n");
 
-		// Top verse, if any
-		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
-			Collections.addAll(lines, "\\markup \\column {",
-					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
-							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 1 ?
-									generateExtendedText(item.getVerseAreaText()) : (item.getTopVerse() + " } "))),
-					"}\n", "\\noPageBreak\n");
-		}
-
-		// Score header
-		Collections.addAll(lines, "\\score {\n", "  \\header {",
-				String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getFinalTitleContent())),
-				String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getSubtitle())),
-				String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
-				String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
-				"    instrument = \"\"",
-				"  }\n");
-
 		// Perform layout procedure
 		String[] results = computeNotationSource(item.getVerseLineControllers());
 
@@ -235,7 +216,36 @@ public class LilyPondInterface {
 			}
 		}
 
-		if (createStaff)
+		// Manual title markup goes here, if not hidden and if there is no staff.
+		if (!createStaff && !item.getFinalTitleContent().isEmpty()) {
+			Collections.addAll(lines, "\\markup \\column {",
+					String.format("  \\fill-line \\bold %s{\\justify { %s } }",
+							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())),
+					String.format("  \\fill-line {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
+					"}\n");
+		}
+
+		// Top verse, if any
+		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
+			Collections.addAll(lines, "\\markup \\column {",
+					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
+							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 1 ?
+									generateExtendedText(item.getVerseAreaText()) : (item.getTopVerse() + " } "))),
+					"}\n",
+					createStaff ? "\\noPageBreak\n" : "");
+		}
+
+		if (createStaff) {
+			// Score header
+			Collections.addAll(lines, "\\score {\n", "  \\header {",
+					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getFinalTitleContent())),
+					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getSubtitle())),
+					String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
+					String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
+					"    instrument = \"\"",
+					"  }\n");
+
+
 			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
 					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
 					"      midiInstrument = #\"choir aahs\"", "    } <<",
@@ -255,22 +265,20 @@ public class LilyPondInterface {
 					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
 					"      \\accidentalStyle neo-modern-voice-cautionary",
 					"    }", "  }", "}\n");
-		else
-			Collections.addAll(lines, "\\lyricmode {}",
-					"}\n");
+
+		} else {
+			lines.add("\\markup \\column { \\vspace #0.5 }\n");
+		}
 
 		// Bottom verse, if any
 		if (!item.getBottomVerse().isEmpty() || item.getExtendTextSelection() == 2) {
-			Collections.addAll(lines, "\\noPageBreak\n",
+			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
 					"\\markup \\column {",
 					String.format("  \\justify { \\halign #-1 \\bold {%s} %s \\vspace #1",
 							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 2 ?
 									generateExtendedText(item.getVerseAreaText()) : (item.getBottomVerse() + " } "))),
 					"}\n");
 		}
-
-		if (!createStaff)
-			lines.add("\\markup \\column {\\vspace #0.5 }\n");
 
 		return String.join("\n", lines);
 	}
