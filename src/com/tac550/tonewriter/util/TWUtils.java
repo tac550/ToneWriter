@@ -154,7 +154,7 @@ public class TWUtils {
 		if (files == null) return;
 		for (File file : files) {
 			String fileNameNoExtension = FilenameUtils.removeExtension(file.getName());
-			if (fileNameNoExtension.endsWith("-Autosave") && ! with_postfix.equals("-Autosave")) continue;
+			if (fileNameNoExtension.endsWith("-Autosave") && !with_postfix.equals("-Autosave")) continue;
 			if (file.getName().startsWith(MainApp.APP_NAME) && fileNameNoExtension.endsWith(with_postfix)) {
 				try {
 					if (file.isDirectory())

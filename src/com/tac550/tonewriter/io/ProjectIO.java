@@ -311,6 +311,8 @@ public class ProjectIO {
 			return false;
 		}
 
+		deleteTempDir();
+
 		// Create temp directory to unzip project into
 		try {
 			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + project_file.getName());
@@ -616,7 +618,7 @@ public class ProjectIO {
 	}
 
 	// Guards against a known Zip vulnerability
-	private File checkExtractionDestination(File dest_dir, ZipEntry zip_entry) throws IOException {
+	private static File checkExtractionDestination(File dest_dir, ZipEntry zip_entry) throws IOException {
 		File destFile = new File(dest_dir, zip_entry.getName());
 
 		String destDirPath = dest_dir.getCanonicalPath();
@@ -627,6 +629,17 @@ public class ProjectIO {
 		}
 
 		return destFile;
+	}
+
+	// Remove existing temp directory, if any.
+	private void deleteTempDir() {
+		if (tempProjectDirectory != null && tempProjectDirectory.exists()) {
+			try {
+				FileUtils.deleteDirectory(tempProjectDirectory);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private List<String> readLine(BufferedReader reader) throws IOException {
