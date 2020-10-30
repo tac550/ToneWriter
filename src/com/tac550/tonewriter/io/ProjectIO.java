@@ -42,8 +42,7 @@ public class ProjectIO {
 		// Create temp directory in which to construct the final compressed project file
 		if (tempProjectDirectory == null || !tempProjectDirectory.exists()) {
 			try {
-				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" +
-						TWUtils.replaceInvalidFileChars(top_controller.getProjectTitle(), "_"));
+				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_file.getName());
 			} catch (IOException e) {
 				TWUtils.showError("Failed to create temp directory for project save!", true);
 				return false;
@@ -314,7 +313,7 @@ public class ProjectIO {
 
 		// Create temp directory to unzip project into
 		try {
-			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + top_controller.getProjectTitle());
+			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + project_file.getName());
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create temp directory for project load!", true);
 			return false;
