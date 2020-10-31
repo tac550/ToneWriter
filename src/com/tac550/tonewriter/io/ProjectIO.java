@@ -103,12 +103,14 @@ public class ProjectIO {
 					+ File.separator + index);
 
 			if (controller.fullyLoaded()) {
+				System.out.printf("Saving loaded item %d, title: %s%n", index, controller.getTitle());
 				saveItemToFile(itemSaveFile, controller, toneHash);
 			} else {
+				System.out.printf("Saving cached item %d from index: %s%n", index, controller.getOriginalIndex());
 				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
 						+ File.separator + controller.getOriginalIndex());
 
-				copyFile(itemSaveFile.toPath(), oldItem.toPath());
+				saveCachedItem(itemSaveFile.toPath(), oldItem.toPath());
 			}
 
 			index++;
@@ -213,12 +215,12 @@ public class ProjectIO {
 		return true;
 	}
 
-	private void copyFile(Path save_file, Path source_file) {
+	private void saveCachedItem(Path save_file, Path source_file) {
 		try {
 			Files.copy(source_file, save_file, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
-			TWUtils.showError("Failed to save item from backup!", false);
+			TWUtils.showError("Failed to save item from cache!", false);
 		}
 	}
 	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
@@ -465,6 +467,8 @@ public class ProjectIO {
 					syllableLines.add(lineSyllables);
 					assignmentLines.add(lineAssignments);
 				}
+
+				System.out.printf("Loading item %d, title: %s%n", i, titleSubtitle.get(0));
 
 				// Create and set up item tab
 				int finalI = i;

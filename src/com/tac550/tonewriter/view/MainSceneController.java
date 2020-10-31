@@ -113,7 +113,7 @@ public class MainSceneController {
 	private Robot robot;
 
 	private File toneFile;
-	private int originalIndex;
+	private int originalIndex = -1;
 	private String cachedItemSource = "";
 	private String cachedToneHash = "";
 
