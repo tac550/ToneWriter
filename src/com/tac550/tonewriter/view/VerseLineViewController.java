@@ -392,8 +392,6 @@ public class VerseLineViewController {
 			chordEntryText.setFill(Color.BLACK);
 			skipChordButton.setDisable(true);
 
-			topController.autoSaveProjectIfUnsaved();
-
 			for (Node syllable : lineTextFlow.getChildren()) { // Disable all syllables
 				((SyllableText) syllable).deactivate();
 			}
@@ -495,8 +493,14 @@ public class VerseLineViewController {
 
 	}
 
-	@FXML public void skipChord() {
-		// Set up an undo action frame to store what happens.
+	@FXML private void skipChordAction() {
+		skipChord();
+
+		if (doneAssigning)
+			topController.autoSaveProjectIfUnsaved();
+	}
+	public void skipChord() {
+		// Set up an undo action frame
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = nextChordIndex - 1;
@@ -517,7 +521,7 @@ public class VerseLineViewController {
 			getCurrentChord().playMidi();
 		}
 
-		// Set up an undo action frame to store what happens.
+		// Set up an undo action frame
 		AssignmentAction undoFrame = new AssignmentAction();
 		undoFrame.previousLastSyllableAssigned = lastSyllableAssigned;
 		undoFrame.previousChordIndex = nextChordIndex - 1;
@@ -556,6 +560,9 @@ public class VerseLineViewController {
 
 		lastSyllableAssigned = last_syll;
 		nextChordAssignment();
+
+		if (!silent && doneAssigning)
+			topController.autoSaveProjectIfUnsaved();
 
 		undoActions.push(undoFrame);
 	}

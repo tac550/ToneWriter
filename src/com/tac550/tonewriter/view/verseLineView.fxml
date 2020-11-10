@@ -33,7 +33,7 @@
                <children>
                   <Text fx:id="chordEntryText" strokeType="OUTSIDE" strokeWidth="0.0" />
                   <ChoiceBox fx:id="tonePhraseChoice" />
-                  <Button fx:id="skipChordButton" mnemonicParsing="false" onAction="#skipChord" text="Skip Chord" />
+                  <Button fx:id="skipChordButton" mnemonicParsing="false" onAction="#skipChordAction" text="Skip Chord" />
                </children>
             </FlowPane>
             <ScrollPane fx:id="syllableScrollPane" fitToHeight="true" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
