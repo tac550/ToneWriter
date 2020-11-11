@@ -480,7 +480,7 @@ public class ProjectIO {
 
 					try {
 						if (originalToneFile.exists() && (ctr.getToneWriter().loadedToneSimilarTo(originalToneFile)
-							|| edited)) {
+								|| edited)) {
 							ctr.swapToneFile(originalToneFile);
 						}
 					} catch (IOException e) {
