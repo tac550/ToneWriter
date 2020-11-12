@@ -103,14 +103,15 @@ public class ProjectIO {
 					+ File.separator + index);
 
 			if (controller.fullyLoaded()) {
-				System.out.printf("Saving loaded item %d, title: %s%n", index, controller.getTitle());
 				saveItemToFile(itemSaveFile, controller, toneHash);
 			} else {
-				System.out.printf("Saving cached item %d from index: %s%n", index, controller.getOriginalIndex());
 				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
 						+ File.separator + controller.getOriginalIndex());
 
 				saveCachedItem(itemSaveFile.toPath(), oldItem.toPath());
+
+				// Update old item index to current index value
+				controller.setOriginalIndex(index);
 			}
 
 			index++;
@@ -467,8 +468,6 @@ public class ProjectIO {
 					syllableLines.add(lineSyllables);
 					assignmentLines.add(lineAssignments);
 				}
-
-				System.out.printf("Loading item %d, title: %s%n", i, titleSubtitle.get(0));
 
 				// Create and set up item tab
 				int finalI = i;
