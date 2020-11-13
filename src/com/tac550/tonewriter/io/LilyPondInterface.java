@@ -902,7 +902,8 @@ public class LilyPondInterface {
 					lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
 		} else {
 			pr = rt.exec(new String[]{MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
-					renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
+					renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
+					"-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
 					lilypondFile.getAbsolutePath()});
 		}
 
