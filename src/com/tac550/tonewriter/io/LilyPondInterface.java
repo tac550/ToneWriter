@@ -896,9 +896,14 @@ public class LilyPondInterface {
 		Process pr;
 
 		if (MainApp.OS_NAME.startsWith("win")) {
-			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"", MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
+			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"",
+					MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
+					renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
+					lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
 		} else {
-			pr = rt.exec(new String[]{MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(), renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()});
+			pr = rt.exec(new String[]{MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
+					renderPNG ? "--png" : "", "-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
+					lilypondFile.getAbsolutePath()});
 		}
 
 		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
