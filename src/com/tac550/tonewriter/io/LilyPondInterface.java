@@ -877,7 +877,7 @@ public class LilyPondInterface {
 		keySigParts[1] = key_sig.substring(key_sig.length() - 5); // ...major or minor...
 		keySigParts[0] = key_sig.replace(keySigParts[1], "").trim(); // ...and the key name itself.
 		// Add the key's note letter.
-		keySigString += keySigParts[0].substring(0, 1).toLowerCase();
+		keySigString += keySigParts[0].substring(0, 1).toLowerCase(Locale.ROOT);
 		// Add sharp or flat, if any.
 		if (keySigParts[0].contains("\u266F")) {
 			keySigString += "s";

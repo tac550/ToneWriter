@@ -18,6 +18,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class QuickVerseController {
 
@@ -48,7 +49,7 @@ public class QuickVerseController {
 	        if (filter == null || filter.isEmpty()) {
 	            filteredData.setPredicate(s -> true);
 	        } else {
-	            filteredData.setPredicate(s -> s.toLowerCase().contains(filter.toLowerCase()));
+	            filteredData.setPredicate(s -> s.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT)));
 	        }
 
 	        // Automatically place top filter result in result field
