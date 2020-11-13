@@ -52,7 +52,7 @@ public class MainApp extends Application {
 	public static final String APP_NAME = "ToneWriter";
 	public static final String APP_VERSION = "1.0";
 	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
-	public static final String OS_NAME = System.getProperty("os.name").toLowerCase();
+	public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ROOT);
 
 	static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
 	public static final File BUILT_IN_TONE_DIR = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
