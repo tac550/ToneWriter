@@ -216,13 +216,14 @@ public class LilyPondInterface {
 			}
 		}
 
-		// Manual title markup goes here, if not hidden and if there is no staff.
-		if (!createStaff && !item.getFinalTitleContent().isEmpty()) {
+		// Manual title markup goes here, if not hidden.
+		// This allows displaying title and subtitle before top text.
+		if (!item.getFinalTitleContent().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\fill-line \\bold %s{\\justify { %s } }",
 							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())),
 					String.format("  \\fill-line {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
-					"}\n");
+					"}\n", "\\noPageBreak\n");
 		}
 
 		// Top verse, if any
@@ -238,8 +239,6 @@ public class LilyPondInterface {
 		if (createStaff) {
 			// Score header
 			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    " + (item.getLargeTitle() ? "title" : "subtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getFinalTitleContent())),
-					String.format("    " + (item.getLargeTitle() ? "subtitle" : "subsubtitle") + " = \"%s\"", escapeDoubleQuotesForHeaders(item.getSubtitle())),
 					String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
 					String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
 					"    instrument = \"\"",
