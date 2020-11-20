@@ -222,7 +222,7 @@ public class LilyPondInterface {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\fill-line \\bold %s{\\justify { %s } }",
 							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())),
-					String.format("  \\fill-line {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
+					String.format("  \\fill-line \\bold {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
 					"}\n", "\\noPageBreak\n");
 		}
 
