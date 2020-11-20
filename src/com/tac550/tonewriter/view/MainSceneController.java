@@ -988,10 +988,9 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(
-				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle(),
-				"_"
-		));
+		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(String.format("%s.pdf",
+				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle()),
+				"_"));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
