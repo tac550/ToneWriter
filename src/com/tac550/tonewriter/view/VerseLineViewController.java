@@ -178,7 +178,6 @@ public class VerseLineViewController {
 		}
 
 		if (!line_text.isEmpty()) {
-
 			isSeparatorLine = false;
 			separatorIndicatorBox.setVisible(false);
 			mainContentPane.setVisible(true);
@@ -201,13 +200,10 @@ public class VerseLineViewController {
 			lineTextFlow.autosize();
 
 		} else {
-
 			isSeparatorLine = true;
 			separatorIndicatorBox.setVisible(true);
 			mainContentPane.setVisible(false);
-
 		}
-
 	}
 
 	String getVerseLineText() {
@@ -421,7 +417,7 @@ public class VerseLineViewController {
 		}
 
 	}
-	void syllableAltClicked() {
+	void playCurrectChord() {
 		if (notAssigning()) return;
 		getCurrentChord().playMidi();
 	}
@@ -659,8 +655,12 @@ public class VerseLineViewController {
 
 	}
 
-	public SyllableText[] getSyllables() {
+	public SyllableText[] getSyllables() { // TODO: Use this more internally
 		return lineTextFlow.getChildren().stream().map(node -> (SyllableText) node).toArray(SyllableText[]::new);
+	}
+
+	void showSyllableMenu(SyllableText syllable) {
+		topController.showSyllableMenu(syllable);
 	}
 
 	public String getTonePhraseChoice() {

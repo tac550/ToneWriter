@@ -98,7 +98,7 @@ public class TopSceneController {
 
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
-	// Note duration menu elements are re-used to save memory
+	// Note duration context menus
 	private static final RadioMenuItem eighthNoteMenuItem = new RadioMenuItem("eighth note");
 	private static final RadioMenuItem quarterNoteMenuItem = new RadioMenuItem("quarter note");
 	private static final RadioMenuItem dottedQuarterNoteMenuItem = new RadioMenuItem("dotted quarter note");
@@ -117,6 +117,11 @@ public class TopSceneController {
 	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(0.5, 1, 0.5, 1);
 	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
 	private static final List<String> durationMapping = new ArrayList<>();
+
+	// Syllable formatting context menus
+	private static final CheckMenuItem boldMenuItem = new CheckMenuItem("Bold");
+	private static final CheckMenuItem italicMenuItem = new CheckMenuItem("Italic");
+	private static final ContextMenu syllableMenu = new ContextMenu(boldMenuItem, italicMenuItem);
 
 	static {
 		Collections.addAll(durationMapping, LilyPondInterface.NOTE_EIGHTH, LilyPondInterface.NOTE_QUARTER,
@@ -857,10 +862,8 @@ public class TopSceneController {
 	}
 
 	void exportProject() throws IOException {
-
 		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
 				getTabControllers(), paperSize);
-
 	}
 
 	void propagateProjectOutputSetting() {
@@ -934,6 +937,19 @@ public class TopSceneController {
 		noteMenu.show(noteButton, Side.BOTTOM, 0,
 				(syllable.getAssociatedButtons().size() - syllable.getAssociatedButtons().indexOf(noteButton) - 1)
 						* VerseLineViewController.NOTE_BUTTON_HEIGHT.get());
+	}
+
+	void showSyllableMenu(SyllableText syllable) {
+		// Behavior
+		boldMenuItem.setOnAction(event -> syllable.setBold(boldMenuItem.isSelected()));
+		italicMenuItem.setOnAction(event -> syllable.setItalic(italicMenuItem.isSelected()));
+
+		// Initial state
+		boldMenuItem.setSelected(syllable.getBold());
+		italicMenuItem.setSelected(syllable.getItalic());
+
+		// Showing / Positioning
+		syllableMenu.show(syllable, Side.TOP, 0, 0);
 	}
 
 	void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {

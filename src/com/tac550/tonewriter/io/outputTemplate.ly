@@ -20,13 +20,13 @@
 
 noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \override NoteHead.no-ledgers = ##t}
 
-lyricItalic = {
-  \override Lyrics.LyricText.font-shape = #'italic
-}
 lyricBold = {
   \override Lyrics.LyricText.font-series = #'bold
 }
+lyricItalic = {
+  \override Lyrics.LyricText.font-shape = #'italic
+}
 lyricRevert = {
-  \revert Lyrics.LyricText.font-shape
   \revert Lyrics.LyricText.font-series
+  \revert Lyrics.LyricText.font-shape
 }

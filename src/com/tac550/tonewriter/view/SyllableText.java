@@ -4,6 +4,9 @@ import com.tac550.tonewriter.model.AssignedChordData;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -20,6 +23,10 @@ public class SyllableText extends Text {
 	// Was this the one that was clicked?
 	private boolean clicked = false;
 	private int nextNoteButtonYPos = 0;
+
+	// Formatting
+	private boolean bold = false;
+	private boolean italic = false;
 	
 	Color defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 	private static final Color highlightColor = Color.DARKCYAN;
@@ -28,7 +35,7 @@ public class SyllableText extends Text {
 		verseController = controller;
 	}
 	
-	SyllableText(String text) {
+	public SyllableText(String text) {
 		super(text);
 
 		setFill(defaultColor);
@@ -54,9 +61,13 @@ public class SyllableText extends Text {
 					verseController.syllableClicked(this);
 
 					verseController.syllableHovered();
-				} else {
-					verseController.syllableAltClicked();
+				} else if (event.isControlDown()) {
+					verseController.playCurrectChord();
 				}
+			}
+
+			if (event.getButton() == MouseButton.SECONDARY && !event.isControlDown()) {
+				verseController.showSyllableMenu(this);
 			}
 		});
 
@@ -72,6 +83,12 @@ public class SyllableText extends Text {
 		});
 		setOnMouseDragExited(event -> verseController.syllableDragExited());
 		setOnMouseReleased(event -> verseController.syllableDragReleased());
+
+		// Associated buttons stay vertically aligned with their syllable text.
+		layoutXProperty().addListener((ov, oldVal, newVal) -> {
+			for (Button button : associatedButtons)
+				button.setLayoutX(newVal.doubleValue());
+		});
 
 	}
 	
@@ -101,12 +118,26 @@ public class SyllableText extends Text {
 		defaultColor = color;
 		setFill(color);
 	}
-	
+
+	boolean getBold() {
+		return bold;
+	}
+	boolean getItalic() {
+		return italic;
+	}
+	void setBold(boolean a_bold) {
+		bold = a_bold;
+		refreshFont();
+	}
+	void setItalic(boolean a_italic) {
+		italic = a_italic;
+		refreshFont();
+	}
+
 	void deactivate() {
 		setFill(defaultColor);
 		active = false;
 	}
-	
 	void reactivate() {
 		setFill(defaultColor);
 		active = true;
@@ -143,6 +174,11 @@ public class SyllableText extends Text {
 		} else {
 			clearSelection();
 		}
+	}
+
+	private void refreshFont() {
+		setFont(Font.font(getFont().getName(), bold ? FontWeight.BOLD : FontWeight.NORMAL,
+				italic ? FontPosture.ITALIC : FontPosture.REGULAR, getFont().getSize()));
 	}
 
 	void refreshStyle() {
