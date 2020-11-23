@@ -299,16 +299,15 @@ public class VerseLineViewController {
 
 	private void resetChordAssignment() {
 		// Set up the first step of chord assignment
-		for (Node syllable : lineTextFlow.getChildren()) {
-			((SyllableText) syllable).clearSelection();
-		}
+		for (SyllableText syllable : getSyllables())
+			syllable.clearSelection();
+
 		chordButtonPane.getChildren().clear();
 		undoActions.clear();
 
 		nextChordIndex = 0;
 		lastSyllableAssigned = -1;
 		nextChordAssignment();
-
 	}
 
 	@FXML private void handleUndo() {
@@ -388,18 +387,17 @@ public class VerseLineViewController {
 			chordEntryText.setFill(Color.BLACK);
 			skipChordButton.setDisable(true);
 
-			for (Node syllable : lineTextFlow.getChildren()) { // Disable all syllables
-				((SyllableText) syllable).deactivate();
-			}
+			// Disable all syllables
+			for (SyllableText syllable : getSyllables())
+				syllable.deactivate();
 		}
 
 		topController.projectEdited();
 	}
 
 	void deactivateAll() {
-		for (Node syllNode : lineTextFlow.getChildren()) {
-			((SyllableText) syllNode).deactivate();
-		}
+		for (SyllableText syllNode : getSyllables())
+			syllNode.deactivate();
 	}
 
 	void syllableClicked(SyllableText clicked_text) {
@@ -450,12 +448,11 @@ public class VerseLineViewController {
 		int smaller = Math.min(dragStartIndex, dragEnteredIndex);
 		int larger = Math.max(dragStartIndex, dragEnteredIndex);
 		int i = 0;
-		for (Node syllNode : lineTextFlow.getChildren()) {
-			if (i >= smaller && i <= larger) {
-				((SyllableText) syllNode).setFill(getCurrentChord().getColor());
-			} else {
-				((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
-			}
+		for (SyllableText syllable : getSyllables()) {
+			if (i >= smaller && i <= larger)
+				syllable.setFill(getCurrentChord().getColor());
+			else
+				syllable.setFill(syllable.defaultColor);
 
 			i++;
 		}
@@ -483,10 +480,8 @@ public class VerseLineViewController {
 		dragStartIndex = -1;
 	}
 	private void defaultSyllableColors() {
-		for (Node syllNode : lineTextFlow.getChildren()) {
-			((SyllableText) syllNode).setFill(((SyllableText) syllNode).defaultColor);
-		}
-
+		for (SyllableText syllable : getSyllables())
+			syllable.setFill(syllable.defaultColor);
 	}
 
 	@FXML private void skipChordAction() {
@@ -655,7 +650,7 @@ public class VerseLineViewController {
 
 	}
 
-	public SyllableText[] getSyllables() { // TODO: Use this more internally
+	public SyllableText[] getSyllables() {
 		return lineTextFlow.getChildren().stream().map(node -> (SyllableText) node).toArray(SyllableText[]::new);
 	}
 
@@ -687,10 +682,8 @@ public class VerseLineViewController {
 	}
 
 	void refreshTextStyle() {
-		for (Object item : lineTextFlow.getChildren()) {
-			SyllableText text = (SyllableText) item;
-			text.refreshStyle();
-		}
+		for (SyllableText syllable : getSyllables())
+			syllable.refreshStyle();
 
 		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
