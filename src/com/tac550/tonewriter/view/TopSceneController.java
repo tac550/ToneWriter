@@ -941,8 +941,14 @@ public class TopSceneController {
 
 	void showSyllableMenu(SyllableText syllable) {
 		// Behavior
-		boldMenuItem.setOnAction(event -> syllable.setBold(boldMenuItem.isSelected()));
-		italicMenuItem.setOnAction(event -> syllable.setItalic(italicMenuItem.isSelected()));
+		boldMenuItem.setOnAction(event -> {
+			syllable.setBold(boldMenuItem.isSelected());
+			projectEdited();
+		});
+		italicMenuItem.setOnAction(event -> {
+			syllable.setItalic(italicMenuItem.isSelected());
+			projectEdited();
+		});
 
 		// Initial state
 		boldMenuItem.setSelected(syllable.getBold());
