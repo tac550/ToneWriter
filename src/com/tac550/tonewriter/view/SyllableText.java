@@ -119,10 +119,10 @@ public class SyllableText extends Text {
 		setFill(color);
 	}
 
-	boolean getBold() {
+	public boolean getBold() {
 		return bold;
 	}
-	boolean getItalic() {
+	public boolean getItalic() {
 		return italic;
 	}
 	void setBold(boolean a_bold) {

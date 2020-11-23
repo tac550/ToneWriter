@@ -133,12 +133,10 @@ public class VerseLineViewController {
 			// Skin is already attached, just access the scroll bars
 			setUpScrollPane();
 		}
-
 	}
 
 	// Sets up scroll bar behavior (makes sure scroll bar does not block view)
 	private void setUpScrollPane() {
-
 		for (Node node : syllableScrollPane.lookupAll(".scroll-bar")) {
 			if (node instanceof ScrollBar scrollBarNode) {
 				scrollBar = scrollBarNode;

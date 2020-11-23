@@ -319,7 +319,7 @@ public class LilyPondInterface {
 			}
 
 			// Buffer for the line's text.
-			StringBuilder verseLine = new StringBuilder().append(" %s "); // TOOD: Check spacing
+			StringBuilder verseLine = new StringBuilder().append(" %s ");
 			// Number of beats in each (invisible) measure in the line. This enables linebreaks for long verse lines.
 			List<Float> lineMeasureLengths = new LinkedList<>();
 			float lineBeats = 0;
@@ -352,6 +352,10 @@ public class LilyPondInterface {
 					// adding to the final text any syllable that has no associated chords.
 					if (chordList.indexOf(chordData) == 0) {
 
+						// Add any formatting flags for the syllable first.
+						syllableTextBuffer.append(syllable.getBold() ? " \\lyricBold " : "")
+								.append(syllable.getItalic() ? " \\lyricItalic " : "");
+
 						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
 						syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
 
@@ -363,6 +367,10 @@ public class LilyPondInterface {
 								syllableTextBuffer.append(" -- ");
 							}
 						}
+
+						// Add closing formatting flag if necessary.
+						if (syllable.getBold() || syllable.getItalic())
+							syllableTextBuffer.append(" \\lyricRevert ");
 
 						// If this is not the first chord associated with the syllable...
 					} else {
