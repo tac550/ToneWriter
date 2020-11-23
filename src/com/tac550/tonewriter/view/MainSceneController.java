@@ -1124,7 +1124,7 @@ public class MainSceneController {
 		return cachedItemSource;
 	}
 	void setLilyPondSource(String source) {
-		// Removes any leading whitespace
+		// Removes any leading whitespace - TODO: Not working?
 		cachedItemSource = source.replaceAll("^\\s+", "");
 	}
 	public String getCachedToneHash() {

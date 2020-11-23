@@ -172,7 +172,11 @@ public class LilyPondInterface {
 
 		int index = 0;
 		for (MainSceneController item : items) {
-			lines.add(item.getLilyPondSource());
+			// Bypass caching item source if single-item export (may differ from multi-item export)
+			if (items.length == 1)
+				lines.add(generateItemSource(item));
+			else
+				lines.add(item.getLilyPondSource());
 
 			// Remove page break at beginning of item listing, if present.
 			if (index == 0)
