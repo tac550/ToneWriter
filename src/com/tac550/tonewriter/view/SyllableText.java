@@ -125,13 +125,16 @@ public class SyllableText extends Text {
 	public boolean getItalic() {
 		return italic;
 	}
-	void setBold(boolean a_bold) {
+	public void setBold(boolean a_bold) {
 		bold = a_bold;
 		refreshFont();
 	}
-	void setItalic(boolean a_italic) {
+	public void setItalic(boolean a_italic) {
 		italic = a_italic;
 		refreshFont();
+	}
+	public String getFormatData() {
+		return (getBold() ? "b" : "") + (getItalic() ? "i" : "");
 	}
 
 	void deactivate() {

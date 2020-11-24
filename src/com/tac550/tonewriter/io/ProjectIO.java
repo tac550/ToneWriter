@@ -275,7 +275,7 @@ public class ProjectIO {
 			writeLine(writer, TWUtils.encodeNewLines(controller.getVerseAreaText())); // Verse area text
 			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
 
-			// Syllables and assignment data
+			// Syllables, assignment, and formatting data
 			for (VerseLineViewController vLine : controller.getVerseLineControllers()) {
 				StringBuilder line = new StringBuilder("+");
 
@@ -286,7 +286,13 @@ public class ProjectIO {
 				}
 
 				for (SyllableText syllable : vLine.getSyllables()) {
-					line.append("|").append(syllable.getText().strip()).append(" ");
+					line.append("|").append(syllable.getText().strip());
+
+					String formatData = syllable.getFormatData();
+					if (formatData.length() > 0)
+						line.append("&").append(formatData);
+
+					line.append(" ");
 
 					for (AssignedChordData chordData : syllable.getAssociatedChords()) {
 						line.append(chordData.getChordIndex()).append("-").append(chordData.getDuration()).append(";");
@@ -441,11 +447,13 @@ public class ProjectIO {
 
 				List<String> assignedPhrases = new ArrayList<>();
 				List<List<String>> syllableLines = new ArrayList<>();
+				List<List<String>> formatLines = new ArrayList<>();
 				List<List<String>> assignmentLines = new ArrayList<>();
 
 				String assignmentLine;
 				while ((assignmentLine = readLine(reader).get(0)).startsWith("+")) {
 					List<String> lineSyllables = new ArrayList<>();
+					List<String> lineFormatting = new ArrayList<>();
 					List<String> lineAssignments = new ArrayList<>();
 
 					String[] data = assignmentLine.split("\\|");
@@ -457,6 +465,15 @@ public class ProjectIO {
 					for (int j = 1; j < data.length; j++) {
 						String[] parts = data[j].split(" ");
 						String syllable = parts[0];
+
+						if (syllable.contains("&")) { // There is appended formatting data
+							String[] syllData = syllable.split("&");
+							syllable = syllData[0];
+							lineFormatting.add(syllData[1]);
+						} else {
+							lineFormatting.add("");
+						}
+
 						if (!syllable.startsWith("-"))
 							syllable = " " + syllable;
 						String assignment = parts.length > 1 ? parts[1] : "";
@@ -466,6 +483,7 @@ public class ProjectIO {
 					}
 
 					syllableLines.add(lineSyllables);
+					formatLines.add(lineFormatting);
 					assignmentLines.add(lineAssignments);
 				}
 
@@ -506,6 +524,7 @@ public class ProjectIO {
 
 					for (int j = 0; j < syllableLines.size(); j++) {
 						List<String> sylls = syllableLines.get(j);
+						List<String> formatting = formatLines.get(j);
 						List<String> assigns = assignmentLines.get(j);
 
 						// Create verse line with provided syllable data and save a reference to its controller
@@ -523,6 +542,12 @@ public class ProjectIO {
 							List<String> durations = new ArrayList<>();
 
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
+
+							// Apply syllable formatting.
+							for (int k = 0; k < formatting.size(); k++) {
+								vLine.getSyllables()[k].setBold(formatting.get(k).contains("b"));
+								vLine.getSyllables()[k].setItalic(formatting.get(k).contains("i"));
+							}
 
 							// Assign and/or skip chords as would be done by a user.
 							int startSyll = 0;
