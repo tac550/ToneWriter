@@ -207,18 +207,22 @@ public class LilyPondInterface {
 		// Perform layout procedure
 		String[] results = computeNotationSource(item.getVerseLineControllers());
 
-		// Create staff only if note data is present
-		boolean createStaff = false;
-
 		// Pattern which matches valid LilyPond notes
-		Pattern noteDataPattern = Pattern.compile("[a-g][0-9]");
-		// Check all four parts for any note data
-		for (String result : results) {
-			if (noteDataPattern.matcher(result).find()) {
+		Pattern noteDataPattern = Pattern.compile("[a-g][\\S]*[0-9]");
+
+		boolean createStaff = false;
+		boolean singleStaff = true;
+
+		// Check all four parts for any note data - if any exists, we need to include a staff or staves.
+		for (int i = 0; i < 4; i++) {
+			if (noteDataPattern.matcher(results[i]).find()) {
 				createStaff = true;
 				break;
 			}
 		}
+		// If the tenor and bass parts are not empty, we will have to include both staves.
+		if (noteDataPattern.matcher(results[2]).find() || noteDataPattern.matcher(results[3]).find())
+			singleStaff = false;
 
 		// Manual title markup goes here, if not hidden.
 		// This allows displaying title and subtitle before top text.
@@ -248,7 +252,6 @@ public class LilyPondInterface {
 					"    instrument = \"\"",
 					"  }\n");
 
-
 			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
 					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
 					"      midiInstrument = #\"choir aahs\"", "    } <<",
@@ -256,14 +259,18 @@ public class LilyPondInterface {
 					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
 					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
 					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
-					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n",
-					"    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-					"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
-					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-					"    >>", "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
+					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n");
+
+			if (!singleStaff)
+				Collections.addAll(lines, "    \\new Staff \\with {",
+						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
+						"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
+						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+						"    >>");
+
+			Collections.addAll(lines, "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
 					"      defaultBarType = \"\" % Hides any auto-generated barlines",
 					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
 					"      \\accidentalStyle neo-modern-voice-cautionary",
