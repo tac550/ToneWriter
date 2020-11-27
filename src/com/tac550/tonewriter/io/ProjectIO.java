@@ -579,14 +579,15 @@ public class ProjectIO {
 									durations.add(ind_dur[1]);
 									if (chordIndex > lastChordIndex) {
 
+										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
+												&& Integer.parseInt(chords[chordNum - 1].split("-")[0])
+												- lastChordIndex < 1 ? k : k - 1);
+
 										while (lastChordIndex < chordIndex - 1) {
 											vLine.skipChord();
 											lastChordIndex++;
 										}
 
-										vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
-												&& Integer.parseInt(chords[chordNum - 1].split("-")[0])
-												- lastChordIndex < 1 ? k : k - 1);
 										lastChordIndex++;
 										startSyll = k;
 
