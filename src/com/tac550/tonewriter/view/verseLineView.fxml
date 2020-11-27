@@ -89,17 +89,23 @@
             </AnchorPane>
          </children>
       </GridPane>
-      <VBox fx:id="separatorIndicatorBox" alignment="CENTER" visible="false">
+      <AnchorPane fx:id="separatorPane" visible="false">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="—————————">
+            <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="—————————">
+                     <font>
+                        <Font size="35.0" />
+                     </font>
+                  </Text>
+               </children>
+            </VBox>
+            <Button mnemonicParsing="false" onAction="#remove" text="X" textFill="RED" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <font>
-                  <Font size="35.0" />
+                  <Font name="System Bold" size="12.0" />
                </font>
-            </Text>
+            </Button>
          </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </VBox>
+      </AnchorPane>
    </children>
 </StackPane>

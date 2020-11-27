@@ -48,7 +48,7 @@ public class VerseLineViewController {
 	@FXML private GridPane mainContentPane;
 
 	private boolean isSeparatorLine = false;
-	@FXML private VBox separatorIndicatorBox;
+	@FXML private AnchorPane separatorPane;
 
 	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
@@ -177,7 +177,7 @@ public class VerseLineViewController {
 
 		if (!line_text.isEmpty()) {
 			isSeparatorLine = false;
-			separatorIndicatorBox.setVisible(false);
+			separatorPane.setVisible(false);
 			mainContentPane.setVisible(true);
 
 			lineTextFlow.getChildren().clear();
@@ -199,7 +199,7 @@ public class VerseLineViewController {
 
 		} else {
 			isSeparatorLine = true;
-			separatorIndicatorBox.setVisible(true);
+			separatorPane.setVisible(true);
 			mainContentPane.setVisible(false);
 		}
 	}
@@ -683,7 +683,7 @@ public class VerseLineViewController {
 		for (SyllableText syllable : getSyllables())
 			syllable.refreshStyle();
 
-		separatorIndicatorBox.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
+		separatorPane.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
 	public void verseEdited() {
