@@ -910,6 +910,9 @@ public class LilyPondInterface {
 
 	public static void executePlatformSpecificLPRender(File lilypondFile, boolean renderPNG, Runnable exitingActions) throws IOException {
 
+		// First, clear old logfiles
+		TWUtils.cleanUpTempFiles("-logfile");
+
 		Runtime rt = Runtime.getRuntime();
 		Process pr;
 
