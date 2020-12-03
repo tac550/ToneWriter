@@ -384,10 +384,12 @@ public class LilyPondInterface {
 
 						// If this is not the first chord associated with the syllable...
 					} else {
-						// If the soprano part was combined two chords ago, we skip the following addition to the text buffer for the syllable.
+						// If the soprano part was combined two chords ago, or it contains a rest,
+						// we skip the following addition to the text buffer for the syllable.
 						// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
-						if (!previousNoteCombined[PART_SOPRANO]) {
-							// For chords subsequent to the first for each syllable, we add this to tell Lilypond this syllable has an additional chord attached to it.
+						if (!previousNoteCombined[PART_SOPRANO] && !chordData.getPart(PART_SOPRANO).contains("r")) {
+							// For chords subsequent to the first for each syllable, we add this to the lyric line
+							// to tell Lilypond this syllable has an additional chord attached to it.
 							syllableTextBuffer.append(" _ ");
 						}
 					}
@@ -608,10 +610,13 @@ public class LilyPondInterface {
 
 						String[] tokens = syllableNoteBuffers[i].trim().split(" ");
 
-						// If there are only two notes in this syllable and they're tied, skip adding slurs.
-						if (tokens.length == 2 && tokens[0].contains("~")) {
+						// If all the notes in this part are tied, skip adding a slur.
+						if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
 							continue;
-						}
+
+						// If the part contains rests, don't slur.
+						if (Arrays.stream(tokens).anyMatch(val -> val.contains("r")))
+							continue;
 
 						// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 						StringBuilder finalString = new StringBuilder();
