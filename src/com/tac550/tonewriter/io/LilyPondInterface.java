@@ -161,10 +161,8 @@ public class LilyPondInterface {
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\""
-						+ (items[0].getSubtitle().isEmpty() ? "" : " " + (items[0].getLargeTitle() ? "\\fontsize #1 \"" : "\\fontsize #0.01 \"")
-						+ escapeDoubleQuotesForHeaders(items[0].getSubtitle()) + "\"")
-						: "\"" + escapeDoubleQuotesForHeaders(project_title) + "\""));
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
+						+ escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -175,6 +173,14 @@ public class LilyPondInterface {
 
 		int index = 0;
 		for (MainSceneController item : items) {
+
+			// Manual subtitle markup goes here, if single-item export.
+			if (items.length == 1 && !item.getSubtitle().isEmpty()) {
+				Collections.addAll(lines, "\\markup \\column {",
+						String.format("  \\fill-line \\bold {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
+						"}\n", "\\noPageBreak\n");
+			}
+
 			// Bypass caching item source if single-item export (may differ from multi-item export)
 			if (items.length == 1)
 				lines.add(generateItemSource(item));
