@@ -172,7 +172,7 @@ public class LilyPondInterface {
 
 		int index = 0;
 		for (MainSceneController item : items) {
-			// Bypass caching item source if single-item export (may differ from multi-item export)
+			// Bypass caching item source if single-item export (result differs from multi-item export)
 			if (items.length == 1)
 				lines.add(generateItemSource(item));
 			else
