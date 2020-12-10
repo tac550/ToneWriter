@@ -161,7 +161,8 @@ public class LilyPondInterface {
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"") + escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
+				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
+						+ escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -172,7 +173,15 @@ public class LilyPondInterface {
 
 		int index = 0;
 		for (MainSceneController item : items) {
-			// Bypass caching item source if single-item export (result differs from multi-item export)
+
+			// Manual subtitle markup goes here, if single-item export.
+			if (items.length == 1 && !item.getSubtitle().isEmpty()) {
+				Collections.addAll(lines, "\\markup \\column {",
+						String.format("  \\fill-line \\bold {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
+						"}\n", "\\noPageBreak\n");
+			}
+
+			// Bypass caching item source if single-item export (may differ from multi-item export)
 			if (items.length == 1)
 				lines.add(generateItemSource(item));
 			else
@@ -381,10 +390,12 @@ public class LilyPondInterface {
 
 						// If this is not the first chord associated with the syllable...
 					} else {
-						// If the soprano part was combined two chords ago, we skip the following addition to the text buffer for the syllable.
+						// If the soprano part was combined two chords ago, or it contains a rest,
+						// we skip the following addition to the text buffer for the syllable.
 						// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
-						if (!previousNoteCombined[PART_SOPRANO]) {
-							// For chords subsequent to the first for each syllable, we add this to tell Lilypond this syllable has an additional chord attached to it.
+						if (!previousNoteCombined[PART_SOPRANO] && !chordData.getPart(PART_SOPRANO).contains("r")) {
+							// For chords subsequent to the first for each syllable, we add this to the lyric line
+							// to tell Lilypond this syllable has an additional chord attached to it.
 							syllableTextBuffer.append(" _ ");
 						}
 					}
@@ -605,10 +616,13 @@ public class LilyPondInterface {
 
 						String[] tokens = syllableNoteBuffers[i].trim().split(" ");
 
-						// If there are only two notes in this syllable and they're tied, skip adding slurs.
-						if (tokens.length == 2 && tokens[0].contains("~")) {
+						// If all the notes in this part are tied, skip adding a slur.
+						if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
 							continue;
-						}
+
+						// If the part contains rests, don't slur.
+						if (Arrays.stream(tokens).anyMatch(val -> val.contains("r")))
+							continue;
 
 						// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 						StringBuilder finalString = new StringBuilder();

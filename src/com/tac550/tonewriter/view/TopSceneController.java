@@ -675,10 +675,6 @@ public class TopSceneController {
 		});
 	}
 
-	private void forceCloseTab(Tab tab) {
-		cleanUpTabForRemoval(tab);
-		tabPane.getTabs().remove(tab);
-	}
 	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
@@ -688,7 +684,7 @@ public class TopSceneController {
 		if (event.isConsumed())
 			return;
 
-		cleanUpTabForRemoval(tab);
+		prepareTabForRemoval(tab);
 		tabPane.getTabs().remove(tab);
 	}
 	void closeSelectedTab() {
@@ -702,13 +698,13 @@ public class TopSceneController {
 		tabPane.getSelectionModel().select(0);
 
 		for (Tab tab : tabs)
-			forceCloseTab(tab);
+			prepareTabForRemoval(tab);
+
+		tabPane.getTabs().clear();
 	}
-	void cleanUpTabForRemoval(Tab tab) {
+	void prepareTabForRemoval(Tab tab) {
 		tab.textProperty().unbind();
 		tabControllerMap.remove(tab);
-
-		System.gc();
 	}
 
 	MainSceneController getSelectedTabScene() {

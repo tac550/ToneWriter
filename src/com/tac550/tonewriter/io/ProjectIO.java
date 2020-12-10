@@ -464,7 +464,12 @@ public class ProjectIO {
 					// Iterate through data[1] -> data[data.length - 1]
 					for (int j = 1; j < data.length; j++) {
 						String[] parts = data[j].split(" ");
-						String syllable = parts[0];
+
+						String syllable;
+						if (parts.length == 0)
+							syllable = data[j];
+						else
+							syllable = parts[0];
 
 						if (syllable.contains("&")) { // There is appended formatting data
 							String[] syllData = syllable.split("&");
