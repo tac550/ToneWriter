@@ -338,7 +338,7 @@ public class LilyPondInterface {
 			StringBuilder verseLine = new StringBuilder().append(" %s ");
 			// Number of beats in each (invisible) measure in the line. This enables linebreaks for long verse lines.
 			List<Float> lineMeasureLengths = new LinkedList<>();
-			float lineBeats = 0;
+			float measureBeats = 0;
 
 			// For each syllable in the line...
 			for (SyllableText syllable : syllableList) {
@@ -408,6 +408,9 @@ public class LilyPondInterface {
 					// but there will be many opportunities for the chord to remain visible based upon what's going on around it.
 					// We must check the notes in each part to see if the chord shouldn't be hidden.
 					boolean hideThisChord = true;
+
+					boolean lastChordInLine = false;
+
 					// For each part...
 					for (int i = 0; i < 4; i++) {
 						// We need to get a previous note, the current note, and the next note in order to do this processing.
@@ -460,6 +463,7 @@ public class LilyPondInterface {
 								// This is the last chord associated with the last syllable with chords on it,
 								// so we definitely do not want to hide it (it's the last chord on the page!)
 								hideThisChord = false;
+								lastChordInLine = true;
 							}
 							// If there's another chord associated with this syllable...
 						} else {
@@ -525,14 +529,11 @@ public class LilyPondInterface {
 								// Add the combined note(s) to the buffer.
 								syllableNoteBuffers[i] += " " + addedNotes;
 								// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
+								// and only if this is not already the last chord on the
 								if (i == 0) {
-									lineBeats += getBeatDuration(addedNotes);
-									if (lineBeats >= measureBreakBeatThreshold) {
-										lineBeats = lineBeats - measureBreakBeatThreshold;
-
-										lineMeasureLengths.add((float) measureBreakBeatThreshold);
-										syllableTextBuffer.append(" %s ");
-									}
+									measureBeats += getBeatDuration(addedNotes);
+									if (!lastChordInLine)
+										measureBeats = trySubdividing(lineMeasureLengths, measureBeats, syllableTextBuffer);
 								}
 
 								// If the notes were combined into one... (not tied)
@@ -580,13 +581,9 @@ public class LilyPondInterface {
 								syllableNoteBuffers[i] += " " + chordData.getPart(i);
 								// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
 								if (i == 0) {
-									lineBeats += getBeatDuration(chordData.getPart(i));
-									if (lineBeats >= measureBreakBeatThreshold) {
-										lineBeats = lineBeats - measureBreakBeatThreshold;
-
-										lineMeasureLengths.add((float) measureBreakBeatThreshold);
-										syllableTextBuffer.append(" %s ");
-									}
+									measureBeats += getBeatDuration(chordData.getPart(i));
+									if (!lastChordInLine)
+										measureBeats = trySubdividing(lineMeasureLengths, measureBeats, syllableTextBuffer);
 								}
 							} else {
 								// If the previous note was combined, we clear the temp field for the current part and reset the flag.
@@ -674,7 +671,7 @@ public class LilyPondInterface {
 				timeSignatures.add(generateTimeSignature(duration));
 			}
 			// Add any leftover beats for final time signature.
-			timeSignatures.add(generateTimeSignature(lineBeats));
+			timeSignatures.add(generateTimeSignature(measureBeats));
 			String verseLineWithTimeSignatures = String.format(verseLine.toString(), timeSignatures.toArray());
 
 			verseText.append(verseLineWithTimeSignatures);
@@ -688,6 +685,16 @@ public class LilyPondInterface {
 		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
+	}
+
+	private static float trySubdividing(List<Float> lineMeasureLengths, float measureBeats, StringBuilder syllableTextBuffer) {
+		if (!syllableTextBuffer.toString().endsWith(" -- ") && measureBeats >= measureBreakBeatThreshold) {
+			lineMeasureLengths.add(measureBeats);
+			syllableTextBuffer.append(" %s ");
+
+			measureBeats = 0;
+		}
+		return measureBeats;
 	}
 
 	// Generates LilyPond time signature notation for a x/4 time signature with given total duration.
