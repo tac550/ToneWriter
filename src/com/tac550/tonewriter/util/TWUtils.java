@@ -123,6 +123,10 @@ public class TWUtils {
 		return original.replaceAll("[\\\\/:*?\"<>|]", replacement);
 	}
 
+	public static String replaceLast(String text, String regex, String replacement) {
+		return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
+	}
+
 	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {

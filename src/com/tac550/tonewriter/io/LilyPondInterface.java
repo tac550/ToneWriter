@@ -149,7 +149,7 @@ public class LilyPondInterface {
 
 		// Copy the render template file to the output path.
 		try {
-			TWUtils.exportFSResource("outputTemplate.ly", lilypond_file);
+			TWUtils.exportFSResource("exportTemplate.ly", lilypond_file);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -173,13 +173,6 @@ public class LilyPondInterface {
 
 		int index = 0;
 		for (MainSceneController item : items) {
-
-			// Manual subtitle markup goes here, if single-item export.
-			if (items.length == 1 && !item.getSubtitle().isEmpty()) {
-				Collections.addAll(lines, "\\markup \\column {",
-						String.format("  \\fill-line \\bold {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
-						"}\n", "\\noPageBreak\n");
-			}
 
 			// Bypass caching item source if single-item export (may differ from multi-item export)
 			if (items.length == 1)
@@ -287,7 +280,7 @@ public class LilyPondInterface {
 						"    >>");
 
 			Collections.addAll(lines, "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
-					"      defaultBarType = \"\" % Hides any auto-generated barlines",
+					"      defaultBarType = \"|\" % Split barlines delimit phrases",
 					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
 					"      \\accidentalStyle neo-modern-voice-cautionary",
 					"    }", "  }", "}\n");
@@ -345,11 +338,11 @@ public class LilyPondInterface {
 				continue;
 			}
 
-			// Buffer for the line's text.
+			// Buffer for the line's text. The format specifier is for the line's time signature.
 			StringBuilder verseLine = new StringBuilder().append(" %s ");
-			// Number of beats in each (invisible) measure in the line. This enables linebreaks for long verse lines.
-			List<Float> lineMeasureLengths = new LinkedList<>();
+			// Number of beats in the line. This determines where the final (visible) barline goes
 			float measureBeats = 0;
+			float breakCount = 0;
 
 			// For each syllable in the line...
 			for (SyllableText syllable : syllableList) {
@@ -543,8 +536,6 @@ public class LilyPondInterface {
 								// and only if this is not already the last chord on the
 								if (i == 0) {
 									measureBeats += getBeatDuration(addedNotes);
-									if (!lastChordInLine)
-										measureBeats = trySubdividing(lineMeasureLengths, measureBeats, syllableTextBuffer);
 								}
 
 								// If the notes were combined into one... (not tied)
@@ -593,8 +584,6 @@ public class LilyPondInterface {
 								// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
 								if (i == 0) {
 									measureBeats += getBeatDuration(chordData.getPart(i));
-									if (!lastChordInLine)
-										measureBeats = trySubdividing(lineMeasureLengths, measureBeats, syllableTextBuffer);
 								}
 							} else {
 								// If the previous note was combined, we clear the temp field for the current part and reset the flag.
@@ -608,6 +597,10 @@ public class LilyPondInterface {
 						}
 
 					}
+
+					// Decide whether to place an invisible barline after this chord (allows for line breaking here).
+					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold)
+						breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 				}
 				// That's it for each chord in the syllable.
@@ -628,17 +621,24 @@ public class LilyPondInterface {
 						if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
 							continue;
 
-						// If the part contains rests, don't slur.
-						if (Arrays.stream(tokens).anyMatch(val -> val.contains("r")))
+						// If the part contains any rests, don't slur.
+						if (Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
 							continue;
 
 						// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 						StringBuilder finalString = new StringBuilder();
 						// For each token in the buffer...
 						for (int i1 = 0; i1 < tokens.length; i1++) {
+							// If the token is a barline indicator, append it and the following as if one token
+							if (tokens[i1].equals("$bar")) {
+								finalString.append(" ").append(tokens[i1])
+										.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
+								i1++; // Don't try to append i1 + 1 again
+								continue;
+							}
 							// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
 							// note group... (two notes occurring in one part, which will be split across two tokens)
-							if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) {
+							if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) { // TODO: Just break?
 								// Add the beginning slur parenthesis and the current token.
 								finalString.append(" \\( ").append(tokens[i1]);
 								addedSlur[i] = true;
@@ -652,6 +652,7 @@ public class LilyPondInterface {
 						// Save the new string to the note buffer.
 						syllableNoteBuffers[i] = finalString.toString();
 					}
+
 				}
 
 				// Close parentheses to complete the slur for the syllable.
@@ -660,7 +661,11 @@ public class LilyPondInterface {
 					// If a slur was begun to be added for the part...
 					if (addedSlur[i]) {
 						// Complete the slur by adding a closing parenthesis.
-						syllableNoteBuffers[i] += ("\\)");
+						if (syllableNoteBuffers[i].endsWith("$bar "))
+							syllableNoteBuffers[i] = TWUtils.replaceLast(syllableNoteBuffers[i],
+									Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
+						else
+							syllableNoteBuffers[i] += ("\\)");
 					}
 				}
 
@@ -676,36 +681,27 @@ public class LilyPondInterface {
 
 			}
 
-			// insert time signatures for the line
-			List<String> timeSignatures = new ArrayList<>();
-			for (float duration : lineMeasureLengths) {
-				timeSignatures.add(generateTimeSignature(duration));
-			}
-			// Add any leftover beats for final time signature.
-			timeSignatures.add(generateTimeSignature(measureBeats));
-			String verseLineWithTimeSignatures = String.format(verseLine.toString(), timeSignatures.toArray());
-
-			verseText.append(verseLineWithTimeSignatures);
-
-			// Add a barline after each verse line
-			parts[PART_SOPRANO] += " \\bar \"|\"";
-
+			// Insert time signature for the line
+			String verseLineWithTimeSignature = String.format(verseLine.toString(), generateTimeSignature(measureBeats));
+			verseText.append(verseLineWithTimeSignature);
 		}
 
+		// Insert invisible barlines where indicated, after reversing posible incorrect orderings of bars/slur starts
+		parts[PART_SOPRANO] = parts[PART_SOPRANO].replace("$bar  \\(", "\\( $bar")
+				.replace("$bar", "\\bar \"\"");
 		// Add a double barline at the end
 		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
 	}
 
-	private static float trySubdividing(List<Float> lineMeasureLengths, float measureBeats, StringBuilder syllableTextBuffer) {
-		if (!syllableTextBuffer.toString().endsWith(" -- ") && measureBeats >= measureBreakBeatThreshold) {
-			lineMeasureLengths.add(measureBeats);
-			syllableTextBuffer.append(" %s ");
+	private static float trySubdividing(String[] partBuffers, StringBuilder syllableTextBuffer) {
+		if (!syllableTextBuffer.toString().endsWith(" -- ")) {
+			partBuffers[PART_SOPRANO] += " $bar ";
 
-			measureBeats = 0;
-		}
-		return measureBeats;
+			return 1;
+		} else return 0;
+
 	}
 
 	// Generates LilyPond time signature notation for a x/4 time signature with given total duration.

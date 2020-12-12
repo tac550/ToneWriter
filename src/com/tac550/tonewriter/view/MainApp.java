@@ -576,7 +576,7 @@ public class MainApp extends Application {
 
 		try {
 			String versionLine = new BufferedReader(new InputStreamReader(
-					LilyPondInterface.class.getResourceAsStream("outputTemplate.ly"))).readLine();
+					LilyPondInterface.class.getResourceAsStream("exportTemplate.ly"))).readLine();
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 
