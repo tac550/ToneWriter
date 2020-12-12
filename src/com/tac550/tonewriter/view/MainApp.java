@@ -291,42 +291,42 @@ public class MainApp extends Application {
 
 	// Returns the path from the LilyPond directory to the executable itself.
 	public static String getPlatformSpecificLPExecutable() {
-		if (OS_NAME.startsWith("win")) {
+		if (OS_NAME.startsWith("win"))
 			return "\\lilypond.exe";
-		} if (OS_NAME.startsWith("mac")) {
+		if (OS_NAME.startsWith("mac"))
 			return (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) ? "/lilypond"
 					: "/LilyPond.app/Contents/Resources/bin/lilypond";
-		} if (OS_NAME.startsWith("lin")) {
+		if (OS_NAME.startsWith("lin"))
 			return "/lilypond";
-		} else return null;
+		else return null;
 	}
 
 	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
-		if (OS_NAME.startsWith("win")) {
+		if (OS_NAME.startsWith("win"))
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
-		} if (OS_NAME.startsWith("mac")) {
+		if (OS_NAME.startsWith("mac"))
 			return "/opt/local/bin";
-		} if (OS_NAME.startsWith("lin")) {
+		if (OS_NAME.startsWith("lin"))
 			return "/usr/bin";
-		} else return null;
+		else return null;
 	}
 
 	// Returns the extension for midi files produced by LilyPond on the current platform.
 	public static String getPlatformSpecificMidiExtension() {
-		if (OS_NAME.startsWith("win")) {
+		if (OS_NAME.startsWith("win"))
 			return ".mid";
-		} else return ".midi";
+		else return ".midi";
 	}
 
 	public static String getPlatformSpecificRootDir() {
-		if (OS_NAME.startsWith("win")) {
+		if (OS_NAME.startsWith("win"))
 			return System.getenv("SystemDrive") + "\\";
-		} if (OS_NAME.startsWith("mac")) {
+		if (OS_NAME.startsWith("mac"))
 			return "/";
-		} if (OS_NAME.startsWith("lin")) {
+		if (OS_NAME.startsWith("lin"))
 			return "/";
-		} else return null;
+		else return null;
 	}
 
 	public static boolean isDarkModeEnabled() {
