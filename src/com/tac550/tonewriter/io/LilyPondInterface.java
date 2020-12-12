@@ -599,7 +599,10 @@ public class LilyPondInterface {
 					}
 
 					// Decide whether to place an invisible barline after this chord (allows for line breaking here).
-					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold)
+					// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
+					// threshold for adding an optional break, or the next syllable is the last and has only one chord.
+					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
+							&& syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
 						breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 				}
