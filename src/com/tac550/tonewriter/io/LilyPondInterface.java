@@ -235,13 +235,15 @@ public class LilyPondInterface {
 
 		// Manual title markup goes here, if not hidden.
 		// This allows displaying title and subtitle before top text.
-		if (!item.getFinalTitleContent().isEmpty()) {
-			Collections.addAll(lines, "\\markup \\column {",
-					String.format("  \\fill-line \\bold %s{\\justify { %s } }",
-							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())),
-					String.format("  \\fill-line \\bold {\\justify { %s } }", escapeDoubleQuotesForNotation(item.getSubtitle())),
-					"}\n", "\\noPageBreak\n");
-		}
+		Collections.addAll(lines, "\\markup \\column {");
+		// Title, if not hidden...
+		if (!item.getFinalTitleContent().isEmpty())
+					Collections.addAll(lines, String.format("  \\fill-line \\bold %s{\\justify { %s } }",
+							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())));
+		// ...and subtitle
+		Collections.addAll(lines, String.format("  \\fill-line %s{\\justify { %s } } \\vspace #0.5",
+				"\\fontsize #0.5 ", escapeDoubleQuotesForNotation(item.getSubtitle())),
+				"}\n", "\\noPageBreak\n");
 
 		// Top verse, if any
 		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
