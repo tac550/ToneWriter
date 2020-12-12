@@ -233,17 +233,22 @@ public class LilyPondInterface {
 		if (noteDataPattern.matcher(results[2]).find() || noteDataPattern.matcher(results[3]).find())
 			singleStaff = false;
 
-		// Manual title markup goes here, if not hidden.
+		// Manual title markup goes here, if any.
 		// This allows displaying title and subtitle before top text.
-		Collections.addAll(lines, "\\markup \\column {");
-		// Title, if not hidden...
-		if (!item.getFinalTitleContent().isEmpty())
-					Collections.addAll(lines, String.format("  \\fill-line \\bold %s{\\justify { %s } }",
-							item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())));
-		// ...and subtitle
-		Collections.addAll(lines, String.format("  \\fill-line %s{\\justify { %s } } \\vspace #0.5",
-				"\\fontsize #0.5 ", escapeDoubleQuotesForNotation(item.getSubtitle())),
-				"}\n", "\\noPageBreak\n");
+		if (!item.getFinalTitleContent().isEmpty() || !item.getSubtitle().isEmpty()) {
+			Collections.addAll(lines, "\\markup \\column {");
+
+			// Title, if not hidden...
+			if (!item.getFinalTitleContent().isEmpty())
+				Collections.addAll(lines, String.format("  \\fill-line \\bold %s{\\justify { %s } }",
+						item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())));
+			// ...and subtitle, if present
+			if (!item.getSubtitle().isEmpty())
+				Collections.addAll(lines, String.format("  \\fill-line %s{\\justify { %s } } \\vspace #0.5",
+						"\\fontsize #0.5 ", escapeDoubleQuotesForNotation(item.getSubtitle())));
+
+			Collections.addAll(lines, "  \\vspace #0.25", "}\n", "\\noPageBreak\n");
+		}
 
 		// Top verse, if any
 		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
@@ -290,6 +295,10 @@ public class LilyPondInterface {
 		} else {
 			lines.add("\\markup \\column { \\vspace #0.5 }\n");
 		}
+
+		// Spacing before bottom verse, if single-staff
+		if (singleStaff)
+			lines.add("\\markup \\column { \\vspace #0.25 }\n");
 
 		// Bottom verse, if any
 		if (!item.getBottomVerse().isEmpty() || item.getExtendTextSelection() == 2) {
