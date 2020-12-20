@@ -602,7 +602,7 @@ public class LilyPondInterface {
 					// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
 					// threshold for adding an optional break, or the next syllable is the last and has only one chord.
 					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
-							&& syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
+							&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1))
 						breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 				}
@@ -689,7 +689,7 @@ public class LilyPondInterface {
 			verseText.append(verseLineWithTimeSignature);
 		}
 
-		// Insert invisible barlines where indicated, after reversing posible incorrect orderings of bars/slur starts
+		// Insert invisible barlines where indicated, after reversing possible incorrect orderings of bars/slur starts
 		parts[PART_SOPRANO] = parts[PART_SOPRANO].replace("$bar  \\(", "\\( $bar")
 				.replace("$bar", "\\bar \"\"");
 		// Add a double barline at the end
