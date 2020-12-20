@@ -38,7 +38,7 @@ public class LilyPondInterface {
 	private static final int PART_TENOR = 2;
 	private static final int PART_BASS = 3;
 
-	private static final int measureBreakBeatThreshold = 15;
+	private static final int measureBreakBeatThreshold = 8;
 
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
