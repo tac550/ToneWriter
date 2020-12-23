@@ -72,11 +72,11 @@ public class LilyPondInterface {
 
 			File[] results = new File[] {outputFile, midiFile};
 			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
-			executePlatformSpecificLPRender(lilypondFile, true, () -> {
+			executeLilyPondRender(lilypondFile, true, () -> {
 				uniqueChordRenders.put(chordID, results);
-				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>())) {
+				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>()))
 					controller.setMediaFilesDirectly(uniqueChordRenders.get(chordID));
-				}
+
 				pendingChordControllers.remove(chordID);
 			});
 		} else if (uniqueChordRenders.get(chordID) == null) {
@@ -98,7 +98,7 @@ public class LilyPondInterface {
 			return false;
 
 		if (MainApp.lilyPondAvailable()) {
-			executePlatformSpecificLPRender(lilypondFile, false, () -> {
+			executeLilyPondRender(lilypondFile, false, () -> {
 				try {
 					// After the render is complete, ask the OS to open the resulting PDF file.
 					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
@@ -939,25 +939,17 @@ public class LilyPondInterface {
 		return keySigString;
 	}
 
-	public static void executePlatformSpecificLPRender(File lilypondFile, boolean renderPNG, Runnable exitingActions) throws IOException {
+	public static void executeLilyPondRender(File lilypondFile, boolean renderPNG, Runnable exitingActions) throws IOException {
 
 		// First, clear old logfiles
 		TWUtils.cleanUpTempFiles("-logfile");
 
-		Runtime rt = Runtime.getRuntime();
-		Process pr;
+		ProcessBuilder prb = new ProcessBuilder(MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
+				renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
+				"-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
+				lilypondFile.getAbsolutePath());
 
-		if (MainApp.OS_NAME.startsWith("win")) {
-			pr = rt.exec(String.format(Locale.US, "%s %s -o \"%s\" \"%s\"",
-					MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
-					renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
-					lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath()));
-		} else {
-			pr = rt.exec(new String[]{MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
-					renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
-					"-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
-					lilypondFile.getAbsolutePath()});
-		}
+		Process pr = prb.start();
 
 		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
 		prExitDetector.addProcessListener(process -> new Thread(exitingActions).start());

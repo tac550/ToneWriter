@@ -243,7 +243,7 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
-		LilyPondInterface.executePlatformSpecificLPRender(lilypondFile, false,
+		LilyPondInterface.executeLilyPondRender(lilypondFile, true,
 				() -> Platform.runLater(final_actions));
 	}
 
@@ -548,8 +548,9 @@ public class MainApp extends Application {
 		String installedVersion = null;
 
 		try {
-			Process pr = Runtime.getRuntime().exec(new String[] {getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
-			"--version"});
+			ProcessBuilder prb = new ProcessBuilder(getLilyPondPath()
+					+ MainApp.getPlatformSpecificLPExecutable(), "--version");
+			Process pr = prb.start();
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 			String s;
