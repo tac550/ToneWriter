@@ -17,8 +17,15 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -30,10 +37,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -387,8 +393,6 @@ public class MainSceneController {
 	}
 
 	void syncCVLMapping() {
-		System.out.println("Called!");
-		System.out.println(ExceptionUtils.getStackTrace(new Exception()));
 		if (toneFile == null) return; // No tone is loaded; don't do anything
 
 		// If manual mode is selected, allow user to choose all chant line assignments.

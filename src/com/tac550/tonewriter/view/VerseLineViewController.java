@@ -226,9 +226,7 @@ public class VerseLineViewController {
 		}
 
 		// Determine initial chant line selection.
-		if (initial_choice != -1) {
-			selectedChantLine = initial_choice;
-		} else if (mainController.manualCLAssignmentEnabled()) {
+		if (mainController.manualCLAssignmentEnabled()) {
 			// If we're in manual assignment mode, try to auto-select a chant line similar to the previous one.
 			if (!previousChantLine.isEmpty()) {
 				// If we don't find a similar chant line below, default to the previous selection.
@@ -249,6 +247,8 @@ public class VerseLineViewController {
 				// If there is no previous chant line, or it was empty, select the previous index (usually has same letter)
 				selectedChantLine = previousSelection;
 			}
+		} else if (initial_choice != -1) {
+			selectedChantLine = initial_choice;
 		} else {
 			// If we're not in manual assignment mode, just select the first by default.
 			selectedChantLine = 0;
