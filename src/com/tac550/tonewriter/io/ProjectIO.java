@@ -103,7 +103,7 @@ public class ProjectIO {
 					+ File.separator + index);
 
 			if (controller.fullyLoaded()) {
-				saveItemToFile(itemSaveFile, controller, toneHash);
+				saveItemToFile(itemSaveFile, controller, toneHash, top_controller.getProjectFile().getParent());
 			} else {
 				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
 						+ File.separator + controller.getOriginalIndex());
@@ -224,7 +224,8 @@ public class ProjectIO {
 			TWUtils.showError("Failed to save item from cache!", false);
 		}
 	}
-	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash) {
+	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash,
+								String projectSavePath) {
 		try {
 			// Create new file
 			if (!save_file.exists()) {
@@ -241,7 +242,7 @@ public class ProjectIO {
 
 			// Save to the file
 			try (OutputStream os = new FileOutputStream(save_file)) {
-				saveItemTo(new OutputStreamWriter(os, StandardCharsets.UTF_8), controller, tone_hash);
+				saveItemTo(new OutputStreamWriter(os, StandardCharsets.UTF_8), controller, tone_hash, projectSavePath);
 			}
 
 		} catch (IOException e) {
@@ -250,7 +251,8 @@ public class ProjectIO {
 		}
 	}
 
-	private void saveItemTo(Writer destination, MainSceneController controller, String tone_hash) throws IOException {
+	private void saveItemTo(Writer destination, MainSceneController controller, String tone_hash,
+							String parent_path) throws IOException {
 		try (PrintWriter writer = new PrintWriter(destination)) {
 
 			// General item data
@@ -259,11 +261,13 @@ public class ProjectIO {
 			// Version info
 			writeLine(writer, MainApp.APP_VERSION);
 
-			// Original tone location; relative path if built-in.
+			// Original tone location; relative path if built-in or in a subdirectory to project file.
 			String tonePath = toneFile != null ? toneFile.getAbsolutePath() : "";
 			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
 			if (tonePath.startsWith(builtInPath))
 				tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
+			else if (tonePath.startsWith(parent_path))
+				tonePath = tonePath.replace(parent_path, "$PROJECT_DIR");
 			writeLine(writer, tonePath);
 
 			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
@@ -436,7 +440,8 @@ public class ProjectIO {
 				}
 
 				File originalToneFile = new File(origToneFilePath
-						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath()));
+						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath())
+						.replace("$PROJECT_DIR", project_file.getParent()));
 				String toneHash = readLine(reader).get(0);
 				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);

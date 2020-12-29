@@ -30,6 +30,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.Toolkit;
@@ -386,6 +387,8 @@ public class MainSceneController {
 	}
 
 	void syncCVLMapping() {
+		System.out.println("Called!");
+		System.out.println(ExceptionUtils.getStackTrace(new Exception()));
 		if (toneFile == null) return; // No tone is loaded; don't do anything
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
