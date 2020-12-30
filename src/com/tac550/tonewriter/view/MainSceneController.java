@@ -583,6 +583,7 @@ public class MainSceneController {
 
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save Tone As");
 		fileChooser.setInitialFileName(".tone");
 		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
 		if (toneFile != null && isToneSavable())
@@ -619,6 +620,7 @@ public class MainSceneController {
 	private boolean loadTone(File selected_file, boolean selectHideToneHeader) {
 		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Open Tone");
 			if (toneFile != null && !projectToneLoaded()) {
 				if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
@@ -995,6 +997,7 @@ public class MainSceneController {
 		}
 
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Export As");
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(String.format("%s.pdf",
 				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle()),
 				"_"));
@@ -1003,7 +1006,6 @@ public class MainSceneController {
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
-		fileChooser.setTitle("Export As");
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
 		if (PDFFile == null) {
 			throw new RenderFormatException();

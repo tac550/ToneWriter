@@ -380,6 +380,7 @@ public class TopSceneController {
 	}
 	@FXML private void handleOpenProject() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Project");
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
@@ -406,6 +407,7 @@ public class TopSceneController {
 	}
 	@FXML private void handleSaveProjectAs() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save Project As");
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
