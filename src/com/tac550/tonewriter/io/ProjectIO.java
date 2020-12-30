@@ -103,7 +103,7 @@ public class ProjectIO {
 					+ File.separator + index);
 
 			if (controller.fullyLoaded()) {
-				saveItemToFile(itemSaveFile, controller, toneHash, top_controller.getProjectFile().getParent());
+				saveItemToFile(itemSaveFile, controller, toneHash, project_file.getParent());
 			} else {
 				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
 						+ File.separator + controller.getOriginalIndex());
