@@ -311,7 +311,7 @@ public class ProjectIO {
 
 	public boolean openProject(File project_file, TopSceneController top_controller) {
 		// Decrypt project file, outputting to a temp zip. This is not meant to be secure, and simply prevents
-		// other programs from detecting that the file is a zip archive and messing with it.
+		// other programs from detecting that the file is a zip archive and displaying it as such.
 		File tempZip;
 		try {
 			tempZip = TWUtils.createTWTempFile("Loading", "in-progress.zip");
@@ -621,7 +621,7 @@ public class ProjectIO {
 					}
 
 					ctr.applyLoadedVerses(finalI != 0 && projectEditedState);
-				});
+				}, true);
 
 			} catch (IOException e) {
 				TWUtils.showError("Failed to read item file " + i, true);

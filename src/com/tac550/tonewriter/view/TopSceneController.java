@@ -297,12 +297,12 @@ public class TopSceneController {
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
 				addTab(null, 0, null, null,
-						ctr -> ctr.handleOpenTone(arg_file, true, false));
+						ctr -> ctr.handleOpenTone(arg_file, true, false), false);
 			else {
-				addTab(null, 0, null, null, ctr -> openProject(arg_file));
+				addTab(null, 0, null, null, ctr -> openProject(arg_file), true);
 			}
 		} else {
-			addTab(null, 0, null, null, null);
+			addTab(null, 0, null, null, null, true);
 		}
 	}
 
@@ -340,7 +340,7 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML private void addTab() {
-		addTab(null, -1, null, null, null);
+		addTab(null, -1, null, null, null, false);
 		projectEdited();
 	}
 	@FXML private void handleSetProjectTitle() {
@@ -522,7 +522,7 @@ public class TopSceneController {
 	}
 
 	public void addTab(String with_title, int at_index, String precomp_source, String tone_hash,
-					   Consumer<MainSceneController> loading_actions) {
+					   Consumer<MainSceneController> loading_actions, boolean reset_edited) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
 
@@ -662,15 +662,13 @@ public class TopSceneController {
 				// Save any loading operations for later (when the user switches to the tab or exports the project).
 				newTabController.setPendingLoadActions(loading_actions);
 				// If this is the first tab, run them now (since this tab will be autoselected).
-				if (at_index == 0) {
-					// If already fully loaded (because there were no pending actions)...
-					if (newTabController.fullyLoaded())
-						// Reset project edited status now.
-						resetProjectEditedStatus();
-					else
-						// Otherwise, run the loading actions immediately. This should reset project edited also.
-						newTabController.runPendingLoadActions();
-				}
+				if (at_index == 0)
+					newTabController.runPendingLoadActions();
+
+				// Reset project edited status if indicated
+				// (usually because this tab is being added as part of a project load).
+				if (reset_edited)
+					resetProjectEditedStatus();
 			});
 		});
 	}
