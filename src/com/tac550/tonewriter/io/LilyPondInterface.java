@@ -414,6 +414,7 @@ public class LilyPondInterface {
 					boolean hideThisChord = true;
 
 					boolean lastChordInLine = false;
+					boolean currentNoteIsEighth = false;
 
 					// For each part...
 					for (int i = 0; i < 4; i++) {
@@ -447,12 +448,13 @@ public class LilyPondInterface {
 						// CURRENT NOTE
 
 						// If there is an alternate current note... (the previous one was combined)
-						if (!tempCurrentNotes[i].isEmpty()) {
+						if (!tempCurrentNotes[i].isEmpty())
 							// Then the current note will be the temporarily designated one.
 							currentNote = tempCurrentNotes[i];
-						} else {
+						else
 							currentNote = chordData.getPart(i);
-						}
+
+						currentNoteIsEighth = currentNote.contains("8");
 
 						// NEXT NOTE
 
@@ -600,9 +602,11 @@ public class LilyPondInterface {
 
 					// Decide whether to place an invisible barline after this chord (allows for line breaking here).
 					// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
-					// threshold for adding an optional break, or the next syllable is the last and has only one chord.
+					// threshold for adding an optional break, the next syllable is the last and has only one chord,
+					// or the note which would precede the possible break point is an eighth note.
 					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
-							&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1))
+							&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
+							&& !currentNoteIsEighth)
 						breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 				}
