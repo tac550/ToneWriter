@@ -12,23 +12,21 @@ public class MainChord extends ChantChordController {
 	protected final List<PrepChord> prepChords = new ArrayList<>(); // Stored left-to-right
 	protected final List<PostChord> postChords = new ArrayList<>(); // Stored right-to-left
 
-	public PrepChord addPrepChord(String values) throws IOException {
+	public PrepChord addPrepChord() throws IOException {
 		chantLineController.edited();
 
 		PrepChord prepChord = chantLineController.addPrepChord(this, chordColor);
 		prepChords.add(prepChord);
 		prepChord.setAssociatedChord(this);
-		prepChord.setFields(values);
 
 		return prepChord;
 	}
-	public PostChord addPostChord(String values) throws IOException {
+	public PostChord addPostChord() throws IOException {
 		chantLineController.edited();
 
 		PostChord postChord = chantLineController.addPostChord(this, chordColor);
 		postChords.add(postChord);
 		postChord.setAssociatedChord(this);
-		postChord.setFields(values);
 
 		return postChord;
 	}

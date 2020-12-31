@@ -347,21 +347,20 @@ public class ToneReaderWriter {
 				// Add the appropriate chord type.
 				if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
 					currentMainChord = currentChantLine.addRecitingChord();
-					currentMainChord.setFields(fields);
 					newChord = currentMainChord;
 				} else if (chantLineLine.contains("Post")) {
 					assert currentMainChord != null;
-					newChord = currentMainChord.addPostChord(fields);
+					newChord = currentMainChord.addPostChord();
 				} else if (chantLineLine.contains("Prep")) {
 					assert currentMainChord != null;
-					newChord = currentMainChord.addPrepChord(fields);
+					newChord = currentMainChord.addPrepChord();
 				} else if (chantLineLine.contains("END")) {
 					currentMainChord = currentChantLine.addEndChord();
-					currentMainChord.setFields(fields);
 					newChord = currentMainChord;
 				}
 
 				assert newChord != null;
+				newChord.setFields(fields);
 				newChord.setComment(comment);
 			}
 		}
