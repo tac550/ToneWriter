@@ -1132,9 +1132,9 @@ public class MainSceneController {
 
 		return cachedItemSource;
 	}
+	// Also removes any leading and trailing whitespace, keeping only one newline at the end.
 	void setLilyPondSource(String source) {
-		// Removes any leading whitespace - TODO: Not working?
-		cachedItemSource = source.replaceAll("^\\s+", "");
+		cachedItemSource = source.strip() + "\n";
 	}
 	public String getCachedToneHash() {
 		return cachedToneHash;
