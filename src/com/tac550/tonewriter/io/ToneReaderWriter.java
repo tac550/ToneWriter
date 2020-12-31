@@ -305,7 +305,6 @@ public class ToneReaderWriter {
 		return default_value;
 	}
 
-	// TODO: Clean this and following method to reduce repetition
 	private void loadChantLine(int index, String chant_line) throws IOException {
 
 		try (Scanner chantLineScanner = new Scanner(chant_line)) {
@@ -391,7 +390,7 @@ public class ToneReaderWriter {
 			String comment = extractComment(chordData, 2);
 
 			if (!chantLineLine.startsWith("\t")) {
-				assigning = reassignMainAndPost(existing_line, assigning, mainChord, postChords);
+				assigning = modifyMainAndPost(existing_line, assigning, mainChord, postChords);
 				mainChord = new String[]{fields, comment};
 			} else if (chantLineLine.contains("Prep")) {
 				existing_line.getChords().get(assigning).setFields(fields);
@@ -410,10 +409,10 @@ public class ToneReaderWriter {
 			}
 		}
 
-		reassignMainAndPost(existing_line, assigning, mainChord, postChords);
+		modifyMainAndPost(existing_line, assigning, mainChord, postChords);
 	}
-	private int reassignMainAndPost(ChantLineViewController existing_line, int assigning,
-	                                String[] mainChord, Stack<String[]> postChords) {
+	private int modifyMainAndPost(ChantLineViewController existing_line, int assigning,
+								  String[] mainChord, Stack<String[]> postChords) {
 		if (mainChord != null) {
 			existing_line.getChords().get(assigning).setFields(mainChord[0]);
 			existing_line.getChords().get(assigning).setComment(mainChord[1]);
