@@ -1,9 +1,6 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.EndChord;
-import com.tac550.tonewriter.model.PostChord;
-import com.tac550.tonewriter.model.PrepChord;
-import com.tac550.tonewriter.model.RecitingChord;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
@@ -325,13 +322,12 @@ public class ToneReaderWriter {
 
 			// Name / CL type parsing
 			String chantLineName = chantLineScanner.nextLine();
-			if (chantLineName.contains("'")) {
+			if (chantLineName.contains("'"))
 				currentChantLine.makePrime();
-			} else if (chantLineName.contains("alt")) {
+			else if (chantLineName.contains("alt"))
 				currentChantLine.makeAlternate();
-			}
 
-			ChantChordController currentMainChord = null;
+			MainChord currentMainChord = null;
 
 			while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
 				// Apply chant line comment
@@ -346,32 +342,27 @@ public class ToneReaderWriter {
 				String fields = chordData[1];
 				String comment = extractComment(chordData, 2);
 
+				ChantChordController newChord = null;
+
 				// Add the appropriate chord type.
 				if (!chantLineLine.startsWith("\t") && !chantLineLine.contains("END")) {
 					currentMainChord = currentChantLine.addRecitingChord();
 					currentMainChord.setFields(fields);
-					currentMainChord.setComment(comment);
+					newChord = currentMainChord;
 				} else if (chantLineLine.contains("Post")) {
 					assert currentMainChord != null;
-					PostChord postChord = null;
-					if (currentMainChord instanceof RecitingChord rMainChord)
-						postChord = rMainChord.addPostChord(fields);
-					assert postChord != null;
-					postChord.setComment(comment);
+					newChord = currentMainChord.addPostChord(fields);
 				} else if (chantLineLine.contains("Prep")) {
 					assert currentMainChord != null;
-					PrepChord prepChord;
-					if (currentMainChord instanceof EndChord eMainChord)
-						prepChord = eMainChord.addPrepChord(fields);
-					else
-						prepChord = ((RecitingChord) currentMainChord).addPrepChord(fields);
-					assert prepChord != null;
-					prepChord.setComment(comment);
+					newChord = currentMainChord.addPrepChord(fields);
 				} else if (chantLineLine.contains("END")) {
 					currentMainChord = currentChantLine.addEndChord();
 					currentMainChord.setFields(fields);
-					currentMainChord.setComment(comment);
+					newChord = currentMainChord;
 				}
+
+				assert newChord != null;
+				newChord.setComment(comment);
 			}
 		}
 
@@ -401,17 +392,7 @@ public class ToneReaderWriter {
 			String comment = extractComment(chordData, 2);
 
 			if (!chantLineLine.startsWith("\t")) {
-				if (mainChord != null) {
-					existing_line.getChords().get(assigning).setFields(mainChord[0]);
-					existing_line.getChords().get(assigning).setComment(mainChord[1]);
-					assigning++;
-				}
-				while (!postChords.isEmpty()) {
-					String[] postChord = postChords.pop();
-					existing_line.getChords().get(assigning).setFields(postChord[0]);
-					existing_line.getChords().get(assigning).setComment(postChord[1]);
-					assigning++;
-				}
+				assigning = reassignMainAndPost(existing_line, assigning, mainChord, postChords);
 				mainChord = new String[]{fields, comment};
 			} else if (chantLineLine.contains("Prep")) {
 				existing_line.getChords().get(assigning).setFields(fields);
@@ -429,6 +410,23 @@ public class ToneReaderWriter {
 				postChords.push(new String[]{fields, comment});
 			}
 		}
+
+		reassignMainAndPost(existing_line, assigning, mainChord, postChords);
+	}
+	private int reassignMainAndPost(ChantLineViewController existing_line, int assigning,
+	                                String[] mainChord, Stack<String[]> postChords) {
+		if (mainChord != null) {
+			existing_line.getChords().get(assigning).setFields(mainChord[0]);
+			existing_line.getChords().get(assigning).setComment(mainChord[1]);
+			assigning++;
+		}
+		while (!postChords.isEmpty()) {
+			String[] postChord = postChords.pop();
+			existing_line.getChords().get(assigning).setFields(postChord[0]);
+			existing_line.getChords().get(assigning).setComment(postChord[1]);
+			assigning++;
+		}
+		return assigning;
 	}
 
 	private String extractComment(String[] split_input, int comment_start_offset) {
