@@ -246,7 +246,7 @@ public class LilyPondInterface {
 		// Top verse, if any
 		if (item.getExtendTextSelection() == 1) {
 			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getTopVerseChoice(),
-					item.getVerseAreaText(), item.getBreakOnlyOnBlank())));
+					item.getVerseAreaText(), item.getBreakOnlyOnBlank())) + (createStaff ? "\\noPageBreak\n" : ""));
 		} else if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\vspace #0.5 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
@@ -293,7 +293,7 @@ public class LilyPondInterface {
 
 		// Bottom verse, if any
 		if (item.getExtendTextSelection() == 2) {
-			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(),
+			lines.add((createStaff ? "\\noPageBreak\n" : "") + escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(),
 					item.getVerseAreaText(), item.getBreakOnlyOnBlank())));
 		} else if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
