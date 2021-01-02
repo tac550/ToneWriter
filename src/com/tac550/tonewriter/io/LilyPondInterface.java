@@ -244,11 +244,12 @@ public class LilyPondInterface {
 		}
 
 		// Top verse, if any
-		if (!item.getTopVerse().isEmpty() || item.getExtendTextSelection() == 1) {
+		if (item.getExtendTextSelection() == 1) {
+			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getTopVerseChoice(), item.getVerseAreaText())));
+		} else if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
-					String.format("  \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
-							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 1 ?
-									generateExtendedText(item.getVerseAreaText()) : (item.getTopVerse() + " } "))),
+					String.format("  \\vspace #0.5 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
+							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getTopVerse()) + " } "),
 					"}\n",
 					createStaff ? "\\noPageBreak\n" : "");
 		}
@@ -289,37 +290,40 @@ public class LilyPondInterface {
 			lines.add("\\markup \\column { \\vspace #0.5 }\n");
 		}
 
-		// Spacing before bottom verse, if single-staff
-		if (singleStaff)
-			lines.add("\\markup \\column { \\vspace #0.25 }\n");
-
 		// Bottom verse, if any
-		if (!item.getBottomVerse().isEmpty() || item.getExtendTextSelection() == 2) {
+		if (item.getExtendTextSelection() == 2) {
+			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(), item.getVerseAreaText())));
+		} else if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
 					"\\markup \\column {",
 					String.format("  \\justify { \\halign #-1 \\bold {%s} %s \\vspace #1",
-							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getExtendTextSelection() == 2 ?
-									generateExtendedText(item.getVerseAreaText()) : (item.getBottomVerse() + " } "))),
+							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getBottomVerse()) + " } "),
 					"}\n");
 		}
 
 		return String.join("\n", lines);
 	}
 
-	private static String generateExtendedText(String text_area_content) {
-		StringBuilder extendedText = new StringBuilder();
+	private static String generateExtendedText(String verse_choice, String extended_text) {
+		StringBuilder resultText = new StringBuilder();
 
-		String[] lines = text_area_content.split("\n");
+		String[] lines = extended_text.split("\n");
 
-		for (int i = 0; i < lines.length; i++) {
-			if (lines[i].isEmpty()) {
-				extendedText.append(i == 0 ? "} " : "").append("\\null ");
+		resultText.append(String.format("\\markup \\column { \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s } \\vspace #0.125 }\n",
+				verse_choice, lines[0]));
+
+		int blankLineCounter = 0;
+		for (int i = 1; i < lines.length; i++) {
+			if (lines[i].isBlank()) {
+				blankLineCounter++;
 			} else {
-				extendedText.append(i == 0 ? "" : "\\justify { ").append(lines[i]).append(" } ");
+				resultText.append(String.format("\\markup \\column {%s \\justify { %s } \\vspace #0.125 }\n",
+						blankLineCounter > 0 ? " \\vspace #" + blankLineCounter : "", lines[i]));
+				blankLineCounter = 0;
 			}
 		}
 
-		return extendedText.toString();
+		return resultText.toString();
 	}
 
 	private static String[] computeNotationSource(List<VerseLineViewController> verse_lines) {
