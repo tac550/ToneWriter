@@ -171,31 +171,44 @@ public class VerseLineViewController {
 
 	void setVerseLine(String line_text) {
 
-		if (lastSyllableAssigned != -1) {
-			resetChordAssignment();
-		}
-
 		if (!line_text.isEmpty()) {
 			isSeparatorLine = false;
 			separatorPane.setVisible(false);
 			mainContentPane.setVisible(true);
 
-			lineTextFlow.getChildren().clear();
-
 			// Create the verseLine object, replacing any excess spaces with a single space.
-			verseLine = new VerseLine(line_text.trim().replaceAll(" +", " "));
+			verseLine = new VerseLine(line_text.strip().replaceAll(" +", " "));
 
-			for (String syllable : verseLine.getSyllables()) {
-				SyllableText text = new SyllableText(syllable);
-				text.setParent(this);
-				text.setFont(Font.font("System", 28));
-				text.setTextAlignment(TextAlignment.CENTER);
+			// If the number of syllabes is the same as before, just change the content of the text elements.
+			// This way assignments are not lost when making small changes.
+			String[] syllables = verseLine.getSyllables();
+			if (lineTextFlow.getChildren().size() == syllables.length) {
+				int i = 0;
+				for (String syllable : syllables) {
+					SyllableText textElement = (SyllableText) lineTextFlow.getChildren().get(i);
+					textElement.setText(syllable);
 
-				lineTextFlow.getChildren().add(text);
+					i++;
+				}
+			} else {
+
+				if (lastSyllableAssigned != -1)
+					resetChordAssignment();
+
+				lineTextFlow.getChildren().clear();
+
+				for (String syllable : verseLine.getSyllables()) {
+					SyllableText text = new SyllableText(syllable);
+					text.setParent(this);
+					text.setFont(Font.font("System", 28));
+					text.setTextAlignment(TextAlignment.CENTER);
+
+					lineTextFlow.getChildren().add(text);
+				}
+
+				// Fixes additional syllables not being visible because the text flow didn't resize.
+				lineTextFlow.autosize();
 			}
-
-			// Fixes additional syllables not being visible because the text flow didn't resize.
-			lineTextFlow.autosize();
 
 		} else {
 			isSeparatorLine = true;
