@@ -104,14 +104,15 @@ public class MainSceneController {
 
 	@FXML private MenuButton optionsButton;
 	@FXML private ToggleGroup titleOptions;
-	@FXML private RadioMenuItem largeTitleMenuItem;
-	@FXML private RadioMenuItem hiddenTitleMenuItem;
+	@FXML private RadioMenuItem largeTitleOption;
+	@FXML private RadioMenuItem hiddenTitleOption;
 
-	@FXML private CheckMenuItem hideToneHeaderMenuItem;
-	@FXML private CheckMenuItem pageBreakMenuItem;
+	@FXML private CheckMenuItem hideToneHeaderOption;
+	@FXML private CheckMenuItem pageBreakOption;
 
-	@FXML private CheckMenuItem extendTextTopMenuItem;
-	@FXML private CheckMenuItem extendTextBottomMenuItem;
+	@FXML private CheckMenuItem extendTextTopOption;
+	@FXML private CheckMenuItem extendTextBottomOption;
+	@FXML private CheckMenuItem breakOnlyOnBlankOption;
 
 	private final ToneMenuState toneMenuState = new ToneMenuState();
 
@@ -246,17 +247,17 @@ public class MainSceneController {
 		openToneHintPane.addEventFilter(MouseEvent.MOUSE_CLICKED, ev -> openToneHintButton.fire());
 
 		// Selecting either extended text option deselects the other and highlights verse field it's replacing.
-		extendTextTopMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+		extendTextTopOption.selectedProperty().addListener((ov, oldVal, newVal) -> {
 			if (newVal) {
-				extendTextBottomMenuItem.setSelected(false);
+				extendTextBottomOption.setSelected(false);
 				topVerseField.setStyle("-fx-base: #FF0000");
 			} else {
 				topVerseField.setStyle("");
 			}
 		});
-		extendTextBottomMenuItem.selectedProperty().addListener((ov, oldVal, newVal) -> {
+		extendTextBottomOption.selectedProperty().addListener((ov, oldVal, newVal) -> {
 			if (newVal) {
-				extendTextTopMenuItem.setSelected(false);
+				extendTextTopOption.setSelected(false);
 				bottomVerseField.setStyle("-fx-base: #FF0000");
 			} else {
 				bottomVerseField.setStyle("");
@@ -643,7 +644,7 @@ public class MainSceneController {
 
 			loadingTone = true;
 			if (toneReader.loadTone(toneFile, this)) {
-				hideToneHeaderMenuItem.setSelected(selectHideToneHeader);
+				hideToneHeaderOption.setSelected(selectHideToneHeader);
 
 				loadingTone = false;
 				return true;
@@ -715,7 +716,7 @@ public class MainSceneController {
 		try {
 			if (exportMode == ExportMode.ITEM) {
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
-						hiddenTitleMenuItem.isSelected() ? "" : titleTextField.getText(),
+						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(),
 						new MainSceneController[] {this}, topSceneController.getPaperSize())) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
@@ -1186,22 +1187,25 @@ public class MainSceneController {
 		bottomVerseField.setText(verse);
 	}
 	public boolean getLargeTitle() {
-		return largeTitleMenuItem.isSelected();
+		return largeTitleOption.isSelected();
 	}
 	public RadioMenuItem getSelectedTitleOption() {
 		return (RadioMenuItem) titleOptions.getSelectedToggle();
 	}
 	public boolean getHideToneHeader() {
-		return hideToneHeaderMenuItem.isSelected();
+		return hideToneHeaderOption.isSelected();
 	}
 	public boolean getPageBreak() {
-		return pageBreakMenuItem.isSelected();
+		return pageBreakOption.isSelected();
 	}
 	public int getExtendTextSelection() { // Only one is selected at a time, so 3 = both is not expected.
-		return (extendTextTopMenuItem.isSelected() ? 1 : 0) + (extendTextBottomMenuItem.isSelected() ? 2 : 0);
+		return (extendTextTopOption.isSelected() ? 1 : 0) + (extendTextBottomOption.isSelected() ? 2 : 0);
+	}
+	public boolean getBreakOnlyOnBlank() {
+		return breakOnlyOnBlankOption.isSelected();
 	}
 	public String getFinalTitleContent() {
-		return hiddenTitleMenuItem.isSelected() || exportMode == ExportMode.ITEM ?
+		return hiddenTitleOption.isSelected() || exportMode == ExportMode.ITEM ?
 				"" : titleTextField.getText();
 	}
 	public String getTitle() {
@@ -1216,21 +1220,22 @@ public class MainSceneController {
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
 	}
-	public void setOptions(String title_format, boolean hide_header, boolean page_break, int extended_text) {
+	public void setOptions(String title_format, boolean hide_header, boolean page_break, int extended_text, boolean break_only_on_blank) {
 		titleOptions.selectToggle(titleOptions.getToggles().stream()
 				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_format)).toArray(Toggle[]::new)[0]);
-		hideToneHeaderMenuItem.setSelected(hide_header);
-		pageBreakMenuItem.setSelected(page_break);
+		hideToneHeaderOption.setSelected(hide_header);
+		pageBreakOption.setSelected(page_break);
 		switch (extended_text) {
-			case 1 -> extendTextTopMenuItem.setSelected(true);
-			case 2 -> extendTextBottomMenuItem.setSelected(true);
+			case 1 -> extendTextTopOption.setSelected(true);
+			case 2 -> extendTextBottomOption.setSelected(true);
 		}
+		breakOnlyOnBlankOption.setSelected(break_only_on_blank);
 	}
 	public String getLeftHeaderText() {
-		return hideToneHeaderMenuItem.isSelected() ? "" : leftText;
+		return hideToneHeaderOption.isSelected() ? "" : leftText;
 	}
 	public String getRightHeaderText() {
-		return hideToneHeaderMenuItem.isSelected() ? "" : rightText;
+		return hideToneHeaderOption.isSelected() ? "" : rightText;
 	}
 	public List<VerseLineViewController> getVerseLineControllers() {
 		return verseLineControllers;

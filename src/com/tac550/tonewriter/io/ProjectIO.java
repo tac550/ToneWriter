@@ -274,7 +274,8 @@ public class ProjectIO {
 			writeLine(writer, controller.getToneEdited()); // Tone edited status
 			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
 			writeLine(writer, controller.getSelectedTitleOption().getText(), // Options
-					controller.getHideToneHeader(), controller.getPageBreak(), controller.getExtendTextSelection());
+					controller.getHideToneHeader(), controller.getPageBreak(), controller.getExtendTextSelection(),
+					controller.getBreakOnlyOnBlank());
 			writeLine(writer, controller.getTopVerseChoice(), controller.getTopVerse()); // Top verse
 			writeLine(writer, TWUtils.encodeNewLines(controller.getVerseAreaText())); // Verse area text
 			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
@@ -520,11 +521,12 @@ public class ProjectIO {
 
 					ctr.setSubtitle(titleSubtitle.get(1));
 
-					// Before 1.0: No extended text option.
+					// Before 1.0: No extended text options.
 					int extText = TWUtils.versionCompare("1.0", itemVersion) == 1 ? 0 : Integer.parseInt(options.get(3));
+					boolean breakOnlyOnBlank = TWUtils.versionCompare("1.0", itemVersion) != 1 && Boolean.parseBoolean(options.get(4));
 
 					ctr.setOptions(options.get(0), Boolean.parseBoolean(options.get(1)),
-							Boolean.parseBoolean(options.get(2)), extText);
+							Boolean.parseBoolean(options.get(2)), extText, breakOnlyOnBlank);
 
 					ctr.setTopVerseChoice(topVerse.get(0));
 					ctr.setTopVerse(topVerse.get(1));

@@ -245,7 +245,8 @@ public class LilyPondInterface {
 
 		// Top verse, if any
 		if (item.getExtendTextSelection() == 1) {
-			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getTopVerseChoice(), item.getVerseAreaText())));
+			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getTopVerseChoice(),
+					item.getVerseAreaText(), item.getBreakOnlyOnBlank())));
 		} else if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\vspace #0.5 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
@@ -292,7 +293,8 @@ public class LilyPondInterface {
 
 		// Bottom verse, if any
 		if (item.getExtendTextSelection() == 2) {
-			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(), item.getVerseAreaText())));
+			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(),
+					item.getVerseAreaText(), item.getBreakOnlyOnBlank())));
 		} else if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
 					"\\markup \\column {",
@@ -304,21 +306,22 @@ public class LilyPondInterface {
 		return String.join("\n", lines);
 	}
 
-	private static String generateExtendedText(String verse_choice, String extended_text) {
+	private static String generateExtendedText(String verse_choice, String extended_text, boolean break_only_on_blank) {
 		StringBuilder resultText = new StringBuilder();
 
 		String[] lines = extended_text.split("\n");
 
-		resultText.append(String.format("\\markup \\column { \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s } \\vspace #0.125 }\n",
-				verse_choice, lines[0]));
+		resultText.append(String.format("\\markup \\column { \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s } \\vspace #0.125 }%s\n",
+				verse_choice, lines[0], break_only_on_blank && lines.length > 1 && !lines[1].isBlank() ? " \\noPageBreak" : ""));
 
 		int blankLineCounter = 0;
 		for (int i = 1; i < lines.length; i++) {
 			if (lines[i].isBlank()) {
 				blankLineCounter++;
 			} else {
-				resultText.append(String.format("\\markup \\column {%s \\justify { %s } \\vspace #0.125 }\n",
-						blankLineCounter > 0 ? " \\vspace #" + blankLineCounter : "", lines[i]));
+				resultText.append(String.format("\\markup \\column {%s \\justify { %s } \\vspace #0.125 }%s\n",
+						blankLineCounter > 0 ? " \\vspace #" + blankLineCounter : "", lines[i],
+						break_only_on_blank && lines.length > i+1 && !lines[i+1].isBlank() ? " \\noPageBreak" : ""));
 				blankLineCounter = 0;
 			}
 		}
