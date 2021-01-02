@@ -265,8 +265,7 @@ public class LilyPondInterface {
 
 			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
 					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
-					"      midiInstrument = #\"choir aahs\"", "    } <<",
-					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"    } <<", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
 					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
 					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
 					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
@@ -275,8 +274,7 @@ public class LilyPondInterface {
 			if (!singleStaff)
 				Collections.addAll(lines, "    \\new Staff \\with {",
 						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-						"      midiInstrument = #\"choir aahs\"", "    } <<", "      \\clef bass",
-						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+						"    } <<", "      \\clef bass", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
 						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
 						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
 						"    >>");
