@@ -386,7 +386,7 @@ public class ProjectIO {
 		// Opening project files from future versions is unsupported because the lazy saving system is likely to corrupt
 		// project files for users of newer versions.
 		if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION) == 1) {
-			TWUtils.showAlert(Alert.AlertType.INFORMATION, "Warning", String.format(Locale.US,
+			TWUtils.showAlert(Alert.AlertType.ERROR, "Error", String.format(Locale.US,
 					"This project can only be opened in %s version %s or newer.",
 					MainApp.APP_NAME, projectVersion), true);
 			return false;
