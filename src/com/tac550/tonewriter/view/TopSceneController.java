@@ -478,15 +478,14 @@ public class TopSceneController {
 	@FXML private void handleSetDefaultPaperSize() {
 		List<String> choices = new ArrayList<>();
 
-		choices.add("a4 (210 x 297 mm)");
 		choices.add("junior-legal (8.0 x 5.0 in)");
+		choices.add("half letter (5.5 x 8.5 in)");
+		choices.add("a5 (148 x 210 mm)");
+		choices.add("letter (8.5 x 11.0 in)");
+		choices.add("a4 (210 x 297 mm)");
 		choices.add("legal (8.5 x 14.0 in)");
 		choices.add("ledger (17.0 x 11.0 in)");
-		choices.add("letter (8.5 x 11.0 in)");
-		choices.add("half letter (5.5 x 8.5 in)");
 		choices.add("tabloid (11.0 x 17.0 in)");
-		choices.add("11x17 (11.0 x 17.0 in)");
-		choices.add("17x11 (17.0 x 11.0 in)");
 
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
 		dialog.setTitle("Default Paper Size");
