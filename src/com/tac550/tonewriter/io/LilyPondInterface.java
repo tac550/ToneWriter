@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class LilyPondInterface {
 
@@ -91,7 +92,7 @@ public class LilyPondInterface {
 
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
-	                                  MainSceneController[] items, String paperSize) throws IOException {
+									  MainSceneController[] items, String paperSize) throws IOException {
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
 		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize))
@@ -207,24 +208,13 @@ public class LilyPondInterface {
 			lines.add("\\pageBreak\n");
 
 		// Perform layout procedure
-		String[] results = computeNotationSource(item.getVerseLineControllers());
+		String[] results = generateNotationSource(item.getVerseLineControllers());
 
 		// Pattern which matches valid LilyPond notes
 		Pattern noteDataPattern = Pattern.compile("[a-g][\\S]*[0-9]");
 
-		boolean createStaff = false;
-		boolean singleStaff = true;
-
 		// Check all four parts for any note data - if any exists, we need to include a staff or staves.
-		for (int i = 0; i < 4; i++) {
-			if (noteDataPattern.matcher(results[i]).find()) {
-				createStaff = true;
-				break;
-			}
-		}
-		// If the tenor and bass parts are not empty, we will have to include both staves.
-		if (noteDataPattern.matcher(results[2]).find() || noteDataPattern.matcher(results[3]).find())
-			singleStaff = false;
+		boolean createStaff = Stream.of(results).limit(4).anyMatch(part -> noteDataPattern.matcher(part).find());
 
 		// Manual title markup goes here, if any.
 		// This allows displaying title and subtitle before top text.
@@ -271,7 +261,8 @@ public class LilyPondInterface {
 					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
 					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n");
 
-			if (!singleStaff)
+			// If the tenor and bass parts are not empty, include a lower staff.
+			if (noteDataPattern.matcher(results[PART_TENOR]).find() || noteDataPattern.matcher(results[PART_BASS]).find())
 				Collections.addAll(lines, "    \\new Staff \\with {",
 						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
 						"    } <<", "      \\clef bass", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
@@ -327,376 +318,14 @@ public class LilyPondInterface {
 		return resultText.toString();
 	}
 
-	private static String[] computeNotationSource(List<VerseLineViewController> verse_lines) {
-		// Note buffers for the piece. S   A   T   B
+	private static String[] generateNotationSource(List<VerseLineViewController> verse_lines) {
+		// Part buffers for the item { S  A    T  B }
 		String[] parts = new String[]{"", "", "", ""};
 		// Buffer for the piece's text.
 		StringBuilder verseText = new StringBuilder();
 
-		// For every verse line...
-		for (VerseLineViewController verseLineController : verse_lines) {
-			// Store the line's syllables.
-			List<SyllableText> syllableList = Arrays.asList(verseLineController.getSyllables());
-			// If this is a verse separator line, add the double bar line and continue to the next one.
-			if (syllableList.isEmpty()) {
-				parts[PART_SOPRANO] += " \\bar \"||\"";
-				continue;
-			}
-
-			// Buffer for the line's text. The format specifier is for the line's time signature.
-			StringBuilder verseLine = new StringBuilder().append(" %s ");
-			// Number of beats in the line. This determines where the final (visible) barline goes
-			float measureBeats = 0;
-			float breakCount = 0;
-
-			// For each syllable in the line...
-			for (SyllableText syllable : syllableList) {
-				// Note buffers for this syllable.           S   A   T   B
-				String[] syllableNoteBuffers = new String[]{"", "", "", ""};
-				// Buffer for the syllable's text.
-				StringBuilder syllableTextBuffer = new StringBuilder();
-
-				// Whether or not notes were combined for each part in the previous chord.
-				// Note that notes being combined means either being made into one note with a
-				// duration which is the sum of the two, or that the notes were tied (because there can be no single note with such a duration)
-				boolean[] noteCombined = new boolean[]{false, false, false, false};
-				// True if the corresponding part needed a combination 2 chords ago.
-				boolean[] previousNoteCombined = new boolean[]{false, false, false, false};
-				// Notes for each part to consider "current" when testing whether to combine.
-				// Gets set if a note was combined on the last chord.
-				String[] tempCurrentNotes = new String[]{"", "", "", ""};
-
-				List<AssignedChordData> chordList = Arrays.asList(syllable.getAssociatedChords());
-				// For each chord assigned to the syllable...
-				for (AssignedChordData chordData : chordList) {
-
-					// SYLLABLE TEXT PROCESSING
-
-					// If this is the first chord associated with the syllable, then we do text parsing right now and only once.
-					// The reason we do this now instead of in the enclosing scope is because we want to skip
-					// adding to the final text any syllable that has no associated chords.
-					if (chordList.indexOf(chordData) == 0) {
-
-						// Add any formatting flags for the syllable first.
-						syllableTextBuffer.append(syllable.getBold() ? " \\lyricBold " : "")
-								.append(syllable.getItalic() ? " \\lyricItalic " : "");
-
-						// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-						syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
-
-						// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
-						if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
-							// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
-							// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-							if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
-								syllableTextBuffer.append(" -- ");
-							}
-						}
-
-						// Add closing formatting flag if necessary.
-						if (syllable.getBold() || syllable.getItalic())
-							syllableTextBuffer.append(" \\lyricRevert ");
-
-						// If this is not the first chord associated with the syllable...
-					} else {
-						// If the soprano part was combined two chords ago, or it contains a rest,
-						// we skip the following addition to the text buffer for the syllable.
-						// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
-						if (!previousNoteCombined[PART_SOPRANO] && !chordData.getPart(PART_SOPRANO).contains("r")) {
-							// For chords subsequent to the first for each syllable, we add this to the lyric line
-							// to tell Lilypond this syllable has an additional chord attached to it.
-							syllableTextBuffer.append(" _ ");
-						}
-					}
-
-					// CHORD DATA PROCESSING
-
-					// Flag to keep track of whether this chord will be hidden.
-					// Chord hiding cleans up repeated quarter notes for extended periods of recitative.
-					// The default behavior is to hide the chord after the below processing is done,
-					// but there will be many opportunities for the chord to remain visible based upon what's going on around it.
-					// We must check the notes in each part to see if the chord shouldn't be hidden.
-					boolean hideThisChord = true;
-
-					boolean lastChordInLine = false;
-					boolean currentNoteIsEighth = false;
-
-					// For each part...
-					for (int i = 0; i < 4; i++) {
-						// We need to get a previous note, the current note, and the next note in order to do this processing.
-						String previousNote = "";
-						String currentNote;
-						String nextNote = "";
-
-						// PREVIOUS NOTE
-
-						// If this is the first chord associated with this syllable...
-						if (chordList.indexOf(chordData) == 0) {
-							// And if this is the first syllable in the whole text...
-							if (syllableList.indexOf(syllable) == 0) {
-								// Then we know we need to show the chord. It'll be the first chord on the page!
-								hideThisChord = false;
-							} else {
-								AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssociatedChords();
-								if (previousSyllableChords.length == 0)
-									// If the previous syllable has no chords assigned, then we know we shouldn't be hiding this one.
-									hideThisChord = false;
-								else
-									// Otherwise, the previous note is the note from the last chord from the previous syllable.
-									previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
-							}
-						} else {
-							// The previous note is the note just before this one on this same syllable.
-							previousNote = chordList.get(chordList.indexOf(chordData) - 1).getPart(i);
-						}
-
-						// CURRENT NOTE
-
-						// If there is an alternate current note... (the previous one was combined)
-						if (!tempCurrentNotes[i].isEmpty())
-							// Then the current note will be the temporarily designated one.
-							currentNote = tempCurrentNotes[i];
-						else
-							currentNote = chordData.getPart(i);
-
-						currentNoteIsEighth = currentNote.contains("8");
-
-						// NEXT NOTE
-
-						// If this is the last chord associated with this syllable...
-						if (chordList.indexOf(chordData) == chordList.size() - 1) {
-							// And if this isn't the last syllable with chords on it...
-							if (syllableList.indexOf(syllable) < syllableList.size() - 1
-									&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords().length > 0) {
-								// Then the next note is the note from the first chord of the next syllable.
-								nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i);
-							} else {
-								// This is the last chord associated with the last syllable with chords on it,
-								// so we definitely do not want to hide it (it's the last chord on the page!)
-								hideThisChord = false;
-								lastChordInLine = true;
-							}
-							// If there's another chord associated with this syllable...
-						} else {
-							// Then the next note is the note from the next chord on this same syllable.
-							nextNote = chordList.get(chordList.indexOf(chordData) + 1).getPart(i);
-
-							// Since we have determined that there is at least one more chord on this syllable,
-							// we have to decide whether the current note should be combined with the next note.
-
-							// If the current and next notes both have the same pitch... (they must if they are to be combined)
-							if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))) {
-
-								// Try to do the combination
-								String addedNotes = combineNotes(currentNote, nextNote);
-
-								// If the previous note was also combined, remove it (and any tokens after it).
-								if (!tempCurrentNotes[i].isEmpty()) {
-									String[] tokens = syllableNoteBuffers[i].split(" ");
-									// This flag gets set if the previous note was a note group.
-									boolean noteGroup = false;
-									// Work backward through the tokens.
-									for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
-										if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") ||
-												tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") || tokens[i1].contains("g")) {
-											if (noteGroup) {
-												// If we hit the beginning of the note group...
-												if (tokens[i1].contains("<")) {
-													// remove it and we're done.
-													tokens[i1] = "";
-													break;
-												}
-
-												// If the note we're trying to remove is actually a note group...
-											} else if (tokens[i1].contains(">")) {
-												// Set the flag.
-												noteGroup = true;
-											}
-
-											tokens[i1] = "";
-
-											if (!noteGroup) {
-												// Stop here because we just removed the previous note.
-												break;
-											}
-
-										} else {
-											// Remove tokens that aren't notes from the end.
-											tokens[i1] = "";
-										}
-									}
-
-									// Remove any excess spaces from the syllable note buffer
-									StringBuilder editedString = new StringBuilder();
-									for (String token : tokens) {
-										if (token.isEmpty()) continue;
-										editedString.append(" ").append(token);
-									}
-									// Save back to the buffer.
-									syllableNoteBuffers[i] = editedString.toString();
-
-								}
-
-								// Add the combined note(s) to the buffer.
-								syllableNoteBuffers[i] += " " + addedNotes;
-								// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-								// and only if this is not already the last chord on the
-								if (i == 0) {
-									measureBeats += getBeatDuration(addedNotes);
-								}
-
-								// If the notes were combined into one... (not tied)
-								if (!addedNotes.contains("~")) {
-									// The new note becomes the temporary current note for the current part.
-									tempCurrentNotes[i] = addedNotes;
-								} else {
-									// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
-									tempCurrentNotes[i] = addedNotes.split(" ")[1];
-								}
-
-								// Remember that we just did a note combination for the current part.
-								noteCombined[i] = true;
-							}
-
-						}
-
-						// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
-						if (previousNote.equals("") || currentNote.equals("") || nextNote.equals("")) {
-							hideThisChord = false;
-						}
-
-						// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
-						if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4")) {
-							// Don't hide the current chord because neighboring chords are different.
-							hideThisChord = false;
-						}
-
-					}
-
-					// If hideThisChord remained true after all the checks for all the parts in the chord...
-					if (hideThisChord) {
-						for (int i = 0; i < 4; i++) {
-							// Add the flag that hides the note for each part of the chord before adding the notes themselves.
-							syllableNoteBuffers[i] += " \\noteHide";
-						}
-					}
-
-					// Add note data for each part to the buffers...
-					for (int i = 0; i < 4; i++) {
-						// ...but only if the note was not combined... (in which case it will already have been added)
-						if (!noteCombined[i]) {
-							// ...and the one before that was not combined.
-							if (!previousNoteCombined[i]) {
-								syllableNoteBuffers[i] += " " + chordData.getPart(i);
-								// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-								if (i == 0) {
-									measureBeats += getBeatDuration(chordData.getPart(i));
-								}
-							} else {
-								// If the previous note was combined, we clear the temp field for the current part and reset the flag.
-								previousNoteCombined[i] = false;
-								tempCurrentNotes[i] = "";
-							}
-						} else {
-							// If the note was combined, set up flags for the next chord.
-							noteCombined[i] = false;
-							previousNoteCombined[i] = true;
-						}
-
-					}
-
-					// Decide whether to place an invisible barline after this chord (allows for line breaking here).
-					// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
-					// threshold for adding an optional break, the next syllable is the last and has only one chord,
-					// or the note which would precede the possible break point is an eighth note.
-					if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
-							&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
-							&& !currentNoteIsEighth)
-						breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
-
-				}
-				// That's it for each chord in the syllable.
-
-				// SLUR PROCESSING
-
-				// Flags for whether we needed a slur on the syllable for each part.
-				boolean[] addedSlur = new boolean[] {false, false, false, false};
-
-				// For each part...
-				for (int i = 0; i < 4; i++) {
-					// If the current part doesn't have any hidden notes on this syllable... (which would indicate that it's recitative)
-					if (!syllableNoteBuffers[i].contains("noteHide")) {
-
-						String[] tokens = syllableNoteBuffers[i].trim().split(" ");
-
-						// If all the notes in this part are tied, skip adding a slur.
-						if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
-							continue;
-
-						// If the part contains any rests, don't slur.
-						if (Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
-							continue;
-
-						// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
-						StringBuilder finalString = new StringBuilder();
-						// For each token in the buffer...
-						for (int i1 = 0; i1 < tokens.length; i1++) {
-							// If the token is a barline indicator, append it and the following as if one token
-							if (tokens[i1].equals("$bar")) {
-								finalString.append(" ").append(tokens[i1])
-										.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
-								i1++; // Don't try to append i1 + 1 again
-								continue;
-							}
-							// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
-							// note group... (two notes occurring in one part, which will be split across two tokens)
-							if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) { // TODO: Just break?
-								// Add the beginning slur parenthesis and the current token.
-								finalString.append(" \\( ").append(tokens[i1]);
-								addedSlur[i] = true;
-							} else {
-								// Otherwise skip empty tokens or add the current one.
-								if (tokens[i1].isEmpty()) continue;
-								finalString.append(" ").append(tokens[i1]);
-							}
-						}
-
-						// Save the new string to the note buffer.
-						syllableNoteBuffers[i] = finalString.toString();
-					}
-
-				}
-
-				// Close parentheses to complete the slur for the syllable.
-				// For each part...
-				for (int i = 0; i < 4; i++) {
-					// If a slur was begun to be added for the part...
-					if (addedSlur[i]) {
-						// Complete the slur by adding a closing parenthesis.
-						if (syllableNoteBuffers[i].endsWith("$bar "))
-							syllableNoteBuffers[i] = TWUtils.replaceLast(syllableNoteBuffers[i],
-									Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
-						else
-							syllableNoteBuffers[i] += ("\\)");
-					}
-				}
-
-				// SYLLABLE BUFFER SAVE-OUTS
-
-				// Add the text buffer for the syllable to that of the line.
-				verseLine.append(syllableTextBuffer);
-
-				// Add the note data for the syllable from the buffers to the final part strings.
-				for (int i = 0; i < 4; i++) {
-					parts[i] += syllableNoteBuffers[i];
-				}
-
-			}
-
-			// Insert time signature for the line
-			String verseLineWithTimeSignature = String.format(verseLine.toString(), generateTimeSignature(measureBeats));
-			verseText.append(verseLineWithTimeSignature);
-		}
+		for (VerseLineViewController verseLineController : verse_lines)
+			generateLineSource(parts, verseText, verseLineController);
 
 		// Insert invisible barlines where indicated, after reversing possible incorrect orderings of bars/slur starts
 		parts[PART_SOPRANO] = parts[PART_SOPRANO].replace("$bar  \\(", "\\( $bar")
@@ -705,6 +334,370 @@ public class LilyPondInterface {
 		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
+	}
+
+	private static void generateLineSource(String[] parts, StringBuilder verseText, VerseLineViewController verseLineController) {
+		// Store the line's syllables.
+		List<SyllableText> syllableList = Arrays.asList(verseLineController.getSyllables());
+		// If this is a verse separator line, add the double bar line and continue to the next one.
+		if (syllableList.isEmpty()) {
+			parts[PART_SOPRANO] += " \\bar \"||\"";
+			return;
+		}
+
+		// Buffer for the line's text. The format specifier is for the line's time signature.
+		StringBuilder verseLine = new StringBuilder().append(" %s ");
+		// Number of beats in the line. This determines where the final (visible) barline goes
+		float measureBeats = 0;
+		float breakCount = 0;
+
+		// For each syllable in the line...
+		for (SyllableText syllable : syllableList) {
+			// Note buffers for this syllable.           S   A   T   B
+			String[] syllableNoteBuffers = new String[]{"", "", "", ""};
+			// Buffer for the syllable's text.
+			StringBuilder syllableTextBuffer = new StringBuilder();
+
+			// Whether or not notes were combined for each part in the previous chord.
+			// Note that notes being combined means either being made into one note with a
+			// duration which is the sum of the two, or that the notes were tied (because there can be no single note with such a duration)
+			boolean[] noteCombined = new boolean[]{false, false, false, false};
+			// True if the corresponding part needed a combination 2 chords ago.
+			boolean[] previousNoteCombined = new boolean[]{false, false, false, false};
+			// Notes for each part to consider "current" when testing whether to combine.
+			// Gets set if a note was combined on the last chord.
+			String[] tempCurrentNotes = new String[]{"", "", "", ""};
+
+			List<AssignedChordData> chordList = Arrays.asList(syllable.getAssociatedChords());
+			// For each chord assigned to the syllable...
+			for (AssignedChordData chordData : chordList) {
+
+				// SYLLABLE TEXT PROCESSING
+
+				// If this is the first chord associated with the syllable, then we do text parsing right now and only once.
+				// The reason we do this now instead of in the enclosing scope is because we want to skip
+				// adding to the final text any syllable that has no associated chords.
+				if (chordList.indexOf(chordData) == 0) {
+
+					// Add any formatting flags for the syllable first.
+					syllableTextBuffer.append(syllable.getBold() ? " \\lyricBold " : "")
+							.append(syllable.getItalic() ? " \\lyricItalic " : "");
+
+					// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
+					syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
+
+					// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
+					if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
+						// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
+						// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
+						if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
+							syllableTextBuffer.append(" -- ");
+						}
+					}
+
+					// Add closing formatting flag if necessary.
+					if (syllable.getBold() || syllable.getItalic())
+						syllableTextBuffer.append(" \\lyricRevert ");
+
+					// If this is not the first chord associated with the syllable...
+				} else {
+					// If the soprano part was combined two chords ago, or it contains a rest,
+					// we skip the following addition to the text buffer for the syllable.
+					// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
+					if (!previousNoteCombined[PART_SOPRANO] && !chordData.getPart(PART_SOPRANO).contains("r")) {
+						// For chords subsequent to the first for each syllable, we add this to the lyric line
+						// to tell Lilypond this syllable has an additional chord attached to it.
+						syllableTextBuffer.append(" _ ");
+					}
+				}
+
+				// CHORD DATA PROCESSING
+
+				// Flag to keep track of whether this chord will be hidden.
+				// Chord hiding cleans up repeated quarter notes for extended periods of recitative.
+				// The default behavior is to hide the chord after the below processing is done,
+				// but there will be many opportunities for the chord to remain visible based upon what's going on around it.
+				// We must check the notes in each part to see if the chord shouldn't be hidden.
+				boolean hideThisChord = true;
+
+				boolean lastChordInLine = false;
+				boolean currentNoteIsEighth = false;
+
+				// For each part...
+				for (int i = 0; i < 4; i++) {
+					// We need to get a previous note, the current note, and the next note in order to do this processing.
+					String previousNote = "";
+					String currentNote;
+					String nextNote = "";
+
+					// PREVIOUS NOTE
+
+					// If this is the first chord associated with this syllable...
+					if (chordList.indexOf(chordData) == 0) {
+						// And if this is the first syllable in the whole text...
+						if (syllableList.indexOf(syllable) == 0) {
+							// Then we know we need to show the chord. It'll be the first chord on the page!
+							hideThisChord = false;
+						} else {
+							AssignedChordData[] previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssociatedChords();
+							if (previousSyllableChords.length == 0)
+								// If the previous syllable has no chords assigned, then we know we shouldn't be hiding this one.
+								hideThisChord = false;
+							else
+								// Otherwise, the previous note is the note from the last chord from the previous syllable.
+								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
+						}
+					} else {
+						// The previous note is the note just before this one on this same syllable.
+						previousNote = chordList.get(chordList.indexOf(chordData) - 1).getPart(i);
+					}
+
+					// CURRENT NOTE
+
+					// If there is an alternate current note... (the previous one was combined)
+					if (!tempCurrentNotes[i].isEmpty())
+						// Then the current note will be the temporarily designated one.
+						currentNote = tempCurrentNotes[i];
+					else
+						currentNote = chordData.getPart(i);
+
+					currentNoteIsEighth = currentNote.contains("8");
+
+					// NEXT NOTE
+
+					// If this is the last chord associated with this syllable...
+					if (chordList.indexOf(chordData) == chordList.size() - 1) {
+						// And if this isn't the last syllable with chords on it...
+						if (syllableList.indexOf(syllable) < syllableList.size() - 1
+								&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords().length > 0) {
+							// Then the next note is the note from the first chord of the next syllable.
+							nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i);
+						} else {
+							// This is the last chord associated with the last syllable with chords on it,
+							// so we definitely do not want to hide it (it's the last chord on the page!)
+							hideThisChord = false;
+							lastChordInLine = true;
+						}
+						// If there's another chord associated with this syllable...
+					} else {
+						// Then the next note is the note from the next chord on this same syllable.
+						nextNote = chordList.get(chordList.indexOf(chordData) + 1).getPart(i);
+
+						// Since we have determined that there is at least one more chord on this syllable,
+						// we have to decide whether the current note should be combined with the next note.
+
+						// If the current and next notes both have the same pitch... (they must if they are to be combined)
+						if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))) {
+
+							// Try to do the combination
+							String addedNotes = combineNotes(currentNote, nextNote);
+
+							// If the previous note was also combined, remove it (and any tokens after it).
+							if (!tempCurrentNotes[i].isEmpty()) {
+								String[] tokens = syllableNoteBuffers[i].split(" ");
+								// This flag gets set if the previous note was a note group.
+								boolean noteGroup = false;
+								// Work backward through the tokens.
+								for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
+									if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") ||
+											tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") || tokens[i1].contains("g")) {
+										if (noteGroup) {
+											// If we hit the beginning of the note group...
+											if (tokens[i1].contains("<")) {
+												// remove it and we're done.
+												tokens[i1] = "";
+												break;
+											}
+
+											// If the note we're trying to remove is actually a note group...
+										} else if (tokens[i1].contains(">")) {
+											// Set the flag.
+											noteGroup = true;
+										}
+
+										tokens[i1] = "";
+
+										if (!noteGroup) {
+											// Stop here because we just removed the previous note.
+											break;
+										}
+
+									} else {
+										// Remove tokens that aren't notes from the end.
+										tokens[i1] = "";
+									}
+								}
+
+								// Remove any excess spaces from the syllable note buffer
+								StringBuilder editedString = new StringBuilder();
+								for (String token : tokens) {
+									if (token.isEmpty()) continue;
+									editedString.append(" ").append(token);
+								}
+								// Save back to the buffer.
+								syllableNoteBuffers[i] = editedString.toString();
+
+							}
+
+							// Add the combined note(s) to the buffer.
+							syllableNoteBuffers[i] += " " + addedNotes;
+							// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
+							// and only if this is not already the last chord on the
+							if (i == 0) {
+								measureBeats += getBeatDuration(addedNotes);
+							}
+
+							// If the notes were combined into one... (not tied)
+							if (!addedNotes.contains("~")) {
+								// The new note becomes the temporary current note for the current part.
+								tempCurrentNotes[i] = addedNotes;
+							} else {
+								// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
+								tempCurrentNotes[i] = addedNotes.split(" ")[1];
+							}
+
+							// Remember that we just did a note combination for the current part.
+							noteCombined[i] = true;
+						}
+
+					}
+
+					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
+					if (previousNote.equals("") || currentNote.equals("") || nextNote.equals("")) {
+						hideThisChord = false;
+					}
+
+					// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
+					if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4")) {
+						// Don't hide the current chord because neighboring chords are different.
+						hideThisChord = false;
+					}
+
+				}
+
+				// If hideThisChord remained true after all the checks for all the parts in the chord...
+				if (hideThisChord) {
+					for (int i = 0; i < 4; i++) {
+						// Add the flag that hides the note for each part of the chord before adding the notes themselves.
+						syllableNoteBuffers[i] += " \\noteHide";
+					}
+				}
+
+				// Add note data for each part to the buffers...
+				for (int i = 0; i < 4; i++) {
+					// ...but only if the note was not combined... (in which case it will already have been added)
+					if (!noteCombined[i]) {
+						// ...and the one before that was not combined.
+						if (!previousNoteCombined[i]) {
+							syllableNoteBuffers[i] += " " + chordData.getPart(i);
+							// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
+							if (i == 0) {
+								measureBeats += getBeatDuration(chordData.getPart(i));
+							}
+						} else {
+							// If the previous note was combined, we clear the temp field for the current part and reset the flag.
+							previousNoteCombined[i] = false;
+							tempCurrentNotes[i] = "";
+						}
+					} else {
+						// If the note was combined, set up flags for the next chord.
+						noteCombined[i] = false;
+						previousNoteCombined[i] = true;
+					}
+
+				}
+
+				// Decide whether to place an invisible barline after this chord (allows for line breaking here).
+				// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
+				// threshold for adding an optional break, the next syllable is the last and has only one chord,
+				// or the note which would precede the possible break point is an eighth note.
+				if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
+						&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
+						&& !currentNoteIsEighth)
+					breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
+
+			}
+			// That's it for each chord in the syllable.
+
+			// SLUR PROCESSING
+
+			// Flags for whether we needed a slur on the syllable for each part.
+			boolean[] addedSlur = new boolean[] {false, false, false, false};
+
+			// For each part...
+			for (int i = 0; i < 4; i++) {
+				// If the current part doesn't have any hidden notes on this syllable... (which would indicate that it's recitative)
+				if (!syllableNoteBuffers[i].contains("noteHide")) {
+
+					String[] tokens = syllableNoteBuffers[i].trim().split(" ");
+
+					// If all the notes in this part are tied, skip adding a slur.
+					if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
+						continue;
+
+					// If the part contains any rests, don't slur.
+					if (Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
+						continue;
+
+					// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
+					StringBuilder finalString = new StringBuilder();
+					// For each token in the buffer...
+					for (int i1 = 0; i1 < tokens.length; i1++) {
+						// If the token is a barline indicator, append it and the following as if one token
+						if (tokens[i1].equals("$bar")) {
+							finalString.append(" ").append(tokens[i1])
+									.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
+							i1++; // Don't try to append i1 + 1 again
+							continue;
+						}
+						// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
+						// note group... (two notes occurring in one part, which will be split across two tokens)
+						if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) { // TODO: Just break?
+							// Add the beginning slur parenthesis and the current token.
+							finalString.append(" \\( ").append(tokens[i1]);
+							addedSlur[i] = true;
+						} else {
+							// Otherwise skip empty tokens or add the current one.
+							if (tokens[i1].isEmpty()) continue;
+							finalString.append(" ").append(tokens[i1]);
+						}
+					}
+
+					// Save the new string to the note buffer.
+					syllableNoteBuffers[i] = finalString.toString();
+				}
+
+			}
+
+			// Close parentheses to complete the slur for the syllable.
+			// For each part...
+			for (int i = 0; i < 4; i++) {
+				// If a slur was begun to be added for the part...
+				if (addedSlur[i]) {
+					// Complete the slur by adding a closing parenthesis.
+					if (syllableNoteBuffers[i].endsWith("$bar "))
+						syllableNoteBuffers[i] = TWUtils.replaceLast(syllableNoteBuffers[i],
+								Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
+					else
+						syllableNoteBuffers[i] += ("\\)");
+				}
+			}
+
+			// SYLLABLE BUFFER SAVE-OUTS
+
+			// Add the text buffer for the syllable to that of the line.
+			verseLine.append(syllableTextBuffer);
+
+			// Add the note data for the syllable from the buffers to the final part strings.
+			for (int i = 0; i < 4; i++) {
+				parts[i] += syllableNoteBuffers[i];
+			}
+
+		}
+
+		// Insert time signature for the line
+		String verseLineWithTimeSignature = String.format(verseLine.toString(), generateTimeSignature(measureBeats));
+		verseText.append(verseLineWithTimeSignature);
 	}
 
 	private static float trySubdividing(String[] partBuffers, StringBuilder syllableTextBuffer) {
