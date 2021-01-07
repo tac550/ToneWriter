@@ -208,7 +208,7 @@ public class LilyPondInterface {
 			lines.add("\\pageBreak\n");
 
 		// Perform layout procedure
-		String[] results = generateNotationSource(item.getVerseLineControllers());
+		String[] results = generateNotationAndLyrics(item.getVerseLineControllers());
 
 		// Pattern which matches valid LilyPond notes
 		Pattern noteDataPattern = Pattern.compile("[a-g][\\S]*[0-9]");
@@ -318,14 +318,14 @@ public class LilyPondInterface {
 		return resultText.toString();
 	}
 
-	private static String[] generateNotationSource(List<VerseLineViewController> verse_lines) {
-		// Part buffers for the item { S  A    T  B }
-		String[] parts = new String[]{"", "", "", ""};
+	private static String[] generateNotationAndLyrics(List<VerseLineViewController> verse_lines) {
+		// Part buffers for the item  { S  A    T  B }
+		String[] parts = new String[] {"", "", "", ""};
 		// Buffer for the piece's text.
 		StringBuilder verseText = new StringBuilder();
 
 		for (VerseLineViewController verseLineController : verse_lines)
-			generateLineSource(parts, verseText, verseLineController);
+			generateLine(parts, verseText, verseLineController);
 
 		// Insert invisible barlines where indicated, after reversing possible incorrect orderings of bars/slur starts
 		parts[PART_SOPRANO] = parts[PART_SOPRANO].replace("$bar  \\(", "\\( $bar")
@@ -336,87 +336,63 @@ public class LilyPondInterface {
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
 	}
 
-	private static void generateLineSource(String[] parts, StringBuilder verseText, VerseLineViewController verseLineController) {
-		// Store the line's syllables.
-		List<SyllableText> syllableList = Arrays.asList(verseLineController.getSyllables());
-		// If this is a verse separator line, add the double bar line and continue to the next one.
-		if (syllableList.isEmpty()) {
+	private static void generateLine(String[] parts, StringBuilder verseText, VerseLineViewController verseLineController) {
+		// If this is a verse separator line, add the double bar line and we're done.
+		if (verseLineController.isSeparator()) {
 			parts[PART_SOPRANO] += " \\bar \"||\"";
-			return;
-		}
+		} else {
+			StringBuilder verseLine = new StringBuilder();
+			// Number of beats in the line. This determines where the visible barline goes.
+			float measureBeats = generateNotatedLine(parts, List.of(verseLineController.getSyllables()), verseLine);
 
-		// Buffer for the line's text. The format specifier is for the line's time signature.
-		StringBuilder verseLine = new StringBuilder().append(" %s ");
-		// Number of beats in the line. This determines where the final (visible) barline goes
+			// Insert time signature for the line
+			verseText.append(String.format(" %s %s", generateTimeSignature(measureBeats), verseLine.toString()));
+		}
+	}
+
+	private static float generateNotatedLine(String[] parts, List<SyllableText> syllableList, StringBuilder verseLine) {
 		float measureBeats = 0;
 		float breakCount = 0;
 
 		// For each syllable in the line...
 		for (SyllableText syllable : syllableList) {
-			// Note buffers for this syllable.           S   A   T   B
-			String[] syllableNoteBuffers = new String[]{"", "", "", ""};
+			// Note buffers for this syllable.          { S  A    T  B }
+			String[] syllableNoteBuffers = new String[] {"", "", "", ""};
 			// Buffer for the syllable's text.
 			StringBuilder syllableTextBuffer = new StringBuilder();
 
 			// Whether or not notes were combined for each part in the previous chord.
 			// Note that notes being combined means either being made into one note with a
 			// duration which is the sum of the two, or that the notes were tied (because there can be no single note with such a duration)
-			boolean[] noteCombined = new boolean[]{false, false, false, false};
+			boolean[] noteCombined = new boolean[] {false, false, false, false};
 			// True if the corresponding part needed a combination 2 chords ago.
-			boolean[] previousNoteCombined = new boolean[]{false, false, false, false};
+			boolean[] previousNoteCombined = new boolean[] {false, false, false, false};
 			// Notes for each part to consider "current" when testing whether to combine.
 			// Gets set if a note was combined on the last chord.
-			String[] tempCurrentNotes = new String[]{"", "", "", ""};
+			String[] tempCurrentNotes = new String[] {"", "", "", ""};
 
 			List<AssignedChordData> chordList = Arrays.asList(syllable.getAssociatedChords());
 			// For each chord assigned to the syllable...
+
+			if (!chordList.isEmpty())
+				addSyllaleToLyrics(syllableList, syllable, syllableTextBuffer);
+
 			for (AssignedChordData chordData : chordList) {
 
-				// SYLLABLE TEXT PROCESSING
-
-				// If this is the first chord associated with the syllable, then we do text parsing right now and only once.
-				// The reason we do this now instead of in the enclosing scope is because we want to skip
-				// adding to the final text any syllable that has no associated chords.
-				if (chordList.indexOf(chordData) == 0) {
-
-					// Add any formatting flags for the syllable first.
-					syllableTextBuffer.append(syllable.getBold() ? " \\lyricBold " : "")
-							.append(syllable.getItalic() ? " \\lyricItalic " : "");
-
-					// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-					syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
-
-					// If this is not the last syllable in the text... (we're just avoiding an index out of bounds-type error)
-					if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
-						// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
-						// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-						if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
-							syllableTextBuffer.append(" -- ");
-						}
-					}
-
-					// Add closing formatting flag if necessary.
-					if (syllable.getBold() || syllable.getItalic())
-						syllableTextBuffer.append(" \\lyricRevert ");
-
-					// If this is not the first chord associated with the syllable...
-				} else {
-					// If the soprano part was combined two chords ago, or it contains a rest,
-					// we skip the following addition to the text buffer for the syllable.
-					// We only check the soprano part because that is the only part to which the text is actually mapped by LilyPond.
-					if (!previousNoteCombined[PART_SOPRANO] && !chordData.getPart(PART_SOPRANO).contains("r")) {
-						// For chords subsequent to the first for each syllable, we add this to the lyric line
-						// to tell Lilypond this syllable has an additional chord attached to it.
-						syllableTextBuffer.append(" _ ");
-					}
+				// Add an additional chord indicator for the syllable, unless the soprano part was combined two chords ago,
+				// or it contains a rest. We only check the soprano part because the text is mapped to it.
+				if (chordList.indexOf(chordData) != 0 && !previousNoteCombined[PART_SOPRANO]
+						&& !chordData.getPart(PART_SOPRANO).contains("r")) {
+					// For chords subsequent to the first for each syllable, we add this to the lyric line
+					// to tell Lilypond this syllable has an additional chord attached to it.
+					syllableTextBuffer.append(" _ ");
 				}
 
 				// CHORD DATA PROCESSING
 
-				// Flag to keep track of whether this chord will be hidden.
-				// Chord hiding cleans up repeated quarter notes for extended periods of recitative.
-				// The default behavior is to hide the chord after the below processing is done,
-				// but there will be many opportunities for the chord to remain visible based upon what's going on around it.
+				// Flag to keep track of whether this chord will be hidden. Chord hiding cleans up repeated quarter
+				// notes for extended periods of recitative. We assume the chord will be hidden by default, but there
+				// will be many opportunities for the chord to remain visible based upon what's going on around it.
 				// We must check the notes in each part to see if the chord shouldn't be hidden.
 				boolean hideThisChord = true;
 
@@ -694,10 +670,29 @@ public class LilyPondInterface {
 			}
 
 		}
+		return measureBeats;
+	}
 
-		// Insert time signature for the line
-		String verseLineWithTimeSignature = String.format(verseLine.toString(), generateTimeSignature(measureBeats));
-		verseText.append(verseLineWithTimeSignature);
+	private static void addSyllaleToLyrics(List<SyllableText> syllableList, SyllableText syllable, StringBuilder syllableTextBuffer) {
+		// Add any formatting flags for the syllable first.
+		syllableTextBuffer.append(syllable.getBold() ? " \\lyricBold " : "")
+				.append(syllable.getItalic() ? " \\lyricItalic " : "");
+
+		// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
+		syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
+
+		// If this is not the last syllable in the text,
+		if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
+			// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
+			// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
+			if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
+				syllableTextBuffer.append(" -- ");
+			}
+		}
+
+		// Add closing formatting flag if necessary.
+		if (syllable.getBold() || syllable.getItalic())
+			syllableTextBuffer.append(" \\lyricRevert ");
 	}
 
 	private static float trySubdividing(String[] partBuffers, StringBuilder syllableTextBuffer) {
