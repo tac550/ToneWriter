@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
@@ -218,6 +219,21 @@ public class TWUtils {
 
 	// UI
 
+	public static class inputFormatter extends TextFormatter<String> {
+		public inputFormatter() {
+			super(c -> {
+				String changeText = c.getText();
+
+				if (changeText.contains("'"))
+					c.setText(changeText.replace("'", "\u2019"));
+				if (changeText.contains("\t"))
+					c.setText(changeText.replace("\t", " "));
+
+				return c;
+			});
+		}
+	}
+
 	public static void showError(String message, boolean wait) {
 		showAlert(AlertType.ERROR, "Error", message, wait);
 	}
@@ -230,7 +246,6 @@ public class TWUtils {
 	}
 	public static Optional<ButtonType> showAlert(AlertType alert_type, String title_text, String header_text, boolean wait,
 												 Stage owner, ButtonType[] button_types, ButtonType default_button) {
-
 		Alert alert = new Alert(alert_type);
 		alert.initOwner(owner);
 		((Stage) alert.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.APP_ICON);

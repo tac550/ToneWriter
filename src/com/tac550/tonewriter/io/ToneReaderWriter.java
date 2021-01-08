@@ -260,9 +260,9 @@ public class ToneReaderWriter {
 		mainScene.setKeySignature(keySig);
 		if (pre0_6) {
 			String[] headerParts = composerText.split("-", 2);
-			mainScene.setHeaderText(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
+			mainScene.setHeaderStrings(headerParts[0].trim(), headerParts.length > 1 ? headerParts[1].trim() : "");
 		} else {
-			mainScene.setHeaderText(poetText, composerText);
+			mainScene.setHeaderStrings(poetText, composerText);
 		}
 
 		mainScene.recalcCLNames();

@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -17,7 +18,11 @@ public class SyllableEditViewController {
 	void setSyllableText(String text) {
 		syllableTextField.setText(text);
 	}
-	
+
+	@FXML private void initialize() {
+		syllableTextField.setTextFormatter(new TWUtils.inputFormatter());
+	}
+
 	@FXML private void handleOK() {
 		// Sending an empty line would cause the verse line controller to think it's a separator.
 		// Also don't send if it's the same as the existing verse line.

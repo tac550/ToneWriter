@@ -163,7 +163,7 @@ public class LilyPondInterface {
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
 		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
 				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
-						+ escapeDoubleQuotesForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
+						+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
 		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 				.replace("$APPNAME", MainApp.APP_NAME));
 		if (items.length == 1 && items[0].getLargeTitle())
@@ -224,23 +224,23 @@ public class LilyPondInterface {
 			// Title, if not hidden...
 			if (!item.getFinalTitleContent().isEmpty())
 				Collections.addAll(lines, String.format("  \\fill-line \\bold %s{\\justify { %s } }",
-						item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", escapeDoubleQuotesForNotation(item.getFinalTitleContent())));
+						item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(item.getFinalTitleContent())));
 			// ...and subtitle, if present
 			if (!item.getSubtitle().isEmpty())
 				Collections.addAll(lines, String.format("  \\fill-line %s{\\justify { %s } } \\vspace #0.5",
-						"\\fontsize #0.5 ", escapeDoubleQuotesForNotation(item.getSubtitle())));
+						"\\fontsize #0.5 ", reformatTextForNotation(item.getSubtitle())));
 
 			Collections.addAll(lines, "  \\vspace #0.25", "}\n", "\\noPageBreak\n");
 		}
 
 		// Top verse, if any
 		if (item.getExtendTextSelection() == 1) {
-			lines.add(escapeDoubleQuotesForNotation(generateExtendedText(item.getTopVerseChoice(),
+			lines.add(reformatTextForNotation(generateExtendedText(item.getTopVerseChoice(),
 					item.getVerseAreaText(), item.getBreakOnlyOnBlank())) + (createStaff ? "\\noPageBreak\n" : ""));
 		} else if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
 					String.format("  \\vspace #0.5 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
-							item.getTopVerseChoice(), escapeDoubleQuotesForNotation(item.getTopVerse()) + " } "),
+							item.getTopVerseChoice(), reformatTextForNotation(item.getTopVerse()) + " } "),
 					"}\n",
 					createStaff ? "\\noPageBreak\n" : "");
 		}
@@ -248,8 +248,8 @@ public class LilyPondInterface {
 		if (createStaff) {
 			// Score header
 			Collections.addAll(lines, "\\score {\n", "  \\header {",
-					String.format("    piece = \"%s\"", escapeDoubleQuotesForHeaders(item.getLeftHeaderText())),
-					String.format("    opus = \"%s\"", escapeDoubleQuotesForHeaders(item.getRightHeaderText())),
+					String.format("    piece = \"%s\"", reformatTextForHeaders(item.getLeftHeaderText())),
+					String.format("    opus = \"%s\"", reformatTextForHeaders(item.getRightHeaderText())),
 					"    instrument = \"\"",
 					"  }\n");
 
@@ -282,13 +282,13 @@ public class LilyPondInterface {
 
 		// Bottom verse, if any
 		if (item.getExtendTextSelection() == 2) {
-			lines.add((createStaff ? "\\noPageBreak\n" : "") + escapeDoubleQuotesForNotation(generateExtendedText(item.getBottomVerseChoice(),
+			lines.add((createStaff ? "\\noPageBreak\n" : "") + reformatTextForNotation(generateExtendedText(item.getBottomVerseChoice(),
 					item.getVerseAreaText(), item.getBreakOnlyOnBlank())));
 		} else if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
 					"\\markup \\column {",
 					String.format("  \\justify { \\halign #-1 \\bold {%s} %s \\vspace #1",
-							item.getBottomVerseChoice(), escapeDoubleQuotesForNotation(item.getBottomVerse()) + " } "),
+							item.getBottomVerseChoice(), reformatTextForNotation(item.getBottomVerse()) + " } "),
 					"}\n");
 		}
 
@@ -679,7 +679,7 @@ public class LilyPondInterface {
 				.append(syllable.getItalic() ? " \\lyricItalic " : "");
 
 		// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-		syllableTextBuffer.append(escapeDoubleQuotesForNotation(syllable.getText().replace("-", "")));
+		syllableTextBuffer.append(reformatTextForNotation(syllable.getText().replace("-", "")));
 
 		// If this is not the last syllable in the text,
 		if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
@@ -791,8 +791,9 @@ public class LilyPondInterface {
 
 	}
 
-	// Returns reformatted version of input such that double quotes display correctly in LilyPond output.
-	private static String escapeDoubleQuotesForNotation(String input) {
+	// Returns reformatted version of input such that double quotes display correctly and
+	// straight apostrophes are replaced with curly ones in LilyPond output.
+	private static String reformatTextForNotation(String input) {
 		StringBuilder outputBuffer = new StringBuilder();
 
 		// Delimiters are included to enable rebuilding the entire string with whitespace
@@ -817,10 +818,10 @@ public class LilyPondInterface {
 			}
 		}
 
-		return outputBuffer.toString();
+		return outputBuffer.toString().replace("'", "\u2019");
 	}
-	private static String escapeDoubleQuotesForHeaders(String input) {
-		return input.replace("\"", "\\\"");
+	private static String reformatTextForHeaders(String input) {
+		return input.replace("\"", "\\\"").replace("'", "\u2019");
 	}
 
 	// TODO: Seems to have bugs with note groups of more than 2 notes

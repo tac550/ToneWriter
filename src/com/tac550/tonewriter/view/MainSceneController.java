@@ -158,17 +158,7 @@ public class MainSceneController {
 			box.getSelectionModel().select(0);
 		});
 
-		// Replace all straight apostrophes with curly ones and tabs with spaces.
-		verseArea.setTextFormatter(new TextFormatter<String>(c -> {
-			String changeText = c.getText();
-
-			if (changeText.contains("'"))
-				c.setText(changeText.replace("'", "\u2019"));
-			if (changeText.contains("\t"))
-				c.setText(changeText.replace("\t", " "));
-
-			return c;
-		}));
+		// Behavior when verseArea content changes
 		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
 			verseTextHintPane.setVisible(newVal.isEmpty());
 
@@ -220,6 +210,12 @@ public class MainSceneController {
 			}
 		});
 
+		verseArea.setTextFormatter(new TWUtils.inputFormatter());
+		titleTextField.setTextFormatter(new TWUtils.inputFormatter());
+		subtitleTextField.setTextFormatter(new TWUtils.inputFormatter());
+		topVerseField.setTextFormatter(new TWUtils.inputFormatter());
+		bottomVerseField.setTextFormatter(new TWUtils.inputFormatter());
+
 		// listeners for triggering project edited status
 		titleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
 		subtitleTextField.textProperty().addListener(change -> topSceneController.projectEdited());
@@ -248,7 +244,7 @@ public class MainSceneController {
 		refreshChordKeySignatures(keySignature);
 	}
 
-	public void setHeaderText(String left, String right) {
+	public void setHeaderStrings(String left, String right) {
 		leftText = left;
 		rightText = right;
 	}
@@ -698,7 +694,7 @@ public class MainSceneController {
 			toneMenuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
-			setHeaderText("", "");
+			setHeaderStrings("", "");
 			keySignature = "C major";
 			toneMenuState.manualCLAssignmentSelected = false;
 
@@ -797,10 +793,15 @@ public class MainSceneController {
 			grid.setVgap(10);
 			grid.setPadding(new Insets(20, 20, 10, 10));
 
-			TextField leftField = new TextField(leftText);
+			TextField leftField = new TextField();
 			leftField.setPromptText("Tone #");
-			TextField rightField = new TextField(rightText);
+			leftField.setTextFormatter(new TWUtils.inputFormatter());
+			leftField.setText(leftText);
+
+			TextField rightField = new TextField();
 			rightField.setPromptText("Composer - System");
+			rightField.setTextFormatter(new TWUtils.inputFormatter());
+			rightField.setText(rightText);
 			rightField.setPrefWidth(200);
 
 			grid.add(new Label("Left side:"), 0, 0);
@@ -827,7 +828,7 @@ public class MainSceneController {
 				if (!(tempLeftText.equals(leftText) && tempRightText.equals(rightText))) {
 					toneEdited();
 
-					setHeaderText(tempLeftText, tempRightText);
+					setHeaderStrings(tempLeftText, tempRightText);
 				}
 			});
 		})).start();

@@ -56,9 +56,8 @@ public class QuickVerseController {
 	        if (filteredData.size() > 0) {
 	        	resultField.setText(filteredData.get(0));
 	        }
-
 	    });
-	    
+
 	    // Verse list setup
 	    verseList = new ListView<>(filteredData);
 	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
@@ -136,6 +135,9 @@ public class QuickVerseController {
 				verseList.scrollTo(0);
 			}
 		});
+
+		filterInput.setTextFormatter(new TWUtils.inputFormatter());
+		resultField.setTextFormatter(new TWUtils.inputFormatter());
 
 		refreshVerses();
 	}
