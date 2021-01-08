@@ -617,7 +617,7 @@ public class MainSceneController {
 
 	public void swapToneFile(File tone_file) {
 		toneFile = tone_file;
-		toneMenuState.saveToneMenuItemDisabled = TWUtils.isBuiltinTone(toneFile);
+		toneMenuState.saveToneMenuItemDisabled = !isToneSavable();
 		applyToneMenuState();
 	}
 
