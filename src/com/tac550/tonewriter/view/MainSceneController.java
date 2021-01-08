@@ -17,21 +17,11 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.robot.Robot;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -39,10 +29,6 @@ import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,7 +41,7 @@ import java.util.stream.Stream;
 
 /*
  * TEST VERSES:
- * 
+ *
 
 Lord, I call upon You, hear me!
 Hear me O Lord!
@@ -118,8 +104,6 @@ public class MainSceneController {
 
 	private Consumer<MainSceneController> pendingLoadActions;
 
-	private Robot robot;
-
 	private File toneFile;
 	private int originalIndex = -1;
 	private String cachedItemSource = "";
@@ -174,42 +158,17 @@ public class MainSceneController {
 			box.getSelectionModel().select(0);
 		});
 
-		// Replace text area with a custom one.
-		AnchorPane verseAreaPane = (AnchorPane) verseArea.getParent();
-		verseAreaPane.getChildren().remove(verseArea);
-		verseArea = new TextArea() {
-			@Override
-			public void paste() { // Intercept paste actions.
-				String pastingText = null;
-				try {
-					pastingText = (String) Toolkit.getDefaultToolkit()
-							.getSystemClipboard().getData(DataFlavor.stringFlavor);
-				} catch (UnsupportedFlavorException | IOException e) {
-					e.printStackTrace();
-				}
+		// Replace all straight apostrophes with curly ones and tabs with spaces.
+		verseArea.setTextFormatter(new TextFormatter<String>(c -> {
+			String changeText = c.getText();
 
-				if (pastingText == null) { super.paste(); return; }
-				// Replace Replace each tabbed-in newline in pasted text with a single space, eliminate multi-spaces,
-				// and replace all tabs with spaces.
-				String editedText = pastingText.replaceAll("\n\t+", " ")
-						.replaceAll(" +", " ")
-						.replaceAll("\t", " ");
-				Toolkit.getDefaultToolkit().getSystemClipboard()
-						.setContents(new StringSelection(editedText), null);
+			if (changeText.contains("'"))
+				c.setText(changeText.replace("'", "\u2019"));
+			if (changeText.contains("\t"))
+				c.setText(changeText.replace("\t", " "));
 
-				super.paste();
-
-				Toolkit.getDefaultToolkit().getSystemClipboard()
-						.setContents(new StringSelection(pastingText), null);
-			}
-		};
-		// Replace all typed tabs with spaces.
-		verseArea.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-			if (event.getCode() == KeyCode.TAB) {
-				robot.keyType(KeyCode.SPACE);
-				event.consume();
-			}
-		});
+			return c;
+		}));
 		verseArea.textProperty().addListener((ov, oldVal, newVal) -> {
 			verseTextHintPane.setVisible(newVal.isEmpty());
 
@@ -219,11 +178,8 @@ public class MainSceneController {
 
 			topSceneController.projectEdited();
 		});
-		verseAreaPane.getChildren().add(0, verseArea);
 		AnchorPane.setLeftAnchor(verseArea, 0.0); AnchorPane.setRightAnchor(verseArea, 0.0);
 		AnchorPane.setTopAnchor(verseArea, 0.0); AnchorPane.setBottomAnchor(verseArea, 0.0);
-
-		Platform.runLater(() -> robot = new Robot());
 
 		setVerseButton.setVisible(false);
 
