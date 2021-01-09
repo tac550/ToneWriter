@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.model.AssignedChordData;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -135,6 +136,10 @@ public class SyllableText extends Text {
 	}
 	public String getFormatData() {
 		return (getBold() ? "b" : "") + (getItalic() ? "i" : "");
+	}
+
+	public String getFormattedText() {
+		return TWUtils.reverseSmartQuotes(getText());
 	}
 
 	void deactivate() {

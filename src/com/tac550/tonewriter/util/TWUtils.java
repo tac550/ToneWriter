@@ -18,6 +18,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TWUtils {
 
@@ -120,12 +122,40 @@ public class TWUtils {
 		return encoded.replaceAll("/n", "\n").replaceAll("<%47>", "/");
 	}
 
-	public static String replaceInvalidFileChars(String original, String replacement) {
-		return original.replaceAll("[\\\\/:*?\"<>|]", replacement);
+	public static String replaceInvalidFileChars(String text, String replacement) {
+		return text.replaceAll("[\\\\/:*?\"<>|]", replacement);
 	}
 
 	public static String replaceLast(String text, String regex, String replacement) {
 		return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
+	}
+
+	public static String applySmartQuotes(String text) {
+		Pattern pattern = Pattern.compile("\"");
+		Matcher matcher = pattern.matcher(text);
+
+		List<Character> punctuation = List.of('.', ',', '!', '?', ';', '\'');
+
+		int lastPos;
+		while (matcher.find()) {
+			lastPos = matcher.end();
+
+			if (lastPos < 2 || lastPos - 1 > text.length())
+				text = text.replaceFirst("\"", "\u201C");
+			else if (!Character.isLetterOrDigit(text.charAt(lastPos - 2))
+					&& !punctuation.contains(text.charAt(lastPos - 2)))
+				text = text.replaceFirst("\"", "\u201C");
+			else
+				text = text.replaceFirst("\"", "\u201D");
+		}
+
+		text = text.replaceAll("\\\\[\"\u201C\u201D]", "\"");
+
+		return text;
+	}
+	public static String reverseSmartQuotes(String text) {
+		return text.replace("\"", "\\\"").replace("\\\\", "\\")
+				.replaceAll("[\u201C\u201D]", "\"");
 	}
 
 	// Filesystem

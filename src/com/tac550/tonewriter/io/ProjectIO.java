@@ -291,7 +291,7 @@ public class ProjectIO {
 				}
 
 				for (SyllableText syllable : vLine.getSyllables()) {
-					line.append("|").append(syllable.getText().strip());
+					line.append("|").append(syllable.getFormattedText().strip());
 
 					String formatData = syllable.getFormatData();
 					if (formatData.length() > 0)

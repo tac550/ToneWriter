@@ -179,10 +179,10 @@ public class VerseLineViewController {
 			// Create the verseLine object, replacing any excess spaces with a single space.
 			verseLine = new VerseLine(line_text.strip().replaceAll(" +", " "));
 
-			// If the number of syllabes is the same as before, just change the content of the text elements.
+			// If the number of syllables is the same as before, just change the content of the text elements.
 			// This way assignments are not lost when making small changes.
-			String[] syllables = verseLine.getSyllables();
-			if (lineTextFlow.getChildren().size() == syllables.length) {
+			List<String> syllables = verseLine.getSyllables();
+			if (lineTextFlow.getChildren().size() == syllables.size()) {
 				int i = 0;
 				for (String syllable : syllables) {
 					SyllableText textElement = (SyllableText) lineTextFlow.getChildren().get(i);

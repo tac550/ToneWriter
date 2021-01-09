@@ -679,13 +679,13 @@ public class LilyPondInterface {
 				.append(syllable.getItalic() ? " \\lyricItalic " : "");
 
 		// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
-		syllableTextBuffer.append(reformatTextForNotation(syllable.getText().replace("-", "")));
+		syllableTextBuffer.append(reformatTextForNotation(syllable.getFormattedText().replace("-", "")));
 
 		// If this is not the last syllable in the text,
 		if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
 			// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
 			// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-			if (syllableList.get(syllableList.indexOf(syllable) + 1).getText().startsWith("-")) {
+			if (syllableList.get(syllableList.indexOf(syllable) + 1).getFormattedText().startsWith("-")) {
 				syllableTextBuffer.append(" -- ");
 			}
 		}
@@ -797,7 +797,8 @@ public class LilyPondInterface {
 		StringBuilder outputBuffer = new StringBuilder();
 
 		// Delimiters are included to enable rebuilding the entire string with whitespace
-		StringTokenizer tokenizer = new StringTokenizer(input, " \t\n\r\f", true);
+		StringTokenizer tokenizer = new StringTokenizer(
+				TWUtils.applySmartQuotes(input), " \t\n\r\f", true);
 
 		while (tokenizer.hasMoreTokens()) {
 			String current_token = tokenizer.nextToken();
@@ -821,7 +822,8 @@ public class LilyPondInterface {
 		return outputBuffer.toString().replace("'", "\u2019");
 	}
 	private static String reformatTextForHeaders(String input) {
-		return input.replace("\"", "\\\"").replace("'", "\u2019");
+		return TWUtils.applySmartQuotes(input)
+				.replace("\"", "\\\"").replace("'", "\u2019");
 	}
 
 	// TODO: Seems to have bugs with note groups of more than 2 notes
