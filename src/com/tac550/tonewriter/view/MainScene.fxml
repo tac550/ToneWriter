@@ -178,7 +178,7 @@
                               <AnchorPane VBox.vgrow="ALWAYS">
                                  <children>
                                     <TextArea fx:id="verseArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                    <StackPane fx:id="setVersePane" mouseTransparent="true" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
+                                    <StackPane fx:id="setVersePane" mouseTransparent="true" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0">
                                        <children>
                                           <HBox fx:id="setVerseProgressBox" alignment="CENTER" visible="false" StackPane.alignment="CENTER">
                                              <children>
