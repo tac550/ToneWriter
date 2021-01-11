@@ -352,8 +352,6 @@ public class MainSceneController {
 				verseLine.selectBarlines("", "unchanged");
 			if (isLastVerseLineOfSection(verseLine))
 				verseLine.selectBarlines("unchanged", "||");
-			if (verseLineControllers.indexOf(verseLine) == verseLineControllers.size() - 1)
-				verseLine.selectBarlines("unchanged", "|.");
 
 			verseLine.refreshBarViews();
 		}
