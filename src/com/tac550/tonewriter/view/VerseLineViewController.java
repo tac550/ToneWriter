@@ -52,6 +52,11 @@ public class VerseLineViewController {
 
 	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
+	private int beforeBar = 0;
+	private int afterBar = 1;
+	@FXML private ImageView beforeBarView;
+	@FXML private ImageView afterBarView;
+
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
 	private String previousChantLine = "";
@@ -214,6 +219,16 @@ public class VerseLineViewController {
 			isSeparatorLine = true;
 			separatorPane.setVisible(true);
 			mainContentPane.setVisible(false);
+		}
+	}
+
+	void selectBarlines(String before, String after) {
+		if (!before.equals("unchanged")) beforeBar = List.of(SyllableEditViewController.beforeBarStrs).indexOf(before);
+		if (!after.equals("unchanged")) afterBar = List.of(SyllableEditViewController.afterBarStrs).indexOf(after);
+
+		if (!before.equals("unchanged") || !after.equals("unchanged")) {
+			refreshBarViews();
+			topController.projectEdited();
 		}
 	}
 
@@ -641,11 +656,12 @@ public class VerseLineViewController {
 	@FXML private void handleEditSyllables() {
 
 		FXMLLoaderIO.loadFXMLLayoutAsync("syllableEditView.fxml", loader -> {
-			BorderPane rootLayout = loader.getRoot();
+			VBox rootLayout = loader.getRoot();
 			SyllableEditViewController controller = loader.getController();
 
 			controller.setParentController(this);
 			controller.setSyllableText(verseLine.getLine());
+			controller.setBarSelections(beforeBar, afterBar);
 
 			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
@@ -678,6 +694,13 @@ public class VerseLineViewController {
 		}
 	}
 
+	public String getBeforeBar() {
+		return SyllableEditViewController.beforeBarStrs[beforeBar];
+	}
+	public String getAfterBar() {
+		return  SyllableEditViewController.afterBarStrs[afterBar];
+	}
+
 	public void setAssignmentDurations(List<String> durations) {
 		int i = 0;
 		for (SyllableText syllable : getSyllables()) {
@@ -699,8 +722,17 @@ public class VerseLineViewController {
 		separatorPane.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
+	void refreshBarViews() {
+		beforeBarView.setImage(SyllableEditViewController.barImages[beforeBar]);
+		afterBarView.setImage(SyllableEditViewController.barImages[afterBar]);
+	}
+
 	public void verseEdited() {
 		mainController.verseEdited();
+	}
+
+	boolean notFirstInItem() {
+		return mainController.getVerseLineControllers().indexOf(this) != 0;
 	}
 
 }

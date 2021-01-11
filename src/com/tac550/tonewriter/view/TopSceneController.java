@@ -107,11 +107,11 @@ public class TopSceneController {
 	private static final List<RadioMenuItem> clickItems = new ArrayList<>();
 	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, wholeNoteMenuItem);
 	private static final ToggleGroup durationGroup = new ToggleGroup();
-	private static final ImageView eighthNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/eighth-note.png").toExternalForm());
-	private static final ImageView quarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/quarter-note.png").toExternalForm());
-	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/dotted-quarter-note.png").toExternalForm());
-	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/half-note.png").toExternalForm());
-	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/whole-note.png").toExternalForm());
+	private static final ImageView eighthNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/eighth.png").toExternalForm());
+	private static final ImageView quarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/quarter.png").toExternalForm());
+	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/dotted-quarter.png").toExternalForm());
+	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/half.png").toExternalForm());
+	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/whole.png").toExternalForm());
 	private static final List<ImageView> touchItems = new ArrayList<>();
 	private static final Text touchDescriptionText = new Text("Note info");
 	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(0.5, 1, 0.5, 1);

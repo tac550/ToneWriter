@@ -346,7 +346,19 @@ public class MainSceneController {
 	}
 
 	void syncCVLMapping() {
-		if (toneFile == null) return; // No tone is loaded; don't do anything
+		// First, update barlines and refresh their display
+		for (VerseLineViewController verseLine : verseLineControllers) {
+			if (verseLine.notFirstInItem())
+				verseLine.selectBarlines("", "unchanged");
+			if (isLastVerseLineOfSection(verseLine))
+				verseLine.selectBarlines("unchanged", "||");
+			if (verseLineControllers.indexOf(verseLine) == verseLineControllers.size() - 1)
+				verseLine.selectBarlines("unchanged", "|.");
+
+			verseLine.refreshBarViews();
+		}
+
+		if (toneFile == null) return; // No tone is loaded; don't continue to phrase assignment.
 
 		// If manual mode is selected, allow user to choose all chant line assignments.
 		if (manualCLAssignmentEnabled()) {
@@ -869,6 +881,16 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 	void removeVerseLine(VerseLineViewController verseLineViewController) {
+
+		// If this is a separator line, and the previous line ends with a double bar, change it to a single bar.
+		if (verseLineControllers.indexOf(verseLineViewController) > 0) {
+			VerseLineViewController previousController = verseLineControllers.get(
+					verseLineControllers.indexOf(verseLineViewController) - 1);
+
+			if (verseLineViewController.isSeparator() && previousController.getAfterBar().equals("||"))
+				previousController.selectBarlines("unchanged", "|");
+		}
+
 		verseLineBox.getChildren().remove(verseLineViewController.getRootPane());
 		verseLineControllers.remove(verseLineViewController);
 

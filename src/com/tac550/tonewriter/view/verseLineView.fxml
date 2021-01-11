@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
@@ -29,13 +30,23 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefWidth="190.0" vgap="10.0">
+            <StackPane prefHeight="150.0" prefWidth="200.0">
                <children>
-                  <Text fx:id="chordEntryText" strokeType="OUTSIDE" strokeWidth="0.0" />
-                  <ChoiceBox fx:id="tonePhraseChoice" />
-                  <Button fx:id="skipChordButton" mnemonicParsing="false" onAction="#skipChordAction" text="Skip Chord" />
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ImageView fx:id="afterBarView" fitHeight="33.0" fitWidth="20.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ImageView fx:id="beforeBarView" fitHeight="33.0" fitWidth="20.0" layoutX="90.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+                  <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefWidth="190.0" vgap="10.0">
+                     <children>
+                        <Text fx:id="chordEntryText" strokeType="OUTSIDE" strokeWidth="0.0" />
+                        <ChoiceBox fx:id="tonePhraseChoice" />
+                        <Button fx:id="skipChordButton" mnemonicParsing="false" onAction="#skipChordAction" text="Skip Chord" />
+                     </children>
+                  </FlowPane>
                </children>
-            </FlowPane>
+            </StackPane>
             <ScrollPane fx:id="syllableScrollPane" fitToHeight="true" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
                <content>
                   <GridPane>
