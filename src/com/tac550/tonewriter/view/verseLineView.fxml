@@ -34,8 +34,8 @@
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <ImageView fx:id="afterBarView" fitHeight="33.0" fitWidth="20.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                        <ImageView fx:id="beforeBarView" fitHeight="33.0" fitWidth="20.0" layoutX="90.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ImageView fx:id="afterBarView" fitHeight="47.0" fitWidth="25.0" layoutX="75.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ImageView fx:id="beforeBarView" fitHeight="47.0" fitWidth="25.0" layoutX="90.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
                   <FlowPane alignment="CENTER" columnHalignment="CENTER" orientation="VERTICAL" prefWidth="190.0" vgap="10.0">
