@@ -26,8 +26,9 @@ public class SyllableEditViewController {
 	private int initialBeforeBar;
 	private int initialAfterBar;
 
-	static final String[] beforeBarStrs = new String[] {" ", "|", "||", ".|:", "[|:"};
-	static final String[] afterBarStrs = new String[] {" ", "|", "||", ".|:", "[|:", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
+	// Limit the number of selectable before barline options to the first beforeOptionsLimit items in afterBarStrs.
+	static final int beforeOptionsLimit = 5;
+	static final String[] barStrings = new String[] {" ", "|", "||", ".|:", "[|:", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
 	static final Image[] barImages = new Image[] {
 			new Image(SyllableEditViewController.class.getResource("/media/bars/noBar.png").toExternalForm()),
 			new Image(SyllableEditViewController.class.getResource("/media/bars/singleBar.png").toExternalForm()),
@@ -47,13 +48,13 @@ public class SyllableEditViewController {
 			barGrid.getChildren().removeIf(node -> GridPane.getColumnIndex(node) == null
 					|| GridPane.getColumnIndex(node) == 0);
 		else
-			setUpBarOptions(beforeBarStrs, beforePane, beforeToggles);
+			setUpBarOptions(beforeOptionsLimit, beforePane, beforeToggles);
 
-		setUpBarOptions(afterBarStrs, afterPane, afterToggles);
+		setUpBarOptions(barStrings.length, afterPane, afterToggles);
 	}
 
-	private void setUpBarOptions(String[] barStrs, FlowPane flowPane, ToggleGroup toggleGroup) {
-		for (int i = 0; i < barStrs.length; i++) {
+	private void setUpBarOptions(int barStrs, FlowPane flowPane, ToggleGroup toggleGroup) {
+		for (int i = 0; i < barStrs; i++) {
 			RadioButton optionButton = new RadioButton();
 			ImageView optionImage = new ImageView(barImages[i]);
 			optionImage.setPreserveRatio(true);
@@ -97,7 +98,7 @@ public class SyllableEditViewController {
 				beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle()) : initialBeforeBar;
 		int selectedAfter = afterToggles.getToggles().indexOf(afterToggles.getSelectedToggle());
 		if (selectedBefore != initialBeforeBar || selectedAfter != initialAfterBar)
-			parentController.setBarlines(beforeBarStrs[selectedBefore], afterBarStrs[selectedAfter]);
+			parentController.setBarlines(barStrings[selectedBefore], barStrings[selectedAfter]);
 
 		closeStage();
 	}

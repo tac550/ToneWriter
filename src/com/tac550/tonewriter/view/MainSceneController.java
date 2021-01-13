@@ -31,10 +31,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -347,13 +344,14 @@ public class MainSceneController {
 
 	void syncCVLMapping() {
 		// First, update barlines and refresh their display
+		VerseLineViewController prev = null;
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			if (verseLine.notFirstInItem())
-				verseLine.setBarlines(" ", "unchanged");
+				verseLine.linkBeforeBarLine(Objects.requireNonNull(prev).afterBarProperty());
 			if (isLastVerseLineOfSection(verseLine))
 				verseLine.setBarlines("unchanged", "||");
 
-			verseLine.refreshBarViews();
+			prev = verseLine;
 		}
 
 		if (toneFile == null) return; // No tone is loaded; don't continue to phrase assignment.

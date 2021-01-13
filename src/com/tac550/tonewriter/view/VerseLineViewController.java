@@ -9,6 +9,9 @@ import com.tac550.tonewriter.model.RecitingChord;
 import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,8 +55,8 @@ public class VerseLineViewController {
 
 	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
-	private int beforeBar = 0;
-	private int afterBar = 1;
+	private final IntegerProperty beforeBar = new SimpleIntegerProperty(0);
+	private final ReadOnlyIntegerWrapper afterBar = new ReadOnlyIntegerWrapper(1);
 	@FXML private ImageView beforeBarView;
 	@FXML private ImageView afterBarView;
 
@@ -123,6 +126,10 @@ public class VerseLineViewController {
 		defaultHeight = mainContentPane.getPrefHeight();
 
 		refreshTextStyle();
+
+		// Barline views automatically refresh when barline selection changes.
+		beforeBar.addListener((ov, oldVal, newVal) -> refreshBarViews());
+		afterBar.addListener((ov, oldVal, newVal) -> refreshBarViews());
 
 		// Prepare scroll pane to be set up at the appropriate time.
 		if (syllableScrollPane.getSkin() == null) {
@@ -223,13 +230,21 @@ public class VerseLineViewController {
 	}
 
 	public void setBarlines(String before, String after) {
-		if (!before.equals("unchanged")) beforeBar = List.of(SyllableEditViewController.beforeBarStrs).indexOf(before);
-		if (!after.equals("unchanged")) afterBar = List.of(SyllableEditViewController.afterBarStrs).indexOf(after);
+		boolean updateBefore = !before.equals("unchanged") && !beforeBar.isBound();
+		boolean updateAfter = !after.equals("unchanged") && !afterBar.isBound();
 
-		if (!before.equals("unchanged") || !after.equals("unchanged")) {
-			refreshBarViews();
+		if (updateBefore) beforeBar.set(List.of(SyllableEditViewController.barStrings).indexOf(before));
+		if (updateAfter) afterBar.set(List.of(SyllableEditViewController.barStrings).indexOf(after));
+
+		if (updateBefore || updateAfter)
 			topController.projectEdited();
-		}
+	}
+
+	void linkBeforeBarLine(ReadOnlyIntegerProperty otherBar) {
+		if (beforeBar.isBound())
+			beforeBar.unbind();
+
+		beforeBar.bind(otherBar);
 	}
 
 	String getVerseLineText() {
@@ -661,7 +676,7 @@ public class VerseLineViewController {
 
 			controller.setParentController(this);
 			controller.setSyllableText(verseLine.getLine());
-			controller.setBarSelections(beforeBar, afterBar);
+			controller.setBarSelections(beforeBar.get(), afterBar.get());
 
 			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
@@ -695,10 +710,14 @@ public class VerseLineViewController {
 	}
 
 	public String getBeforeBar() {
-		return SyllableEditViewController.beforeBarStrs[beforeBar];
+		return SyllableEditViewController.barStrings[beforeBar.get()];
 	}
 	public String getAfterBar() {
-		return  SyllableEditViewController.afterBarStrs[afterBar];
+		return SyllableEditViewController.barStrings[afterBar.get()];
+	}
+
+	public ReadOnlyIntegerProperty afterBarProperty() {
+		return afterBar.getReadOnlyProperty();
 	}
 
 	public void setAssignmentDurations(List<String> durations) {
@@ -722,9 +741,9 @@ public class VerseLineViewController {
 		separatorPane.setStyle("-fx-background-color: " + (MainApp.isDarkModeEnabled() ? "#585c5f;" : "#f4f4f4;"));
 	}
 
-	void refreshBarViews() {
-		beforeBarView.setImage(SyllableEditViewController.barImages[beforeBar]);
-		afterBarView.setImage(SyllableEditViewController.barImages[afterBar]);
+	private void refreshBarViews() {
+		beforeBarView.setImage(SyllableEditViewController.barImages[beforeBar.get()]);
+		afterBarView.setImage(SyllableEditViewController.barImages[afterBar.get()]);
 	}
 
 	public void verseEdited() {
