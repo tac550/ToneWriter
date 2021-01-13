@@ -78,7 +78,6 @@ public class ProjectIO {
 			File toneFile = controller.getToneFile();
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
-
 				ToneReaderWriter toneWriter = controller.getToneWriter();
 				toneHash = toneWriter.getCurrentToneHash();
 
@@ -304,6 +303,8 @@ public class ProjectIO {
 					}
 				}
 
+				line.append("~~").append(vLine.getBeforeBar()).append("~~").append(vLine.getAfterBar());
+
 				writeLine(writer, line);
 			}
 
@@ -452,17 +453,25 @@ public class ProjectIO {
 				List<String> bottomVerse = readLine(reader);
 
 				List<String> assignedPhrases = new ArrayList<>();
+				List<List<String>> barLines = new ArrayList<>();
 				List<List<String>> syllableLines = new ArrayList<>();
 				List<List<String>> formatLines = new ArrayList<>();
 				List<List<String>> assignmentLines = new ArrayList<>();
 
 				String assignmentLine;
 				while ((assignmentLine = readLine(reader).get(0)).startsWith("+")) {
+					List<String> lineBars = new ArrayList<>();
+					String[] lineBarsOptional = assignmentLine.split("~~");
+					if (lineBarsOptional.length == 3) {
+						lineBars.add(lineBarsOptional[1]);
+						lineBars.add(lineBarsOptional[2]);
+					}
+
 					List<String> lineSyllables = new ArrayList<>();
 					List<String> lineFormatting = new ArrayList<>();
 					List<String> lineAssignments = new ArrayList<>();
 
-					String[] data = assignmentLine.split("\\|");
+					String[] data = lineBarsOptional[0].split("\\|");
 
 					// data[0] contains meta info about the line.
 					assignedPhrases.add(data[0].substring(1));
@@ -493,6 +502,7 @@ public class ProjectIO {
 						lineAssignments.add(assignment);
 					}
 
+					barLines.add(lineBars);
 					syllableLines.add(lineSyllables);
 					formatLines.add(lineFormatting);
 					assignmentLines.add(lineAssignments);
@@ -535,6 +545,7 @@ public class ProjectIO {
 					ctr.setBottomVerse(bottomVerse.get(1));
 
 					for (int j = 0; j < syllableLines.size(); j++) {
+						List<String> bars = barLines.get(j);
 						List<String> sylls = syllableLines.get(j);
 						List<String> formatting = formatLines.get(j);
 						List<String> assigns = assignmentLines.get(j);
@@ -554,6 +565,10 @@ public class ProjectIO {
 							List<String> durations = new ArrayList<>();
 
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
+
+							// Set barline selections, if any.
+							if (bars.size() == 2)
+								vLine.setBarlines(bars.get(0), bars.get(1));
 
 							// Apply syllable formatting.
 							for (int k = 0; k < formatting.size(); k++) {

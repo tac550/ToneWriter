@@ -26,8 +26,8 @@ public class SyllableEditViewController {
 	private int initialBeforeBar;
 	private int initialAfterBar;
 
-	static final String[] beforeBarStrs = new String[] {"", "|", "||", ".|:", "[|:"};
-	static final String[] afterBarStrs = new String[] {"", "|", "||", ".|:", "[|:", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
+	static final String[] beforeBarStrs = new String[] {" ", "|", "||", ".|:", "[|:"};
+	static final String[] afterBarStrs = new String[] {" ", "|", "||", ".|:", "[|:", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
 	static final Image[] barImages = new Image[] {
 			new Image(SyllableEditViewController.class.getResource("/media/bars/noBar.png").toExternalForm()),
 			new Image(SyllableEditViewController.class.getResource("/media/bars/singleBar.png").toExternalForm()),
@@ -97,7 +97,7 @@ public class SyllableEditViewController {
 				beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle()) : initialBeforeBar;
 		int selectedAfter = afterToggles.getToggles().indexOf(afterToggles.getSelectedToggle());
 		if (selectedBefore != initialBeforeBar || selectedAfter != initialAfterBar)
-			parentController.selectBarlines(beforeBarStrs[selectedBefore], afterBarStrs[selectedAfter]);
+			parentController.setBarlines(beforeBarStrs[selectedBefore], afterBarStrs[selectedAfter]);
 
 		closeStage();
 	}

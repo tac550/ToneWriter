@@ -222,7 +222,7 @@ public class VerseLineViewController {
 		}
 	}
 
-	void selectBarlines(String before, String after) {
+	public void setBarlines(String before, String after) {
 		if (!before.equals("unchanged")) beforeBar = List.of(SyllableEditViewController.beforeBarStrs).indexOf(before);
 		if (!after.equals("unchanged")) afterBar = List.of(SyllableEditViewController.afterBarStrs).indexOf(after);
 

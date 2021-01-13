@@ -349,9 +349,9 @@ public class MainSceneController {
 		// First, update barlines and refresh their display
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			if (verseLine.notFirstInItem())
-				verseLine.selectBarlines("", "unchanged");
+				verseLine.setBarlines(" ", "unchanged");
 			if (isLastVerseLineOfSection(verseLine))
-				verseLine.selectBarlines("unchanged", "||");
+				verseLine.setBarlines("unchanged", "||");
 
 			verseLine.refreshBarViews();
 		}
@@ -886,7 +886,7 @@ public class MainSceneController {
 					verseLineControllers.indexOf(verseLineViewController) - 1);
 
 			if (verseLineViewController.isSeparator() && previousController.getAfterBar().equals("||"))
-				previousController.selectBarlines("unchanged", "|");
+				previousController.setBarlines("unchanged", "|");
 		}
 
 		verseLineBox.getChildren().remove(verseLineViewController.getRootPane());
