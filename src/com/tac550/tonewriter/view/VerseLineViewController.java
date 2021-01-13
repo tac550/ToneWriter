@@ -126,6 +126,7 @@ public class VerseLineViewController {
 		defaultHeight = mainContentPane.getPrefHeight();
 
 		refreshTextStyle();
+		refreshBarViews();
 
 		// Barline views automatically refresh when barline selection changes.
 		beforeBar.addListener((ov, oldVal, newVal) -> refreshBarViews());
