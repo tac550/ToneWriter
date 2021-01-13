@@ -323,6 +323,9 @@ public class LilyPondInterface {
 		String[] parts = new String[] {"", "", "", ""};
 		// Buffer for the piece's text.
 		StringBuilder verseText = new StringBuilder();
+		// Add initial bar line, if there are any vlines.
+		if (verse_lines.size() > 0)
+			verseText.append(String.format("\\bar \"%s\"", verse_lines.get(0).getBeforeBar()));
 
 		for (VerseLineViewController verseLineController : verse_lines)
 			generateLine(parts, verseText, verseLineController);
@@ -330,22 +333,20 @@ public class LilyPondInterface {
 		// Insert invisible barlines where indicated, after reversing possible incorrect orderings of bars/slur starts
 		parts[PART_SOPRANO] = parts[PART_SOPRANO].replace("$bar  \\(", "\\( $bar")
 				.replace("$bar", "\\bar \"\"");
-		// Add a double barline at the end
-		parts[PART_SOPRANO] += " \\bar \"||\"";
 
 		return new String[] {parts[0], parts[1], parts[2], parts[3], verseText.toString()};
 	}
 
 	private static void generateLine(String[] parts, StringBuilder verseText, VerseLineViewController verseLineController) {
-		// If this is a verse separator line, add the double bar line and we're done.
-		if (verseLineController.isSeparator()) {
-			parts[PART_SOPRANO] += " \\bar \"||\"";
-		} else {
+		// Do nothing if this is a verse separator line.
+		if (!verseLineController.isSeparator()) {
 			StringBuilder verseLine = new StringBuilder();
 			// Number of beats in the line. This determines where the visible barline goes.
 			float measureBeats = generateNotatedLine(parts, List.of(verseLineController.getSyllables()), verseLine);
+			// Add barline style indicator to the soprano part.
+			parts[PART_SOPRANO] += String.format(" \\bar \"%s\"", verseLineController.getAfterBar());
 
-			// Insert time signature for the line
+			// Insert time signature and the line's text into the lyrics buffer.
 			verseText.append(String.format(" %s %s", generateTimeSignature(measureBeats), verseLine.toString()));
 		}
 	}
