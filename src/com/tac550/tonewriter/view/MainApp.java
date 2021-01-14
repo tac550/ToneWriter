@@ -489,7 +489,7 @@ public class MainApp extends Application {
 
 	static void setLilyPondDir(Stage owner, boolean startup) {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Please select the folder which contains the LilyPond executable");
+		directoryChooser.setTitle("Select the folder containing the LilyPond executable");
 		directoryChooser.setInitialDirectory(new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificRootDir())));
 		File savingDirectory = directoryChooser.showDialog(owner);
 		if (savingDirectory == null) return;
