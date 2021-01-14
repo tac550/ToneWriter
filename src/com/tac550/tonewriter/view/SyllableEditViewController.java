@@ -8,7 +8,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class SyllableEditViewController {
@@ -17,7 +16,6 @@ public class SyllableEditViewController {
 	
 	@FXML private TextField syllableTextField;
 
-	@FXML private GridPane barGrid;
 	private final ToggleGroup beforeToggles = new ToggleGroup();
 	@FXML private FlowPane beforePane;
 	private final ToggleGroup afterToggles = new ToggleGroup();
@@ -27,7 +25,7 @@ public class SyllableEditViewController {
 	private int initialAfterBar;
 
 	// Limit the number of selectable before barline options to the first beforeOptionsLimit items in afterBarStrs.
-	static final int beforeOptionsLimit = 5;
+	static final int firstBarOptionsLimit = 5;
 	static final String[] barStrings = new String[] {" ", "|", "||", ".|:", "[|:", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
 	static final Image[] barImages = new Image[] {
 			new Image(SyllableEditViewController.class.getResource("/media/bars/noBar.png").toExternalForm()),
@@ -44,12 +42,8 @@ public class SyllableEditViewController {
 	void setParentController(VerseLineViewController controller) {
 		parentController = controller;
 
-		if (parentController.notFirstInItem())
-			barGrid.getChildren().removeIf(node -> GridPane.getColumnIndex(node) == null
-					|| GridPane.getColumnIndex(node) == 0);
-		else
-			setUpBarOptions(beforeOptionsLimit, beforePane, beforeToggles);
-
+		setUpBarOptions(parentController.notFirstInItem() ? barStrings.length : firstBarOptionsLimit,
+				beforePane, beforeToggles);
 		setUpBarOptions(barStrings.length, afterPane, afterToggles);
 	}
 

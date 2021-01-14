@@ -10,8 +10,6 @@ import com.tac550.tonewriter.model.VerseLine;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -56,7 +54,8 @@ public class VerseLineViewController {
 	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
 	private final IntegerProperty beforeBar = new SimpleIntegerProperty(0);
-	private final ReadOnlyIntegerWrapper afterBar = new ReadOnlyIntegerWrapper(1);
+	private final IntegerProperty afterBar = new SimpleIntegerProperty(1);
+	private IntegerProperty beforeBoundTo;
 	@FXML private ImageView beforeBarView;
 	@FXML private ImageView afterBarView;
 
@@ -231,8 +230,8 @@ public class VerseLineViewController {
 	}
 
 	public void setBarlines(String before, String after) {
-		boolean updateBefore = !before.equals("unchanged") && !beforeBar.isBound();
-		boolean updateAfter = !after.equals("unchanged") && !afterBar.isBound();
+		boolean updateBefore = !before.equals("unchanged");
+		boolean updateAfter = !after.equals("unchanged");
 
 		if (updateBefore) beforeBar.set(List.of(SyllableEditViewController.barStrings).indexOf(before));
 		if (updateAfter) afterBar.set(List.of(SyllableEditViewController.barStrings).indexOf(after));
@@ -241,11 +240,12 @@ public class VerseLineViewController {
 			topController.projectEdited();
 	}
 
-	void linkBeforeBarLine(ReadOnlyIntegerProperty otherBar) {
+	void linkBeforeBarLine(IntegerProperty otherBar) {
 		if (beforeBar.isBound())
-			beforeBar.unbind();
+			beforeBar.unbindBidirectional(beforeBoundTo);
 
-		beforeBar.bind(otherBar);
+		beforeBar.bindBidirectional(otherBar);
+		beforeBoundTo = otherBar;
 	}
 
 	String getVerseLineText() {
@@ -717,8 +717,8 @@ public class VerseLineViewController {
 		return SyllableEditViewController.barStrings[afterBar.get()];
 	}
 
-	public ReadOnlyIntegerProperty afterBarProperty() {
-		return afterBar.getReadOnlyProperty();
+	public IntegerProperty afterBarProperty() {
+		return afterBar;
 	}
 
 	public void setAssignmentDurations(List<String> durations) {

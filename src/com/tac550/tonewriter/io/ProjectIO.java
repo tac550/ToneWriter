@@ -567,8 +567,12 @@ public class ProjectIO {
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
 
 							// Set barline selections, if any.
-							if (bars.size() == 2)
-								vLine.setBarlines(bars.get(0), bars.get(1));
+							if (bars.size() == 2) {
+								if (finalJ == 0)
+									vLine.setBarlines(bars.get(0), bars.get(1));
+								else
+									vLine.setBarlines("unchanged", bars.get(1));
+							}
 
 							// Apply syllable formatting.
 							for (int k = 0; k < formatting.size(); k++) {

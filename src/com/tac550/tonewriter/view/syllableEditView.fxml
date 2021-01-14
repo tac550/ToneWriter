@@ -29,9 +29,9 @@
             </VBox>
          </content>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="10.0" text="Barline(s)">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="10.0" text="Barlines">
          <content>
-            <GridPane fx:id="barGrid">
+            <GridPane>
               <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
@@ -52,7 +52,7 @@
                      </font>
                   </Text>
                   <FlowPane fx:id="beforePane" alignment="CENTER" columnHalignment="CENTER" hgap="5.0" vgap="5.0" GridPane.rowIndex="1" />
-                  <FlowPane fx:id="afterPane" hgap="5.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <FlowPane fx:id="afterPane" alignment="CENTER" hgap="5.0" vgap="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
          </content>
