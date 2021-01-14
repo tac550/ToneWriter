@@ -117,7 +117,7 @@
                                                 </HBox>
                                              </content>
                                           </CustomMenuItem>
-                                          <CheckMenuItem fx:id="pageBreakOption" mnemonicParsing="false" text="Page break before item" />
+                                          <CheckMenuItem fx:id="pageBreakOption" mnemonicParsing="false" text="Page Break Before Item" />
                                           <CustomMenuItem mnemonicParsing="false" text="Extended Text Separator">
                                              <content>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
@@ -132,8 +132,8 @@
                                                 </HBox>
                                              </content>
                                           </CustomMenuItem>
-                                          <CheckMenuItem fx:id="extendTextTopOption" mnemonicParsing="false" text="Extend top text" />
-                                          <CheckMenuItem fx:id="extendTextBottomOption" mnemonicParsing="false" text="Extend bottom text" />
+                                          <CheckMenuItem fx:id="extendTextTopOption" mnemonicParsing="false" text="Extend Top Text" />
+                                          <CheckMenuItem fx:id="extendTextBottomOption" mnemonicParsing="false" text="Extend Bottom Text" />
                                           <CheckMenuItem fx:id="breakOnlyOnBlankOption" mnemonicParsing="false" text="Page Breaks on Blank Lines Only" />
                                        </items>
                                     </MenuButton>
