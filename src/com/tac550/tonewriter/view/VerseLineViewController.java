@@ -457,7 +457,7 @@ public class VerseLineViewController {
 		}
 
 	}
-	void playCurrectChord() {
+	void playCurrentChord() {
 		if (notAssigning()) return;
 		getCurrentChord().playMidi();
 	}

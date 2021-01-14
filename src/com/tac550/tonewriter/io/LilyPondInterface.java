@@ -6,11 +6,12 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import org.apache.commons.io.FilenameUtils;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,17 +60,16 @@ public class LilyPondInterface {
 
 			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-			lines.set(10, "  \\key " + keySignatureToLilyPond(keySignature));
-			lines.set(18, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-			lines.set(24, "\\with-color #(rgb-color " + TWUtils.toNormalizedRGBCode(TWUtils.getUIBaseColor()) + ")");
-			lines.set(34, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
-			lines.set(40, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
-			lines.set(46, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
+			lines.set(14, "  \\key " + keySignatureToLilyPond(keySignature));
+			lines.set(20, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
+			lines.set(25, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
+			lines.set(30, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
+			lines.set(35, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
 			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
 			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-					Objects.requireNonNull(MainApp.getPlatformSpecificMidiExtension())));
+					MainApp.getPlatformSpecificMidiExtension()));
 
 			File[] results = new File[] {outputFile, midiFile};
 			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
@@ -946,9 +946,9 @@ public class LilyPondInterface {
 		TWUtils.cleanUpTempFiles("-logfile");
 
 		ProcessBuilder prb = new ProcessBuilder(MainApp.getLilyPondPath() + MainApp.getPlatformSpecificLPExecutable(),
-				renderPNG ? "--png" : "-dlog-file=" + FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
-				"-o", lilypondFile.getAbsolutePath().replace(".ly", ""),
-				lilypondFile.getAbsolutePath());
+				renderPNG ? "-dpixmap-format=pngalpha" : "", renderPNG ? "-dresolution=300" : "", renderPNG ? "--png" : "-dlog-file=" +
+				FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
+				"-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath());
 
 		Process pr = prb.start();
 
@@ -970,12 +970,4 @@ public class LilyPondInterface {
 
 		return tempFile;
 	}
-
-	public static void clearAllCachedChordPreviews() {
-		TWUtils.cleanUpTempFiles("-chord");
-
-		uniqueChordRenders.clear();
-		pendingChordControllers.clear();
-	}
-
 }

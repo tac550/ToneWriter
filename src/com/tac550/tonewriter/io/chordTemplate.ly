@@ -1,10 +1,14 @@
 \version "2.20.0"
 
+#(ly:set-option 'aux-files #f)
+#(set-default-paper-size "a9landscape")
+
 \language english
 
 \header {
   subtitle = ""
   composer = ""
+  tagline = ##f
 }
 
 global = {
@@ -12,50 +16,30 @@ global = {
   \time 1/4
 }
 
-noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \override NoteHead.no-ledgers = ##t}
-
 soprano = {
   \global
   c''4
-
-  -\tweak layer #-1
-   -\markup {
-     \with-dimensions #'(0 . 0) #'(0 . 0)
-     % specify color
-     \with-color #(rgb-color 0.345 0.361 0.373)
-     % specify size
-     \filled-box #'(-1000 . 1000) #'(-1000 . 4000) #0
-   }
-
-  
 }
 
 alto = {
   \global
   c'4
-  
 }
 
 tenor = {
   \global
   c'4
-  
 }
 
 bass = {
   \global
   c4
-  
 }
 
-verse = \lyricmode {
-
-
-
-}
+verse = \lyricmode { }
 
 \score {
-  \new ChoirStaff <<
+  \new PianoStaff <<
     \new Staff \with {
       \once \override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves
       midiInstrument = #"choir aahs"

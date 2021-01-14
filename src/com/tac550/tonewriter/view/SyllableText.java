@@ -63,7 +63,7 @@ public class SyllableText extends Text {
 
 					verseController.syllableHovered();
 				} else if (event.isControlDown()) {
-					verseController.playCurrectChord();
+					verseController.playCurrentChord();
 				}
 			}
 

@@ -338,8 +338,6 @@ public class MainApp extends Application {
 		if (dark_mode) setUserAgentStylesheet("/styles/modena-dark/modena-dark.css");
 		else setUserAgentStylesheet(Application.STYLESHEET_MODENA);
 
-		LilyPondInterface.clearAllCachedChordPreviews();
-
 		topSceneController.propagateDarkModeSetting();
 
 	}

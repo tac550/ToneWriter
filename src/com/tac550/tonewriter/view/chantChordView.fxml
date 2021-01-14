@@ -35,7 +35,7 @@
                      <children>
                         <ImageView fx:id="chordView" fitHeight="117.0" fitWidth="124.0" pickOnBounds="true" preserveRatio="true" smooth="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="28.0" AnchorPane.rightAnchor="28.0" AnchorPane.topAnchor="0.0">
                            <viewport>
-                              <Rectangle2D height="130.0" minX="90.0" minY="22.0" width="130.0" />
+                              <Rectangle2D height="350.0" minX="70.0" minY="22.0" width="350.0" />
                            </viewport>
                         </ImageView>
                         <Text fx:id="numText" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="6.431640625">

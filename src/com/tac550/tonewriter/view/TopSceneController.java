@@ -873,7 +873,6 @@ public class TopSceneController {
 			MainSceneController controller = tabControllerMap.get(tab);
 			controller.refreshVerseTextStyle();
 		}
-		refreshAllChordPreviews();
 	}
 
 	void refreshAllChordPreviews() {

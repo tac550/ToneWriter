@@ -36,25 +36,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-/*
- * TEST VERSES:
- *
-
-Lord, I call upon You, hear me!
-Hear me O Lord!
-Lord, I call upon You, hear me!
-Receive the voice of my prayer
-when I call upon You.//
-Hear me O Lord!
-
-Let my prayer arise
-in Your sight as incense.
-And let the lifting up of my hands
-be an evening sacrifice.//
-Hear me O Lord!
-
- */
-
 public class MainSceneController {
 
 	enum ExportMode {

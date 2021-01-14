@@ -33,13 +33,6 @@ public class TWUtils {
 		        (int) (color.getGreen() * 255),
 		        (int) (color.getBlue() * 255));
     }
-	public static String toNormalizedRGBCode(Color color) {
-		return String.format(Locale.US,
-				"%f %f %f",
-				color.getRed(),
-				color.getGreen(),
-				color.getBlue());
-	}
 
     public static Color getUIBaseColor() {
     	return MainApp.isDarkModeEnabled() ? new Color(0.345, 0.361, 0.373, 1)
