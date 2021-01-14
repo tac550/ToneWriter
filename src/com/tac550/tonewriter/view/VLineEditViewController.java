@@ -73,9 +73,10 @@ public class VLineEditViewController {
 		initialBeforeBar = before;
 		initialAfterBar = after;
 
-		if (beforeToggles.getToggles().size() > 0)
+		if (beforeToggles.getToggles().size() > before)
 			beforeToggles.selectToggle(beforeToggles.getToggles().get(before));
-		afterToggles.selectToggle(afterToggles.getToggles().get(after));
+		if (afterToggles.getToggles().size() > after)
+			afterToggles.selectToggle(afterToggles.getToggles().get(after));
 	}
 
 	void setDisableLineBreaks(boolean disable) {

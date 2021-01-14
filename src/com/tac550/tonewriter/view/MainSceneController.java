@@ -329,6 +329,10 @@ public class MainSceneController {
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			if (verseLine.notFirstInItem())
 				verseLine.linkBeforeBarLine(Objects.requireNonNull(prev).afterBarProperty());
+			else if (Arrays.asList(VLineEditViewController.barStrings).indexOf(verseLine.getBeforeBar())
+					>= VLineEditViewController.firstBarOptionsLimit)
+				verseLine.setBarlines(" ", "unchanged");
+
 			if (isLastVerseLineOfSection(verseLine))
 				verseLine.setBarlines("unchanged", "||");
 
