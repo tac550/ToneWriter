@@ -342,7 +342,8 @@ public class LilyPondInterface {
 		if (!verseLineController.isSeparator()) {
 			StringBuilder verseLine = new StringBuilder();
 			// Number of beats in the line. This determines where the visible barline goes.
-			float measureBeats = generateNotatedLine(parts, List.of(verseLineController.getSyllables()), verseLine);
+			float measureBeats = generateNotatedLine(parts, List.of(verseLineController.getSyllables()), verseLine,
+					verseLineController.getDisableLineBreaks());
 			// Add barline style indicator to the soprano part.
 			parts[PART_SOPRANO] += String.format(" \\bar \"%s\"", verseLineController.getAfterBar());
 
@@ -351,7 +352,8 @@ public class LilyPondInterface {
 		}
 	}
 
-	private static float generateNotatedLine(String[] parts, List<SyllableText> syllableList, StringBuilder verseLine) {
+	private static float generateNotatedLine(String[] parts, List<SyllableText> syllableList, StringBuilder verseLine,
+	                                         boolean disableLineBreaks) {
 		float measureBeats = 0;
 		float breakCount = 0;
 
@@ -585,12 +587,12 @@ public class LilyPondInterface {
 				}
 
 				// Decide whether to place an invisible barline after this chord (allows for line breaking here).
-				// Don't try subdividing if this is the last chord in the phrase, we haven't reached the beat
-				// threshold for adding an optional break, the next syllable is the last and has only one chord,
-				// or the note which would precede the possible break point is an eighth note.
-				if (!lastChordInLine && measureBeats > measureBreakBeatThreshold * breakCount + measureBreakBeatThreshold
-						&& (syllableList.indexOf(syllable) != syllableList.size() - 2 || syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1)
-						&& !currentNoteIsEighth)
+				// Individual lines can disable this. Also, don't  try subdividing if this is the last chord in the
+				// phrase, we haven't reached the beat threshold for adding an optional break, the next syllable is th
+				// last and has only one chord, or the note which would precede the possible break point is an eighth note.
+				if (!disableLineBreaks && !lastChordInLine && measureBeats > measureBreakBeatThreshold
+						* breakCount + measureBreakBeatThreshold && (syllableList.indexOf(syllable) != syllableList.size() - 2
+						|| syllableList.get(syllableList.size() - 1).getAssociatedChords().length != 1) && !currentNoteIsEighth)
 					breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 			}

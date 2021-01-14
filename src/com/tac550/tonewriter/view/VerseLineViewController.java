@@ -59,6 +59,8 @@ public class VerseLineViewController {
 	@FXML private ImageView beforeBarView;
 	@FXML private ImageView afterBarView;
 
+	private boolean disableLineBreaks = false;
+
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
 	private String previousChantLine = "";
@@ -678,6 +680,7 @@ public class VerseLineViewController {
 			controller.setParentController(this);
 			controller.setSyllableText(verseLine.getLine());
 			controller.setBarSelections(beforeBar.get(), afterBar.get());
+			controller.setDisableLineBreaks(disableLineBreaks);
 
 			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
@@ -715,6 +718,15 @@ public class VerseLineViewController {
 	}
 	public String getAfterBar() {
 		return VLineEditViewController.barStrings[afterBar.get()];
+	}
+
+	public boolean getDisableLineBreaks() {
+		return disableLineBreaks;
+	}
+	public void setDisableLineBreaks(boolean disable) {
+		disableLineBreaks = disable;
+
+		topController.projectEdited();
 	}
 
 	public IntegerProperty afterBarProperty() {

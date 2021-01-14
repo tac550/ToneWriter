@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -20,6 +21,8 @@ public class VLineEditViewController {
 	@FXML private FlowPane beforePane;
 	private final ToggleGroup afterToggles = new ToggleGroup();
 	@FXML private FlowPane afterPane;
+
+	@FXML private CheckBox disableBreaksCheckBox;
 
 	private int initialBeforeBar;
 	private int initialAfterBar;
@@ -75,6 +78,10 @@ public class VLineEditViewController {
 		afterToggles.selectToggle(afterToggles.getToggles().get(after));
 	}
 
+	void setDisableLineBreaks(boolean disable) {
+		disableBreaksCheckBox.setSelected(disable);
+	}
+
 	@FXML private void initialize() {
 		syllableTextField.setTextFormatter(new TWUtils.inputFormatter());
 	}
@@ -88,11 +95,16 @@ public class VLineEditViewController {
 			parentController.verseEdited();
 		}
 
+		// Set bar line info if it differs from initial values
 		int selectedBefore = beforeToggles.getToggles().size() > 0 ?
 				beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle()) : initialBeforeBar;
 		int selectedAfter = afterToggles.getToggles().indexOf(afterToggles.getSelectedToggle());
 		if (selectedBefore != initialBeforeBar || selectedAfter != initialAfterBar)
 			parentController.setBarlines(barStrings[selectedBefore], barStrings[selectedAfter]);
+
+		// Same for whether to disable line breaks
+		if (disableBreaksCheckBox.isSelected() != parentController.getDisableLineBreaks())
+			parentController.setDisableLineBreaks(disableBreaksCheckBox.isSelected());
 
 		closeStage();
 	}

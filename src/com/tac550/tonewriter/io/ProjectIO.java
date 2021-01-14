@@ -305,7 +305,7 @@ public class ProjectIO {
 
 				line.append("~~").append(vLine.getBeforeBar()).append("~~").append(vLine.getAfterBar());
 
-				writeLine(writer, line);
+				writeLine(writer, line, vLine.getDisableLineBreaks());
 			}
 
 		}
@@ -457,11 +457,15 @@ public class ProjectIO {
 				List<List<String>> syllableLines = new ArrayList<>();
 				List<List<String>> formatLines = new ArrayList<>();
 				List<List<String>> assignmentLines = new ArrayList<>();
+				List<Boolean> disableLineBreaksLines = new ArrayList<>();
 
-				String assignmentLine;
-				while ((assignmentLine = readLine(reader).get(0)).startsWith("+")) {
+				List<String> lineEntry;
+				while ((lineEntry = readLine(reader)).get(0).startsWith("+")) {
+					if (lineEntry.size() > 1)
+						disableLineBreaksLines.add(Boolean.parseBoolean(lineEntry.get(1)));
+
 					List<String> lineBars = new ArrayList<>();
-					String[] lineBarsOptional = assignmentLine.split("~~");
+					String[] lineBarsOptional = lineEntry.get(0).split("~~");
 					if (lineBarsOptional.length == 3) {
 						lineBars.add(lineBarsOptional[1]);
 						lineBars.add(lineBarsOptional[2]);
@@ -549,6 +553,8 @@ public class ProjectIO {
 						List<String> sylls = syllableLines.get(j);
 						List<String> formatting = formatLines.get(j);
 						List<String> assigns = assignmentLines.get(j);
+						boolean disableLineBreaks = disableLineBreaksLines.size() > j ?
+								disableLineBreaksLines.get(j) : false;
 
 						// Create verse line with provided syllable data and save a reference to its controller
 						Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("", sylls));
@@ -573,6 +579,9 @@ public class ProjectIO {
 								else
 									vLine.setBarlines("unchanged", bars.get(1));
 							}
+
+							// Set status of disabling line breaks
+							vLine.setDisableLineBreaks(disableLineBreaks);
 
 							// Apply syllable formatting.
 							for (int k = 0; k < formatting.size(); k++) {
