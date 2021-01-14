@@ -64,6 +64,7 @@ public class ProjectIO {
 			writeLine(writer, MainApp.APP_VERSION);
 			writeLine(writer, top_controller.getProjectTitle());
 			writeLine(writer, top_controller.getTabCount());
+			writeLine(writer, top_controller.getPaperSize());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -376,6 +377,8 @@ public class ProjectIO {
 			projectVersion = readLine(reader).get(0);
 			top_controller.setProjectTitle(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
+			// Before 1.0: no per-project paper size (fails gracefully).
+			top_controller.setPaperSize(readLine(reader).get(0));
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);

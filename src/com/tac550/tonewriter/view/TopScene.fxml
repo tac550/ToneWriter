@@ -33,6 +33,11 @@
                         <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
+                  <MenuItem fx:id="paperSizeMenuItem" mnemonicParsing="false" onAction="#handleSetPaperSize" text="Set Paper Size...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" onAction="#handleNewProject" text="New Project">
                      <accelerator>

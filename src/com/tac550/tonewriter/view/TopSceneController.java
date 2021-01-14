@@ -46,6 +46,7 @@ public class TopSceneController {
 
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
+	@FXML private MenuItem paperSizeMenuItem;
 	@FXML private MenuItem newProjectMenuItem;
 	@FXML private MenuItem openProjectMenuItem;
 	@FXML private MenuItem saveProjectMenuItem;
@@ -81,7 +82,8 @@ public class TopSceneController {
 
 	static final String headerIconPath = "/media/profile.png";
 	static final String keyIconPath = "/media/key.png";
-	static final String bookIconPath = "/media/book.png";
+	private static final String bookIconPath = "/media/book.png";
+	private static final String fileEXEIconPath = "/media/file-exe.png";
 
 	private boolean projectEdited = true;
 
@@ -94,7 +96,8 @@ public class TopSceneController {
 	private File projectFile;
 	private String projectTitle = "Unnamed Project";
 
-	private String paperSize = "";
+	private String defaultPaperSize = "";
+	private String projectPaperSize = "";
 
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
@@ -195,6 +198,7 @@ public class TopSceneController {
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
+		setMenuIcon(paperSizeMenuItem, fileEXEIconPath);
 		setMenuIcon(newProjectMenuItem, "/media/file-sound.png");
 		setMenuIcon(openProjectMenuItem, "/media/folder.png");
 		setMenuIcon(saveProjectMenuItem, "/media/floppy.png");
@@ -232,7 +236,8 @@ public class TopSceneController {
 		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
 		// Set initial state for paper size, which may have been saved in preferences.
-		paperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
+		defaultPaperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
+		projectPaperSize = defaultPaperSize;
 
 		// Hover Highlight menu item behavior and initial state
 		hoverHighlightMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_HOVER_HIGHLIGHT, true));
@@ -315,9 +320,9 @@ public class TopSceneController {
 	}
 
 	private void setDefaultPaperSize(String size) {
-		paperSize = size;
+		defaultPaperSize = size;
 
-		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, paperSize);
+		MainApp.prefs.put(MainApp.PREFS_PAPER_SIZE, defaultPaperSize);
 	}
 
 	private void addNextPendingTabs() {
@@ -362,6 +367,9 @@ public class TopSceneController {
 			projectEdited();
 		}
 	}
+	@FXML private void handleSetPaperSize() {
+		applyToPaperSize("Project", fileEXEIconPath, projectPaperSize, this::setPaperSize);
+	}
 
 	@FXML private void handleNewProject() {
 		// Create new project in existing window
@@ -373,6 +381,7 @@ public class TopSceneController {
 		clearAllTabs();
 
 		setProjectTitle("Unnamed Project");
+		projectPaperSize = defaultPaperSize;
 		projectFile = null;
 
 		addTab();
@@ -476,24 +485,7 @@ public class TopSceneController {
 		MainApp.resetLilyPondDir(false);
 	}
 	@FXML private void handleSetDefaultPaperSize() {
-		List<String> choices = new ArrayList<>();
-
-		choices.add("junior-legal (8.0 x 5.0 in)");
-		choices.add("half letter (5.5 x 8.5 in)");
-		choices.add("a5 (148 x 210 mm)");
-		choices.add("letter (8.5 x 11.0 in)");
-		choices.add("a4 (210 x 297 mm)");
-		choices.add("legal (8.5 x 14.0 in)");
-		choices.add("ledger (17.0 x 11.0 in)");
-		choices.add("tabloid (11.0 x 17.0 in)");
-
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(paperSize, choices);
-		dialog.setTitle("Default Paper Size");
-		dialog.setHeaderText("Set the default paper size");
-		dialog.initOwner(parentStage);
-		Optional<String> result = dialog.showAndWait();
-
-		result.ifPresent(this::setDefaultPaperSize);
+		applyToPaperSize("Default", null, defaultPaperSize, this::setDefaultPaperSize);
 	}
 	@FXML private void handleResetMidi() {
 		MidiInterface.resetMidiSystem();
@@ -803,6 +795,33 @@ public class TopSceneController {
 		}
 	}
 
+	void applyToPaperSize(String type, String iconPath, String initial, Consumer<String> actions) {
+		List<String> choices = new ArrayList<>();
+
+		choices.add("junior-legal (8.0 x 5.0 in)");
+		choices.add("half letter (5.5 x 8.5 in)");
+		choices.add("a5 (148 x 210 mm)");
+		choices.add("letter (8.5 x 11.0 in)");
+		choices.add("a4 (210 x 297 mm)");
+		choices.add("legal (8.5 x 14.0 in)");
+		choices.add("ledger (17.0 x 11.0 in)");
+		choices.add("tabloid (11.0 x 17.0 in)");
+
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(initial, choices);
+		dialog.setTitle("%sPaper Size".formatted(type.isEmpty() ? "" : type + " "));
+		dialog.setHeaderText("Set the%spaper size".formatted(type.isEmpty() ? " " : " " + type.toLowerCase() + " "));
+		if (iconPath != null) {
+			ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
+			icon.setFitHeight(50);
+			icon.setFitWidth(50);
+			dialog.setGraphic(icon);
+		}
+		dialog.initOwner(parentStage);
+		Optional<String> result = dialog.showAndWait();
+
+		result.ifPresent(actions);
+	}
+
 	/*
 	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
 	 */
@@ -859,7 +878,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), paperSize);
+				getTabControllers(), projectPaperSize);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -900,7 +919,18 @@ public class TopSceneController {
 	}
 
 	public String getPaperSize() {
-		return paperSize;
+		return projectPaperSize;
+	}
+	public void setPaperSize(String size) {
+		if (size.isBlank()) {
+			if (!projectPaperSize.equals(defaultPaperSize)) {
+				projectPaperSize = defaultPaperSize;
+				projectEdited();
+			}
+		} else if (!size.equals(projectPaperSize)) {
+			projectPaperSize = size;
+			projectEdited();
+		}
 	}
 
 	public MainSceneController[] getTabControllers() {
