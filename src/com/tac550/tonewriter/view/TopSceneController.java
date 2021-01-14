@@ -46,7 +46,7 @@ public class TopSceneController {
 
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
-	@FXML private MenuItem paperSizeMenuItem;
+	@FXML private MenuItem pageSetupMenuItem;
 	@FXML private MenuItem newProjectMenuItem;
 	@FXML private MenuItem openProjectMenuItem;
 	@FXML private MenuItem saveProjectMenuItem;
@@ -83,7 +83,6 @@ public class TopSceneController {
 	static final String headerIconPath = "/media/profile.png";
 	static final String keyIconPath = "/media/key.png";
 	private static final String bookIconPath = "/media/book.png";
-	private static final String fileEXEIconPath = "/media/file-exe.png";
 
 	private boolean projectEdited = true;
 
@@ -98,6 +97,12 @@ public class TopSceneController {
 
 	private String defaultPaperSize = "";
 	private String projectPaperSize = "";
+
+	static final List<String> PAPER_SIZES = List.of("junior-legal (8.0 x 5.0 in)",
+			"half letter (5.5 x 8.5 in)", "a5 (148 x 210 mm)", "letter (8.5 x 11.0 in)", "a4 (210 x 297 mm)",
+			"legal (8.5 x 14.0 in)", "ledger (17.0 x 11.0 in)", "tabloid (11.0 x 17.0 in)");
+
+	private boolean noHeader = false;
 
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
@@ -198,7 +203,7 @@ public class TopSceneController {
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
-		setMenuIcon(paperSizeMenuItem, fileEXEIconPath);
+		setMenuIcon(pageSetupMenuItem, "/media/file-exe.png");
 		setMenuIcon(newProjectMenuItem, "/media/file-sound.png");
 		setMenuIcon(openProjectMenuItem, "/media/folder.png");
 		setMenuIcon(saveProjectMenuItem, "/media/floppy.png");
@@ -367,8 +372,26 @@ public class TopSceneController {
 			projectEdited();
 		}
 	}
-	@FXML private void handleSetPaperSize() {
-		applyToPaperSize("Project", fileEXEIconPath, projectPaperSize, this::setPaperSize);
+	@FXML private void handlePageSetup() {
+		FXMLLoaderIO.loadFXMLLayoutAsync("PageSetupView.fxml", loader -> {
+			VBox rootLayout = loader.getRoot();
+			PageSetupViewController controller = loader.getController();
+
+			controller.setParentController(this);
+			controller.setPaperSize(projectPaperSize);
+			controller.setNoHeader(noHeader);
+
+			Platform.runLater(() -> {
+				Stage syllableStage = new Stage();
+				syllableStage.setTitle("Page Setup");
+				syllableStage.getIcons().add(MainApp.APP_ICON);
+				syllableStage.setScene(new Scene(rootLayout));
+				syllableStage.initModality(Modality.APPLICATION_MODAL);
+				syllableStage.setResizable(false);
+				syllableStage.initOwner(parentStage);
+				syllableStage.show();
+			});
+		});
 	}
 
 	@FXML private void handleNewProject() {
@@ -485,7 +508,13 @@ public class TopSceneController {
 		MainApp.resetLilyPondDir(false);
 	}
 	@FXML private void handleSetDefaultPaperSize() {
-		applyToPaperSize("Default", null, defaultPaperSize, this::setDefaultPaperSize);
+		ChoiceDialog<String> dialog = new ChoiceDialog<>(defaultPaperSize, PAPER_SIZES);
+		dialog.setTitle("Default Paper Size");
+		dialog.setHeaderText("Set the default spaper size");
+		dialog.initOwner(parentStage);
+		Optional<String> result = dialog.showAndWait();
+
+		result.ifPresent(this::setDefaultPaperSize);
 	}
 	@FXML private void handleResetMidi() {
 		MidiInterface.resetMidiSystem();
@@ -795,33 +824,6 @@ public class TopSceneController {
 		}
 	}
 
-	void applyToPaperSize(String type, String iconPath, String initial, Consumer<String> actions) {
-		List<String> choices = new ArrayList<>();
-
-		choices.add("junior-legal (8.0 x 5.0 in)");
-		choices.add("half letter (5.5 x 8.5 in)");
-		choices.add("a5 (148 x 210 mm)");
-		choices.add("letter (8.5 x 11.0 in)");
-		choices.add("a4 (210 x 297 mm)");
-		choices.add("legal (8.5 x 14.0 in)");
-		choices.add("ledger (17.0 x 11.0 in)");
-		choices.add("tabloid (11.0 x 17.0 in)");
-
-		ChoiceDialog<String> dialog = new ChoiceDialog<>(initial, choices);
-		dialog.setTitle("%sPaper Size".formatted(type.isEmpty() ? "" : type + " "));
-		dialog.setHeaderText("Set the%spaper size".formatted(type.isEmpty() ? " " : " " + type.toLowerCase() + " "));
-		if (iconPath != null) {
-			ImageView icon = new ImageView(getClass().getResource(iconPath).toExternalForm());
-			icon.setFitHeight(50);
-			icon.setFitWidth(50);
-			dialog.setGraphic(icon);
-		}
-		dialog.initOwner(parentStage);
-		Optional<String> result = dialog.showAndWait();
-
-		result.ifPresent(actions);
-	}
-
 	/*
 	 * Returns false if the user chooses cancel or closes. Doing that should halt any impending file related functions.
 	 */
@@ -878,7 +880,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), projectPaperSize);
+				getTabControllers(), projectPaperSize, noHeader);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -929,6 +931,16 @@ public class TopSceneController {
 			}
 		} else if (!size.equals(projectPaperSize)) {
 			projectPaperSize = size;
+			projectEdited();
+		}
+	}
+
+	public boolean getNoHeader() {
+		return noHeader;
+	}
+	public void setNoHeader(boolean no_header) {
+		if (noHeader != no_header) {
+			noHeader = no_header;
 			projectEdited();
 		}
 	}

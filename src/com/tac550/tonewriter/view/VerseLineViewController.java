@@ -671,8 +671,7 @@ public class VerseLineViewController {
 		MidiInterface.playAssignedPhrase(getSyllables(), playButton);
 	}
 
-	@FXML private void handleEditSyllables() {
-
+	@FXML private void handleEdit() {
 		FXMLLoaderIO.loadFXMLLayoutAsync("VLineEditView.fxml", loader -> {
 			VBox rootLayout = loader.getRoot();
 			VLineEditViewController controller = loader.getController();
@@ -693,7 +692,6 @@ public class VerseLineViewController {
 				syllableStage.show();
 			});
 		});
-
 	}
 
 	public SyllableText[] getSyllables() {

@@ -64,7 +64,7 @@ public class ProjectIO {
 			writeLine(writer, MainApp.APP_VERSION);
 			writeLine(writer, top_controller.getProjectTitle());
 			writeLine(writer, top_controller.getTabCount());
-			writeLine(writer, top_controller.getPaperSize());
+			writeLine(writer, top_controller.getPaperSize(), top_controller.getNoHeader());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -159,7 +159,7 @@ public class ProjectIO {
 		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
 		try {
 			LilyPondInterface.saveToLilyPondFile(lilypondFile, top_controller.getProjectTitle(),
-					top_controller.getTabControllers(), top_controller.getPaperSize());
+					top_controller.getTabControllers(), top_controller.getPaperSize(), top_controller.getNoHeader());
 		} catch (IOException e) {
 			TWUtils.showError("Failed to save project render!", true);
 			return false;
@@ -377,8 +377,12 @@ public class ProjectIO {
 			projectVersion = readLine(reader).get(0);
 			top_controller.setProjectTitle(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
-			// Before 1.0: no per-project paper size (fails gracefully).
-			top_controller.setPaperSize(readLine(reader).get(0));
+			// Before 1.0: no project-level paper size or no-header option.
+			if (TWUtils.versionCompare("1.0", projectVersion) != 1) {
+				List<String> pageSettings = readLine(reader);
+				top_controller.setPaperSize(pageSettings.get(0));
+				top_controller.setNoHeader(Boolean.parseBoolean(pageSettings.get(1)));
+			}
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);

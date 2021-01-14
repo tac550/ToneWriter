@@ -92,10 +92,10 @@ public class LilyPondInterface {
 
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title,
-									  MainSceneController[] items, String paperSize) throws IOException {
+									  MainSceneController[] items, String paperSize, boolean no_header) throws IOException {
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize))
+		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize, no_header))
 			return false;
 
 		if (MainApp.lilyPondAvailable()) {
@@ -133,7 +133,7 @@ public class LilyPondInterface {
 	}
 
 	public static boolean saveToLilyPondFile(File lilypond_file, String project_title,
-											 MainSceneController[] items, String paperSize) throws IOException {
+											 MainSceneController[] items, String paperSize, boolean no_header) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		if (lilypond_file.exists()) {
@@ -150,7 +150,8 @@ public class LilyPondInterface {
 
 		// Copy the render template file to the output path.
 		try {
-			TWUtils.exportFSResource("exportTemplate.ly", lilypond_file);
+			TWUtils.exportFSResource(no_header && items.length > 1 ? "exportTemplateNoHeader.ly"
+					: "exportTemplate.ly", lilypond_file);
 		} catch (Exception e2) {
 			e2.printStackTrace();
 			return false;
@@ -161,13 +162,15 @@ public class LilyPondInterface {
 
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		lines.set(7,  lines.get(7).replace("$PROJECT_TITLE",
-				items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
-						+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
-		lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
-				.replace("$APPNAME", MainApp.APP_NAME));
-		if (items.length == 1 && items[0].getLargeTitle())
-			lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+		if (!no_header || items.length == 1) {
+			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
+					items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
+							+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
+			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
+					.replace("$APPNAME", MainApp.APP_NAME));
+			if (items.length == 1 && items[0].getLargeTitle())
+				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+		}
 
 		// Add a blank line before scores begin
 		lines.add("");

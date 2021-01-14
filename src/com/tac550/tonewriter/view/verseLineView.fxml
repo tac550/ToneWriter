@@ -81,7 +81,7 @@
                   </Button>
                   <VBox alignment="CENTER" layoutY="48.0" spacing="5.0" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="25.0">
                      <children>
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleEditSyllables" text="Edit...">
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleEdit" text="Edit...">
                            <VBox.margin>
                               <Insets left="2.0" right="2.0" top="2.0" />
                            </VBox.margin></Button>
