@@ -303,9 +303,7 @@ public class ProjectIO {
 					}
 				}
 
-				line.append("~~").append(vLine.getBeforeBar()).append("~~").append(vLine.getAfterBar());
-
-				writeLine(writer, line, vLine.getDisableLineBreaks());
+				writeLine(writer, line, vLine.getBeforeBar(), vLine.getAfterBar(), vLine.getDisableLineBreaks());
 			}
 
 		}
@@ -461,21 +459,11 @@ public class ProjectIO {
 
 				List<String> lineEntry;
 				while ((lineEntry = readLine(reader)).get(0).startsWith("+")) {
-					if (lineEntry.size() > 1)
-						disableLineBreaksLines.add(Boolean.parseBoolean(lineEntry.get(1)));
-
-					List<String> lineBars = new ArrayList<>();
-					String[] lineBarsOptional = lineEntry.get(0).split("~~");
-					if (lineBarsOptional.length == 3) {
-						lineBars.add(lineBarsOptional[1]);
-						lineBars.add(lineBarsOptional[2]);
-					}
-
 					List<String> lineSyllables = new ArrayList<>();
 					List<String> lineFormatting = new ArrayList<>();
 					List<String> lineAssignments = new ArrayList<>();
 
-					String[] data = lineBarsOptional[0].split("\\|");
+					String[] data = lineEntry.get(0).split("\\|");
 
 					// data[0] contains meta info about the line.
 					assignedPhrases.add(data[0].substring(1));
@@ -506,10 +494,14 @@ public class ProjectIO {
 						lineAssignments.add(assignment);
 					}
 
-					barLines.add(lineBars);
 					syllableLines.add(lineSyllables);
 					formatLines.add(lineFormatting);
 					assignmentLines.add(lineAssignments);
+					// Before 1.0: No custom barlines or line break disabling.
+					if (TWUtils.versionCompare("1.0", itemVersion) != 1) {
+						barLines.add(List.of(lineEntry.get(1), lineEntry.get(2)));
+						disableLineBreaksLines.add(Boolean.parseBoolean(lineEntry.get(3)));
+					}
 				}
 
 				// Create and set up item tab
@@ -549,12 +541,9 @@ public class ProjectIO {
 					ctr.setBottomVerse(bottomVerse.get(1));
 
 					for (int j = 0; j < syllableLines.size(); j++) {
-						List<String> bars = barLines.get(j);
 						List<String> sylls = syllableLines.get(j);
 						List<String> formatting = formatLines.get(j);
 						List<String> assigns = assignmentLines.get(j);
-						boolean disableLineBreaks = disableLineBreaksLines.size() > j ?
-								disableLineBreaksLines.get(j) : false;
 
 						// Create verse line with provided syllable data and save a reference to its controller
 						Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("", sylls));
@@ -572,16 +561,18 @@ public class ProjectIO {
 
 							vLine.setTonePhraseChoice(assignedPhrases.get(finalJ));
 
-							// Set barline selections, if any.
-							if (bars.size() == 2) {
+							// Set barline selections, if item from 1.0 or later.
+							if (TWUtils.versionCompare("1.0", itemVersion) != 1) {
 								if (finalJ == 0)
-									vLine.setBarlines(bars.get(0), bars.get(1));
+									vLine.setBarlines(barLines.get(finalJ).get(0), barLines.get(finalJ).get(1));
 								else
-									vLine.setBarlines("unchanged", bars.get(1));
+									vLine.setBarlines("unchanged", barLines.get(finalJ).get(1));
 							}
 
-							// Set status of disabling line breaks
-							vLine.setDisableLineBreaks(disableLineBreaks);
+							// Set status of disabling line breaks, if item from 1.0 or later
+							if (TWUtils.versionCompare("1.0", itemVersion) != 1) {
+								vLine.setDisableLineBreaks(disableLineBreaksLines.get(finalJ));
+							}
 
 							// Apply syllable formatting.
 							for (int k = 0; k < formatting.size(); k++) {
