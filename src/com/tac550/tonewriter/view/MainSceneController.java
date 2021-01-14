@@ -635,7 +635,6 @@ public class MainSceneController {
 	 * Project Menu Actions
 	 */
 	void handleExport() {
-
 		// First make sure a filename and output mode are selected and that the target location is ready.
 		if (exportMode != ExportMode.NONE) { // If an output mode is already selected for this tab...
 			// Ask whether to keep settings and overwrite or reset export settings
@@ -674,7 +673,6 @@ public class MainSceneController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
 					true, parentStage);
 		}
-
 	}
 
 	/*
@@ -934,7 +932,6 @@ public class MainSceneController {
 	}
 
 	private void setNewRenderFilename() throws RenderFormatException {
-
 		ExportMode tempExportMode;
 
 		if (topSceneController.getTabCount() > 1) {
@@ -960,8 +957,8 @@ public class MainSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Export As");
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(String.format("%s.pdf",
-				tempExportMode == ExportMode.ITEM ? titleTextField.getText() : topSceneController.getProjectTitle()),
-				"_"));
+				tempExportMode == ExportMode.ITEM ? titleTextField.getText()
+						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())), "_"));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
