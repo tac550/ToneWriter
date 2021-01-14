@@ -233,8 +233,8 @@ public class VerseLineViewController {
 		boolean updateBefore = !before.equals("unchanged");
 		boolean updateAfter = !after.equals("unchanged");
 
-		if (updateBefore) beforeBar.set(List.of(SyllableEditViewController.barStrings).indexOf(before));
-		if (updateAfter) afterBar.set(List.of(SyllableEditViewController.barStrings).indexOf(after));
+		if (updateBefore) beforeBar.set(List.of(VLineEditViewController.barStrings).indexOf(before));
+		if (updateAfter) afterBar.set(List.of(VLineEditViewController.barStrings).indexOf(after));
 
 		if (updateBefore || updateAfter)
 			topController.projectEdited();
@@ -671,9 +671,9 @@ public class VerseLineViewController {
 
 	@FXML private void handleEditSyllables() {
 
-		FXMLLoaderIO.loadFXMLLayoutAsync("syllableEditView.fxml", loader -> {
+		FXMLLoaderIO.loadFXMLLayoutAsync("VLineEditView.fxml", loader -> {
 			VBox rootLayout = loader.getRoot();
-			SyllableEditViewController controller = loader.getController();
+			VLineEditViewController controller = loader.getController();
 
 			controller.setParentController(this);
 			controller.setSyllableText(verseLine.getLine());
@@ -711,10 +711,10 @@ public class VerseLineViewController {
 	}
 
 	public String getBeforeBar() {
-		return SyllableEditViewController.barStrings[beforeBar.get()];
+		return VLineEditViewController.barStrings[beforeBar.get()];
 	}
 	public String getAfterBar() {
-		return SyllableEditViewController.barStrings[afterBar.get()];
+		return VLineEditViewController.barStrings[afterBar.get()];
 	}
 
 	public IntegerProperty afterBarProperty() {
@@ -743,8 +743,8 @@ public class VerseLineViewController {
 	}
 
 	private void refreshBarViews() {
-		beforeBarView.setImage(SyllableEditViewController.barImages[beforeBar.get()]);
-		afterBarView.setImage(SyllableEditViewController.barImages[afterBar.get()]);
+		beforeBarView.setImage(VLineEditViewController.barImages[beforeBar.get()]);
+		afterBarView.setImage(VLineEditViewController.barImages[afterBar.get()]);
 	}
 
 	public void verseEdited() {
