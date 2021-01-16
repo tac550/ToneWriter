@@ -79,7 +79,7 @@ public class ProjectIO {
 			File toneFile = controller.getToneFile();
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
-				ToneReaderWriter toneWriter = controller.getToneWriter();
+				ToneIO toneWriter = controller.getToneWriter();
 				toneHash = toneWriter.getCurrentToneHash();
 
 				// Save each unique tone file into "tones" directory
@@ -89,7 +89,7 @@ public class ProjectIO {
 					File toneSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones"
 							+ File.separator + toneHash + File.separator + "Unsaved Tone.tone");
 
-					if (ToneReaderWriter.createToneFile(toneSaveFile)) {
+					if (ToneIO.createToneFile(toneSaveFile)) {
 						toneWriter.saveToneToFile(toneSaveFile);
 					}
 				}

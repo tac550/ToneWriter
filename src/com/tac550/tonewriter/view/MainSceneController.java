@@ -3,7 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.Syllables;
-import com.tac550.tonewriter.io.ToneReaderWriter;
+import com.tac550.tonewriter.io.ToneIO;
 import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -546,7 +546,7 @@ public class MainSceneController {
 			saveFile = new File(saveFile.getAbsolutePath() + ".tone");
 		}
 
-		if (ToneReaderWriter.createToneFile(saveFile)) {
+		if (ToneIO.createToneFile(saveFile)) {
 			toneFile = saveFile;
 
 			toneMenuState.saveToneMenuItemDisabled = false;
@@ -585,7 +585,7 @@ public class MainSceneController {
 		if (selected_file.exists()) {
 			toneFile = selected_file;
 
-			ToneReaderWriter toneReader = getToneReader();
+			ToneIO toneReader = getToneReader();
 
 			loadingTone = true;
 			if (toneReader.loadTone(toneFile, this)) {
@@ -714,7 +714,7 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneReaderWriter toneWriter = getToneWriter();
+		ToneIO toneWriter = getToneWriter();
 		if (!toneWriter.saveToneToFile(toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
@@ -727,11 +727,11 @@ public class MainSceneController {
 		if (createNewTone()) handleSaveTone();
 	}
 
-	public ToneReaderWriter getToneWriter() {
-		return new ToneReaderWriter(chantLineControllers, this, keySignature, leftText, rightText);
+	public ToneIO getToneWriter() {
+		return new ToneIO(chantLineControllers, this, keySignature, leftText, rightText);
 	}
-	private ToneReaderWriter getToneReader() {
-		return new ToneReaderWriter(chantLineControllers, this);
+	private ToneIO getToneReader() {
+		return new ToneIO(chantLineControllers, this);
 	}
 
 	/*

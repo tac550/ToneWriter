@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
-public class ToneReaderWriter {
+public class ToneIO {
 
 	private final List<ChantLineViewController> chantLines;
 
@@ -30,15 +30,15 @@ public class ToneReaderWriter {
 
 	private MainSceneController mainScene;
 
-	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene,
-	                        String key, String poet, String composer) {
+	public ToneIO(List<ChantLineViewController> lines, MainSceneController main_scene,
+				  String key, String poet, String composer) {
 		chantLines = new ArrayList<>(lines);
 		associatedMainScene = main_scene;
 		keySig = key;
 		poetText = poet;
 		composerText = composer;
 	}
-	public ToneReaderWriter(List<ChantLineViewController> lines, MainSceneController main_scene) {
+	public ToneIO(List<ChantLineViewController> lines, MainSceneController main_scene) {
 		chantLines = new ArrayList<>(lines);
 		associatedMainScene = main_scene;
 	}
@@ -52,39 +52,6 @@ public class ToneReaderWriter {
 			// Create new file
 			if (!toneFile.createNewFile())
 				return false;
-
-			// Set up PrintWriter
-			try (FileWriter fileWriter = new FileWriter(toneFile);
-			     PrintWriter printWriter = new PrintWriter(fileWriter)) {
-
-				// Header info
-				printWriter.println("VERSION: " + MainApp.APP_VERSION);
-				printWriter.println("Key Signature: " +
-						keySig.replace("\u266F", "s").replace("\u266D", "f"));
-				printWriter.println("Tone: " + poetText);
-				printWriter.println("Composer: " + composerText);
-				printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
-				printWriter.println();
-				printWriter.println();
-
-				// Line name which is marked first repeated. Filled when found.
-				String firstRepeated = "";
-
-				// For each chant line...
-				for (ChantLineViewController chantLine : chantLines) {
-
-					if (chantLine.getFirstRepeated()) {
-						firstRepeated = chantLine.getName();
-					}
-
-					printWriter.println(chantLine.toString());
-
-				}
-
-				// Footer info
-				printWriter.println();
-				printWriter.println("First Repeated: " + firstRepeated);
-			}
 
 			// Save to the file
 			FileWriter fileWriter = new FileWriter(toneFile);
