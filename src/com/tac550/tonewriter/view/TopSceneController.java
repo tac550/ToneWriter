@@ -111,14 +111,16 @@ public class TopSceneController {
 	private static final RadioMenuItem quarterNoteMenuItem = new RadioMenuItem("quarter note");
 	private static final RadioMenuItem dottedQuarterNoteMenuItem = new RadioMenuItem("dotted quarter note");
 	private static final RadioMenuItem halfNoteMenuItem = new RadioMenuItem("half note");
+	private static final RadioMenuItem dottedHalfNoteMenuItem = new RadioMenuItem("dotted half note");
 	private static final RadioMenuItem wholeNoteMenuItem = new RadioMenuItem("whole note");
 	private static final List<RadioMenuItem> clickItems = new ArrayList<>();
-	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, wholeNoteMenuItem);
+	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 	private static final ToggleGroup durationGroup = new ToggleGroup();
 	private static final ImageView eighthNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/eighth.png").toExternalForm());
 	private static final ImageView quarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/quarter.png").toExternalForm());
 	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/dotted-quarter.png").toExternalForm());
 	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/half.png").toExternalForm());
+	private static final ImageView dottedHalfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/dotted-half.png").toExternalForm());
 	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/whole.png").toExternalForm());
 	private static final List<ImageView> touchItems = new ArrayList<>();
 	private static final Text touchDescriptionText = new Text("Note info");
@@ -133,10 +135,11 @@ public class TopSceneController {
 
 	static {
 		Collections.addAll(durationMapping, LilyPondInterface.NOTE_EIGHTH, LilyPondInterface.NOTE_QUARTER,
-				LilyPondInterface.NOTE_DOTTED_QUARTER, LilyPondInterface.NOTE_HALF, LilyPondInterface.NOTE_WHOLE);
+				LilyPondInterface.NOTE_DOTTED_QUARTER, LilyPondInterface.NOTE_HALF, LilyPondInterface.NOTE_DOTTED_HALF,
+				LilyPondInterface.NOTE_WHOLE);
 
 		Collections.addAll(clickItems, eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem,
-				halfNoteMenuItem, wholeNoteMenuItem);
+				halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 
 		Platform.runLater(() -> {
 			for (RadioMenuItem item : clickItems) {
@@ -149,7 +152,7 @@ public class TopSceneController {
 		});
 
 		Collections.addAll(touchItems, eighthNoteTouchItem, quarterNoteTouchItem, dottedQuarterNoteTouchItem,
-				halfNoteTouchItem, wholeNoteTouchItem);
+				halfNoteTouchItem, dottedHalfNoteTouchItem, wholeNoteTouchItem);
 
 		VBox mainBox = new VBox();
 		mainBox.setAlignment(Pos.CENTER);
