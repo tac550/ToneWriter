@@ -69,14 +69,13 @@ public class ToneIO {
 		try (PrintWriter printWriter = new PrintWriter(destination)) {
 
 			// Header info
-			printWriter.println("VERSION: " + MainApp.APP_VERSION);
-			printWriter.println("Key Signature: " +
-					keySig.replace("\u266F", "s").replace("\u266D", "f"));
-			printWriter.println("Tone: " + poetText);
-			printWriter.println("Composer: " + composerText);
-			printWriter.println("Manually Assign Phrases: " + associatedMainScene.manualCLAssignmentEnabled());
-			printWriter.println();
-			printWriter.println();
+			writePairTo(printWriter, "VERSION", MainApp.APP_VERSION);
+			writePairTo(printWriter, "Key Signature", keySig.replace("\u266F", "s").replace("\u266D", "f"));
+			writePairTo(printWriter, "Tone", poetText);
+			writePairTo(printWriter, "Composer", composerText);
+			writePairTo(printWriter, "Manually Assign Phrases", associatedMainScene.manualCLAssignmentEnabled());
+			writeBlankLine(printWriter);
+			writeBlankLine(printWriter);
 
 			// Line name which is marked first repeated. Filled when found.
 			String firstRepeated = "";
@@ -84,17 +83,16 @@ public class ToneIO {
 			// For each chant line...
 			for (ChantLineViewController chantLine : chantLines) {
 
-				if (chantLine.getFirstRepeated()) {
+				if (chantLine.getFirstRepeated())
 					firstRepeated = chantLine.getName();
-				}
 
 				printWriter.println(chantLine.toString());
 
 			}
 
 			// Footer info
-			printWriter.println();
-			printWriter.println("First Repeated: " + firstRepeated);
+			writeBlankLine(printWriter);
+			writePairTo(printWriter, "First Repeated", firstRepeated);
 
 		}
 	}
@@ -155,23 +153,23 @@ public class ToneIO {
 				footer = null;
 			}
 
-			versionSaved = tryReadingLine(header, 0, "0");
+			versionSaved = readFromSection(header, 0, "0");
 			pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
 			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION) == 1;
 
-			keySig = tryReadingLine(header, 1, "C major")
+			keySig = readFromSection(header, 1, "C major")
 					.replace("s", "\u266F").replace("f", "\u266D");
 			if (pre0_6) {
-				composerText = tryReadingLine(header, 2, "");
+				composerText = readFromSection(header, 2, "");
 			} else {
-				poetText = tryReadingLine(header, 2, "");
-				composerText = tryReadingLine(header, 3, "");
+				poetText = readFromSection(header, 2, "");
+				composerText = readFromSection(header, 3, "");
 			}
 			associatedMainScene.setManualCLAssignmentSilently(
-					Boolean.parseBoolean(tryReadingLine(header, pre0_6 ? 3 : 4, "false")));
+					Boolean.parseBoolean(readFromSection(header, pre0_6 ? 3 : 4, "false")));
 
 			if (footer != null) {
-				firstRepeated = tryReadingLine(footer, 0, "");
+				firstRepeated = readFromSection(footer, 0, "");
 			}
 
 			// Version warning
@@ -260,13 +258,20 @@ public class ToneIO {
 		return tonesSimilar(parts[1].split("\\r?\\n\\r?\\n"));
 	}
 
-	private String tryReadingLine(String[] section, int line_index, String default_value) {
+	private void writePairTo(PrintWriter writer, String label, Object value) {
+		writer.println(String.format("%s: %s", label, String.valueOf(value).replace(":", "\\:")));
+	}
+	private void writeBlankLine(PrintWriter writer) {
+		writer.println();
+	}
 
-		if (line_index < section.length && section[line_index].contains(":")) {
-			String[] elements = section[line_index].split(":");
+	private String readFromSection(String[] section, int line_index, String default_value) {
+
+		if (line_index < section.length && section[line_index].matches(".*[^\\\\]:.*")) { // Matches colon WITHOUT escape
+			String[] elements = section[line_index].split("[^\\\\]:");
 
 			// Always return the last element or empty string if there is nothing after the only ":" in the line.
-			return elements[elements.length - 1].trim();
+			return elements[elements.length - 1].trim().replace("\\:", ":");
 		}
 
 		return default_value;
