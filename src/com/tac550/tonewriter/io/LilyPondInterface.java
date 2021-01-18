@@ -603,68 +603,8 @@ public class LilyPondInterface {
 			// That's it for each chord in the syllable.
 
 			// SLUR PROCESSING
-
-			// Flags for whether we needed a slur on the syllable for each part.
-			boolean[] addedSlur = new boolean[] {false, false, false, false};
-
-			// For each part...
-			for (int i = 0; i < 4; i++) {
-				// If the current part doesn't have any hidden notes on this syllable... (which would indicate that it's recitative)
-				if (!syllableNoteBuffers[i].contains("noteHide")) {
-
-					String[] tokens = syllableNoteBuffers[i].trim().split(" ");
-
-					// If all the notes in this part are tied, skip adding a slur.
-					if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
-						continue;
-
-					// If the part contains any rests, don't slur.
-					if (Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
-						continue;
-
-					// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
-					StringBuilder finalString = new StringBuilder();
-					// For each token in the buffer...
-					for (int i1 = 0; i1 < tokens.length; i1++) {
-						// If the token is a barline indicator, append it and the following as if one token
-						if (tokens[i1].equals("$bar")) {
-							finalString.append(" ").append(tokens[i1])
-									.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
-							i1++; // Don't try to append i1 + 1 again
-							continue;
-						}
-						// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
-						// note group... (two notes occurring in one part, which will be split across two tokens)
-						if (i1 > 0 && !addedSlur[i] && !tokens[i1 - 1].contains("<")) { // TODO: Just break?
-							// Add the beginning slur parenthesis and the current token.
-							finalString.append(" \\( ").append(tokens[i1]);
-							addedSlur[i] = true;
-						} else {
-							// Otherwise skip empty tokens or add the current one.
-							if (tokens[i1].isEmpty()) continue;
-							finalString.append(" ").append(tokens[i1]);
-						}
-					}
-
-					// Save the new string to the note buffer.
-					syllableNoteBuffers[i] = finalString.toString();
-				}
-
-			}
-
-			// Close parentheses to complete the slur for the syllable.
-			// For each part...
-			for (int i = 0; i < 4; i++) {
-				// If a slur was begun to be added for the part...
-				if (addedSlur[i]) {
-					// Complete the slur by adding a closing parenthesis.
-					if (syllableNoteBuffers[i].endsWith("$bar "))
-						syllableNoteBuffers[i] = TWUtils.replaceLast(syllableNoteBuffers[i],
-								Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
-					else
-						syllableNoteBuffers[i] += ("\\)");
-				}
-			}
+			for (int i = 0; i < 4; i++)
+				computeSlurForPart(syllableNoteBuffers, i);
 
 			// SYLLABLE BUFFER SAVE-OUTS
 
@@ -678,6 +618,63 @@ public class LilyPondInterface {
 
 		}
 		return measureBeats;
+	}
+
+	private static void computeSlurForPart(String[] syllableNoteBuffers, int i) {
+		boolean addedSlur = false;
+
+		// If the current part doesn't have any hidden notes on this syllable... (which would indicate that it's recitative)
+		if (!syllableNoteBuffers[i].contains("noteHide")) {
+
+			String[] tokens = syllableNoteBuffers[i].trim().split(" ");
+
+			// If all the notes in this part are tied, skip adding a slur.
+			if (Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
+				return;
+
+			// If the part contains any rests, don't slur.
+			if (Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
+				return;
+
+			// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
+			StringBuilder finalString = new StringBuilder();
+			// For each token in the buffer...
+			for (int i1 = 0; i1 < tokens.length; i1++) {
+				// If the token is a barline indicator, append it and the following as if one token
+				if (tokens[i1].equals("$bar")) {
+					finalString.append(" ").append(tokens[i1])
+							.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
+					i1++; // Don't try to append i1 + 1 again
+					continue;
+				}
+				// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
+				// note group... (two notes occurring in one part, which will be split across two tokens)
+				if (i1 > 0 && !addedSlur && !tokens[i1 - 1].contains("<")) {
+					// Add the beginning slur parenthesis and the current token.
+					finalString.append(" \\( ").append(tokens[i1]);
+					addedSlur = true;
+				} else {
+					// Otherwise skip empty tokens or add the current one.
+					if (tokens[i1].isEmpty()) continue;
+					finalString.append(" ").append(tokens[i1]);
+				}
+			}
+
+			// Save the new string to the note buffer.
+			syllableNoteBuffers[i] = finalString.toString();
+		}
+
+		// Close parentheses to complete the slur for the syllable.
+		// For each part...
+		// If a slur was begun to be added for the part...
+		if (addedSlur) {
+			// Complete the slur by adding a closing parenthesis.
+			if (syllableNoteBuffers[i].endsWith("$bar "))
+				syllableNoteBuffers[i] = TWUtils.replaceLast(syllableNoteBuffers[i],
+						Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
+			else
+				syllableNoteBuffers[i] += ("\\)");
+		}
 	}
 
 	private static void addSyllaleToLyrics(List<SyllableText> syllableList, SyllableText syllable, StringBuilder syllableTextBuffer) {
