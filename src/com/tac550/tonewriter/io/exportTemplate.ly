@@ -12,9 +12,8 @@
 
 \paper {
   print-all-headers = ##t
-  oddHeaderMarkup = \markup {
-    \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:instrument "" } }
-  evenHeaderMarkup = \oddHeaderMarkup
+  evenHeaderMarkup = \markup { \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:instrument "" } }
+  oddHeaderMarkup = \markup { \fill-line { "" \on-the-fly #not-first-page \fromproperty #'header:instrument \on-the-fly #not-first-page \fromproperty #'page:page-number-string } }
   ragged-bottom = ##t
 }
 

@@ -92,11 +92,11 @@ public class LilyPondInterface {
 	}
 
 	// The function that handles final output.
-	public static boolean exportItems(File saving_dir, String file_name, String project_title,
-									  MainSceneController[] items, String paperSize, boolean no_header) throws IOException {
+	public static boolean exportItems(File saving_dir, String file_name, String project_title, MainSceneController[] items,
+	                                  String paperSize, boolean no_header, boolean even_spread) throws IOException {
 		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize, no_header))
+		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize, no_header, even_spread))
 			return false;
 
 		if (MainApp.lilyPondAvailable()) {
@@ -133,8 +133,8 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	public static boolean saveToLilyPondFile(File lilypond_file, String project_title,
-											 MainSceneController[] items, String paperSize, boolean no_header) throws IOException {
+	public static boolean saveToLilyPondFile(File lilypond_file, String project_title, MainSceneController[] items,
+	                                         String paperSize, boolean no_header, boolean even_spread) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		if (lilypond_file.exists()) {
@@ -169,8 +169,15 @@ public class LilyPondInterface {
 							+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
 			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 					.replace("$APPNAME", MainApp.APP_NAME));
-			if (items.length == 1 && items[0].getLargeTitle())
+			if (items.length == 1 && items[0].getLargeTitle()) {
+				lines.set(14, lines.get(14).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+			}
+
+			if (!even_spread) {
+				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
+				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
+			}
 		}
 
 		// Add a blank line before scores begin

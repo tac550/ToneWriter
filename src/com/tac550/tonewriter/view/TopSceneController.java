@@ -103,6 +103,7 @@ public class TopSceneController {
 			"legal (8.5 x 14.0 in)", "ledger (17.0 x 11.0 in)", "tabloid (11.0 x 17.0 in)");
 
 	private boolean noHeader = false;
+	private boolean evenSpread = true;
 
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
@@ -383,6 +384,7 @@ public class TopSceneController {
 			controller.setParentController(this);
 			controller.setPaperSize(projectPaperSize);
 			controller.setNoHeader(noHeader);
+			controller.setSpreadSetting(evenSpread);
 
 			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
@@ -883,7 +885,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), projectPaperSize, noHeader);
+				getTabControllers(), projectPaperSize, noHeader, evenSpread);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -944,6 +946,16 @@ public class TopSceneController {
 	public void setNoHeader(boolean no_header) {
 		if (noHeader != no_header) {
 			noHeader = no_header;
+			projectEdited();
+		}
+	}
+
+	public boolean getEvenSpread() {
+		return evenSpread;
+	}
+	public void setEvenSpread(boolean even_spread) {
+		if (evenSpread != even_spread) {
+			evenSpread = even_spread;
 			projectEdited();
 		}
 	}

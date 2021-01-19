@@ -5,7 +5,10 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.PageSetupViewController">
@@ -21,9 +24,16 @@
       </TitledPane>
       <TitledPane animated="false" collapsible="false" text="Header/Footer Settings">
          <content>
-            <VBox>
+            <VBox spacing="5.0">
                <children>
-                  <CheckBox fx:id="noHeaderCheckBox" mnemonicParsing="false" text="No Header (Page numbers appear at the bottom of each page)" />
+                  <CheckBox fx:id="noHeaderCheckBox" mnemonicParsing="false" text="No Header (Page numbers appear centered at the bottom of each page)" />
+                  <Separator prefWidth="200.0" />
+                  <RadioButton fx:id="evenSpreadRadioButton" mnemonicParsing="false" selected="true" text="Position Page Numbers for Even Spread">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="pageNumberPosGroup" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="oddSpreadRadioButton" mnemonicParsing="false" text="Position Page Numbers for Odd Spread" toggleGroup="$pageNumberPosGroup" />
                </children>
             </VBox>
          </content>
