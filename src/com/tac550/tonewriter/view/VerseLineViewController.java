@@ -494,7 +494,7 @@ public class VerseLineViewController {
 			if (i >= smaller && i <= larger)
 				syllable.setFill(getCurrentChord().getColor());
 			else
-				syllable.setFill(syllable.defaultColor);
+				syllable.applyDefaultFill();
 
 			i++;
 		}
@@ -523,7 +523,7 @@ public class VerseLineViewController {
 	}
 	private void defaultSyllableColors() {
 		for (SyllableText syllable : getSyllables())
-			syllable.setFill(syllable.defaultColor);
+			syllable.applyDefaultFill();
 	}
 
 	@FXML private void skipChordAction() {
