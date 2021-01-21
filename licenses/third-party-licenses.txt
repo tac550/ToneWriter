@@ -677,11 +677,12 @@ the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
+-----------------------------------------------------------------------------
 
-ToneWriter uses Apache Commons, Apache HttpComponents,
-	htmlunit, Xalan-Java, Xerces2 Java Parser, Apache XML Commons, and Eclipse Jetty.
+ToneWriter uses Apache Commons, Apache HttpComponents, htmlunit, Xalan-Java,
+    Xerces2 Java Parser, Apache XML Commons, Eclipse Jetty, and fonts from the OpenSans font-family.
 	
-These libraries are licensed under the Apache License Version 2.0, included below.
+These libraries and fonts are licensed under the Apache License Version 2.0, included below.
 
 https://commons.apache.org/
 https://hc.apache.org/
@@ -690,6 +691,7 @@ http://xml.apache.org/xalan-j/
 http://xerces.apache.org/xerces2-j/
 http://xerces.apache.org/xml-commons/
 https://www.eclipse.org/jetty/
+https://fonts.google.com/specimen/Open+Sans
 
                                  Apache License
                            Version 2.0, January 2004

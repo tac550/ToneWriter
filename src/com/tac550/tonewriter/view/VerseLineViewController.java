@@ -23,7 +23,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -214,7 +213,6 @@ public class VerseLineViewController {
 				for (String syllable : verseLine.getSyllables()) {
 					SyllableText text = new SyllableText(syllable);
 					text.setParent(this);
-					text.setFont(Font.font("System", 28));
 					text.setTextAlignment(TextAlignment.CENTER);
 
 					lineTextFlow.getChildren().add(text);

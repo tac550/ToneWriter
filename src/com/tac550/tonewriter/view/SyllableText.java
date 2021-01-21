@@ -6,8 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
@@ -28,6 +26,12 @@ public class SyllableText extends Text {
 	// Formatting
 	private boolean bold = false;
 	private boolean italic = false;
+
+	private static final int fontSize = 28;
+	Font regularFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf").toExternalForm(), fontSize);
+	Font boldFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Bold.ttf").toExternalForm(), fontSize);
+	Font italicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Italic.ttf").toExternalForm(), fontSize);
+	Font boldItalicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-BoldItalic.ttf").toExternalForm(), fontSize);
 	
 	Color defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 	private static final Color highlightColor = Color.DARKCYAN;
@@ -39,6 +43,7 @@ public class SyllableText extends Text {
 	public SyllableText(String text) {
 		super(text);
 
+		setFont(regularFont);
 		setFill(defaultColor);
 
 		hoverProperty().addListener((o, old_val, new_val) -> {
@@ -185,8 +190,14 @@ public class SyllableText extends Text {
 	}
 
 	private void refreshFont() {
-		setFont(Font.font(getFont().getName(), bold ? FontWeight.BOLD : FontWeight.NORMAL,
-				italic ? FontPosture.ITALIC : FontPosture.REGULAR, getFont().getSize()));
+		if (bold && italic)
+			setFont(boldItalicFont);
+		else if (bold)
+			setFont(boldFont);
+		else if (italic)
+			setFont(italicFont);
+		else
+			setFont(regularFont);
 	}
 
 	void refreshStyle() {
