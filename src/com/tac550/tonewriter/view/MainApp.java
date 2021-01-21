@@ -125,9 +125,9 @@ public class MainApp extends Application {
 		// Initialize LilyPond
 
 		refreshLilyPondLocation();
-		// If the installation is no good, do initialization
-		if (!lilyPondAvailable()) {
-			platformSpecificInitialization();
+		// If the Windows LilyPond installation is no good, do initialization
+		if (!lilyPondAvailable() && OS_NAME.startsWith("win")) {
+			promptWinLilyPondInstall();
 
 			// Final availability determination after initialization attempt
 			refreshLilyPondLocation();
@@ -294,8 +294,7 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win"))
 			return "\\lilypond.exe";
 		if (OS_NAME.startsWith("mac"))
-			return (prefs.get(PREFS_LILYPOND_LOCATION, null) == null) ? "/lilypond"
-					: "/LilyPond.app/Contents/Resources/bin/lilypond";
+			return "/LilyPond.app/Contents/Resources/bin/lilypond";
 		if (OS_NAME.startsWith("lin"))
 			return "/lilypond";
 		else return null;
@@ -306,7 +305,7 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win"))
 			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
 		if (OS_NAME.startsWith("mac"))
-			return "/opt/local/bin";
+			return "lilypond";
 		if (OS_NAME.startsWith("lin"))
 			return "/usr/bin";
 		else return null;
@@ -388,7 +387,7 @@ public class MainApp extends Application {
 		} else return false;
 	}
 
-	private static void platformSpecificInitialization() {
+	private static void promptWinLilyPondInstall() {
 
 		// First, prompt the user asking how to proceed
 		// (either to locate a compatible LilyPond installation, continue anyway, or install the bundled one).
@@ -409,7 +408,7 @@ public class MainApp extends Application {
 			else if (result.get() == locateInstall) { // Set directory and continue
 				setLilyPondDir(splashStage, true);
 				if (!isLilyPondVersionCompatible()) { // Try again if version incompatible
-					platformSpecificInitialization();
+					promptWinLilyPondInstall();
 				}
 				return;
 			}
@@ -418,73 +417,52 @@ public class MainApp extends Application {
 		// Reset to default directory for after installation
 		resetLilyPondDir(true);
 
-		if (OS_NAME.startsWith("win")) {
+		try {
+			// Uninstall old version if present
+			String uninstallerLocation = new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))
+					.getParentFile().getParentFile().getAbsolutePath() + "\\uninstall.exe";
 
-			try {
-				// Uninstall old version if present
-				String uninstallerLocation = new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))
-						.getParentFile().getParentFile().getAbsolutePath() + "\\uninstall.exe";
+			if (new File(uninstallerLocation).exists()) {
+				Optional<ButtonType> uninsResult = TWUtils.showAlert(AlertType.CONFIRMATION, "Uninstall",
+						"Previous LilyPond installation will be removed.", true);
+				if (uninsResult.isPresent() && uninsResult.get() == ButtonType.OK) {
+					Process uninsProc = Runtime.getRuntime().exec(String.format("cmd /c \"%s\"", uninstallerLocation));
+					uninsProc.waitFor();
 
-				if (new File(uninstallerLocation).exists()) {
-					Optional<ButtonType> uninsResult = TWUtils.showAlert(AlertType.CONFIRMATION, "Uninstall",
-							"Previous LilyPond installation will be removed.", true);
-					if (uninsResult.isPresent() && uninsResult.get() == ButtonType.OK) {
-						Process uninsProc = Runtime.getRuntime().exec(String.format("cmd /c \"%s\"", uninstallerLocation));
-						uninsProc.waitFor();
-
-						AtomicBoolean done = new AtomicBoolean(false);
-						int loops = 0;
-						while (!done.get() && loops < 3) {
-							Thread.sleep(1000);
-							String line;
-							Process p = Runtime.getRuntime().exec
-									(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
-							try (BufferedReader input =
-									new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-								while ((line = input.readLine()) != null) {
-									if (line.startsWith("Au_.exe ")) {
-										loops = 0;
-										break;
-									}
+					AtomicBoolean done = new AtomicBoolean(false);
+					int loops = 0;
+					while (!done.get() && loops < 3) {
+						Thread.sleep(1000);
+						String line;
+						Process p = Runtime.getRuntime().exec
+								(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
+						try (BufferedReader input =
+								new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+							while ((line = input.readLine()) != null) {
+								if (line.startsWith("Au_.exe ")) {
+									loops = 0;
+									break;
 								}
-								loops++;
 							}
+							loops++;
 						}
+					}
 
-					} else return;
-				}
-
-				// Install bundled version
-				Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
-						Objects.requireNonNull(bundledLPDir.listFiles(
-								file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
-				process.waitFor();
-				if (process.exitValue() != 0) {
-					TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+				} else return;
 			}
 
-		} if (OS_NAME.startsWith("mac")) {
-
-			try {
-				String[] command = {
-						"osascript",
-						"-e",
-						String.format("do shell script \"installer -pkg %s -target /\" with administrator privileges",
-								Objects.requireNonNull(bundledLPDir.listFiles(file -> !file.isHidden()))[0].getAbsolutePath()) };
-				Process process = Runtime.getRuntime().exec(command);
-				process.waitFor();
-
-				if (process.exitValue() != 0) {
-					TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
-				}
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
+			// Install bundled version
+			Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
+					Objects.requireNonNull(bundledLPDir.listFiles(
+							file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
+			process.waitFor();
+			if (process.exitValue() != 0) {
+				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
 			}
-
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	static void setLilyPondDir(Stage owner, boolean startup) {
