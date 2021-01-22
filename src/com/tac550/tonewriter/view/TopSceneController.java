@@ -29,7 +29,6 @@ import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -89,8 +88,7 @@ public class TopSceneController {
 	// File names and directories are kept separately to make exporting multiple items with the same name
 	// and different extensions easier.
 	String projectOutputFileName;
-	File defaultProjectDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
-			: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+	File defaultProjectDirectory = MainApp.getPlatformSpecificInitialChooserDir();
 
 	private File projectFile;
 	private String projectTitle = "Unnamed Project";
@@ -421,7 +419,7 @@ public class TopSceneController {
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(defaultProjectDirectory);
+			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File selectedFile = fileChooser.showOpenDialog(parentStage);
 		if (selectedFile == null) return;
@@ -449,7 +447,7 @@ public class TopSceneController {
 		if (projectFile != null)
 			fileChooser.setInitialDirectory(projectFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(defaultProjectDirectory);
+			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return;

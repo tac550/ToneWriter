@@ -28,7 +28,6 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -107,7 +106,7 @@ public class MainSceneController {
 	// and different extensions easier.
 	private String itemExportFileName = MainApp.APP_NAME + " Render";
 	private File itemSavingDirectory = MainApp.developerMode ? new File(System.getProperty("user.home") + File.separator + "Downloads")
-		: new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
+		: MainApp.getPlatformSpecificInitialChooserDir();
 
 	@FXML private ScrollPane toneScrollPane;
 	@FXML private VBox chantLineBox;
@@ -531,12 +530,11 @@ public class MainSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Tone As");
 		fileChooser.setInitialFileName(".tone");
-		// The second condition is there to make sure the chooser doesn't offer the built-in tones directory.
-		if (toneFile != null && isToneSavable())
-			fileChooser.setInitialDirectory(projectToneLoaded() ? new File(System.getProperty("user.home") + File.separator + "Downloads")
-					: toneFile.getParentFile());
+
+		if (toneFile != null && isToneSavable() && !projectToneLoaded())
+			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		else
-			fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
+			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
@@ -571,11 +569,10 @@ public class MainSceneController {
 				if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
-				if (MainApp.BUILT_IN_TONE_DIR.exists()) {
+				if (MainApp.BUILT_IN_TONE_DIR.exists())
 					fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
-				} else {
-					fileChooser.setInitialDirectory(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getPath()));
-				}
+				else
+					fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 			}
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 			selected_file = fileChooser.showOpenDialog(parentStage);
@@ -962,8 +959,8 @@ public class MainSceneController {
 						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())), "_"));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
-		if (!fileChooser.getInitialDirectory().exists())
-			fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+		if (!fileChooser.getInitialDirectory().exists()) // TODO: Why is this here?
+			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
 		if (PDFFile == null) {

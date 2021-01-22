@@ -32,6 +32,7 @@ import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -318,14 +319,10 @@ public class MainApp extends Application {
 		else return ".midi";
 	}
 
-	public static String getPlatformSpecificRootDir() {
+	private static String getPlatformSpecificRootDir() {
 		if (OS_NAME.startsWith("win"))
 			return System.getenv("SystemDrive") + "\\";
-		if (OS_NAME.startsWith("mac"))
-			return "/";
-		if (OS_NAME.startsWith("lin"))
-			return "/";
-		else return null;
+		else return "/";
 	}
 
 	public static boolean isDarkModeEnabled() {
@@ -385,6 +382,12 @@ public class MainApp extends Application {
 				return false;
 			}
 		} else return false;
+	}
+
+	static File getPlatformSpecificInitialChooserDir() {
+		return new File(MainApp.developerMode ? System.getProperty("user.home") + File.separator + "Downloads"
+				: MainApp.OS_NAME.startsWith("mac") ? System.getProperty("user.home") + File.separator + "Documents"
+				: FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
 	}
 
 	private static void promptWinLilyPondInstall() {
