@@ -28,10 +28,10 @@ public class SyllableText extends Text {
 	private boolean italic = false;
 
 	private static final int fontSize = 28;
-	Font regularFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf").toExternalForm(), fontSize);
-	Font boldFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Bold.ttf").toExternalForm(), fontSize);
-	Font italicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Italic.ttf").toExternalForm(), fontSize);
-	Font boldItalicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-BoldItalic.ttf").toExternalForm(), fontSize);
+	private static final Font regularFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf").toExternalForm(), fontSize);
+	private static final Font boldFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Bold.ttf").toExternalForm(), fontSize);
+	private static final Font italicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Italic.ttf").toExternalForm(), fontSize);
+	private static final Font boldItalicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-BoldItalic.ttf").toExternalForm(), fontSize);
 	
 	Color defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 	private static final Color highlightColor = Color.DARKCYAN;
@@ -44,7 +44,7 @@ public class SyllableText extends Text {
 		super(text);
 
 		setFont(regularFont);
-		setFill(defaultColor);
+		applyDefaultFill();
 
 		hoverProperty().addListener((o, old_val, new_val) -> {
 			if (active) {
@@ -52,7 +52,7 @@ public class SyllableText extends Text {
 					setFill(highlightColor);
 					verseController.syllableHovered();
 				} else {
-					setFill(defaultColor);
+					applyDefaultFill();
 					verseController.syllableUnHovered();
 				}
 			}
@@ -97,7 +97,11 @@ public class SyllableText extends Text {
 		});
 
 	}
-	
+
+	void applyDefaultFill() {
+		setFill(defaultColor);
+	}
+
 	void select(int chord_index, Color chord_color, Button note_button) {
 		if (!clicked) active = false;
 
@@ -148,11 +152,11 @@ public class SyllableText extends Text {
 	}
 
 	void deactivate() {
-		setFill(defaultColor);
+		applyDefaultFill();
 		active = false;
 	}
 	void reactivate() {
-		setFill(defaultColor);
+		applyDefaultFill();
 		active = true;
 	}
 	
@@ -203,7 +207,7 @@ public class SyllableText extends Text {
 	void refreshStyle() {
 		if (getFill().equals(Color.BLACK) || getFill().equals(Color.WHITE)) {
 			defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
-			setFill(defaultColor);
+			applyDefaultFill();
 		}
 	}
 

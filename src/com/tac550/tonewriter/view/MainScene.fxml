@@ -190,7 +190,7 @@
                                                 </ProgressBar>
                                              </children>
                                           </HBox>
-                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set _Verse" StackPane.alignment="CENTER" />
+                                          <Button fx:id="setVerseButton" onAction="#handleSetVerse" text="Set S_yllables" StackPane.alignment="CENTER" />
                                        </children>
                                     </StackPane>
                                     <StackPane fx:id="verseTextHintPane" mouseTransparent="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

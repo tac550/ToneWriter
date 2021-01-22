@@ -1,18 +1,15 @@
-VERSION: 0.7
+VERSION: 1.0
 Key Signature: G major
 Tone: Tone 6
 Composer: A. Arkhangel'sky - Znamenny Chant
 Manually Assign Phrases: false
 
 
-A
+Final
 1: g-e-b,-e
 2: a-fs-d-d
-
-Final
-1: a-fs-d-d
 	Post: b-g-d-g
-2: c'-g-e-c
+3: c'-g-e-c
 	Post: b-g-d-g
 END: a-e-c-a
 	Prep: a-e-c-a

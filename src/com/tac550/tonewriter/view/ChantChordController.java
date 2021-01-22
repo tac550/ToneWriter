@@ -40,6 +40,8 @@ public abstract class ChantChordController implements CommentableView {
 
 	private TextField lastFocusedField;
 	private String lastFocusedContents;
+
+	private static final Image noLilyPondImage = new Image(ChantChordController.class.getResource("/media/NoLilyPondMessage.png").toExternalForm());
 	
 	@FXML private AnchorPane mainPane;
 	
@@ -173,8 +175,7 @@ public abstract class ChantChordController implements CommentableView {
 
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
-			chordView.setImage(new Image(getClass().getResource(MainApp.isDarkModeEnabled() ?
-					"/media/NoLilyPondMessage-Dark.png" : "/media/NoLilyPondMessage.png").toExternalForm()));
+			chordView.setImage(noLilyPondImage);
 			return;
 		}
 

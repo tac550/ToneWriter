@@ -289,10 +289,8 @@ public class VerseLineViewController {
 
 			} else {
 				// If there is no previous chant line, or it was empty, select the previous index (usually has same letter)
-				selectedChantLine = previousSelection;
+				selectedChantLine = initial_choice > -1 ? initial_choice : 0;
 			}
-		} else if (initial_choice != -1) {
-			selectedChantLine = initial_choice;
 		} else {
 			// If we're not in manual assignment mode, just select the first by default.
 			selectedChantLine = 0;
@@ -494,7 +492,7 @@ public class VerseLineViewController {
 			if (i >= smaller && i <= larger)
 				syllable.setFill(getCurrentChord().getColor());
 			else
-				syllable.setFill(syllable.defaultColor);
+				syllable.applyDefaultFill();
 
 			i++;
 		}
@@ -523,7 +521,7 @@ public class VerseLineViewController {
 	}
 	private void defaultSyllableColors() {
 		for (SyllableText syllable : getSyllables())
-			syllable.setFill(syllable.defaultColor);
+			syllable.applyDefaultFill();
 	}
 
 	@FXML private void skipChordAction() {

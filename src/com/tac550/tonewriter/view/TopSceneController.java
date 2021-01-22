@@ -125,7 +125,7 @@ public class TopSceneController {
 	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/whole.png").toExternalForm());
 	private static final List<ImageView> touchItems = new ArrayList<>();
 	private static final Text touchDescriptionText = new Text("Note info");
-	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(0.5, 1, 0.5, 1);
+	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(1, 1, 1, 1);
 	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
 	private static final List<String> durationMapping = new ArrayList<>();
 
