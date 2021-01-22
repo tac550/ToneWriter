@@ -29,7 +29,7 @@ public class VLineEditViewController {
 
 	// Limit the number of selectable before barline options to the first beforeOptionsLimit items in afterBarStrs.
 	static final int firstBarOptionsLimit = 3;
-	static final String[] barStrings = new String[] {" ", ".|:", "[|:", "|", "||", ":|.|:", ":|][|:", ":|]", ":|.", "|."};
+	static final String[] barStrings = new String[] {" ", ".|:", "[|:", "|", "||", ":|.|:", ":|][|:", "|.", ":|.", ":|]"};
 	static final Image[] barImages = new Image[] {
 			new Image(VLineEditViewController.class.getResource("/media/bars/noBar.png").toExternalForm()),
 			new Image(VLineEditViewController.class.getResource("/media/bars/beginRepeat.png").toExternalForm()),
@@ -38,9 +38,9 @@ public class VLineEditViewController {
 			new Image(VLineEditViewController.class.getResource("/media/bars/doubleBar.png").toExternalForm()),
 			new Image(VLineEditViewController.class.getResource("/media/bars/beginEndRepeat.png").toExternalForm()),
 			new Image(VLineEditViewController.class.getResource("/media/bars/beginEndClosedRepeat.png").toExternalForm()),
-			new Image(VLineEditViewController.class.getResource("/media/bars/endClosedRepeat.png").toExternalForm()),
+			new Image(VLineEditViewController.class.getResource("/media/bars/endBar.png").toExternalForm()),
 			new Image(VLineEditViewController.class.getResource("/media/bars/endRepeat.png").toExternalForm()),
-			new Image(VLineEditViewController.class.getResource("/media/bars/endBar.png").toExternalForm())};
+			new Image(VLineEditViewController.class.getResource("/media/bars/endClosedRepeat.png").toExternalForm())};
 
 	void setParentController(VerseLineViewController controller) {
 		parentController = controller;
