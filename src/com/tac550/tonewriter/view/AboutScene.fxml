@@ -12,7 +12,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.AboutSceneController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="420.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.AboutSceneController">
    <bottom>
       <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <buttons>
@@ -36,9 +36,10 @@
       </HBox>
    </top>
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Third-party Licenses:" />
+            <Text fx:id="appLicenseText" strokeType="OUTSIDE" strokeWidth="0.0" text="\%APPNAME% is licensed under the GNU General Public License and comes with NO WARRANTY." />
+            <Text layoutX="15.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Third-party Licenses:" />
             <TextArea fx:id="licenseTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" />
             <VBox alignment="CENTER_RIGHT" prefHeight="0.0" prefWidth="590.0">
                <children>
@@ -46,7 +47,7 @@
                      <font>
                         <Font size="16.0" />
                      </font></Text>
-                  <Text fx:id="appVersionText1" layoutX="444.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please help improve this app by sending feedback to ToneWriterDev@gmail.com">
+                  <Text fx:id="appVersionText1" layoutX="444.0" layoutY="25.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Help improve this app by sending feedback to ToneWriterDev@gmail.com">
                      <font>
                         <Font size="12.0" />
                      </font>

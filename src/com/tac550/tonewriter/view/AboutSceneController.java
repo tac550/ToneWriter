@@ -16,6 +16,7 @@ import java.nio.charset.Charset;
 public class AboutSceneController {
 
 	@FXML private Text appNameText;
+	@FXML private Text appLicenseText;
 	@FXML private TextArea licenseTextArea;
 	@FXML private Text appVersionText;
 	
@@ -30,8 +31,9 @@ public class AboutSceneController {
 			licenseTextArea.setText("Error reading file \"licenses/third-party-licenses.txt\"");
 			e.printStackTrace();
 		}
-		
-		appVersionText.setText(appVersionText.getText().replaceAll("%VERSION%", MainApp.APP_VERSION));
+
+		appLicenseText.setText(appLicenseText.getText().replace("%APPNAME%", MainApp.APP_NAME));
+		appVersionText.setText(appVersionText.getText().replace("%VERSION%", MainApp.APP_VERSION));
 		
 		appIconView.setImage(MainApp.APP_ICON);
 		
