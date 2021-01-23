@@ -99,8 +99,7 @@ public class VLineEditViewController {
 		}
 
 		// Set bar line info if it differs from initial values
-		int selectedBefore = beforeToggles.getToggles().size() > 0 ?
-				beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle()) : initialBeforeBar;
+		int selectedBefore = beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle());
 		int selectedAfter = afterToggles.getToggles().indexOf(afterToggles.getSelectedToggle());
 		if (selectedBefore != initialBeforeBar || selectedAfter != initialAfterBar)
 			parentController.setBarlines(barStrings[selectedBefore], barStrings[selectedAfter]);
