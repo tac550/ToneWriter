@@ -326,7 +326,7 @@ public class MainSceneController {
 		// First, update barlines and refresh their display
 		VerseLineViewController prev = null;
 		for (VerseLineViewController verseLine : verseLineControllers) {
-			if (verseLine.notFirstInItem())
+			if (verseLine.notFirstInItem() && !Objects.requireNonNull(prev).isSeparator())
 				verseLine.linkBeforeBarLine(Objects.requireNonNull(prev).afterBarProperty());
 			else if (Arrays.asList(VLineEditViewController.barStrings).indexOf(verseLine.getBeforeBar())
 					>= VLineEditViewController.firstBarOptionsLimit)
@@ -523,7 +523,7 @@ public class MainSceneController {
 		}
 	}
 	private boolean isToneSavable() {
-		return (!projectToneLoaded() && !TWUtils.isBuiltinTone(toneFile)) || MainApp.developerMode;
+		return (nonInternalToneLoaded() && !TWUtils.isBuiltinTone(toneFile)) || MainApp.developerMode;
 	}
 
 	private boolean createNewTone() {
@@ -531,7 +531,7 @@ public class MainSceneController {
 		fileChooser.setTitle("Save Tone As");
 		fileChooser.setInitialFileName(".tone");
 
-		if (toneFile != null && isToneSavable() && !projectToneLoaded())
+		if (toneFile != null && isToneSavable() && nonInternalToneLoaded())
 			fileChooser.setInitialDirectory(toneFile.getParentFile());
 		else
 			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
@@ -565,7 +565,7 @@ public class MainSceneController {
 		if (selected_file == null) {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Open Tone");
-			if (toneFile != null && !projectToneLoaded()) {
+			if (toneFile != null && nonInternalToneLoaded()) {
 				if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
 				else fileChooser.setInitialDirectory(toneFile.getParentFile());
 			} else {
@@ -925,8 +925,8 @@ public class MainSceneController {
 		}
 	}
 
-	private boolean projectToneLoaded() {
-		return toneFile.getAbsolutePath().startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath());
+	private boolean nonInternalToneLoaded() {
+		return !toneFile.getAbsolutePath().startsWith(new File(System.getProperty("java.io.tmpdir")).getAbsolutePath());
 	}
 
 	private void setNewRenderFilename() throws RenderFormatException {

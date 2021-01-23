@@ -53,7 +53,7 @@ public class VerseLineViewController {
 	private final Stack<AssignmentAction> undoActions = new Stack<>();
 
 	private final IntegerProperty beforeBar = new SimpleIntegerProperty(0);
-	private final IntegerProperty afterBar = new SimpleIntegerProperty(0);
+	private final IntegerProperty afterBar = new SimpleIntegerProperty(3);
 	private IntegerProperty beforeBoundTo;
 	@FXML private ImageView beforeBarView;
 	@FXML private ImageView afterBarView;
