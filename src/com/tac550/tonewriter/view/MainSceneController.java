@@ -959,7 +959,7 @@ public class MainSceneController {
 						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())), "_"));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
-		if (!fileChooser.getInitialDirectory().exists()) // TODO: Why is this here?
+		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
 		File PDFFile = fileChooser.showSaveDialog(parentStage);
