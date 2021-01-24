@@ -29,6 +29,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Stack;
@@ -262,12 +263,12 @@ public class VerseLineViewController {
 		int previousSelection = tonePhraseChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
 				tonePhraseChoice.getSelectionModel().getSelectedIndex();
 
+		boolean identicalChoices = Arrays.equals(associatedChantLines, chant_lines);
 		// Load in new chant line choices
 		associatedChantLines = chant_lines;
 		tonePhraseChoice.getItems().clear();
-		for (ChantLineViewController chantLine : associatedChantLines) {
+		for (ChantLineViewController chantLine : associatedChantLines)
 			tonePhraseChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
-		}
 
 		// Determine initial chant line selection.
 		if (mainController.manualCLAssignmentEnabled()) {
@@ -276,15 +277,18 @@ public class VerseLineViewController {
 				// If we don't find a similar chant line below, default to the previous selection.
 				selectedChantLine = previousSelection;
 
-				int i = 0;
-				for (ChantLineViewController chantLine : associatedChantLines) {
-					if (chantLine.isSimilarTo(previousChantLine)) {
-						// The first time we find a similar chant line, select it and stop searching.
-						selectedChantLine = i;
-						break;
-					}
+				// If the chant line choices are identical (all chant lines are equal, just take the previous selection.
+				if (!identicalChoices) {
+					int i = 0;
+					for (ChantLineViewController chantLine : associatedChantLines) {
+						if (chantLine.isSimilarTo(previousChantLine)) {
+							// The first time we find a similar chant line, select it and stop searching.
+							selectedChantLine = i;
+							break;
+						}
 
-					i++;
+						i++;
+					}
 				}
 
 			} else {
