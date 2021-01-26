@@ -3,6 +3,7 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.view.MainApp;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ public class QuickVerseIO {
 		List<String> finalList = new ArrayList<>();
 
 		try (InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
-		InputStreamReader inputReader = new InputStreamReader(stream);
-		BufferedReader bufferedReader = new BufferedReader(inputReader)) {
+			 InputStreamReader inputReader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+			 BufferedReader bufferedReader = new BufferedReader(inputReader)) {
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
@@ -39,7 +40,7 @@ public class QuickVerseIO {
 			return finalList;
 		}
 
-		try (FileReader fileReader = new FileReader(verseFile);
+		try (FileReader fileReader = new FileReader(verseFile, StandardCharsets.UTF_8);
 		     BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 			String line;
 
@@ -85,7 +86,7 @@ public class QuickVerseIO {
 		File tempFile = new File(verseFile.getParent() + File.separator + "TEMP");
 
 		boolean removed = false;
-		try (BufferedReader reader = new BufferedReader(new FileReader(verseFile));
+		try (BufferedReader reader = new BufferedReader(new FileReader(verseFile, StandardCharsets.UTF_8));
 		     BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
 			// Only skip the removed line once (only one is removed even if there are multiple lines with same text).
 			String currentLine;
