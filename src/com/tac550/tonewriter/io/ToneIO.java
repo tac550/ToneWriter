@@ -54,7 +54,7 @@ public class ToneIO {
 				return false;
 
 			// Save to the file
-			FileWriter fileWriter = new FileWriter(toneFile);
+			FileWriter fileWriter = new FileWriter(toneFile, StandardCharsets.UTF_8);
 			saveToneTo(fileWriter);
 
 		} catch (IOException e) {
