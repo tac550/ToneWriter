@@ -513,7 +513,7 @@ public class TopSceneController {
 	@FXML private void handleSetDefaultPaperSize() {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(defaultPaperSize, PAPER_SIZES);
 		dialog.setTitle("Default Paper Size");
-		dialog.setHeaderText("Set the default spaper size");
+		dialog.setHeaderText("Set the default paper size");
 		dialog.initOwner(parentStage);
 		Optional<String> result = dialog.showAndWait();
 
