@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.AutoUpdater;
+import com.tac550.tonewriter.util.DesktopInterface;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -53,15 +54,7 @@ public class UpdaterViewController {
 						HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
 						String href = anchorElement.getHref();
 
-						try {
-							if (MainApp.OS_NAME.startsWith("lin")) {
-								Runtime.getRuntime().exec("xdg-open " + href);
-							} else {
-								Desktop.getDesktop().browse(new URL(href).toURI());
-							}
-						} catch (IOException | URISyntaxException e) {
-							e.printStackTrace();
-						}
+						DesktopInterface.browseURI(href);
 
 						event.preventDefault();
 					}, false);

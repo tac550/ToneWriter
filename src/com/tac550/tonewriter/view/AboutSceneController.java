@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -7,10 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.Charset;
 
 public class AboutSceneController {
@@ -45,15 +44,7 @@ public class AboutSceneController {
 	}
 	
 	@FXML private void handleGitHubLink() {
-		try {
-			if (MainApp.OS_NAME.startsWith("lin")) {
-				Runtime.getRuntime().exec("xdg-open https://github.com/tac550/ToneWriter/");
-			} else {
-				Desktop.getDesktop().browse(new URL("https://github.com/tac550/ToneWriter/").toURI());
-			}
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+		DesktopInterface.browseURI("https://github.com/tac550/ToneWriter/");
 	}
 	
 }

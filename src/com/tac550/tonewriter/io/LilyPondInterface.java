@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.AssignedChordData;
+import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
@@ -103,7 +104,8 @@ public class LilyPondInterface {
 			executeLilyPondRender(lilypondFile, false, () -> {
 				try {
 					// After the render is complete, ask the OS to open the resulting PDF file.
-					Desktop.getDesktop().open(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+					System.out.println("Opening.");
+					DesktopInterface.openFile(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
 
 					// Delete the lilypond file if the option to save it isn't set
 					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
@@ -115,19 +117,11 @@ public class LilyPondInterface {
 				} catch (Exception e) {
 					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
 					// if it's not set to be saved).
-					try {
-						Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+					DesktopInterface.openFile(lilypondFile.getParentFile());
 				}
 			});
 		} else {
-			try {
-				Desktop.getDesktop().open(new File(lilypondFile.getParent()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			DesktopInterface.openFile(lilypondFile.getParentFile());
 		}
 
 		return true;
