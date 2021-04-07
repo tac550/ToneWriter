@@ -9,7 +9,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.charset.Charset;
 
 public class AboutSceneController {

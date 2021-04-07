@@ -115,12 +115,12 @@ public class TopSceneController {
 	private static final List<RadioMenuItem> clickItems = new ArrayList<>();
 	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 	private static final ToggleGroup durationGroup = new ToggleGroup();
-	private static final ImageView eighthNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/eighth.png").toExternalForm());
-	private static final ImageView quarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/quarter.png").toExternalForm());
-	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/dotted-quarter.png").toExternalForm());
-	private static final ImageView halfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/half.png").toExternalForm());
-	private static final ImageView dottedHalfNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/dotted-half.png").toExternalForm());
-	private static final ImageView wholeNoteTouchItem = new ImageView(TopSceneController.class.getResource("/media/notes/whole.png").toExternalForm());
+	private static final ImageView eighthNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/eighth.png")).toExternalForm());
+	private static final ImageView quarterNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/quarter.png")).toExternalForm());
+	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-quarter.png")).toExternalForm());
+	private static final ImageView halfNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/half.png")).toExternalForm());
+	private static final ImageView dottedHalfNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-half.png")).toExternalForm());
+	private static final ImageView wholeNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/whole.png")).toExternalForm());
 	private static final List<ImageView> touchItems = new ArrayList<>();
 	private static final Text touchDescriptionText = new Text("Note info");
 	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(1, 1, 1, 1);
@@ -281,7 +281,7 @@ public class TopSceneController {
 
 		// Add button initialization
 
-		ImageView addImageView = new ImageView(new Image(getClass().getResource("/media/sign-add.png").toExternalForm(),
+		ImageView addImageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/media/sign-add.png")).toExternalForm(),
 				16, 16, false, true));
 		addTabButton.setGraphic(addImageView);
 		if (MainApp.OS_NAME.startsWith("mac")) addTabButton.getTooltip().setText("Add item (\u2318T)");
@@ -319,7 +319,7 @@ public class TopSceneController {
 	}
 
 	private static void setMenuIcon(MenuItem menu_item, String image_path) {
-		ImageView imageView = new ImageView(TopSceneController.class.getResource(image_path).toExternalForm());
+		ImageView imageView = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource(image_path)).toExternalForm());
 		double menuIconSize = 30;
 		imageView.setFitHeight(menuIconSize);
 		imageView.setFitWidth(menuIconSize);
@@ -361,7 +361,7 @@ public class TopSceneController {
 		dialog.setHeaderText("Enter project title");
 		dialog.setContentText("This appears on the top of every page of a project export");
 		dialog.getEditor().setPrefWidth(250);
-		ImageView bookIcon = new ImageView(getClass().getResource(bookIconPath).toExternalForm());
+		ImageView bookIcon = new ImageView(Objects.requireNonNull(getClass().getResource(bookIconPath)).toExternalForm());
 		bookIcon.setFitHeight(50);
 		bookIcon.setFitWidth(50);
 		dialog.setGraphic(bookIcon);

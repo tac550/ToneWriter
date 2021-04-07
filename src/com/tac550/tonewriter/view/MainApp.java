@@ -52,7 +52,7 @@ public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
 	public static final String APP_VERSION = "1.0.1";
-	public static final Image APP_ICON = new Image(MainApp.class.getResourceAsStream("/media/AppIcon.png"));
+	public static final Image APP_ICON = new Image(Objects.requireNonNull(MainApp.class.getResourceAsStream("/media/AppIcon.png")));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ROOT);
 
 	static final boolean developerMode = "true".equalsIgnoreCase(System.getProperty("developerMode"));
@@ -556,7 +556,7 @@ public class MainApp extends Application {
 
 		try {
 			String versionLine = new BufferedReader(new InputStreamReader(
-					LilyPondInterface.class.getResourceAsStream("exportTemplate.ly"))).readLine();
+					Objects.requireNonNull(LilyPondInterface.class.getResourceAsStream("exportTemplate.ly")))).readLine();
 
 			Matcher matcher = Pattern.compile("\\d+(\\.\\d+)+").matcher(versionLine);
 

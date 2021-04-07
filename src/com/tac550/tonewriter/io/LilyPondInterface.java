@@ -7,12 +7,10 @@ import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import org.apache.commons.io.FilenameUtils;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -353,7 +351,7 @@ public class LilyPondInterface {
 			parts[PART_SOPRANO] += String.format(" \\bar \"%s\"", verseLineController.getAfterBar());
 
 			// Insert time signature and the line's text into the lyrics buffer.
-			verseText.append(String.format(" %s %s", generateTimeSignature(measureBeats), verseLine.toString()));
+			verseText.append(String.format(" %s %s", generateTimeSignature(measureBeats), verseLine));
 		}
 	}
 
@@ -814,7 +812,7 @@ public class LilyPondInterface {
 				}
 
 				// Surround the syllable without a leading space with quotes.
-				outputBuffer.append("\"").append(working_token.toString()).append("\"");
+				outputBuffer.append("\"").append(working_token).append("\"");
 			} else {
 				outputBuffer.append(current_token);
 			}
