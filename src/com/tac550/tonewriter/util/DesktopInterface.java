@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * Automates some Desktop boilerplate to avoid application hangs on Linux
