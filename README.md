@@ -18,24 +18,24 @@ Please feel free to fork this repo and send in pull requests! I'm happy to accep
 
 You need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. Version 2.20.x or greater is required.
 
-I'm building ToneWriter against Java 15 (With preview features enabled) on all platforms. This repo contains project files for both Eclipse and Idea, so importing the project into either of those IDEs should be easy. I use Gluon SceneBuilder to edit the .fxml interface files. You also need to download the JavaFX SDK from Gluon and point to it properly in your VM options in order to debug/run the application. My VM options look like this: "--module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml,javafx.web -Xms256m -Xmx4096m".
+I'm building ToneWriter against Java 16 on all platforms. This repo contains project files for both Eclipse and IDEA. I use Gluon SceneBuilder to edit the .fxml interface files. You also need to download the JavaFX SDK from Gluon and point to it properly in your VM options in order to debug/run the application. My VM options look like this: "--module-path ${PATH_TO_FX} --add-modules=javafx.controls,javafx.fxml,javafx.web -Xms256m -Xmx4096m".
 
 ## Packaging
 
 ### Windows
 
-dependencies: [launch4j](http://launch4j.sourceforge.net/) (make sure its install directory is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure its install directory is on the PATH). Your JDK 15 bin directory must also be on the PATH. The JavaFX SDK 15 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
+dependencies: [launch4j 3.14 or later](http://launch4j.sourceforge.net/) (make sure its install directory is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure its install directory is on the PATH). The JDK 16 bin directory must also be on the PATH. The JavaFX SDK 16 jmods directory must be located at build/res for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_WIN.cmd. An artifact definition for ToneWriter.jar is included with the Idea project files. The installer will be placed in build/win.
+To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_WIN.cmd. An artifact definition for ToneWriter.jar is included with the IDEA project files. The installer will be placed in build/win.
 
 ### macOS
 
-dependencies: Your JDK 15 bin directory must be on the PATH. The JavaFX SDK 15 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
+dependencies: Your JDK 16 bin directory must be on the PATH. The JavaFX SDK 16 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_MAC.sh. An artifact definition for ToneWriter.jar is included with the Idea project files. The .app will be placed in build/mac along with a zipped copy.
+To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_MAC.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. The .app will be placed in build/mac along with a zipped copy.
 
 ### Linux
 
-dependencies: Your JDK 15 bin directory must be on the PATH. The JavaFX SDK 15 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
+dependencies: Your JDK 16 bin directory must be on the PATH. The JavaFX SDK 16 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-Export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_LIN.sh. An artifact definition for ToneWriter.jar is included with the Idea project files. The resulting ToneWriter.sh script runs the packaged application.
+Export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_LIN.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. The resulting ToneWriter.sh script runs the packaged application.
