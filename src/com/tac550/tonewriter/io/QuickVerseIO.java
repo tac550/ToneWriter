@@ -9,6 +9,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class QuickVerseIO {
 
@@ -16,7 +17,7 @@ public class QuickVerseIO {
 		List<String> finalList = new ArrayList<>();
 
 		try (InputStream stream = LilyPondInterface.class.getResourceAsStream(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "quickVersesTT.txt" : "quickVersesYY.txt");
-			 InputStreamReader inputReader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+			 InputStreamReader inputReader = new InputStreamReader(Objects.requireNonNull(stream), StandardCharsets.UTF_8);
 			 BufferedReader bufferedReader = new BufferedReader(inputReader)) {
 			String line;
 

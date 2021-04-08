@@ -19,5 +19,4 @@ public class RecitingChord extends MainChord {
 		}
 	}
 
-
 }

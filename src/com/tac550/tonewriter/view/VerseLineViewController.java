@@ -29,10 +29,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class VerseLineViewController {
@@ -112,8 +109,8 @@ public class VerseLineViewController {
 
 		// Interface icons
 		double iconSize = 22;
-		plusIcon = new ImageView(getClass().getResource("/media/magnify.png").toExternalForm());
-		minusIcon = new ImageView(getClass().getResource("/media/magnify-less.png").toExternalForm());
+		plusIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/media/magnify.png")).toExternalForm());
+		minusIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/media/magnify-less.png")).toExternalForm());
 		plusIcon.setFitHeight(iconSize);
 		plusIcon.setFitWidth(iconSize);
 		minusIcon.setFitHeight(iconSize);

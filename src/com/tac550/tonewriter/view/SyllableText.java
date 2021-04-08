@@ -10,6 +10,7 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SyllableText extends Text {
 
@@ -28,10 +29,10 @@ public class SyllableText extends Text {
 	private boolean italic = false;
 
 	private static final int fontSize = 28;
-	private static final Font regularFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf").toExternalForm(), fontSize);
-	private static final Font boldFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Bold.ttf").toExternalForm(), fontSize);
-	private static final Font italicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-Italic.ttf").toExternalForm(), fontSize);
-	private static final Font boldItalicFont = Font.loadFont(SyllableText.class.getResource("/styles/fonts/OpenSans-BoldItalic.ttf").toExternalForm(), fontSize);
+	private static final Font regularFont = Font.loadFont(Objects.requireNonNull(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf")).toExternalForm(), fontSize);
+	private static final Font boldFont = Font.loadFont(Objects.requireNonNull(SyllableText.class.getResource("/styles/fonts/OpenSans-Bold.ttf")).toExternalForm(), fontSize);
+	private static final Font italicFont = Font.loadFont(Objects.requireNonNull(SyllableText.class.getResource("/styles/fonts/OpenSans-Italic.ttf")).toExternalForm(), fontSize);
+	private static final Font boldItalicFont = Font.loadFont(Objects.requireNonNull(SyllableText.class.getResource("/styles/fonts/OpenSans-BoldItalic.ttf")).toExternalForm(), fontSize);
 	
 	Color defaultColor = MainApp.isDarkModeEnabled() ? Color.WHITE : Color.BLACK;
 	private static final Color highlightColor = Color.DARKCYAN;

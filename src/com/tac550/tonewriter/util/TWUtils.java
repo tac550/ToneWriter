@@ -109,10 +109,10 @@ public class TWUtils {
 	}
 
 	public static String encodeNewLines(String original) {
-		return original.replaceAll("/", "<%47>").replaceAll("\n", "/n");
+		return original.replace("/", "<%47>").replace("\n", "/n");
 	}
 	public static String decodeNewLines(String encoded) {
-		return encoded.replaceAll("/n", "\n").replaceAll("<%47>", "/");
+		return encoded.replace("/n", "\n").replace("<%47>", "/");
 	}
 
 	public static String replaceInvalidFileChars(String text, String replacement) {
@@ -204,15 +204,13 @@ public class TWUtils {
 		try (InputStream inputStream = LilyPondInterface.class.getResourceAsStream(resource_name);
 		     OutputStream outputStream = new FileOutputStream(out_file)) {
 
-			if (inputStream == null) {
+			if (inputStream == null)
 				throw new Exception("Cannot get resource \"" + resource_name + "\" from Jar file.");
-			}
 
 			int readBytes;
 			byte[] buffer = new byte[4096];
-			while ((readBytes = inputStream.read(buffer)) > 0) {
+			while ((readBytes = inputStream.read(buffer)) > 0)
 				outputStream.write(buffer, 0, readBytes);
-			}
 
 		}
 	}
@@ -224,15 +222,13 @@ public class TWUtils {
 		return fileList;
 	}
 	private static void generateFileList(List<String> file_list, File node) {
-		if (node.isFile()) {
+		if (node.isFile())
 			file_list.add(node.getAbsolutePath().replace("\\", "/"));
-		}
 
 		if (node.isDirectory()) {
 			String[] subNode = node.list();
-			for (String filename : Objects.requireNonNull(subNode)) {
+			for (String filename : Objects.requireNonNull(subNode))
 				generateFileList(file_list, new File(node, filename));
-			}
 		}
 	}
 
@@ -279,12 +275,12 @@ public class TWUtils {
 		if (default_button != null)
 			((Button) alert.getDialogPane().lookupButton(default_button)).setDefaultButton(true);
 
-		if (wait) {
+		if (wait)
 			return alert.showAndWait();
-		} else {
+		else
 			alert.show();
-			return Optional.empty();
-		}
+
+		return Optional.empty();
 	}
 
 }

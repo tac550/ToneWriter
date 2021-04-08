@@ -37,7 +37,7 @@ public class UpdaterViewController {
 		updateOnStartupBox.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, newVal));
 
-		// Open any webview links in the system's default Web browser.
+		// Open any Web links in the system's default Web browser.
 		webView.getEngine().getLoadWorker().stateProperty().addListener((ov, oldVal, newVal) -> {
 			if (newVal == Worker.State.SUCCEEDED) {
 

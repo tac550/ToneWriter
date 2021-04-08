@@ -86,7 +86,7 @@ public class ToneIO {
 				if (chantLine.getFirstRepeated())
 					firstRepeated = chantLine.getName();
 
-				printWriter.println(chantLine.toString());
+				printWriter.println(chantLine);
 
 			}
 

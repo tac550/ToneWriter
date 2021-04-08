@@ -747,7 +747,7 @@ public class MainSceneController {
 			ChoiceDialog<String> dialog = new ChoiceDialog<>(keySignature, choices);
 			dialog.setTitle("Key Choice");
 			dialog.setHeaderText("Choose a key");
-			ImageView keyIcon = new ImageView(getClass().getResource(TopSceneController.keyIconPath).toExternalForm());
+			ImageView keyIcon = new ImageView(Objects.requireNonNull(getClass().getResource(TopSceneController.keyIconPath)).toExternalForm());
 			keyIcon.setFitHeight(50);
 			keyIcon.setFitWidth(50);
 			dialog.setGraphic(keyIcon);
@@ -769,7 +769,7 @@ public class MainSceneController {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
 			dialog.setHeaderText("Input header info for first page");
-			ImageView headerIcon = new ImageView(getClass().getResource(TopSceneController.headerIconPath).toExternalForm());
+			ImageView headerIcon = new ImageView(Objects.requireNonNull(getClass().getResource(TopSceneController.headerIconPath)).toExternalForm());
 			headerIcon.setFitHeight(50);
 			headerIcon.setFitWidth(50);
 			dialog.setGraphic(headerIcon);

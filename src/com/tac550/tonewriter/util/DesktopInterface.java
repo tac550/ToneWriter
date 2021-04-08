@@ -18,7 +18,7 @@ public class DesktopInterface {
         if (!checkedSupported) {
             supported = Desktop.isDesktopSupported();
             if (!supported)
-                TWUtils.showError("Failed to show folder or website becasue desktop interactions are not supported on this system.", true);
+                TWUtils.showError("Failed to show folder or website because desktop interactions are not supported on this system.", true);
             checkedSupported = true;
         }
 

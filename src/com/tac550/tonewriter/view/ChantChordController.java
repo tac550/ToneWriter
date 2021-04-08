@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 public abstract class ChantChordController implements CommentableView {
 	
@@ -41,7 +42,7 @@ public abstract class ChantChordController implements CommentableView {
 	private TextField lastFocusedField;
 	private String lastFocusedContents;
 
-	private static final Image noLilyPondImage = new Image(ChantChordController.class.getResource("/media/NoLilyPondMessage.png").toExternalForm());
+	private static final Image noLilyPondImage = new Image(Objects.requireNonNull(ChantChordController.class.getResource("/media/NoLilyPondMessage.png")).toExternalForm());
 	
 	@FXML private AnchorPane mainPane;
 	
@@ -76,12 +77,12 @@ public abstract class ChantChordController implements CommentableView {
 		}
 
 		// Buttons
-		ImageView copyIcon = new ImageView(getClass().getResource("/media/copy.png").toExternalForm());
+		ImageView copyIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/media/copy.png")).toExternalForm());
 		copyIcon.setFitHeight(20);
 		copyIcon.setFitWidth(20);
 		copyButton.setGraphic(copyIcon);
 
-		ImageView pasteIcon = new ImageView(getClass().getResource("/media/paste.png").toExternalForm());
+		ImageView pasteIcon = new ImageView(Objects.requireNonNull(getClass().getResource("/media/paste.png")).toExternalForm());
 		pasteIcon.setFitHeight(20);
 		pasteIcon.setFitWidth(20);
 		pasteButton.setGraphic(pasteIcon);

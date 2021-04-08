@@ -26,7 +26,7 @@ public class Syllables {
 
 			webClient.setIncorrectnessListener((a0, a1) -> {});
 
-	        final HtmlPage page = webClient.getPage("http://www.juiciobrennan.com/syllables/");
+	        final HtmlPage page = webClient.getPage("https://www.juiciobrennan.com/syllables/");
 
 	        final HtmlTextArea textField = page.getHtmlElementById("inputText");
 	        final HtmlSubmitInput submitButton = page.getHtmlElementById("inputTextButton");
