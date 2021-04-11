@@ -292,17 +292,16 @@ public class MainSceneController {
 				chantLine.setHasPrime(false);
 
 				if (chantLine.getIsPrime()) { // Prime chant line
-					if (prevMainLine != null) {
+					if (prevMainLine != null)
 						prevMainLine.setHasPrime(true);
-					}
 
 					previousWasPrime = true;
 				} else if (chantLine.getIsAlternate()) { // Alternate chant line
 					nextAlternate++;
 				} else { // Normal chant line
-					if (prevMainLine != null) {
+					if (prevMainLine != null)
 						prevMainLine.setNumAlts(nextAlternate - 1);
-					}
+
 					prevMainLine = chantLine;
 					mainChantLines.add(chantLine);
 
@@ -312,9 +311,8 @@ public class MainSceneController {
 			} else {
 				chantLine.makeFinal();
 				// If this is not the only chant line...
-				if (prevMainLine != null) {
+				if (prevMainLine != null)
 					prevMainLine.setNumAlts(nextAlternate - 1);
-				}
 			}
 		}
 
