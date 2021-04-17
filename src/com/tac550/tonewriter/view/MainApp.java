@@ -10,6 +10,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -197,6 +198,7 @@ public class MainApp extends Application {
 		splashPane.setAlignment(Pos.CENTER);
 		splashPane.getChildren().setAll(createSplashContent());
 		splashPane.setStyle("-fx-background-color: null");
+		splashPane.setCursor(Cursor.WAIT);
 
 		Scene scene = new Scene(
 				splashPane,
