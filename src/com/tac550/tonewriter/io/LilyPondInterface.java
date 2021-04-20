@@ -596,12 +596,11 @@ public class LilyPondInterface {
 			}
 			// That's it for each chord in the syllable.
 
-			// SLUR PROCESSING
+			// SLUR AND BEAM PROCESSING
 
 			// For each part...
-			for (int i = 0; i < 4; i++) {
-				syllableNoteBuffers[i] = applySlurToPart(syllableNoteBuffers[i]);
-			}
+			for (int i = 0; i < 4; i++)
+				syllableNoteBuffers[i] = applySlursAndBeams(syllableNoteBuffers[i]);
 
 			// SYLLABLE BUFFER SAVE-OUTS
 
@@ -609,15 +608,14 @@ public class LilyPondInterface {
 			verseLine.append(syllableTextBuffer);
 
 			// Add the note data for the syllable from the buffers to the final part strings.
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 4; i++)
 				parts[i] += syllableNoteBuffers[i];
-			}
 
 		}
 		return measureBeats;
 	}
 
-	private static String applySlurToPart(String syllableNoteBuffer) {
+	private static String applySlursAndBeams(String syllableNoteBuffer) {
 		boolean addedSlur = false;
 
 		String[] tokens = syllableNoteBuffer.trim().split(" ");
@@ -627,6 +625,18 @@ public class LilyPondInterface {
 				|| Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~"))
 				|| Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
 			return syllableNoteBuffer;
+
+		String startSymbol = "\\(";
+		String endSymbol = "\\)";
+
+		// If the syllable contains nothing but two eighth chords, apply beam instead of slur
+		// (prevents auto-connecting beam to notes from previous syllable).
+		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
+				t.contains("8") || !t.matches(".*\\d.*")).count();
+		if (eighthNotes == tokens.length) {
+			startSymbol = "[";
+			endSymbol = "]";
+		}
 
 		// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 		StringBuilder finalString = new StringBuilder();
@@ -643,7 +653,7 @@ public class LilyPondInterface {
 			// note group... (two notes occurring in one part, which will be split across two tokens)
 			if (i1 > 0 && !addedSlur && !tokens[i1 - 1].contains("<")) {
 				// Add the beginning slur parenthesis and the current token.
-				finalString.append(" \\( ").append(tokens[i1]);
+				finalString.append(" %s ".formatted(startSymbol)).append(tokens[i1]);
 				addedSlur = true;
 			} else {
 				// Otherwise skip empty tokens or add the current one.
@@ -659,9 +669,9 @@ public class LilyPondInterface {
 		if (addedSlur) {
 			if (result.endsWith("$bar "))
 				result = TWUtils.replaceLast(result,
-						Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("\\) $bar"));
+						Matcher.quoteReplacement("$bar "), Matcher.quoteReplacement("%s $bar".formatted(endSymbol)));
 			else
-				result += ("\\)");
+				result += ("%s".formatted(endSymbol));
 		}
 
 		return result;
