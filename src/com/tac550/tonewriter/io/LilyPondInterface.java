@@ -102,7 +102,6 @@ public class LilyPondInterface {
 			executeLilyPondRender(lilypondFile, false, () -> {
 				try {
 					// After the render is complete, ask the OS to open the resulting PDF file.
-					System.out.println("Opening.");
 					DesktopInterface.openFile(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
 
 					// Delete the lilypond file if the option to save it isn't set
@@ -468,8 +467,10 @@ public class LilyPondInterface {
 						// Since we have determined that there is at least one more chord on this syllable,
 						// we have to decide whether the current note should be combined with the next note.
 
-						// If the current and next notes both have the same pitch... (they must if they are to be combined)
-						if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))) {
+						// If the current and next notes both have the same pitch
+						// AND, if we're on a subdivision, the previous note was also combined...
+						if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))
+								&& ((int) measureBeats == measureBeats) || previousNoteCombined[i]) {
 
 							// Try to do the combination
 							String addedNotes = combineNotes(currentNote, nextNote);
@@ -499,10 +500,9 @@ public class LilyPondInterface {
 
 										tokens[i1] = "";
 
-										if (!noteGroup) {
+										if (!noteGroup)
 											// Stop here because we just removed the previous note.
 											break;
-										}
 
 									} else {
 										// Remove tokens that aren't notes from the end.
@@ -525,18 +525,15 @@ public class LilyPondInterface {
 							syllableNoteBuffers[i] += " " + addedNotes;
 							// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
 							// and only if this is not already the last chord on the
-							if (i == 0) {
-								measureBeats += getBeatDuration(addedNotes);
-							}
+							if (i == 0) measureBeats += getBeatDuration(addedNotes);
 
 							// If the notes were combined into one... (not tied)
-							if (!addedNotes.contains("~")) {
+							if (!addedNotes.contains("~"))
 								// The new note becomes the temporary current note for the current part.
 								tempCurrentNotes[i] = addedNotes;
-							} else {
+							else
 								// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
 								tempCurrentNotes[i] = addedNotes.split(" ")[1];
-							}
 
 							// Remember that we just did a note combination for the current part.
 							noteCombined[i] = true;
@@ -545,9 +542,8 @@ public class LilyPondInterface {
 					}
 
 					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
-					if (previousNote.equals("") || currentNote.equals("") || nextNote.equals("")) {
+					if (previousNote.equals("") || currentNote.equals("") || nextNote.equals(""))
 						hideThisChord = false;
-					}
 
 					// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
 					if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4")) {
@@ -573,9 +569,8 @@ public class LilyPondInterface {
 						if (!previousNoteCombined[i]) {
 							syllableNoteBuffers[i] += " " + chordData.getPart(i);
 							// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-							if (i == 0) {
+							if (i == 0)
 								measureBeats += getBeatDuration(chordData.getPart(i));
-							}
 						} else {
 							// If the previous note was combined, we clear the temp field for the current part and reset the flag.
 							previousNoteCombined[i] = false;
