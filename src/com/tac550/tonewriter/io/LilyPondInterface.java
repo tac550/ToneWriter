@@ -470,7 +470,7 @@ public class LilyPondInterface {
 						// If the current and next notes both have the same pitch
 						// AND, if we're on a subdivision, the previous note was also combined...
 						if (currentNote.replaceAll("[^A-Za-z',]+", "").equals(nextNote.replaceAll("[^A-Za-z',]+", ""))
-								&& ((int) measureBeats == measureBeats) || previousNoteCombined[i]) {
+								&& (((int) measureBeats == measureBeats) || previousNoteCombined[i])) {
 
 							// Try to do the combination
 							String addedNotes = combineNotes(currentNote, nextNote);
