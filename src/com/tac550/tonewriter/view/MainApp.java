@@ -33,7 +33,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.xpath.operations.Bool;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.BufferedReader;
@@ -263,18 +262,17 @@ public class MainApp extends Application {
 
 			// Fix bug where alt+tabbing away from and back to the app leaves menu mnemonics activated.
 			// https://bugs.openjdk.java.net/browse/JDK-8238731
-			AtomicReference<KeyEvent> lastPressedEvent = new AtomicReference<>();
+			AtomicReference<Boolean> altLastPressed = new AtomicReference<>(false);
 			AtomicReference<Boolean> mnemonicsActive = new AtomicReference<>(false);
 			mainStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-				lastPressedEvent.set(event);
-				mnemonicsActive.set(!mnemonicsActive.get());
+				if (event.getCode() == KeyCode.ALT) {
+					altLastPressed.set(true);
+					mnemonicsActive.set(!mnemonicsActive.get());
+				} else altLastPressed.set(false);
 			});
 			mainStage.focusedProperty().addListener(current -> {
-				if (lastPressedEvent.get() != null && mainStage.isFocused() && mnemonicsActive.get()
-						&& lastPressedEvent.get().getCode() == KeyCode.ALT) {
-					rootPane.fireEvent(lastPressedEvent.get());
-					lastPressedEvent.set(null);
-				}
+				if (mainStage.isFocused() && mnemonicsActive.get() && altLastPressed.get())
+					rootPane.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ALT, false, false, true, false));
 			});
 
 			// Launching with tone/project loading TODO: Implement Mac support for this
