@@ -33,6 +33,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.xpath.operations.Bool;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.BufferedReader;
@@ -263,9 +264,14 @@ public class MainApp extends Application {
 			// Fix bug where alt+tabbing away from and back to the app leaves menu mnemonics activated.
 			// https://bugs.openjdk.java.net/browse/JDK-8238731
 			AtomicReference<KeyEvent> lastPressedEvent = new AtomicReference<>();
-			mainStage.addEventFilter(KeyEvent.KEY_PRESSED, lastPressedEvent::set);
+			AtomicReference<Boolean> mnemonicsActive = new AtomicReference<>(false);
+			mainStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+				lastPressedEvent.set(event);
+				mnemonicsActive.set(!mnemonicsActive.get());
+			});
 			mainStage.focusedProperty().addListener(current -> {
-				if (lastPressedEvent.get() != null && mainStage.isFocused() && lastPressedEvent.get().getCode() == KeyCode.ALT) {
+				if (lastPressedEvent.get() != null && mainStage.isFocused() && mnemonicsActive.get()
+						&& lastPressedEvent.get().getCode() == KeyCode.ALT) {
 					rootPane.fireEvent(lastPressedEvent.get());
 					lastPressedEvent.set(null);
 				}
