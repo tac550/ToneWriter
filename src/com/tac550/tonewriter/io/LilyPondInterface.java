@@ -620,7 +620,7 @@ public class LilyPondInterface {
 
 		String[] tokens = syllableNoteBuffer.trim().split(" ");
 
-		// If this part has any hidden notes, notes that are tied, or the part contains any rests, skip adding a slur.
+		// If this part has any hidden notes, or all notes are tied, or the part contains any rests, skip adding a slur.
 		if (syllableNoteBuffer.contains("noteHide")
 				|| Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~"))
 				|| Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
