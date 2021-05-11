@@ -24,6 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -258,6 +259,17 @@ public class MainApp extends Application {
 			loader.setLocation(MainApp.class.getResource("TopScene.fxml"));
 			BorderPane rootPane = loader.load();
 			topSceneController = loader.getController();
+
+			// Fix bug where alt+tabbing away from and back to the app leaves menu mnemonics activated.
+			// https://bugs.openjdk.java.net/browse/JDK-8238731
+			AtomicReference<KeyEvent> lastPressedEvent = new AtomicReference<>();
+			mainStage.addEventFilter(KeyEvent.KEY_PRESSED, lastPressedEvent::set);
+			mainStage.focusedProperty().addListener(current -> {
+				if (lastPressedEvent.get() != null && mainStage.isFocused() && lastPressedEvent.get().getCode() == KeyCode.ALT) {
+					rootPane.fireEvent(lastPressedEvent.get());
+					lastPressedEvent.set(null);
+				}
+			});
 
 			// Launching with tone/project loading TODO: Implement Mac support for this
 			List<String> params = getParameters().getRaw();
