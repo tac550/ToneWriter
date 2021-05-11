@@ -225,11 +225,11 @@ public class LilyPondInterface {
 
 			// Title, if not hidden...
 			if (!item.getFinalTitleContent().isEmpty())
-				Collections.addAll(lines, String.format("  \\fill-line \\bold %s{\\justify { %s } }",
-						item.getLargeTitle() ? "\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(item.getFinalTitleContent())));
+				Collections.addAll(lines, "  \\fill-line \\bold %s{\\justify { %s } }".formatted(item.getLargeTitle() ?
+						"\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(item.getFinalTitleContent())));
 			// ...and subtitle, if present
 			if (!item.getSubtitle().isEmpty())
-				Collections.addAll(lines, String.format("  \\fill-line %s{\\justify { %s } } \\vspace #0.5",
+				Collections.addAll(lines, "  \\fill-line %s{\\justify { %s } } \\vspace #0.5".formatted(
 						"\\fontsize #0.5 ", reformatTextForNotation(item.getSubtitle())));
 
 			Collections.addAll(lines, "  \\vspace #0.25", "}\n", "\\noPageBreak\n");

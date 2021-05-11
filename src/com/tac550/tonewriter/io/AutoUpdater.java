@@ -97,7 +97,7 @@ public class AutoUpdater {
 						FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
 						UpdaterViewController updaterController = loader.getController();
 
-						updaterStage.setTitle(String.format("%s Automatic Updater", MainApp.APP_NAME));
+						updaterStage.setTitle("%s Automatic Updater".formatted(MainApp.APP_NAME));
 						updaterStage.getIcons().add(MainApp.APP_ICON);
 						updaterStage.setScene(new Scene(loader.getRoot()));
 						updaterStage.setOnShown(event -> {
