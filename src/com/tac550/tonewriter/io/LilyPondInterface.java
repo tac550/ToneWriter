@@ -481,9 +481,10 @@ public class LilyPondInterface {
 
 							// Add the combined note(s) to the buffer.
 							syllableNoteBuffers[i] += " " + addedNotes;
-							// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
-							// and only if this is not already the last chord on the
-							if (i == 0) measureBeats += getBeatDuration(addedNotes);
+							// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for one part).
+							// Subtract duration of previous note if it was also combined, so it isn't counted twice.
+							if (i == 0) measureBeats += getBeatDuration(addedNotes)
+									- (previousNoteCombined[i] ? getBeatDuration(tempCurrentNotes[i]) : 0);
 
 							// If the notes were combined into one... (not tied)
 							if (!addedNotes.contains("~"))
@@ -523,8 +524,7 @@ public class LilyPondInterface {
 						if (!previousNoteCombined[i]) {
 							syllableNoteBuffers[i] += " " + chordData.getPart(i);
 							// Add duration of this note to the beat total only if we're on the soprano part (we only need to count beats for one part).
-							if (i == 0)
-								measureBeats += getBeatDuration(chordData.getPart(i));
+							if (i == 0) measureBeats += getBeatDuration(chordData.getPart(i));
 						} else {
 							// If the previous note was combined, we clear the temp field for the current part and reset the flag.
 							previousNoteCombined[i] = false;
