@@ -474,28 +474,29 @@ public class LilyPondInterface {
 
 							// Try to do the combination
 							String addedNotes = combineNotes(currentNote, nextNote);
+							if (!addedNotes.isEmpty()) { // Complete note combining only if combining notes didn't fail
+								// If the previous note was also combined, remove it (and any tokens after it).
+								if (!tempCurrentNotes[i].isEmpty())
+									syllableNoteBuffers[i] = removeLastNote(syllableNoteBuffers[i]);
 
-							// If the previous note was also combined, remove it (and any tokens after it).
-							if (!tempCurrentNotes[i].isEmpty())
-								syllableNoteBuffers[i] = removeLastNote(syllableNoteBuffers[i]);
+								// Add the combined note(s) to the buffer.
+								syllableNoteBuffers[i] += " " + addedNotes;
+								// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for one part).
+								// Subtract duration of previous note if it was also combined, so it isn't counted twice.
+								if (i == 0) measureBeats += getBeatDuration(addedNotes)
+										- (previousNoteCombined[i] ? getBeatDuration(tempCurrentNotes[i]) : 0);
 
-							// Add the combined note(s) to the buffer.
-							syllableNoteBuffers[i] += " " + addedNotes;
-							// Add duration of this/these note(s) to the beat total but only if we're on the soprano part (we only need to count beats for one part).
-							// Subtract duration of previous note if it was also combined, so it isn't counted twice.
-							if (i == 0) measureBeats += getBeatDuration(addedNotes)
-									- (previousNoteCombined[i] ? getBeatDuration(tempCurrentNotes[i]) : 0);
+								// If the notes were combined into one... (not tied)
+								if (!addedNotes.contains("~"))
+									// The new note becomes the temporary current note for the current part.
+									tempCurrentNotes[i] = addedNotes;
+								else
+									// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
+									tempCurrentNotes[i] = addedNotes.split(" ")[1];
 
-							// If the notes were combined into one... (not tied)
-							if (!addedNotes.contains("~"))
-								// The new note becomes the temporary current note for the current part.
-								tempCurrentNotes[i] = addedNotes;
-							else
-								// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
-								tempCurrentNotes[i] = addedNotes.split(" ")[1];
-
-							// Remember that we just did a note combination for the current part.
-							noteCombined[i] = true;
+								// Remember that we just did a note combination for the current part.
+								noteCombined[i] = true;
+							}
 						}
 					}
 
@@ -753,8 +754,8 @@ public class LilyPondInterface {
 				newDur = "2.";
 			else if (inverse == 0.375) // Dotted quarter
 				newDur = "4.";
-			else // If the non-whole computed value didn't have a definition, we return the original notes with a tie.
-				return curr + "~ " + next;
+			else // If no definition exists, we simply tie the notes, unless they are rests. In this case, return "".
+				return noteFormat.contains("r") ? "" : curr + "~ " + next;
 		}
 
 		// If we got this far, the notes will be combined into one. We just format the new duration string into the note and return it.
@@ -763,7 +764,6 @@ public class LilyPondInterface {
 
 	// Returns the number of beats for which the given note (or notes, if tied) last(s).
 	private static float getBeatDuration(String note) {
-
 		// If there is a tie...
 		if (note.contains("~")) {
 			String[] tiedNotes = note.split("~ ");
@@ -776,9 +776,7 @@ public class LilyPondInterface {
 
 			return totalDuration;
 
-			// If no tie is present...
 		} else {
-
 			// Calculate the duration of the note.
 			float beats = 4 / Float.parseFloat(note.replaceAll("[\\D]", ""));
 
@@ -786,7 +784,6 @@ public class LilyPondInterface {
 
 			return beats;
 		}
-
 	}
 
 	// Returns reformatted version of input such that double quotes display correctly and
