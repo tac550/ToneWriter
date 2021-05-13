@@ -538,7 +538,6 @@ public class LilyPondInterface {
 							// Remember that we just did a note combination for the current part.
 							noteCombined[i] = true;
 						}
-
 					}
 
 					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
@@ -546,20 +545,17 @@ public class LilyPondInterface {
 						hideThisChord = false;
 
 					// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
-					if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4")) {
+					if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4"))
 						// Don't hide the current chord because neighboring chords are different.
 						hideThisChord = false;
-					}
 
 				}
 
 				// If hideThisChord remained true after all the checks for all the parts in the chord...
-				if (hideThisChord) {
-					for (int i = 0; i < 4; i++) {
+				if (hideThisChord)
+					for (int i = 0; i < 4; i++)
 						// Add the flag that hides the note for each part of the chord before adding the notes themselves.
 						syllableNoteBuffers[i] += " \\noteHide";
-					}
-				}
 
 				// Add note data for each part to the buffers...
 				for (int i = 0; i < 4; i++) {
@@ -568,7 +564,7 @@ public class LilyPondInterface {
 						// ...and the one before that was not combined.
 						if (!previousNoteCombined[i]) {
 							syllableNoteBuffers[i] += " " + chordData.getPart(i);
-							// Add duration of this note to the beat total but only if we're on the soprano part (we only need to count beats for 1 part).
+							// Add duration of this note to the beat total only if we're on the soprano part (we only need to count beats for one part).
 							if (i == 0)
 								measureBeats += getBeatDuration(chordData.getPart(i));
 						} else {
@@ -751,15 +747,15 @@ public class LilyPondInterface {
 			// We just take it as the new duration and continue to the return statement.
 			newDur = String.valueOf((int) computedDur);
 		} else { // If a fractional number resulted it may be covered by a special case.
-			// Inverse the computed duration.
+			// Invert the computed duration.
 			float inverse = 1 / computedDur;
-			if (inverse == 0.75) { // Dotted half
+
+			if (inverse == 0.75) // Dotted half
 				newDur = "2.";
-			} else if (inverse == 0.375) { // Dotted quarter
+			else if (inverse == 0.375) // Dotted quarter
 				newDur = "4.";
-			} else { // If the non-whole computed value didn't have a definition, we just return the notes as they came in, but tied.
+			else // If the non-whole computed value didn't have a definition, we return the original notes with a tie.
 				return curr + "~ " + next;
-			}
 		}
 
 		// If we got this far, the notes will be combined into one. We just format the new duration string into the note and return it.
@@ -775,10 +771,9 @@ public class LilyPondInterface {
 
 			float totalDuration = 0;
 
-			for (String tNote : tiedNotes) {
+			for (String tNote : tiedNotes)
 				// Make one recursive call for each tied note
 				totalDuration += getBeatDuration(tNote);
-			}
 
 			return totalDuration;
 
@@ -833,13 +828,12 @@ public class LilyPondInterface {
 	// TODO: Seems to have bugs with note groups of more than 2 notes
 	// Adjusts the octave of the given note according to the octave_data string.
 	// octave_data should be formatted "''", "'", ",", "", etc.
-	// Each ' shifts the user's input up one octave and each , shifts the same down one octave.
+	// Each ' shifts the user's input up one octave and each , shifts down one octave.
 	public static String parseNoteRelative(String note_data, String octave_data) {
 
 		// If there is no note, no adjustment is needed, but we do need to return a rest.
-		if (note_data.trim().isEmpty()) {
+		if (note_data.trim().isEmpty())
 			return "r";
-		}
 
 		// We construct the final adjusted note here.
 		StringBuilder finalNoteData = new StringBuilder();
@@ -860,9 +854,9 @@ public class LilyPondInterface {
 			 * Continue to the next match if this is an add-on character after a note name,
 			 * such as an "f" to indicate flat.
 			 */
-			if (!first && note_data.substring(position - 1, position).matches("[abcdefg]")) {
+			if (!first && note_data.substring(position - 1, position).matches("[abcdefg]"))
 				continue;
-			}
+
 			first = false;
 
 			String workingOctave = octave_data;
@@ -887,13 +881,12 @@ public class LilyPondInterface {
 			while (workingOctave.contains("'")) {
 				// Remove one quote.
 				workingOctave = workingOctave.replaceFirst("'", "");
-				if (workingSection.toString().contains(",")) { // If we've got comma(s) in the note data...
+				if (workingSection.toString().contains(",")) // If we've got comma(s) in the note data...
 					// Remove a comma from the note.
 					workingSection = new StringBuilder(workingSection.toString().replaceFirst(",", ""));
-				} else { // If we don't have commas in the note data...
+				else // If we don't have commas in the note data...
 					// Add a quote to the note.
 					workingSection.append("'");
-				}
 			}
 
 			// for each comma in the octave data...
