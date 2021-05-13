@@ -476,50 +476,8 @@ public class LilyPondInterface {
 							String addedNotes = combineNotes(currentNote, nextNote);
 
 							// If the previous note was also combined, remove it (and any tokens after it).
-							if (!tempCurrentNotes[i].isEmpty()) {
-								String[] tokens = syllableNoteBuffers[i].split(" ");
-								// This flag gets set if the previous note was a note group.
-								boolean noteGroup = false;
-								// Work backward through the tokens.
-								for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
-									if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") ||
-											tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") || tokens[i1].contains("g")) {
-										if (noteGroup) {
-											// If we hit the beginning of the note group...
-											if (tokens[i1].contains("<")) {
-												// remove it and we're done.
-												tokens[i1] = "";
-												break;
-											}
-
-											// If the note we're trying to remove is actually a note group...
-										} else if (tokens[i1].contains(">")) {
-											// Set the flag.
-											noteGroup = true;
-										}
-
-										tokens[i1] = "";
-
-										if (!noteGroup)
-											// Stop here because we just removed the previous note.
-											break;
-
-									} else {
-										// Remove tokens that aren't notes from the end.
-										tokens[i1] = "";
-									}
-								}
-
-								// Remove any excess spaces from the syllable note buffer
-								StringBuilder editedString = new StringBuilder();
-								for (String token : tokens) {
-									if (token.isEmpty()) continue;
-									editedString.append(" ").append(token);
-								}
-								// Save back to the buffer.
-								syllableNoteBuffers[i] = editedString.toString();
-
-							}
+							if (!tempCurrentNotes[i].isEmpty())
+								syllableNoteBuffers[i] = removeLastNote(syllableNoteBuffers[i]);
 
 							// Add the combined note(s) to the buffer.
 							syllableNoteBuffers[i] += " " + addedNotes;
@@ -611,6 +569,49 @@ public class LilyPondInterface {
 		return measureBeats;
 	}
 
+	private static String removeLastNote(String syllableNoteBuffer) {
+		String[] tokens = syllableNoteBuffer.split(" ");
+		// This flag gets set if the previous token removed was in a note group.
+		boolean noteGroup = false;
+		// Work backward through the tokens.
+		for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
+			if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") ||
+					tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") ||
+					tokens[i1].contains("g") || tokens[i1].contains("r")) { // TODO: Might want to rethink this
+				if (noteGroup) {
+					// If we hit the beginning of the note group (last token to remove)...
+					if (tokens[i1].contains("<")) {
+						// remove it and we're done.
+						tokens[i1] = "";
+						break;
+					}
+				} else if (tokens[i1].contains(">")) { // If the note we're trying to remove is part of a note group...
+					// Set the flag.
+					noteGroup = true;
+				}
+
+				tokens[i1] = "";
+
+				if (!noteGroup)
+					// Stop here because we just removed the previous note.
+					break;
+
+			} else {
+				// Remove tokens that aren't notes from the end.
+				tokens[i1] = "";
+			}
+		}
+
+		// Remove any excess spaces as we reconstruct the note buffer.
+		StringBuilder editedBuffer = new StringBuilder();
+		for (String token : tokens) {
+			if (token.isEmpty()) continue;
+			editedBuffer.append(" ").append(token);
+		}
+		// Save back to the buffer.
+		return editedBuffer.toString();
+	}
+
 	private static String applySlursAndBeams(String syllableNoteBuffer) {
 		boolean addedSlur = false;
 
@@ -682,13 +683,11 @@ public class LilyPondInterface {
 		syllableTextBuffer.append(reformatTextForNotation(syllable.getFormattedText().replace("-", "")));
 
 		// If this is not the last syllable in the text,
-		if (syllableList.indexOf(syllable) < syllableList.size() - 1) {
+		if (syllableList.indexOf(syllable) < syllableList.size() - 1)
 			// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
 			// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-			if (syllableList.get(syllableList.indexOf(syllable) + 1).getFormattedText().startsWith("-")) {
+			if (syllableList.get(syllableList.indexOf(syllable) + 1).getFormattedText().startsWith("-"))
 				syllableTextBuffer.append(" -- ");
-			}
-		}
 
 		// Add closing formatting flag if necessary.
 		if (syllable.getBold() || syllable.getItalic())
