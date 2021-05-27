@@ -26,7 +26,8 @@ public class DesktopInterface {
     }
 
     public static void openFile(File file) {
-        if (checkSuppported())
+        if (file.exists()) {
+            if (checkSuppported())
                 new Thread(() -> {
                     try {
                         Desktop.getDesktop().open(file);
@@ -34,6 +35,9 @@ public class DesktopInterface {
                         e.printStackTrace();
                     }
                 }).start();
+        } else {
+            TWUtils.showError("File does not exist.", true);
+        }
     }
     public static void browseURI(String uri) {
         if (checkSuppported())
