@@ -955,7 +955,7 @@ public class MainSceneController {
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(String.format("%s.pdf",
 				tempExportMode == ExportMode.ITEM ? titleTextField.getText()
 						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())), "_"));
-		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM ? itemSavingDirectory :
+		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM && topSceneController.getTabCount() > 1 ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
