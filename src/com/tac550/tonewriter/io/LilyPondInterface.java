@@ -127,7 +127,7 @@ public class LilyPondInterface {
 						if (!lastLilypondFile.delete()) {
 							TWUtils.showError("Failed to delete LilyPond file, continuing...", false);
 						}
-					}
+					} // TODO: Consider making sure this has a chance to happen in event of cancellation or failure.
 
 				} catch (Exception e) {
 					Platform.runLater(top_scene::exportMenuFailure);
