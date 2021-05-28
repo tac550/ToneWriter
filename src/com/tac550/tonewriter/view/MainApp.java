@@ -76,6 +76,7 @@ public class MainApp extends Application {
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
 	static final String PREFS_CHECK_UPDATE_APPSTARTUP = "Check-Update-Appstart";
+	static final String PREFS_AUTO_OPEN_EXPORT = "Auto-Open-Completed-Export";
 
 	// UI Stuff
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.

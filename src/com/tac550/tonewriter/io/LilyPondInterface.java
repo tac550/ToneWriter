@@ -5,6 +5,7 @@ import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
+import javafx.application.Platform;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -45,6 +46,10 @@ public class LilyPondInterface {
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
 	private static final Map<String, List<ChantChordController>> pendingChordControllers = new HashMap<>();
+
+	private static File lastLilypondFile;
+	private static Process lastExportProcess;
+	private static boolean exportCancelled = false;
 
 	// Renders chord previews for the tone UI
 	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
@@ -92,33 +97,50 @@ public class LilyPondInterface {
 
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title, MainSceneController[] items,
-	                                  String paperSize, boolean no_header, boolean even_spread) throws IOException {
-		File lilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
+	                                  String paperSize, boolean no_header, boolean even_spread, TopSceneController top_scene) throws IOException {
+		exportCancelled = false;
+		lastLilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (!saveToLilyPondFile(lilypondFile, project_title, items, paperSize, no_header, even_spread))
+		if (!saveToLilyPondFile(lastLilypondFile, project_title, items, paperSize, no_header, even_spread)) {
+			top_scene.exportMenuFailure();
 			return false;
+		}
 
 		if (MainApp.lilyPondAvailable()) {
-			executeLilyPondRender(lilypondFile, false, () -> {
+			top_scene.exportMenuWorking();
+
+			executeLilyPondRender(lastLilypondFile, false, () -> {
+				if (exportCancelled) return; // TODO Deal with cases where a temp file is left behind
+				if (lastExportProcess.exitValue() != 0) {
+					Platform.runLater(top_scene::exportMenuFailure);
+					return;
+				}
+
 				try {
+					Platform.runLater(top_scene::exportMenuSuccess);
 					// After the render is complete, ask the OS to open the resulting PDF file.
-					DesktopInterface.openFile(new File(lilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
+					if (top_scene.autoOpenCompletedExports())
+						openLastExportPDF();
 
 					// Delete the lilypond file if the option to save it isn't set
 					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
-						if (!lilypondFile.delete()) {
+						if (!lastLilypondFile.delete()) {
 							TWUtils.showError("Failed to delete LilyPond file, continuing...", false);
 						}
 					}
 
 				} catch (Exception e) {
+					Platform.runLater(top_scene::exportMenuFailure);
 					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
 					// if it's not set to be saved).
-					DesktopInterface.openFile(lilypondFile.getParentFile());
+					if (top_scene.autoOpenCompletedExports())
+						openLastExportFolder();
 				}
 			});
 		} else {
-			DesktopInterface.openFile(lilypondFile.getParentFile());
+			top_scene.exportMenuSuccess();
+			if (top_scene.autoOpenCompletedExports())
+				openLastExportFolder();
 		}
 
 		return true;
@@ -942,9 +964,9 @@ public class LilyPondInterface {
 				FilenameUtils.removeExtension(TWUtils.createTWTempFile("render", "logfile.log").getAbsolutePath()),
 				"-o", lilypondFile.getAbsolutePath().replace(".ly", ""), lilypondFile.getAbsolutePath());
 
-		Process pr = prb.start();
+		lastExportProcess = prb.start();
 
-		ProcessExitDetector prExitDetector = new ProcessExitDetector(pr);
+		ProcessExitDetector prExitDetector = new ProcessExitDetector(lastExportProcess);
 		prExitDetector.addProcessListener(process -> new Thread(exitingActions).start());
 		prExitDetector.start();
 	}
@@ -961,5 +983,16 @@ public class LilyPondInterface {
 		}
 
 		return tempFile;
+	}
+
+	public static void cancelExportProcess() {
+		lastExportProcess.destroy();
+		exportCancelled = true;
+	}
+	public static void openLastExportFolder() {
+		DesktopInterface.openFile(lastLilypondFile.getParentFile());
+	}
+	public static void openLastExportPDF() {
+		DesktopInterface.openFile(new File(lastLilypondFile.getAbsolutePath().replace(".ly", ".pdf")));
 	}
 }

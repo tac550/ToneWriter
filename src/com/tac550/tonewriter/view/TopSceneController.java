@@ -74,6 +74,16 @@ public class TopSceneController {
 	@FXML private MenuItem aboutMenuItem;
 	@FXML private MenuItem updateMenuItem;
 
+	@FXML private Menu exportProgressMenu;
+	@FXML private ProgressIndicator exportProgressIndicator;
+	private final ImageView exportCompleteImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-check.png")).toExternalForm());
+	private final ImageView exportFailedImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-delete.png")).toExternalForm());
+	private final ImageView exportCancelledImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-ban.png")).toExternalForm());
+	@FXML private MenuItem cancelExportMenuItem;
+	@FXML private MenuItem openPDFMenuItem;
+	@FXML private MenuItem openFolderMenuItem;
+	@FXML private CheckMenuItem openWhenCompletedItem;
+
 	@FXML private TabPane tabPane;
 	private final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
 
@@ -222,6 +232,9 @@ public class TopSceneController {
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
+		setMenuIcon(cancelExportMenuItem, "/media/sign-ban.png");
+		setMenuIcon(openPDFMenuItem, "/media/file-pdf.png");
+		setMenuIcon(openFolderMenuItem, "/media/folder-document.png");
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac")) {
@@ -257,6 +270,19 @@ public class TopSceneController {
 			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
 			MainApp.setDarkModeEnabled(newVal);
 		});
+
+		// Auto-open on completed export menu item behavior and initial state
+		openWhenCompletedItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_AUTO_OPEN_EXPORT, true));
+		openWhenCompletedItem.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_AUTO_OPEN_EXPORT, newVal));
+
+		// Make sure export status icon sizes match the progress indicator's sizing
+		exportCompleteImage.setFitHeight(exportProgressIndicator.getPrefHeight());
+		exportCompleteImage.setFitWidth(exportProgressIndicator.getPrefWidth());
+		exportFailedImage.setFitHeight(exportProgressIndicator.getPrefHeight());
+		exportFailedImage.setFitWidth(exportProgressIndicator.getPrefWidth());
+		exportCancelledImage.setFitHeight(exportProgressIndicator.getPrefHeight());
+		exportCancelledImage.setFitWidth(exportProgressIndicator.getPrefWidth());
 
 		// Tab pane initialization
 
@@ -404,14 +430,8 @@ public class TopSceneController {
 		if (event.isConsumed())
 			return;
 
-		clearAllTabs();
-
-		setProjectTitle("Unnamed Project");
-		projectPaperSize = defaultPaperSize;
-		projectFile = null;
-
+		clearProjectState();
 		addTab();
-
 	}
 	@FXML private void handleOpenProject() {
 		FileChooser fileChooser = new FileChooser();
@@ -452,9 +472,8 @@ public class TopSceneController {
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return;
 
-		if (!saveFile.getName().endsWith(".twproj")) {
+		if (!saveFile.getName().endsWith(".twproj"))
 			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
-		}
 
 		if (projectIO.saveProject(saveFile, this)) {
 			projectFile = saveFile;
@@ -545,6 +564,20 @@ public class TopSceneController {
 	}
 	@FXML private void handleUpdateCheck() {
 		AutoUpdater.updateCheck(parentStage, false);
+	}
+
+	/*
+	 * Export Menu Actions
+	 */
+	@FXML private void handleCancelExport() {
+		LilyPondInterface.cancelExportProcess();
+		exportMenuCancelled();
+	}
+	@FXML private void handleOpenPDF() {
+		LilyPondInterface.openLastExportPDF();
+	}
+	@FXML private void handleOpenExportFolder() {
+		LilyPondInterface.openLastExportFolder();
 	}
 
 	public void addTab(String with_title, int at_index, String precomp_source, String tone_hash,
@@ -699,6 +732,15 @@ public class TopSceneController {
 		});
 	}
 
+	private void clearProjectState() {
+		clearAllTabs();
+        exportMenuReset();
+
+		setProjectTitle("Unnamed Project");
+		projectPaperSize = defaultPaperSize;
+		projectFile = null;
+	}
+
 	private void closeTab(Tab tab) {
 		if (tabPane.getTabClosingPolicy() == TabPane.TabClosingPolicy.UNAVAILABLE) return;
 
@@ -765,13 +807,13 @@ public class TopSceneController {
 	}
 
 	private void openProject(File selected_file) {
-		clearAllTabs();
+		clearProjectState();
 
 		if (selected_file.exists()) {
 			if (projectIO.openProject(selected_file, this)) {
 				projectFile = selected_file;
 			} else {
-				clearAllTabs();
+				clearProjectState();
 				addTab();
 			}
 		}
@@ -819,6 +861,10 @@ public class TopSceneController {
 	}
 	boolean hoverHighlightEnabled() {
 		return hoverHighlightMenuItem.isSelected();
+	}
+
+	public boolean autoOpenCompletedExports() {
+		return openWhenCompletedItem.isSelected();
 	}
 
 	void requestClose(Event ev) {
@@ -883,7 +929,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), projectPaperSize, noHeader, evenSpread);
+				getTabControllers(), projectPaperSize, noHeader, evenSpread, this);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -1039,6 +1085,52 @@ public class TopSceneController {
 		durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
 				- (stepSize / 2));
 		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
+	}
+
+	public void exportMenuWorking() {
+		exportProgressMenu.setText("E_xport in Progress...");
+		exportProgressMenu.setGraphic(exportProgressIndicator);
+
+		exportProgressMenu.setDisable(false);
+		cancelExportMenuItem.setDisable(false);
+		openPDFMenuItem.setDisable(true);
+		openFolderMenuItem.setDisable(true);
+	}
+	public void exportMenuSuccess() {
+		exportProgressMenu.setText("E_xport Complete");
+		exportProgressMenu.setGraphic(exportCompleteImage);
+
+		exportProgressMenu.setDisable(false);
+		cancelExportMenuItem.setDisable(true);
+		openPDFMenuItem.setDisable(!MainApp.lilyPondAvailable());
+		openFolderMenuItem.setDisable(false);
+	}
+	public void exportMenuCancelled() {
+		exportProgressMenu.setText("E_xport Cancelled");
+		exportProgressMenu.setGraphic(exportCancelledImage);
+
+		exportProgressMenu.setDisable(false);
+		cancelExportMenuItem.setDisable(true);
+		openPDFMenuItem.setDisable(true);
+		openFolderMenuItem.setDisable(false);
+	}
+	public void exportMenuFailure() {
+		exportProgressMenu.setText("E_xport Failed");
+		exportProgressMenu.setGraphic(exportFailedImage);
+
+		exportProgressMenu.setDisable(false);
+		cancelExportMenuItem.setDisable(true);
+		openPDFMenuItem.setDisable(true);
+		openFolderMenuItem.setDisable(false);
+	}
+	private void exportMenuReset() {
+		exportProgressMenu.setText("No recent export");
+		exportProgressMenu.setGraphic(exportProgressIndicator);
+
+		exportProgressMenu.setDisable(true);
+		cancelExportMenuItem.setDisable(true);
+		openPDFMenuItem.setDisable(true);
+		openFolderMenuItem.setDisable(true);
 	}
 
 }
