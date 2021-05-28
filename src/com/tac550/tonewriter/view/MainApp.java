@@ -510,7 +510,7 @@ public class MainApp extends Application {
 			}
 
 			TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
-					"That directory does not contain a valid LilyPond executable.", true, owner);
+					"That folder does not contain a valid LilyPond executable.", true, owner);
 
 			setLilyPondDir(owner, startup);
 
