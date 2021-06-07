@@ -547,7 +547,7 @@ public class MainSceneController {
 
 			toneMenuState.saveToneMenuItemDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;
-			toneMenuState.editMenuDisabled = false;
+			toneMenuState.editOptionsDisabled = false;
 			applyToneMenuState();
 
 			return true;
@@ -622,8 +622,8 @@ public class MainSceneController {
 	void applyToneMenuState() {
 		topSceneController.setMenuState(toneMenuState);
 
-		openToneHintPane.setVisible(toneMenuState.editMenuDisabled);
-		openToneHintPane.setMouseTransparent(!toneMenuState.editMenuDisabled);
+		openToneHintPane.setVisible(toneMenuState.editOptionsDisabled);
+		openToneHintPane.setMouseTransparent(!toneMenuState.editOptionsDisabled);
 	}
 
 	/*
@@ -677,7 +677,7 @@ public class MainSceneController {
 	void handleNewTone() {
 		if (checkSaveTone() && createNewTone()) {
 			clearChantLines();
-			toneMenuState.editMenuDisabled = false;
+			toneMenuState.editOptionsDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;
 
 			// Reset settings pertaining to any previously-loaded tone
@@ -692,7 +692,7 @@ public class MainSceneController {
 	public void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((auto_load || checkSaveTone()) && loadTone(tone_file, selectHideToneHeader)) {
-			toneMenuState.editMenuDisabled = false;
+			toneMenuState.editOptionsDisabled = false;
 			toneMenuState.saveToneMenuItemDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;
 			toneMenuState.saveToneMenuItemDisabled = !isToneSavable();

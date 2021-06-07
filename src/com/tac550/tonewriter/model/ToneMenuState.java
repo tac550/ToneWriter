@@ -2,7 +2,7 @@ package com.tac550.tonewriter.model;
 
 public class ToneMenuState {
 
-	public boolean editMenuDisabled = true;
+	public boolean editOptionsDisabled = true;
 
 	public boolean saveToneMenuItemDisabled = true;
 	public boolean saveToneAsMenuItemDisabled = true;

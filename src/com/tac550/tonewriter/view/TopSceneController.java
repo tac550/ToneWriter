@@ -58,11 +58,11 @@ public class TopSceneController {
 	@FXML private MenuItem saveToneMenuItem;
 	@FXML private MenuItem saveToneAsMenuItem;
 
-	@FXML private Menu editMenu;
 	@FXML private MenuItem addCLMenuItem;
 	@FXML private MenuItem setKeyMenuItem;
 	@FXML private MenuItem editHeaderInfoMenuItem;
 	@FXML private CheckMenuItem manualCLAssignmentMenuItem;
+	private MenuItem[] toneEditItems;
 
 	@FXML private CheckMenuItem playMidiMenuItem;
 	@FXML private CheckMenuItem hoverHighlightMenuItem;
@@ -212,6 +212,9 @@ public class TopSceneController {
 
 	@FXML private void initialize() {
 
+		// Init tone edit menu item group
+		toneEditItems = new MenuItem[]{addCLMenuItem, setKeyMenuItem, editHeaderInfoMenuItem, manualCLAssignmentMenuItem};
+
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
@@ -285,7 +288,6 @@ public class TopSceneController {
 		exportCancelledImage.setFitWidth(exportProgressIndicator.getPrefWidth());
 
 		// Tab pane initialization
-
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
 			if (getTabCount() == 1) {
@@ -306,7 +308,6 @@ public class TopSceneController {
 		});
 
 		// Add button initialization
-
 		ImageView addImageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/media/sign-add.png")).toExternalForm(),
 				16, 16, false, true));
 		addTabButton.setGraphic(addImageView);
@@ -846,7 +847,8 @@ public class TopSceneController {
 	}
 
 	void setMenuState(ToneMenuState menu_state) {
-		editMenu.setDisable(menu_state.editMenuDisabled);
+		for (MenuItem item : toneEditItems)
+			item.setDisable(menu_state.editOptionsDisabled);
 		saveToneMenuItem.setDisable(menu_state.saveToneMenuItemDisabled);
 		saveToneAsMenuItem.setDisable(menu_state.saveToneAsMenuItemDisabled);
 		manualCLAssignmentMenuItem.setSelected(menu_state.manualCLAssignmentSelected);
