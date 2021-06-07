@@ -24,22 +24,6 @@
          <menus>
             <Menu text="_Project">
                <items>
-                  <MenuItem fx:id="addItemMenuItem" mnemonicParsing="false" onAction="#addTab" text="Add Item">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
-                  <MenuItem fx:id="projectTitleMenuItem" mnemonicParsing="false" onAction="#handleSetProjectTitle" text="Set Project Title...">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
-                  <MenuItem fx:id="pageSetupMenuItem" mnemonicParsing="false" onAction="#handlePageSetup" text="Page Setup...">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
-                     </accelerator>
-                  </MenuItem>
-                  <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" onAction="#handleNewProject" text="New Project">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -58,6 +42,22 @@
                   <MenuItem fx:id="saveProjectAsMenuItem" mnemonicParsing="false" onAction="#handleSaveProjectAs" text="Save Project As...">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="addItemMenuItem" mnemonicParsing="false" onAction="#addTab" text="Add Item">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="projectTitleMenuItem" mnemonicParsing="false" onAction="#handleSetProjectTitle" text="Set Project Title...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem fx:id="pageSetupMenuItem" mnemonicParsing="false" onAction="#handlePageSetup" text="Page Setup...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
