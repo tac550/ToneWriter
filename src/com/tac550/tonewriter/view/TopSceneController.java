@@ -43,6 +43,7 @@ public class TopSceneController {
 
 	private final ProjectIO projectIO = new ProjectIO();
 
+	private static final double MENU_ICON_SIZE = 30;
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
 	@FXML private MenuItem pageSetupMenuItem;
@@ -79,10 +80,14 @@ public class TopSceneController {
 	private final ImageView exportCompleteImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-check.png")).toExternalForm());
 	private final ImageView exportFailedImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-delete.png")).toExternalForm());
 	private final ImageView exportCancelledImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-ban.png")).toExternalForm());
+	private final ImageView repeatExportImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-sync.png")).toExternalForm());
+	private final ImageView cancelExportImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-ban.png")).toExternalForm());
 	@FXML private MenuItem cancelExportMenuItem;
 	@FXML private MenuItem openPDFMenuItem;
 	@FXML private MenuItem openFolderMenuItem;
 	@FXML private CheckMenuItem openWhenCompletedItem;
+	private boolean currentlyExporting = false;
+	private MainSceneController lastExportTab;
 
 	@FXML private TabPane tabPane;
 	private final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
@@ -235,16 +240,20 @@ public class TopSceneController {
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
-		setMenuIcon(cancelExportMenuItem, "/media/sign-ban.png");
 		setMenuIcon(openPDFMenuItem, "/media/file-pdf.png");
 		setMenuIcon(openFolderMenuItem, "/media/folder-document.png");
 
+		// Sizing for switching menu icons
+		repeatExportImage.setFitHeight(MENU_ICON_SIZE);
+		repeatExportImage.setFitWidth(MENU_ICON_SIZE);
+		cancelExportImage.setFitHeight(MENU_ICON_SIZE);
+		cancelExportImage.setFitWidth(MENU_ICON_SIZE);
+
 		// Modify LilyPond location editing menu items on Mac
-		if (MainApp.OS_NAME.startsWith("mac")) {
+		if (MainApp.OS_NAME.startsWith("mac"))
 			setLilyPondLocationItem.setText("Locate LilyPond.app");
-		} if (MainApp.OS_NAME.startsWith("lin")) {
+		if (MainApp.OS_NAME.startsWith("lin"))
 			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
-		}
 
 		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
 		if (!MainApp.lilyPondAvailable()) {
@@ -347,9 +356,8 @@ public class TopSceneController {
 
 	private static void setMenuIcon(MenuItem menu_item, String image_path) {
 		ImageView imageView = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource(image_path)).toExternalForm());
-		double menuIconSize = 30;
-		imageView.setFitHeight(menuIconSize);
-		imageView.setFitWidth(menuIconSize);
+		imageView.setFitHeight(MENU_ICON_SIZE);
+		imageView.setFitWidth(MENU_ICON_SIZE);
 		menu_item.setGraphic(imageView);
 	}
 
@@ -482,7 +490,8 @@ public class TopSceneController {
 		}
 	}
 	@FXML private void handleExport() {
-		getSelectedTabScene().handleExport();
+		lastExportTab = getSelectedTabScene();
+		lastExportTab.handleExport();
 	}
 	@FXML private void handleExit() {
 		Window window = parentStage.getScene().getWindow();
@@ -571,8 +580,12 @@ public class TopSceneController {
 	 * Export Menu Actions
 	 */
 	@FXML private void handleCancelExport() {
-		LilyPondInterface.cancelExportProcess();
-		exportMenuCancelled();
+		if (currentlyExporting) {
+			LilyPondInterface.cancelExportProcess();
+			exportMenuCancelled();
+		} else {
+			lastExportTab.performExport();
+		}
 	}
 	@FXML private void handleOpenPDF() {
 		LilyPondInterface.openLastExportPDF();
@@ -1090,49 +1103,62 @@ public class TopSceneController {
 	}
 
 	public void exportMenuWorking() {
+		currentlyExporting = true;
 		exportProgressMenu.setText("E_xport in Progress...");
 		exportProgressMenu.setGraphic(exportProgressIndicator);
 
 		exportProgressMenu.setDisable(false);
-		cancelExportMenuItem.setDisable(false);
+		showCancelExportOption();
 		openPDFMenuItem.setDisable(true);
 		openFolderMenuItem.setDisable(true);
 	}
 	public void exportMenuSuccess() {
+		currentlyExporting = false;
 		exportProgressMenu.setText("E_xport Complete");
 		exportProgressMenu.setGraphic(exportCompleteImage);
 
 		exportProgressMenu.setDisable(false);
-		cancelExportMenuItem.setDisable(true);
+		showRepeatExportOption();
 		openPDFMenuItem.setDisable(!MainApp.lilyPondAvailable());
 		openFolderMenuItem.setDisable(false);
 	}
 	public void exportMenuCancelled() {
+		currentlyExporting = false;
 		exportProgressMenu.setText("E_xport Cancelled");
 		exportProgressMenu.setGraphic(exportCancelledImage);
 
 		exportProgressMenu.setDisable(false);
-		cancelExportMenuItem.setDisable(true);
+		showRepeatExportOption();
 		openPDFMenuItem.setDisable(true);
 		openFolderMenuItem.setDisable(false);
 	}
 	public void exportMenuFailure() {
+		currentlyExporting = false;
 		exportProgressMenu.setText("E_xport Failed");
 		exportProgressMenu.setGraphic(exportFailedImage);
 
 		exportProgressMenu.setDisable(false);
-		cancelExportMenuItem.setDisable(true);
+		showRepeatExportOption();
 		openPDFMenuItem.setDisable(true);
 		openFolderMenuItem.setDisable(false);
 	}
 	private void exportMenuReset() {
+		currentlyExporting = false;
 		exportProgressMenu.setText("No recent export");
 		exportProgressMenu.setGraphic(exportProgressIndicator);
 
 		exportProgressMenu.setDisable(true);
-		cancelExportMenuItem.setDisable(true);
 		openPDFMenuItem.setDisable(true);
 		openFolderMenuItem.setDisable(true);
+	}
+
+	private void showRepeatExportOption() {
+		cancelExportMenuItem.setGraphic(repeatExportImage);
+		cancelExportMenuItem.setText("Repeat Last Export");
+	}
+	private void showCancelExportOption() {
+		cancelExportMenuItem.setGraphic(cancelExportImage);
+		cancelExportMenuItem.setText("Cancel Export");
 	}
 
 }

@@ -110,7 +110,7 @@ public class LilyPondInterface {
 			top_scene.exportMenuWorking();
 
 			executeLilyPondRender(lastLilypondFile, false, () -> {
-				if (exportCancelled) return; // TODO Deal with cases where a temp file is left behind
+				if (exportCancelled) return; // If user cancelled before we got here, stop. // TODO: Potential bug where a LP temp file is left behind?
 				if (lastExportProcess.exitValue() != 0) {
 					Platform.runLater(top_scene::exportMenuFailure);
 					return;

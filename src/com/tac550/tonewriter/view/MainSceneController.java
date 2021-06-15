@@ -652,23 +652,7 @@ public class MainSceneController {
 			} catch (RenderFormatException e) { return; }
 		}
 
-		try {
-			if (exportMode == ExportMode.ITEM) {
-				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
-						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(),
-						new MainSceneController[] {this}, topSceneController.getPaperSize(), topSceneController.getNoHeader(),
-						topSceneController.getEvenSpread(), topSceneController)) {
-					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
-							true, parentStage);
-				}
-			} else if (exportMode == ExportMode.PROJECT) {
-				topSceneController.exportProject();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
-					true, parentStage);
-		}
+		performExport();
 	}
 
 	/*
@@ -994,6 +978,26 @@ public class MainSceneController {
 		File pdfFile = new File(FilenameUtils.removeExtension(lyFile.getAbsolutePath()) + ".pdf");
 
         return pdfFile.delete() || lyFile.delete();
+	}
+
+	void performExport() {
+		try {
+			if (exportMode == ExportMode.ITEM) {
+				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
+						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(),
+						new MainSceneController[] {this}, topSceneController.getPaperSize(), topSceneController.getNoHeader(),
+						topSceneController.getEvenSpread(), topSceneController)) {
+					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
+							true, parentStage);
+				}
+			} else if (exportMode == ExportMode.PROJECT) {
+				topSceneController.exportProject();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			TWUtils.showAlert(AlertType.ERROR, "Error", "There was an IO error while saving!",
+					true, parentStage);
+		}
 	}
 
 	private void showQuickVerseStage(TextField targetField) {

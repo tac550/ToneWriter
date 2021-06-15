@@ -179,7 +179,7 @@
                   <ProgressIndicator fx:id="exportProgressIndicator" mouseTransparent="true" prefHeight="16.0" prefWidth="16.0" />
                </graphic>
                <items>
-                  <MenuItem fx:id="cancelExportMenuItem" disable="true" mnemonicParsing="false" onAction="#handleCancelExport" text="Cancel Export" />
+                  <MenuItem fx:id="cancelExportMenuItem" mnemonicParsing="false" onAction="#handleCancelExport" text="Cancel Export" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="openPDFMenuItem" disable="true" mnemonicParsing="false" onAction="#handleOpenPDF" text="Open Exported PDF" />
                   <MenuItem fx:id="openFolderMenuItem" disable="true" mnemonicParsing="false" onAction="#handleOpenExportFolder" text="Open Folder" />
