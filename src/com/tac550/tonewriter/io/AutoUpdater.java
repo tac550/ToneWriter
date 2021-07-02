@@ -323,9 +323,9 @@ public class AutoUpdater {
 			String pid = bean.getName().split("@")[0];
 
 			try {
-				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()}).waitFor();
 				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), userDir.getParentFile().getAbsolutePath()});
-			} catch (IOException e) {
+			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Failed to run installer script!", true));

@@ -129,9 +129,13 @@ public class MainApp extends Application {
 		// Initialize LilyPond
 
 		refreshLilyPondLocation();
-		// If the Windows LilyPond installation is no good, do initialization
-		if (!lilyPondAvailable() && OS_NAME.startsWith("win")) {
-			promptWinLilyPondInstall();
+
+		if (!lilyPondAvailable() && !OS_NAME.startsWith("lin")) {
+			if (OS_NAME.startsWith("win")) // If the Windows LilyPond installation is no good, prompt initialization
+				promptWinLilyPondInstall();
+			if (OS_NAME.startsWith("mac") && !lilyPondDirectory.getAbsolutePath().equals(getPlatformSpecificDefaultLPDir()))
+				// If the MacOS LilyPond default setup is no good, this is probably an access issue
+				attemptFixLilyPondMacAccess();
 
 			// Final availability determination after initialization attempt
 			refreshLilyPondLocation();
@@ -485,6 +489,48 @@ public class MainApp extends Application {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void attemptFixLilyPondMacAccess() {
+		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "Password",
+				"Please enter your password once more to complete installation.", true);
+		if (result.isPresent() && result.get().equals(ButtonType.CANCEL))
+			return;
+
+		File scriptFile;
+		try {
+			scriptFile = TWUtils.createTWTempFile("fixLilyPondScript",
+					"version" + MainApp.APP_VERSION + ".sh");
+		} catch (IOException e) {
+			e.printStackTrace();
+			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"I/O error occurred while generating temp files!", true));
+			return;
+		}
+
+		try {
+			TWUtils.exportFSResource("tryfix-LilyPond-macOS.sh", scriptFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"Error occurred while exporting script!", true));
+			return;
+		}
+
+		try {
+			String appLocation = new File(System.getProperty("user.dir")).getParentFile().getParentFile().getAbsolutePath();
+			if (TWUtils.versionCompare(System.getProperty("os.version"), "10.15.0") < 2)
+				appLocation = "/System/Volumes/Data" + appLocation;
+
+			Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()}).waitFor();
+			String[] cmdlist = new String[] {"osascript", "-e", String.format("do shell script \"%s\" with administrator privileges", String.join(" ",
+					new String[] {scriptFile.getAbsolutePath(), appLocation}))};
+			Runtime.getRuntime().exec(cmdlist).waitFor();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
+					"Failed to run script!", true));
+		}
 	}
 
 	static void setLilyPondDir(Stage owner, boolean startup) {
