@@ -20,6 +20,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TWUtils {
 
@@ -41,6 +43,10 @@ public class TWUtils {
 
 	// Strings
 
+	public static String truncateVersionNumber(String version, int len_limit) {
+		return Stream.of(version.split("\\.")).limit(len_limit).collect(Collectors.joining("."));
+	}
+
 	/**
 	 * Compares two version strings.
 	 *
@@ -49,14 +55,18 @@ public class TWUtils {
 	 *
 	 * @param v1 a string of alpha numerals separated by decimal points.
 	 * @param v2 a string of alpha numerals separated by decimal points.
-	 * @return The result is 1 if v1 is greater than v2.
-	 *         The result is 2 if v2 is greater than v1.
+	 * @param len_limit Maximum number of decimal-separated numerals to compare. Negative value signals no limit.
+	 * @return The result is 0 if the versions are equal up to len_limit or len_limit is 0.
+	 *         The result is 1 if v1 is greater than v2 up to len_limit.
+	 *         The result is 2 if v2 is greater than v1 up to len_limit.
 	 *         The result is -1 if the version format is unrecognized.
-	 *         The result is zero if the strings are equal.
 	 */
+	public static int versionCompare(String v1, String v2, int len_limit) {
 
-	// Used to compare LilyPond versions, not ToneWriter versions, which are comparable using floating point math.
-	public static int versionCompare(String v1, String v2) {
+		if (len_limit > -1) {
+			v1 = truncateVersionNumber(v1, len_limit);
+			v2 = truncateVersionNumber(v2, len_limit);
+		}
 
 		int v1Len = StringUtils.countMatches(v1,".");
 		int v2Len = StringUtils.countMatches(v2,".");
@@ -106,6 +116,13 @@ public class TWUtils {
 		}
 
 		return -1;
+	}
+	/**
+	 * Overloaded {@link #versionCompare(String,String,int)} which always compares the entirety of the version strings.
+	 * @see TWUtils#versionCompare(String,String,int)
+	 */
+	public static int versionCompare(String v1, String v2) {
+		return versionCompare(v1, v2, -1);
 	}
 
 	public static String encodeNewLines(String original) {

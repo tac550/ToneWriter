@@ -390,12 +390,12 @@ public class ProjectIO {
 			return false;
 		}
 
-		// Opening project files from future versions is unsupported because the lazy saving system is likely to corrupt
-		// project files for users of newer versions.
-		if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION) == 1) {
+		// Opening project files from future minor version increases is unsupported because the lazy saving system is
+		// likely to corrupt project files for users of newer versions. Patch version defferences do not trigger this.
+		if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION, 2) == 1) {
 			TWUtils.showAlert(Alert.AlertType.ERROR, "Error", String.format(Locale.US,
-					"This project can only be opened in %s version %s or newer.",
-					MainApp.APP_NAME, projectVersion), true);
+					"This project can only be opened in %s version %s.0 or newer.",
+					MainApp.APP_NAME, TWUtils.truncateVersionNumber(projectVersion, 2)), true);
 			return false;
 		}
 

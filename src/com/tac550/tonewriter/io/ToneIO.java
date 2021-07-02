@@ -155,7 +155,7 @@ public class ToneIO {
 
 			versionSaved = readFromSection(header, 0, "0");
 			pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
-			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION) == 1;
+			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION, 2) == 1;
 
 			keySig = readFromSection(header, 1, "C major")
 					.replace("s", "\u266F").replace("f", "\u266D");
@@ -174,15 +174,11 @@ public class ToneIO {
 
 			// Version warning
 			if (futureVersion) {
-
 				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
 						"This tone was created with a newer version of %s (%s). Be advised you may encounter problems.",
 						MainApp.APP_NAME, versionSaved), true);
-
 			} else if (versionSaved.equals("0")) {
-
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone file; it appears to be corrupted", true);
-
 				return false;
 			}
 
