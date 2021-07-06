@@ -30,6 +30,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
+
 public class ProjectIO {
 
 	private static final String RC4Key = "0123456789abcdef";
@@ -447,9 +449,9 @@ public class ProjectIO {
 					origToneFilePath = firstLine;
 				}
 
-				File originalToneFile = new File(origToneFilePath
+				File originalToneFile = new File(separatorsToSystem(origToneFilePath
 						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath())
-						.replace("$PROJECT_DIR", project_file.getParent()));
+						.replace("$PROJECT_DIR", project_file.getParent())));
 				String toneHash = readLine(reader).get(0);
 				boolean edited = Boolean.parseBoolean(readLine(reader).get(0));
 				List<String> titleSubtitle = readLine(reader);
