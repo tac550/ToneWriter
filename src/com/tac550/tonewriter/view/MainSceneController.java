@@ -940,7 +940,7 @@ public class MainSceneController {
 				tempExportMode == ExportMode.ITEM ? titleTextField.getText()
 						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())), "_"));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM && topSceneController.getTabCount() > 1 ? itemSavingDirectory :
-				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultProjectDirectory);
+				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultExportDirectory);
 		if (!fileChooser.getInitialDirectory().exists())
 			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF file (*.pdf)", "*.pdf"));
@@ -951,7 +951,7 @@ public class MainSceneController {
 
 			if (tempExportMode == ExportMode.PROJECT) {
 				topSceneController.projectOutputFileName = FilenameUtils.removeExtension(PDFFile.getName());
-				topSceneController.defaultProjectDirectory = PDFFile.getParentFile();
+				topSceneController.defaultExportDirectory = PDFFile.getParentFile();
 
 				topSceneController.propagateProjectOutputSetting();
 			} else {
@@ -973,7 +973,7 @@ public class MainSceneController {
 	private boolean deletePreviousRender() {
 		boolean item = exportMode == ExportMode.ITEM;
 
-		File lyFile = new File((item ? itemSavingDirectory : topSceneController.defaultProjectDirectory) +
+		File lyFile = new File((item ? itemSavingDirectory : topSceneController.defaultExportDirectory) +
 				File.separator + (item ? itemExportFileName : topSceneController.projectOutputFileName) + ".ly");
 		File pdfFile = new File(FilenameUtils.removeExtension(lyFile.getAbsolutePath()) + ".pdf");
 

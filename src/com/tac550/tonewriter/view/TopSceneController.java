@@ -103,7 +103,7 @@ public class TopSceneController {
 	// File names and directories are kept separately to make exporting multiple items with the same name
 	// and different extensions easier.
 	String projectOutputFileName;
-	File defaultProjectDirectory = MainApp.getPlatformSpecificInitialChooserDir();
+	File defaultExportDirectory = MainApp.getPlatformSpecificInitialChooserDir();
 
 	private File projectFile;
 	private String projectTitle = "Unnamed Project";
@@ -445,10 +445,7 @@ public class TopSceneController {
 	@FXML private void handleOpenProject() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Project");
-		if (projectFile != null)
-			fileChooser.setInitialDirectory(projectFile.getParentFile());
-		else
-			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
+		setInitialProjectDirectory(fileChooser);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File selectedFile = fileChooser.showOpenDialog(parentStage);
 		if (selectedFile == null) return;
@@ -473,10 +470,7 @@ public class TopSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Project As");
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
-		if (projectFile != null)
-			fileChooser.setInitialDirectory(projectFile.getParentFile());
-		else
-			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
+		setInitialProjectDirectory(fileChooser);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return;
@@ -489,6 +483,7 @@ public class TopSceneController {
 			resetProjectEditedStatus();
 		}
 	}
+
 	@FXML private void handleExport() {
 		lastExportTab = getSelectedTabScene();
 		lastExportTab.handleExport();
@@ -806,6 +801,13 @@ public class TopSceneController {
 		return projectFile != null ? projectFile.getName() : "Unsaved Project";
 	}
 
+	private void setInitialProjectDirectory(FileChooser fileChooser) {
+		if (projectFile != null && projectFile.exists())
+			fileChooser.setInitialDirectory(projectFile.getParentFile());
+		else
+			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
+	}
+
 	void autoSaveProjectIfUnsaved() {
 		TWUtils.cleanUpAutosaves();
 
@@ -943,7 +945,7 @@ public class TopSceneController {
 	}
 
 	void exportProject() throws IOException {
-		LilyPondInterface.exportItems(defaultProjectDirectory, projectOutputFileName, projectTitle,
+		LilyPondInterface.exportItems(defaultExportDirectory, projectOutputFileName, projectTitle,
 				getTabControllers(), projectPaperSize, noHeader, evenSpread, this);
 	}
 
