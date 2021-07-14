@@ -26,7 +26,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<SplitPane fx:id="mainSplitPane" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
+<SplitPane fx:id="mainSplitPane" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <items>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
@@ -37,7 +37,7 @@
             </ScrollPane>
             <StackPane fx:id="openToneHintPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <Button fx:id="openToneHintButton" mnemonicParsing="false" onAction="#handleOpenToneHint" stylesheets="@../../../../styles/LoadToneButton.css" text="Open Tone" textFill="#3700ff">
+                  <Button fx:id="openToneHintButton" mnemonicParsing="false" mouseTransparent="true" onAction="#handleOpenToneHint" stylesheets="@../../../../styles/LoadToneButton.css" text="Open Tone" textFill="#3700ff">
                      <font>
                         <Font size="19.0" />
                      </font>
