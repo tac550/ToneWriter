@@ -339,7 +339,7 @@ public class TopSceneController {
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
 				addTab(null, 0, null, null,
-						ctr -> ctr.handleOpenTone(arg_file, true, false), false);
+						ctr -> ctr.requestOpenTone(arg_file, true, false), false);
 			else
 				addTab(null, 0, null, null, ctr -> openProject(arg_file), true);
 		} else {
@@ -493,7 +493,7 @@ public class TopSceneController {
 		getSelectedTabScene().handleNewTone();
 	}
 	@FXML private void handleOpenTone() {
-		getSelectedTabScene().handleOpenTone(null, false, false);
+		getSelectedTabScene().handleOpenTone();
 	}
 	@FXML private void handleSaveTone() {
 		getSelectedTabScene().handleSaveTone();
@@ -631,7 +631,7 @@ public class TopSceneController {
 					if (loading_actions == null && prevTabController.getToneFile() != null) TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "New Tab",
 							"Open tone \"" + prevTabController.getToneFile().getName() + "\" for new item?",
 							true, parentStage, new ButtonType[]{ButtonType.YES, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
-						if (buttonType == ButtonType.YES) newTabController.handleOpenTone(prevTabController.getToneFile(), true, true);
+						if (buttonType == ButtonType.YES) newTabController.requestOpenTone(prevTabController.getToneFile(), true, true);
 					});
 
 					// Propagate project output mode if it's active on the previous tab.
@@ -955,7 +955,7 @@ public class TopSceneController {
 
 	void refreshAllChordPreviews() {
 		for (Tab tab : tabPane.getTabs())
-			tabControllerMap.get(tab).refreshToneChordPreviews();
+			tabControllerMap.get(tab).refreshChordPreviews();
 	}
 
 	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
@@ -963,7 +963,7 @@ public class TopSceneController {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
 			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile))
-				controller.handleOpenTone(toneFile, true, controller.getHideToneHeader());
+				controller.requestOpenTone(toneFile, true, controller.getHideToneHeader());
 		}
 	}
 

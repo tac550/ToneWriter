@@ -422,7 +422,7 @@ public class MainSceneController {
 	}
 
 	@FXML private void handleOpenToneHint() {
-		handleOpenTone(null, false, false);
+		handleOpenTone();
 	}
 
 	@FXML private void handleSetVerse() {
@@ -559,24 +559,7 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean loadTone(File selected_file, boolean selectHideToneHeader) {
-		if (selected_file == null) {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Tone");
-			if (toneFile != null && nonInternalToneLoaded()) {
-				if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
-				else fileChooser.setInitialDirectory(toneFile.getParentFile());
-			} else {
-				if (MainApp.BUILT_IN_TONE_DIR.exists())
-					fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
-				else
-					fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
-			}
-			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-			selected_file = fileChooser.showOpenDialog(parentStage);
-		}
-		if (selected_file == null) return false;
-
+	private boolean tryLoadingTone(File selected_file, boolean hide_header) {
 		if (selected_file.exists()) {
 			toneFile = selected_file;
 
@@ -584,7 +567,7 @@ public class MainSceneController {
 
 			loadingTone = true;
 			if (toneReader.loadTone(toneFile, this)) {
-				hideToneHeaderOption.setSelected(selectHideToneHeader);
+				hideToneHeaderOption.setSelected(hide_header);
 
 				loadingTone = false;
 				return true;
@@ -673,23 +656,11 @@ public class MainSceneController {
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
-	public void handleOpenTone(File tone_file, boolean auto_load, boolean selectHideToneHeader) {
-		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
-		if ((auto_load || checkSaveTone()) && loadTone(tone_file, selectHideToneHeader)) {
-			toneMenuState.editOptionsDisabled = false;
-			toneMenuState.saveToneMenuItemDisabled = false;
-			toneMenuState.saveToneAsMenuItemDisabled = false;
-			toneMenuState.saveToneMenuItemDisabled = !isToneSavable();
+	public void handleOpenTone() {
+		File selectedTone = promptSelectTone();
+		if (selectedTone == null) return;
 
-			resetToneEditedStatus();
-			applyToneMenuState();
-
-			if (exportMode == ExportMode.ITEM)
-				exportMode = ExportMode.NONE;
-		}
-
-		LoadingTone = false;
-		refreshToneChordPreviews();
+		requestOpenTone(selectedTone, false, false);
 	}
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
@@ -820,12 +791,47 @@ public class MainSceneController {
 		topSceneController.setMenuState(toneMenuState);
 	}
 
+	private File promptSelectTone() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Tone");
+		if (toneFile != null && nonInternalToneLoaded()) {
+			if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
+			else fileChooser.setInitialDirectory(toneFile.getParentFile());
+		} else {
+			if (MainApp.BUILT_IN_TONE_DIR.exists())
+				fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
+			else
+				fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
+		}
+		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
+
+		return fileChooser.showOpenDialog(parentStage);
+	}
+	public void requestOpenTone(File tone_file, boolean skip_savecheck, boolean hide_header) {
+		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
+		if ((skip_savecheck || checkSaveTone()) && tryLoadingTone(tone_file, hide_header)) {
+			toneMenuState.editOptionsDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = false;
+			toneMenuState.saveToneAsMenuItemDisabled = false;
+			toneMenuState.saveToneMenuItemDisabled = !isToneSavable();
+
+			resetToneEditedStatus();
+			applyToneMenuState();
+
+			if (exportMode == ExportMode.ITEM)
+				exportMode = ExportMode.NONE;
+		}
+
+		LoadingTone = false;
+		refreshChordPreviews();
+	}
+
 	private void refreshChordKeySignatures(String key) {
 		for (ChantLineViewController chantLineController : chantLineControllers) {
 	    	chantLineController.setKeySignature(key);
 	    }
 	}
-	void refreshToneChordPreviews() {
+	void refreshChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
 		for (ChantLineViewController chantLineController : chantLineControllers) {

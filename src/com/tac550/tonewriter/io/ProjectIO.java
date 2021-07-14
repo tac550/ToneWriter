@@ -520,7 +520,7 @@ public class ProjectIO {
 					final boolean projectEditedState = top_controller.getProjectEdited();
 
 					if (!toneHash.isEmpty())
-						ctr.handleOpenTone(hashtoToneFile.get(toneHash), true, false);
+						ctr.requestOpenTone(hashtoToneFile.get(toneHash), true, false);
 
 					try {
 						if (originalToneFile.exists() && (ctr.getToneWriter().loadedToneSimilarTo(originalToneFile)
