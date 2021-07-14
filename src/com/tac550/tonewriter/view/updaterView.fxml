@@ -24,8 +24,8 @@
             </HBox>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Update to Release:" />
             <ChoiceBox fx:id="versionChoiceBox" prefWidth="150.0" />
-            <Button fx:id="laterButton" cancelButton="true" mnemonicParsing="false" onAction="#handleLater" text="Later" />
             <Button fx:id="updateButton" defaultButton="true" mnemonicParsing="false" onAction="#handleUpdate" text="Update" />
+            <Button fx:id="laterButton" cancelButton="true" mnemonicParsing="false" onAction="#handleLater" text="Later" />
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
