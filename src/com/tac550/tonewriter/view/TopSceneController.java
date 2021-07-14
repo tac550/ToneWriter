@@ -156,9 +156,8 @@ public class TopSceneController {
 				halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 
 		Platform.runLater(() -> {
-			for (RadioMenuItem item : clickItems) {
+			for (RadioMenuItem item : clickItems)
 				item.setToggleGroup(durationGroup);
-			}
 
 			// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
 			// making it impossible to double click a note button near the bottom of the screen.
@@ -201,9 +200,8 @@ public class TopSceneController {
 
 	}
 	private static void selectTouchDuration(TouchEvent event) {
-		for (ImageView release_item : touchItems) {
+		for (ImageView release_item : touchItems)
 			release_item.setEffect(null);
-		}
 
 		double totalWidth = durationTouchStage.getWidth();
 		double stepSize = totalWidth / touchItems.size();
@@ -299,11 +297,10 @@ public class TopSceneController {
 		// Tab pane initialization
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 		tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
-			if (getTabCount() == 1) {
+			if (getTabCount() == 1)
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-			} else {
+			else
 				tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-			}
 		});
 		tabPane.getSelectionModel().selectedItemProperty().addListener(observable -> {
 			MainSceneController selectedController = getSelectedTabScene();
@@ -314,6 +311,12 @@ public class TopSceneController {
 
 			updateStageTitle();
 			selectedController.applyToneMenuState();
+		});
+		// listener which triggers project edited status when tabs reordered or removed
+		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
+			while (change.next())
+				if (change.wasPermutated() || change.wasRemoved())
+					projectEdited();
 		});
 
 		// Add button initialization
@@ -327,15 +330,6 @@ public class TopSceneController {
 			if (change.wasAdded())
 				addNextPendingTabs();
 		});
-
-		// listener which triggers project edited status when tabs reordered or removed
-		tabPane.getTabs().addListener((ListChangeListener<? super Tab>) change -> {
-			while (change.next()) {
-				if (change.wasPermutated() || change.wasRemoved())
-					projectEdited();
-			}
-		});
-
 	}
 
 	void performSetup(Stage parent_stage, File arg_file) {
@@ -346,9 +340,8 @@ public class TopSceneController {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
 				addTab(null, 0, null, null,
 						ctr -> ctr.handleOpenTone(arg_file, true, false), false);
-			else {
+			else
 				addTab(null, 0, null, null, ctr -> openProject(arg_file), true);
-			}
 		} else {
 			addTab(null, 0, null, null, null, true);
 		}
@@ -619,9 +612,8 @@ public class TopSceneController {
 
 				Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Deleting Item",
 						"Are you sure you want to remove \"" + tab.getText() + "\" from your project?", true, parentStage);
-				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSaveTone()) {
+				if (result.isPresent() && result.get() == ButtonType.CANCEL || !newTabController.checkSaveTone())
 					event.consume();
-				}
 
 				// This is necessary to avoid a bug where tabs may be left unable to respond to UI events.
 				Platform.runLater(() -> tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER));
@@ -713,11 +705,11 @@ public class TopSceneController {
 						tabPane.getTabs().add(at_index, tab);
 				} else {
 					// Add the tab after the selected one, if any.
-					if (prevTabController != null) {
+					if (prevTabController != null)
 						tabPane.getTabs().add(tabPane.getTabs().indexOf(prevTab) + 1, tab);
-					} else {
+					else
 						tabPane.getTabs().add(tab);
-					}
+
 					tabPane.getSelectionModel().select(tab);
 					tab.getContent().requestFocus();
 				}
@@ -885,9 +877,8 @@ public class TopSceneController {
 	}
 
 	void requestClose(Event ev) {
-		if (!checkSaveProject() || !checkAllToneSaves()) {
+		if (!checkSaveProject() || !checkAllToneSaves())
 			ev.consume();
-		}
 	}
 
 	/*
@@ -963,18 +954,16 @@ public class TopSceneController {
 	}
 
 	void refreshAllChordPreviews() {
-		for (Tab tab : tabPane.getTabs()) {
+		for (Tab tab : tabPane.getTabs())
 			tabControllerMap.get(tab).refreshToneChordPreviews();
-		}
 	}
 
 	// Notifies other tabs that a tone file was saved to synchronize changes or avoid repeating save requests
 	void refreshToneInstances(File toneFile, MainSceneController caller) {
 		for (Tab tab : tabPane.getTabs()) {
 			MainSceneController controller = tabControllerMap.get(tab);
-			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile)) {
+			if (controller != caller && controller.getToneFile() != null && controller.getToneFile().equals(toneFile))
 				controller.handleOpenTone(toneFile, true, controller.getHideToneHeader());
-			}
 		}
 	}
 
@@ -1025,9 +1014,8 @@ public class TopSceneController {
 		int tabCount = getTabCount();
 
 		MainSceneController[] mainControllers = new MainSceneController[tabCount];
-		for (int i = 0; i < tabCount; i++) {
+		for (int i = 0; i < tabCount; i++)
 			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
-		}
 
 		return mainControllers;
 	}
