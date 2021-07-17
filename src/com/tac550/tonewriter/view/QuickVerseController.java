@@ -38,24 +38,21 @@ public class QuickVerseController {
 	@FXML private void initialize() {
 
 		// Set text for youThouSwitch button.
-		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false)) {
+		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false))
 			youThouSwitch.setText("Switch to You/Your");
-		}
 		
 		// Filter field setup
 	    FilteredList<String> filteredData = new FilteredList<>(verses, s -> true);
 	    filterInput.textProperty().addListener(obs -> {
 	        String filter = filterInput.getText();
-	        if (filter == null || filter.isEmpty()) {
+	        if (filter == null || filter.isEmpty())
 	            filteredData.setPredicate(s -> true);
-	        } else {
+	        else
 	            filteredData.setPredicate(s -> s.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT)));
-	        }
 
 	        // Automatically place top filter result in result field
-	        if (filteredData.size() > 0) {
+	        if (filteredData.size() > 0)
 	        	resultField.setText(filteredData.get(0));
-	        }
 	    });
 
 	    // Verse list setup
@@ -63,9 +60,8 @@ public class QuickVerseController {
 	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
 			    resultField.setText(newVal));
 	    verseList.setOnMouseClicked((me) -> {
-	    	if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2) {
+	    	if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2)
 	    		handleOK();
-	    	}
 	    });
 	    
 	    // Verse list cell factory (for deletion context menus)
@@ -79,14 +75,13 @@ public class QuickVerseController {
             deleteItem.textProperty().bind(Bindings.format("Remove \"%s\"", cell.itemProperty()));
             deleteItem.setOnAction(event -> {
             	try {
-                	// Only remove the verse if it was a custom one (QuickVerseIO.removeCustomVerse returns true).
-					if (QuickVerseIO.removeCustomVerse(cell.itemProperty().get())) {
-						verses.remove(cell.itemProperty().get());	
-					} else {
+                	// Only remove the verse if it was a custom one (QuickVerseIO.removeCustomVerse returns true)
+					if (QuickVerseIO.removeCustomVerse(cell.itemProperty().get()))
+						verses.remove(cell.itemProperty().get());
+					else
 						TWUtils.showAlert(AlertType.INFORMATION, "Deletion",
 								"Can't delete this verse because it's built-in.", true, getStage());
-					}
-				} catch (IOException e) {
+            	} catch (IOException e) {
 					e.printStackTrace();
 					TWUtils.showAlert(AlertType.ERROR, "Error", "IO Error while deleting verse!",
 							true, getStage());
@@ -97,11 +92,10 @@ public class QuickVerseController {
             cell.textProperty().bind(cell.itemProperty());
 
             cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-                if (isNowEmpty) {
+                if (isNowEmpty)
                     cell.setContextMenu(null);
-                } else {
+                else
                     cell.setContextMenu(contextMenu);
-                }
             });
             return cell;
         });
@@ -111,17 +105,14 @@ public class QuickVerseController {
 	    
 	    // Set up keyboard events
 	    EventHandler<KeyEvent> keyHandler = ke -> {
-			if (ke.getCode() == KeyCode.ESCAPE) {
+			if (ke.getCode() == KeyCode.ESCAPE)
 				handleCancel();
-			}
 
-			if (ke.getCode() == KeyCode.ENTER) {
+			if (ke.getCode() == KeyCode.ENTER)
 				handleOK();
-			}
 
-			if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0)) {
+			if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0))
 				filterInput.requestFocus();
-			}
 		};
 	    
 		// Set escape, enter, and up key behavior for scene and list view
@@ -166,7 +157,6 @@ public class QuickVerseController {
 		try {
 			if (!verses.contains(resultField.getText())) {
 				QuickVerseIO.addCustomVerse(resultField.getText());
-
 				verses.add(resultField.getText());
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Add failed", "That verse is already in the list!",
@@ -200,11 +190,9 @@ public class QuickVerseController {
 		
 		// Built-in verses
 		try {
-			for (String item : QuickVerseIO.getBuiltinVerses()) {
-				if (!(item.startsWith("-") || item.startsWith("^"))) {
+			for (String item : QuickVerseIO.getBuiltinVerses())
+				if (!(item.startsWith("-") || item.startsWith("^")))
 					verses.add(item);
-				}
-			}
 		} catch (IOException e) {
 			verses.add("ERROR READING INTERNAL FILE");
 			e.printStackTrace();
