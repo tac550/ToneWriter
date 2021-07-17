@@ -657,10 +657,24 @@ public class MainSceneController {
 		}
 	}
 	public void handleOpenTone() {
-		File selectedTone = promptSelectTone();
-		if (selectedTone == null) return;
+		FXMLLoaderIO.loadFXMLLayoutAsync("ToneOpenView.fxml", loader -> {
+			VBox rootLayout = loader.getRoot();
+			ToneOpenViewController controller = loader.getController();
 
-		requestOpenTone(selectedTone, false, false);
+			controller.setMainController(this);
+
+			Platform.runLater(() -> {
+				Stage openToneStage = new Stage();
+				openToneStage.setTitle("Open Tone");
+				openToneStage.initModality(Modality.APPLICATION_MODAL);
+				openToneStage.getIcons().add(MainApp.APP_ICON);
+				openToneStage.setScene(new Scene(rootLayout));
+
+				openToneStage.show();
+				openToneStage.setMinWidth(openToneStage.getWidth());
+				openToneStage.setMinHeight(openToneStage.getHeight());
+			});
+		});
 	}
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
@@ -791,22 +805,6 @@ public class MainSceneController {
 		topSceneController.setMenuState(toneMenuState);
 	}
 
-	private File promptSelectTone() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Tone");
-		if (toneFile != null && nonInternalToneLoaded()) {
-			if (TWUtils.isBuiltinTone(toneFile)) fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
-			else fileChooser.setInitialDirectory(toneFile.getParentFile());
-		} else {
-			if (MainApp.BUILT_IN_TONE_DIR.exists())
-				fileChooser.setInitialDirectory(MainApp.BUILT_IN_TONE_DIR);
-			else
-				fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
-		}
-		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
-
-		return fileChooser.showOpenDialog(parentStage);
-	}
 	public void requestOpenTone(File tone_file, boolean skip_savecheck, boolean hide_header) {
 		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((skip_savecheck || checkSaveTone()) && tryLoadingTone(tone_file, hide_header)) {

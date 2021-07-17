@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ToneOpenViewController">
+   <children>
+      <GridPane VBox.vgrow="ALWAYS">
+        <columnConstraints>
+          <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+          <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints prefHeight="30.0" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" />
+        </rowConstraints>
+         <children>
+            <TitledPane animated="false" collapsible="false" focusTraversable="false" maxHeight="1.7976931348623157E308" text="Built-in Tones" GridPane.vgrow="ALWAYS">
+               <content>
+                  <TreeView fx:id="builtinTonesView" showRoot="false" />
+               </content>
+            </TitledPane>
+            <TitledPane animated="false" collapsible="false" focusTraversable="false" maxHeight="1.7976931348623157E308" text="Recent Custom Tones" GridPane.columnIndex="1" GridPane.vgrow="ALWAYS">
+               <content>
+                  <ListView fx:id="recentTonesView" />
+               </content>
+            </TitledPane>
+            <Button mnemonicParsing="false" onAction="#handleBrowse" text="Browse..." GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Button>
+         </children>
+      </GridPane>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+          <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOpen" text="Open" />
+            <Button cancelButton="true" layoutX="530.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+        </buttons>
+         <padding>
+            <Insets right="5.0" />
+         </padding>
+      </ButtonBar>
+   </children>
+</VBox>
