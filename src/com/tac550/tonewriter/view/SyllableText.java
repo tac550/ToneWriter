@@ -47,9 +47,9 @@ public class SyllableText extends Text {
 		setFont(regularFont);
 		applyDefaultFill();
 
-		hoverProperty().addListener((o, old_val, new_val) -> {
+		hoverProperty().addListener((ov, oldVal, newVal) -> {
 			if (active) {
-				if (new_val) {
+				if (newVal) {
 					setFill(highlightColor);
 					verseController.syllableHovered();
 				} else {

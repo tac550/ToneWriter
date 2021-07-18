@@ -106,8 +106,8 @@ public class ChantLineViewController implements CommentableView {
 		nameChoice.setOnMouseClicked((ov) -> selfTriggered = true);
 		
 		// First repeated line status should not be available for "prime" lines
-		nameChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
-			if (new_val.equals(0)) {
+		nameChoice.getSelectionModel().selectedIndexProperty().addListener((ov, oldVal, newVal) -> {
+			if (newVal.equals(0)) {
 				if (!nameChoice.getItems().get(0).endsWith("A")) {
 					setFirstRepeatedAvailable(true);
 				}

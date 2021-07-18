@@ -95,14 +95,13 @@ public class VerseLineViewController {
 	private boolean firstTab = false;
 
 	@FXML private void initialize() {
-		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, old_val, new_val) -> {
+		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, oldVal, newVal) -> {
 			if (changingAssignments) return;
 
-			selectedChantLine = new_val.intValue();
+			selectedChantLine = newVal.intValue();
 
-			if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
+			if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine))
 				resetChordAssignment();
-			}
 
 			previousChantLine = associatedChantLines[selectedChantLine].toString();
 		});
