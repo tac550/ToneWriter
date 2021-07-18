@@ -348,6 +348,18 @@ public class MainApp extends Application {
 		else return "/";
 	}
 
+	public static String getPlatformSpecificAppDataDir() {
+		String subDirString = File.separator + APP_NAME;
+
+		if (OS_NAME.startsWith("win")) {
+			return System.getenv("APPDATA") + subDirString;
+		} if (OS_NAME.startsWith("mac")) {
+			return System.getProperty("user.home") + "/Library/Preferences" + subDirString;
+		} if (OS_NAME.startsWith("lin")) {
+			return System.getProperty("user.home") + "/.config" + subDirString;
+		} else return null;
+	}
+
 	public static boolean isDarkModeEnabled() {
 		return darkModeEnabled;
 	}

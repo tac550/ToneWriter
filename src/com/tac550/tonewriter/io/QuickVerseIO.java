@@ -34,7 +34,7 @@ public class QuickVerseIO {
 	public static List<String> getCustomVerses() throws IOException {
 		List<String> finalList = new ArrayList<>();
 
-		File verseFile = getPlatformSpecificVerseFile();
+		File verseFile = getVerseFile();
 
 		// If verse file doesn't exist, just return the empty final list.
 		if (verseFile == null || !verseFile.exists()) {
@@ -56,7 +56,7 @@ public class QuickVerseIO {
 	}
 
 	public static void addCustomVerse(String verse) throws IOException {
-		File verseFile = getPlatformSpecificVerseFile();
+		File verseFile = getVerseFile();
 
 		if (verseFile == null) throw new IOException("Failed to get verse storage file!");
 
@@ -78,11 +78,10 @@ public class QuickVerseIO {
 	}
 
 	public static boolean removeCustomVerse(String verse) throws IOException {
-		File verseFile = getPlatformSpecificVerseFile();
+		File verseFile = getVerseFile();
 
-		if (verseFile == null || !verseFile.exists()) {
+		if (verseFile == null || !verseFile.exists())
 			return false;
-		}
 
 		File tempFile = new File(verseFile.getParent() + File.separator + "TEMP");
 
@@ -108,17 +107,13 @@ public class QuickVerseIO {
 		return removed;
 	}
 
-	private static File getPlatformSpecificVerseFile() {
-		String fileNameString = File.separator + MainApp.APP_NAME + File.separator +
-				(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "CustomVersesTT.txt" : "CustomVersesYY.txt");
+	private static File getVerseFile() {
+		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
 
-		if (MainApp.OS_NAME.startsWith("win")) {
-			return new File(System.getenv("APPDATA") + fileNameString);
-		} if (MainApp.OS_NAME.startsWith("mac")) {
-			return new File(System.getProperty("user.home") + "/Library/Preferences" + fileNameString);
-		} if (MainApp.OS_NAME.startsWith("lin")) {
-			return new File(System.getProperty("user.home") + "/.config" + fileNameString);
-		} else return null;
+		if (appDataDir == null) return null;
+
+		return new File(appDataDir + File.separator +
+				(MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false) ? "CustomVersesTT.txt" : "CustomVersesYY.txt"));
 	}
 
 }
