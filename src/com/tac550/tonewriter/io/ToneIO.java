@@ -429,12 +429,14 @@ public class ToneIO {
 
 		String recentsFilePath = appDataDir + File.separator + "RecentTones.txt";
 
-		try (Stream<String> fileStream = Files.lines(Paths.get(recentsFilePath))) {
-			return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toList());
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		if (new File(recentsFilePath).exists()) {
+			try (Stream<String> fileStream = Files.lines(Paths.get(recentsFilePath))) {
+				return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toList());
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else return null;
 	}
 
 	public static void bumpRecentTone(File tone_file) {
