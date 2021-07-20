@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.*;
+import com.tac550.tonewriter.model.MainChord;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
@@ -14,12 +14,17 @@ import org.apache.commons.text.TextStringBuilder;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ToneIO {
+
+	private static final int MAX_RECENT_TONES = 20;
 
 	private final List<ChantLineViewController> chantLines;
 
@@ -416,5 +421,23 @@ public class ToneIO {
 			TWUtils.showError("Failed to create directory for .tone file!", false);
 			return false;
 		}
+	}
+
+	public static List<File> getRecentTones() {
+		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
+		if (appDataDir == null) return null;
+
+		String recentsFilePath = appDataDir + File.separator + "RecentTones.txt";
+
+		try (Stream<String> fileStream = Files.lines(Paths.get(recentsFilePath))) {
+			return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toList());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static void bumpRecentTone(File tone_file) {
+		// TODO: Implement.
 	}
 }
