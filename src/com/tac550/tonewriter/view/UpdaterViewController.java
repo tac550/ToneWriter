@@ -29,8 +29,6 @@ public class UpdaterViewController {
 
 	@FXML private CheckBox updateOnStartupBox;
 
-	private String result = "";
-
 	@FXML private void initialize() {
 		// Checkbox initial state and behavior
 		updateOnStartupBox.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, true));
@@ -61,13 +59,11 @@ public class UpdaterViewController {
 	}
 
 	@FXML private void handleUpdate() {
-		result = versionChoiceBox.getSelectionModel().getSelectedItem();
 		getStage().close();
-		AutoUpdater.downloadUpdate(result);
+		AutoUpdater.downloadUpdate(versionChoiceBox.getSelectionModel().getSelectedItem());
 	}
 
 	@FXML private void handleLater() {
-		result = "";
 		getStage().close();
 	}
 
@@ -86,10 +82,6 @@ public class UpdaterViewController {
 			updateButton.setDisable(true);
 			laterButton.setText("Close");
 		}
-	}
-
-	public String getResult() {
-		return result;
 	}
 
 	private Stage getStage() {
