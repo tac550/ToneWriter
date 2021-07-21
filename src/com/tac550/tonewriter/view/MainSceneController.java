@@ -91,7 +91,6 @@ public class MainSceneController {
 	private String rightText = "";
 	private boolean manualCLAssignment = false;
 
-	static boolean LoadingTone = false;
 	static String copiedChord = "";
 
 	private boolean setVerseCancelled = false;
@@ -806,7 +805,6 @@ public class MainSceneController {
 	}
 
 	public void requestOpenTone(File tone_file, boolean skip_savecheck, boolean hide_header) {
-		LoadingTone = MainApp.lilyPondAvailable(); // Don't block re-renders during loading if there's no lilypond
 		if ((skip_savecheck || checkSaveTone()) && tryLoadingTone(tone_file, hide_header)) {
 			toneMenuState.editOptionsDisabled = false;
 			toneMenuState.saveToneMenuItemDisabled = false;
@@ -820,7 +818,6 @@ public class MainSceneController {
 				exportMode = ExportMode.NONE;
 		}
 
-		LoadingTone = false;
 		refreshChordPreviews();
 	}
 

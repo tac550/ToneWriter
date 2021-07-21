@@ -172,7 +172,10 @@ public abstract class ChantChordController implements CommentableView {
 
 	@FXML void refreshChordPreview() {
 
-		if (MainSceneController.LoadingTone) return; // Avoid unnecessary refreshes while loading a tone
+		if (chantLineController.isLoadingTone()) {
+			System.out.println("Is loading!");
+			return; // Avoid unnecessary refreshes while loading a tone
+		}
 
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);

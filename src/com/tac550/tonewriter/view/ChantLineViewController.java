@@ -735,6 +735,10 @@ public class ChantLineViewController implements CommentableView {
 		return Arrays.equals(thisLines, otherLines);
 	}
 
+	boolean isLoadingTone() {
+		return mainController.isLoadingTone();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 
