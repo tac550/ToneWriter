@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ public class ToneOpenViewController {
         builtinTonesView.setCellFactory(p -> new ToneTreeCell());
         builtinTonesView.focusedProperty().addListener(new treeFocusListener(recentTonesView));
         builtinTonesView.setRoot(new TreeItem<>(MainApp.BUILT_IN_TONE_DIR));
-        populateBuiltinView(builtinTonesView.getRoot());
+        populateBuiltinTones(builtinTonesView.getRoot());
         // Default top-level directories to expanded position
         for (TreeItem<File> item : builtinTonesView.getRoot().getChildren())
             item.setExpanded(true);
@@ -85,7 +86,7 @@ public class ToneOpenViewController {
         }
     }
 
-    private void populateBuiltinView(TreeItem<File> root_node) {
+    private void populateBuiltinTones(TreeItem<File> root_node) {
         File[] files = root_node.getValue().listFiles();
         if (files == null) return;
 
@@ -96,7 +97,7 @@ public class ToneOpenViewController {
                 root_node.getChildren().add(item);
 
             if (file.isDirectory())
-                populateBuiltinView(item);
+                populateBuiltinTones(item);
         }
     }
 
