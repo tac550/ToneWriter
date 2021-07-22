@@ -14,6 +14,7 @@ import org.apache.commons.text.TextStringBuilder;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -423,23 +424,43 @@ public class ToneIO {
 		}
 	}
 
-	public static List<File> getRecentTones() {
-		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
-		if (appDataDir == null) return null;
-
-		String recentsFilePath = appDataDir + File.separator + "RecentTones.txt";
+	public static LinkedList<File> getRecentTones() throws IOException {
+		String recentsFilePath = getRecentsFilePath();
 
 		if (new File(recentsFilePath).exists()) {
 			try (Stream<String> fileStream = Files.lines(Paths.get(recentsFilePath))) {
-				return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toList());
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
+				return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toCollection(LinkedList::new));
 			}
-		} else return null;
+		} else throw new FileNotFoundException(recentsFilePath);
 	}
 
 	public static void bumpRecentTone(File tone_file) {
-		// TODO: Implement.
+		List<File> recents;
+		try {
+			recents = getRecentTones();
+			recents.remove(tone_file);
+			((LinkedList<File>) recents).addFirst(tone_file);
+		} catch (IOException e) {
+			recents = List.of(tone_file);
+		}
+		writeRecentTones(recents);
+	}
+	public static void writeRecentTones(List<File> tone_files) {
+		try {
+			Path recentsPath = Paths.get(getRecentsFilePath());
+			if (!Files.exists(recentsPath.getParent()))
+				Files.createDirectories(recentsPath.getParent());
+			Files.write(recentsPath,
+					(Iterable<String>)tone_files.stream().limit(MAX_RECENT_TONES).map(File::getAbsolutePath)::iterator);
+		} catch (IOException e) {
+			System.out.println("Failed to write to recent tones list!");
+			e.printStackTrace();
+		}
+	}
+
+	private static String getRecentsFilePath() throws IOException {
+		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
+		if (appDataDir == null) throw new IOException("Unknown platform.");
+		return appDataDir + File.separator + "RecentTones.txt";
 	}
 }

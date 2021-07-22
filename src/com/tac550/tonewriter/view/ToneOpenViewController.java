@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import org.apache.commons.io.comparator.NameFileComparator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,10 +42,13 @@ public class ToneOpenViewController {
         recentTonesView.setCellFactory(p -> new ToneTreeCell());
         recentTonesView.focusedProperty().addListener(new treeFocusListener(builtinTonesView));
         recentTonesView.setRoot(new TreeItem<>());
-        List<File> recentTones = ToneIO.getRecentTones(); // TODO: Should this return the stream?
-        if (recentTones != null)
+        try {
+            List<File> recentTones = ToneIO.getRecentTones();
             recentTonesView.getRoot().getChildren().addAll(recentTones.stream().distinct()
                     .map(TreeItem::new).collect(Collectors.toList()));
+        } catch (IOException e) {
+            recentTonesView.getRoot().getChildren().add(new TreeItem<>(new File("No recent tones")));
+        }
     }
 
     private static class treeFocusListener implements ChangeListener<Boolean> {
@@ -66,10 +70,14 @@ public class ToneOpenViewController {
     }
 
     @FXML private void handleOpen() {
-        TreeItem<File> selected = builtinTonesView.getSelectionModel().getSelectedItem();
-        if (selected != null && selected.isLeaf()) {
+        TreeItem<File> selectedBuiltin = builtinTonesView.getSelectionModel().getSelectedItem();
+        TreeItem<File> selectedCustom = recentTonesView.getSelectionModel().getSelectedItem();
+        if (selectedBuiltin != null && selectedBuiltin.isLeaf()) {
             closeWindow();
-            mainController.requestOpenTone(selected.getValue(), false, false);
+            mainController.requestOpenTone(selectedBuiltin.getValue(), false, false);
+        } else if (selectedCustom != null && selectedCustom.isLeaf()) {
+            closeWindow();
+            mainController.requestOpenTone(selectedCustom.getValue(), false, false);
         }
     }
 
@@ -83,6 +91,7 @@ public class ToneOpenViewController {
 
         if (selectedFile != null) {
             closeWindow();
+            ToneIO.bumpRecentTone(selectedFile);
             mainController.requestOpenTone(selectedFile, false, false);
         }
     }
