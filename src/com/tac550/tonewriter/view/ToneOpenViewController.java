@@ -9,8 +9,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.io.comparator.NameFileComparator;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +41,7 @@ public class ToneOpenViewController {
         recentTonesView.setCellFactory(p -> new ToneTreeCell());
         recentTonesView.focusedProperty().addListener(new treeFocusListener(builtinTonesView));
         recentTonesView.setRoot(new TreeItem<>());
-        List<File> recentTones = ToneIO.getRecentTones();
+        List<File> recentTones = ToneIO.getRecentTones(); // TODO: Should this return the stream?
         if (recentTones != null)
             recentTonesView.getRoot().getChildren().addAll(recentTones.stream().distinct()
                     .map(TreeItem::new).collect(Collectors.toList()));
@@ -89,6 +91,7 @@ public class ToneOpenViewController {
         File[] files = root_node.getValue().listFiles();
         if (files == null) return;
 
+        Arrays.sort(files, NameFileComparator.NAME_COMPARATOR);
         for (File file : files) {
             TreeItem<File> item = new TreeItem<>(file);
 
