@@ -77,6 +77,7 @@ public class ToneOpenViewController {
             mainController.requestOpenTone(selectedBuiltin.getValue(), false, false);
         } else if (selectedCustom != null && selectedCustom.isLeaf()) {
             closeWindow();
+            ToneIO.bumpRecentTone(selectedCustom.getValue());
             mainController.requestOpenTone(selectedCustom.getValue(), false, false);
         }
     }
