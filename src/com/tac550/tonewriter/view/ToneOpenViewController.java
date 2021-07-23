@@ -7,6 +7,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.comparator.NameFileComparator;
@@ -32,6 +34,12 @@ public class ToneOpenViewController {
         // Built-in view initialization
         builtinTonesView.setCellFactory(p -> new ToneTreeCell());
         builtinTonesView.focusedProperty().addListener(new treeFocusListener(recentTonesView));
+        builtinTonesView.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+            if (ev.getCode() == KeyCode.ENTER)
+                handleOpen();
+            else if (ev.getCode() == KeyCode.ESCAPE)
+                handleCancel();
+        });
         builtinTonesView.setRoot(new TreeItem<>(MainApp.BUILT_IN_TONE_DIR));
         populateBuiltinTones(builtinTonesView.getRoot());
         // Default top-level directories to expanded position
@@ -41,6 +49,12 @@ public class ToneOpenViewController {
         // Recent view initialization
         recentTonesView.setCellFactory(p -> new ToneTreeCell());
         recentTonesView.focusedProperty().addListener(new treeFocusListener(builtinTonesView));
+        recentTonesView.addEventHandler(KeyEvent.KEY_PRESSED, ev -> {
+            if (ev.getCode() == KeyCode.ENTER)
+                handleOpen();
+            else if (ev.getCode() == KeyCode.ESCAPE)
+                handleCancel();
+        });
         recentTonesView.setRoot(new TreeItem<>());
         try {
             List<File> recentTones = ToneIO.getRecentTones();
