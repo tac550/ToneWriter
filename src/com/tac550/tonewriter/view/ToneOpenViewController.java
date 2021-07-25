@@ -3,13 +3,11 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.ToneIO;
 import com.tac550.tonewriter.model.ToneTreeCell;
 import com.tac550.tonewriter.util.DesktopInterface;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -26,6 +24,7 @@ import java.util.stream.Collectors;
 public class ToneOpenViewController {
 
     private static final String NO_RECENTS_MESSAGE = "No recent tones";
+    private static final ButtonType openFolderButton = new ButtonType("Open Folder");
 
     private MainSceneController mainController;
 
@@ -68,12 +67,7 @@ public class ToneOpenViewController {
         recentToneMenu.getItems().addAll(openFolderItem, removeItem);
         openFolderItem.setOnAction(ev ->
                 DesktopInterface.openFile(recentTonesView.getSelectionModel().getSelectedItem().getValue().getParentFile()));
-        removeItem.setOnAction(ev -> {
-            recentTones.remove(recentTonesView.getSelectionModel().getSelectedItem().getValue());
-            ToneIO.writeRecentTones(recentTones);
-            refreshRecentTones();
-        });
-
+        removeItem.setOnAction(ev -> removeRecentTone(recentTonesView.getSelectionModel().getSelectedItem().getValue()));
     }
 
     private static class treeFocusListener implements ChangeListener<Boolean> {
@@ -98,7 +92,12 @@ public class ToneOpenViewController {
         else
             recentTonesView.getRoot().getChildren().addAll(recentTones.stream().distinct()
                     .map(TreeItem::new).collect(Collectors.toList()));
+    }
 
+    private void removeRecentTone(File tone_file) {
+        recentTones.remove(tone_file);
+        ToneIO.writeRecentTones(recentTones);
+        refreshRecentTones();
     }
 
     private void applyCommonTVHandlers(TreeView<File> tree_view) {
@@ -130,7 +129,12 @@ public class ToneOpenViewController {
                 ToneIO.bumpRecentTone(selectedCustom.getValue());
                 mainController.requestOpenTone(selectedCustom.getValue(), false, false);
             } else if (!selectedCustom.getValue().getName().equals(NO_RECENTS_MESSAGE)) {
-                // TODO: Deal with recent tones since removed
+                TWUtils.showAlert(Alert.AlertType.INFORMATION, "Missing Tone",
+                        "Recent tone \"" + selectedCustom.getValue().getName() + "\" is missing. Remove from list?",
+                        true, (Stage)builtinTonesView.getScene().getWindow(), new ButtonType[]{ButtonType.YES, openFolderButton, ButtonType.NO}, ButtonType.YES).ifPresent(buttonType -> {
+                    if (buttonType == ButtonType.YES) removeRecentTone(selectedCustom.getValue());
+                    else if (buttonType == openFolderButton) DesktopInterface.openFile(selectedCustom.getValue().getParentFile());
+                });
             }
         }
     }
