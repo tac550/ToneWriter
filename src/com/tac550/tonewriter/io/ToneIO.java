@@ -424,25 +424,21 @@ public class ToneIO {
 		}
 	}
 
-	public static LinkedList<File> getRecentTones() throws IOException {
-		String recentsFilePath = getRecentsFilePath();
-
-		if (new File(recentsFilePath).exists()) {
+	public static LinkedList<File> getRecentTones() {
+		try {
+			String recentsFilePath = getRecentsFilePath();
 			try (Stream<String> fileStream = Files.lines(Paths.get(recentsFilePath))) {
 				return fileStream.limit(MAX_RECENT_TONES).map(File::new).collect(Collectors.toCollection(LinkedList::new));
 			}
-		} else throw new FileNotFoundException(recentsFilePath);
+		} catch (IOException e) {
+			return new LinkedList<>();
+		}
 	}
 
 	public static void bumpRecentTone(File tone_file) {
-		List<File> recents;
-		try {
-			recents = getRecentTones();
-			recents.remove(tone_file);
-			((LinkedList<File>) recents).addFirst(tone_file);
-		} catch (IOException e) {
-			recents = List.of(tone_file);
-		}
+		LinkedList<File> recents = getRecentTones();
+		recents.remove(tone_file);
+		recents.addFirst(tone_file);
 		writeRecentTones(recents);
 	}
 	public static void writeRecentTones(List<File> tone_files) {
