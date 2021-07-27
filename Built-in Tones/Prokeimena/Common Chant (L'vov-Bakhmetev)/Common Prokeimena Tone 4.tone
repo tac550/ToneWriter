@@ -1,4 +1,4 @@
-VERSION: 1.0
+VERSION: 1.1.0
 Key Signature: F major
 Tone: Tone 4
 Composer: L’vov/Bakhmetev - Common Chant
@@ -7,12 +7,12 @@ Manually Assign Phrases: false
 
 Final
 1: a-f-c-f
+2: bf-f-d-<bf bf,>
 	Post: g-f-bf,-f
 	Post: a-f-c-f
+3: a-f-c-f
 	Post: bf-f-d-<bf bf,>
-2: a-f-c-f
-	Post: bf-f-d-<bf bf,>
-3: a-fs-c-d
+4: a-fs-c-d
 	Prep: a-f-c-f
 END: g-d-bf,-g
 
