@@ -67,6 +67,7 @@ public class ProjectIO {
 			writeLine(writer, top_controller.getProjectTitle());
 			writeLine(writer, top_controller.getTabCount());
 			writeLine(writer, top_controller.getPaperSize(), top_controller.getNoHeader(), top_controller.getEvenSpread());
+			writeLine(writer, (Object[]) top_controller.getMarginInfo());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -161,7 +162,7 @@ public class ProjectIO {
 		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
 		try {
 			LilyPondInterface.saveToLilyPondFile(lilypondFile, top_controller.getProjectTitle(), top_controller.getTabControllers(),
-					top_controller.getPaperSize(), top_controller.getNoHeader(), top_controller.getEvenSpread());
+					top_controller.getPaperSize(), top_controller.getNoHeader(), top_controller.getEvenSpread(), top_controller.getMarginInfo());
 		} catch (IOException e) {
 			TWUtils.showError("Failed to save project render!", true);
 			return false;
@@ -385,7 +386,14 @@ public class ProjectIO {
 				top_controller.setPaperSize(pageSettings.get(0));
 				top_controller.setNoHeader(Boolean.parseBoolean(pageSettings.get(1)));
 				top_controller.setEvenSpread(Boolean.parseBoolean(pageSettings.get(2)));
-			}
+				// Before 1.2: no margin size settings
+				if (TWUtils.versionCompare("1.2", projectVersion) != 1) {
+					List<String> margins = readLine(reader);
+					top_controller.setMargins(Float.parseFloat(margins.get(0)), margins.get(1),
+							Float.parseFloat(margins.get(2)), margins.get(3), Float.parseFloat(margins.get(4)),
+							margins.get(5), Float.parseFloat(margins.get(6)), margins.get(7));
+				}
+			} // TODO: Add Else blocks to set default values for older projects.
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);

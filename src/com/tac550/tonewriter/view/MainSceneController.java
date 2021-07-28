@@ -987,7 +987,7 @@ public class MainSceneController {
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
 						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(),
 						new MainSceneController[] {this}, topSceneController.getPaperSize(), topSceneController.getNoHeader(),
-						topSceneController.getEvenSpread(), topSceneController)) {
+						topSceneController.getEvenSpread(), topSceneController.getMarginInfo(), topSceneController)) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
 				}

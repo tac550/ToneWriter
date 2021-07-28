@@ -10,6 +10,10 @@
     \fill-line { "" \fromproperty #'page:page-number-string "" } }
   evenFooterMarkup = \oddFooterMarkup
   ragged-bottom = ##t
+  top-margin = 13.0\mm
+  bottom-margin = 13.0\mm
+  left-margin = 13.0\mm
+  right-margin = 13.0\mm
 }
 
 noteHide = {\once \hide Stem \once \hide NoteHead \once \hide Accidental \once \override NoteHead.no-ledgers = ##t}

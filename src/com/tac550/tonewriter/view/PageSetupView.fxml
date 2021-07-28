@@ -5,10 +5,15 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.PageSetupViewController">
@@ -36,6 +41,69 @@
                   <RadioButton fx:id="oddSpreadRadioButton" mnemonicParsing="false" text="Position Page Numbers for Odd Spread" toggleGroup="$pageNumberPosGroup" />
                </children>
             </VBox>
+         </content>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" focusTraversable="false" layoutX="10.0" layoutY="10.0" text="Margin Sizes">
+         <content>
+            <BorderPane>
+               <left>
+                  <FlowPane alignment="CENTER_RIGHT" hgap="5.0" prefWrapLength="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <TextField fx:id="leftMargin" prefWidth="50.0" />
+                        <ChoiceBox fx:id="leftUnits" prefWidth="50.0" />
+                        <Label text="Left" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets right="20.0" />
+                     </BorderPane.margin>
+                  </FlowPane>
+               </left>
+               <right>
+                  <FlowPane alignment="CENTER_LEFT" hgap="5.0" prefWrapLength="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Right" />
+                        <TextField fx:id="rightMargin" prefWidth="50.0" />
+                        <ChoiceBox fx:id="rightUnits" prefWidth="50.0" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets left="20.0" />
+                     </BorderPane.margin>
+                  </FlowPane>
+               </right>
+               <bottom>
+                  <FlowPane alignment="BOTTOM_CENTER" hgap="5.0" prefWrapLength="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <TextField fx:id="bottomMargin" prefWidth="50.0" />
+                        <ChoiceBox fx:id="bottomUnits" prefWidth="50.0" />
+                     </children>
+                  </FlowPane>
+               </bottom>
+               <center>
+                  <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Top" />
+                        <Label text="Bottom" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </BorderPane.margin>
+                  </VBox>
+               </center>
+               <top>
+                  <StackPane BorderPane.alignment="CENTER">
+                     <children>
+                        <FlowPane alignment="TOP_CENTER" hgap="5.0" prefWrapLength="200.0">
+                           <children>
+                              <TextField fx:id="topMargin" prefWidth="50.0" />
+                              <ChoiceBox fx:id="topUnits" prefWidth="50.0" />
+                              <StackPane />
+                           </children>
+                        </FlowPane>
+                        <CheckBox fx:id="equalMarginsCheckBox" mnemonicParsing="false" text="Equal Margins" StackPane.alignment="CENTER_LEFT" />
+                     </children>
+                  </StackPane>
+               </top>
+            </BorderPane>
          </content>
       </TitledPane>
       <ButtonBar prefHeight="40.0">

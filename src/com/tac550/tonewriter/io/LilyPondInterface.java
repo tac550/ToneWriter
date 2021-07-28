@@ -97,11 +97,11 @@ public class LilyPondInterface {
 
 	// The function that handles final output.
 	public static boolean exportItems(File saving_dir, String file_name, String project_title, MainSceneController[] items,
-	                                  String paperSize, boolean no_header, boolean even_spread, TopSceneController top_scene) throws IOException {
+	                                  String paperSize, boolean no_header, boolean even_spread, String[] margin_info, TopSceneController top_scene) throws IOException {
 		exportCancelled = false;
 		lastLilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (!saveToLilyPondFile(lastLilypondFile, project_title, items, paperSize, no_header, even_spread)) {
+		if (!saveToLilyPondFile(lastLilypondFile, project_title, items, paperSize, no_header, even_spread, margin_info)) {
 			top_scene.exportMenuFailure();
 			return false;
 		}
@@ -147,7 +147,7 @@ public class LilyPondInterface {
 	}
 
 	public static boolean saveToLilyPondFile(File lilypond_file, String project_title, MainSceneController[] items,
-	                                         String paperSize, boolean no_header, boolean even_spread) throws IOException {
+	                                         String paperSize, boolean no_header, boolean even_spread, String[] margin_info) throws IOException {
 
 		// Create the LilyPond output file, and if it already exists, delete the old one.
 		if (lilypond_file.exists()) {
@@ -191,6 +191,16 @@ public class LilyPondInterface {
 				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
 				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
 			}
+
+			lines.set(17, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
+			lines.set(18, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
+			lines.set(19, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
+			lines.set(20, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
+		} else {
+			lines.set(12, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
+			lines.set(13, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
+			lines.set(14, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
+			lines.set(15, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
 		}
 
 		// Add a blank line before scores begin

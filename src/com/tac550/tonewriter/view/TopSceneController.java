@@ -43,6 +43,9 @@ public class TopSceneController {
 
 	private final ProjectIO projectIO = new ProjectIO();
 
+	private static final float DEFAULT_MARGIN_SIZE = 13;
+	private static final String DEFAULT_MARGIN_UNITS = "mm";
+
 	private static final double MENU_ICON_SIZE = 30;
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
@@ -117,6 +120,8 @@ public class TopSceneController {
 
 	private boolean noHeader = false;
 	private boolean evenSpread = true;
+	private float topMargin, bottomMargin, leftMargin, rightMargin;
+	private String topMarginUnits, bottomMarginUnits, leftMarginUnits, rightMarginUnits;
 
 	private final ObservableMap<Integer, Tab> tabsToAdd = FXCollections.observableHashMap();
 
@@ -160,7 +165,7 @@ public class TopSceneController {
 				item.setToggleGroup(durationGroup);
 
 			// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
-			// making it impossible to double click a note button near the bottom of the screen.
+			// making it impossible to double-click a note button near the bottom of the screen.
 			noteMenu.setStyle("-fx-effect: null");
 		});
 
@@ -214,6 +219,9 @@ public class TopSceneController {
 	}
 
 	@FXML private void initialize() {
+		// Default margin settings
+		topMargin = bottomMargin = leftMargin = rightMargin = DEFAULT_MARGIN_SIZE;
+		topMarginUnits = bottomMarginUnits = leftMarginUnits = rightMarginUnits = DEFAULT_MARGIN_UNITS;
 
 		// Init tone edit menu item group
 		toneEditItems = new MenuItem[]{addCLMenuItem, setKeyMenuItem, editHeaderInfoMenuItem, manualCLAssignmentMenuItem};
@@ -411,6 +419,8 @@ public class TopSceneController {
 			controller.setPaperSize(projectPaperSize);
 			controller.setNoHeader(noHeader);
 			controller.setSpreadSetting(evenSpread);
+			controller.setMargins(topMargin, topMarginUnits, bottomMargin, bottomMarginUnits,
+					leftMargin, leftMarginUnits, rightMargin, rightMarginUnits);
 
 			Platform.runLater(() -> {
 				Stage syllableStage = new Stage();
@@ -739,6 +749,10 @@ public class TopSceneController {
 
 		setProjectTitle("Unnamed Project");
 		projectPaperSize = defaultPaperSize;
+		noHeader = false;
+		evenSpread = true;
+		topMargin = bottomMargin = leftMargin = rightMargin = DEFAULT_MARGIN_SIZE;
+		topMarginUnits = bottomMarginUnits = leftMarginUnits = rightMarginUnits = DEFAULT_MARGIN_UNITS;
 		projectFile = null;
 	}
 
@@ -937,7 +951,7 @@ public class TopSceneController {
 
 	void exportProject() throws IOException {
 		LilyPondInterface.exportItems(defaultExportDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), projectPaperSize, noHeader, evenSpread, this);
+				getTabControllers(), projectPaperSize, noHeader, evenSpread, getMarginInfo(), this);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -1006,6 +1020,29 @@ public class TopSceneController {
 	public void setEvenSpread(boolean even_spread) {
 		if (evenSpread != even_spread) {
 			evenSpread = even_spread;
+			projectEdited();
+		}
+	}
+
+	public String[] getMarginInfo() {
+		return new String[]{String.valueOf(topMargin), topMarginUnits, String.valueOf(bottomMargin), bottomMarginUnits,
+				String.valueOf(leftMargin), leftMarginUnits, String.valueOf(rightMargin), rightMarginUnits};
+	}
+	public void setMargins(float top, String top_units, float bottom, String bottom_units,
+						   float left, String left_units, float right, String right_units) {
+		if (topMargin != top || bottomMargin != bottom || leftMargin != left || rightMargin != right
+				|| !topMarginUnits.equals(top_units) || !bottomMarginUnits.equals(bottom_units)
+				|| !leftMarginUnits.equals(left_units) || !rightMarginUnits.equals(right_units)) {
+			topMargin = top;
+			bottomMargin = bottom;
+			leftMargin = left;
+			rightMargin = right;
+
+			topMarginUnits = top_units;
+			bottomMarginUnits = bottom_units;
+			leftMarginUnits = left_units;
+			rightMarginUnits = right_units;
+
 			projectEdited();
 		}
 	}
