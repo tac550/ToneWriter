@@ -907,7 +907,7 @@ public class TopSceneController {
 		ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(Alert.AlertType.CONFIRMATION, "Project Save Confirmation",
-				"Save changes to project \"" + projectTitle + "\"?", true, parentStage,
+				"Save changes to project \"" + (projectFile != null ? projectFile.getName() : projectTitle) + "\"?", true, parentStage,
 				new ButtonType[] {saveButton, dontSaveButton, cancelButton}, cancelButton);
 
 		if (result.isPresent()) {
