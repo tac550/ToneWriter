@@ -43,8 +43,8 @@ public class TopSceneController {
 
 	private final ProjectIO projectIO = new ProjectIO();
 
-	private static final float DEFAULT_MARGIN_SIZE = 13;
-	private static final String DEFAULT_MARGIN_UNITS = "mm";
+	public static final float DEFAULT_MARGIN_SIZE = 13;
+	public static final String DEFAULT_MARGIN_UNITS = "mm";
 
 	private static final double MENU_ICON_SIZE = 30;
 	@FXML private MenuItem addItemMenuItem;

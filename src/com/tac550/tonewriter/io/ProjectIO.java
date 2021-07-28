@@ -386,14 +386,24 @@ public class ProjectIO {
 				top_controller.setPaperSize(pageSettings.get(0));
 				top_controller.setNoHeader(Boolean.parseBoolean(pageSettings.get(1)));
 				top_controller.setEvenSpread(Boolean.parseBoolean(pageSettings.get(2)));
-				// Before 1.2: no margin size settings
-				if (TWUtils.versionCompare("1.2", projectVersion) != 1) {
-					List<String> margins = readLine(reader);
-					top_controller.setMargins(Float.parseFloat(margins.get(0)), margins.get(1),
-							Float.parseFloat(margins.get(2)), margins.get(3), Float.parseFloat(margins.get(4)),
-							margins.get(5), Float.parseFloat(margins.get(6)), margins.get(7));
-				}
-			} // TODO: Add Else blocks to set default values for older projects.
+
+			} else {
+				top_controller.setPaperSize("");
+				top_controller.setNoHeader(false);
+				top_controller.setEvenSpread(true);
+			}
+			// Before 1.2: no margin size settings
+			if (TWUtils.versionCompare("1.2", projectVersion) != 1) {
+				List<String> margins = readLine(reader);
+				top_controller.setMargins(Float.parseFloat(margins.get(0)), margins.get(1),
+						Float.parseFloat(margins.get(2)), margins.get(3), Float.parseFloat(margins.get(4)),
+						margins.get(5), Float.parseFloat(margins.get(6)), margins.get(7));
+			} else {
+				top_controller.setMargins(TopSceneController.DEFAULT_MARGIN_SIZE, TopSceneController.DEFAULT_MARGIN_UNITS,
+						TopSceneController.DEFAULT_MARGIN_SIZE, TopSceneController.DEFAULT_MARGIN_UNITS,
+						TopSceneController.DEFAULT_MARGIN_SIZE, TopSceneController.DEFAULT_MARGIN_UNITS,
+						TopSceneController.DEFAULT_MARGIN_SIZE, TopSceneController.DEFAULT_MARGIN_UNITS);
+			}
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to read project metadata file!", true);
