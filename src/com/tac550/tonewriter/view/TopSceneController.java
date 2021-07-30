@@ -71,6 +71,7 @@ public class TopSceneController {
 	@FXML private CheckMenuItem playMidiMenuItem;
 	@FXML private CheckMenuItem hoverHighlightMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
+	@FXML private CheckMenuItem saveMIDIMenuItem;
 	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
 	@FXML private CheckMenuItem darkModeMenuItem;
@@ -261,18 +262,23 @@ public class TopSceneController {
 		if (MainApp.OS_NAME.startsWith("lin"))
 			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
 
-		// If Lilypond isn't present, disable option to play midi as chords are assigned and to not save LilyPond files.
+		// If Lilypond isn't present, disable midi options and the ability not to save LilyPond files.
 		if (!MainApp.lilyPondAvailable()) {
-			playMidiMenuItem.setSelected(false);
-			playMidiMenuItem.setDisable(true);
 			saveLPMenuItem.setSelected(true);
 			saveLPMenuItem.setDisable(true);
+			playMidiMenuItem.setSelected(false);
+			playMidiMenuItem.setDisable(true);
+			saveMIDIMenuItem.setSelected(false);
+			saveMIDIMenuItem.setDisable(true);
 		}
 
 		// Initial state and behavior for "Save LilyPond file" option
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
 		saveLPMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, newVal));
+		saveMIDIMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false));
+		saveMIDIMenuItem.selectedProperty().addListener((ov, oldVal, newVal) ->
+				MainApp.prefs.putBoolean(MainApp.PREFS_SAVE_MIDI_FILE, newVal));
 		// Set initial state for paper size, which may have been saved in preferences.
 		defaultPaperSize = MainApp.prefs.get(MainApp.PREFS_PAPER_SIZE, "letter (8.5 x 11.0 in)");
 		projectPaperSize = defaultPaperSize;

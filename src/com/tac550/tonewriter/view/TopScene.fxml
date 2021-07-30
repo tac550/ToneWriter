@@ -115,7 +115,8 @@
                         </HBox>
                      </content>
                   </CustomMenuItem>
-                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Save LilyPond File With PDF" />
+                  <CheckMenuItem fx:id="saveLPMenuItem" mnemonicParsing="false" text="Export LilyPond File" />
+                  <CheckMenuItem fx:id="saveMIDIMenuItem" mnemonicParsing="false" text="Export MIDI File (single-item export only)" />
                   <MenuItem mnemonicParsing="false" onAction="#handleSetDefaultPaperSize" text="Set Default Paper Size..." />
                   <CustomMenuItem mnemonicParsing="false" text="LilyPond Separator">
                      <content>

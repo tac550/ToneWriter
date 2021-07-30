@@ -72,6 +72,7 @@ public class MainApp extends Application {
 	static final String PREFS_LILYPOND_LOCATION = "LilyPond-Bin-Location";
 	public static final String PREFS_THOU_THY = "Thou-Thy-Enabled";
 	public static final String PREFS_SAVE_LILYPOND_FILE = "Save-LP-File";
+	public static final String PREFS_SAVE_MIDI_FILE = "Save-MIDI-File";
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";

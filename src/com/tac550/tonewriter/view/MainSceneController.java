@@ -420,6 +420,10 @@ public class MainSceneController {
 		verseLineBox.getChildren().clear();
 	}
 
+	private boolean hasAssignments() {
+		return verseLineControllers.stream().anyMatch(VerseLineViewController::hasAssignments);
+	}
+
 	@FXML private void handleOpenToneHint() {
 		handleOpenTone();
 	}
@@ -917,7 +921,8 @@ public class MainSceneController {
 
 		if (topSceneController.getTabCount() > 1) {
 			ButtonType projectBT = new ButtonType("Entire project");
-			ButtonType itemBT = new ButtonType("Current item only");
+			ButtonType itemBT = new ButtonType("Current item only" +
+					(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments() ? " (with MIDI file)" : ""));
 
 			Optional<ButtonType> result = TWUtils.showAlert(AlertType.CONFIRMATION, "Export Type",
 					"Which type of export do you want? (Both result in 1 PDF file)", true, parentStage,
@@ -1087,7 +1092,7 @@ public class MainSceneController {
 	}
 	public String getLilyPondSource() {
 		if (fullyLoaded())
-			cachedItemSource = LilyPondInterface.generateItemSource(this);
+			cachedItemSource = LilyPondInterface.generateItemSource(this, false);
 
 		return cachedItemSource;
 	}
@@ -1203,6 +1208,9 @@ public class MainSceneController {
 	}
 	boolean isLoadingTone() {
 		return loadingTone;
+	}
+	public Stage getParentStage() {
+		return parentStage;
 	}
 
 	private static class RenderFormatException extends Exception {}

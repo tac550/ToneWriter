@@ -6,6 +6,7 @@ import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import javafx.application.Platform;
+import javafx.scene.control.TextInputDialog;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -211,7 +212,7 @@ public class LilyPondInterface {
 
 			// Bypass caching item source if single-item export (may differ from multi-item export)
 			if (items.length == 1)
-				lines.add(generateItemSource(item));
+				lines.add(generateItemSource(item, MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false)));
 			else
 				lines.add(item.getLilyPondSource());
 
@@ -231,7 +232,27 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	public static String generateItemSource(MainSceneController item) {
+	public static String generateItemSource(MainSceneController item, boolean generate_midi) {
+		int midiTempo = 150;
+		if (generate_midi) { // Ask user to indicate preferred MIDI tempo
+			boolean done = false;
+			while (!done) {
+				TextInputDialog dialog = new TextInputDialog(String.valueOf(midiTempo));
+				dialog.setTitle("MIDI Tempo");
+				dialog.setHeaderText("Enter MIDI tempo (quarter-note beats per minute)");
+				dialog.initOwner(item.getParentStage());
+				Optional<String> result = dialog.showAndWait();
+				if (result.isPresent()) {
+					try {
+						midiTempo = Integer.parseInt(result.get());
+						done = true;
+					} catch (NumberFormatException e) {
+						TWUtils.showError("Invalid input.", true);
+					}
+				} else done = true;
+			}
+		}
+
 		List<String> lines = new ArrayList<>();
 
 		// Comment for purposes of future parsing of output (for internal project file renders)
@@ -288,8 +309,9 @@ public class LilyPondInterface {
 					"  }\n");
 
 			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves",
-					"    } <<", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves");
+			if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
+			Collections.addAll(lines, "    } <<", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
 					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
 					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
 					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
@@ -298,17 +320,21 @@ public class LilyPondInterface {
 			// If the tenor and bass parts are not empty, include a lower staff.
 			if (noteDataPattern.matcher(results[PART_TENOR]).find() || noteDataPattern.matcher(results[PART_BASS]).find())
 				Collections.addAll(lines, "    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves",
-						"    } <<", "      \\clef bass", "      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-						"    >>");
+					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves");
+			if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
+			Collections.addAll(lines, "    } <<", "      \\clef bass",
+					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+					"    >>");
 
 			Collections.addAll(lines, "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
 					"      defaultBarType = \"|\" % Split barlines delimit phrases",
 					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
 					"      \\accidentalStyle neo-modern-voice-cautionary",
-					"    }", "  }", "}\n");
+					"    }", "  }");
+			if (generate_midi) lines.add("  \\midi {\n    \\tempo 4 = %d\n  }".formatted(midiTempo));
+			lines.add("}\n");
 
 		} else {
 			lines.add("\\markup \\column { \\vspace #0.5 }\n");

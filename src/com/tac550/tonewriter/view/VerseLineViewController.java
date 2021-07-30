@@ -202,7 +202,7 @@ public class VerseLineViewController {
 				}
 			} else {
 
-				if (lastSyllableAssigned != -1)
+				if (hasAssignments())
 					resetChordAssignment();
 
 				lineTextFlow.getChildren().clear();
@@ -445,15 +445,13 @@ public class VerseLineViewController {
 
 		final int indexClicked = lineTextFlow.getChildren().indexOf(clicked_text);
 
-		if (lastSyllableAssigned == -1) {
+		if (!hasAssignments())
 			assignChord(0, indexClicked);
-		} else if (lastSyllableAssigned == indexClicked) {
+		else if (lastSyllableAssigned == indexClicked)
 			// If the clicked syllable already has a chord, this keeps it activated for further chord assignments.
 			assignChord(lastSyllableAssigned, indexClicked);
-		} else {
+		else
 			assignChord(lastSyllableAssigned + 1, indexClicked);
-		}
-
 	}
 	void playCurrentChord() {
 		if (notAssigning()) return;
@@ -548,9 +546,8 @@ public class VerseLineViewController {
 	}
 	private void assignChord(int first_syll, int last_syll, boolean silent) {
 		// First, play the chord if chord playing is on.
-		if (!silent && topController.playMidiAsAssigned()) {
+		if (!silent && topController.playMidiAsAssigned())
 			getCurrentChord().playMidi();
-		}
 
 		// Set up an undo action frame
 		AssignmentAction undoFrame = new AssignmentAction();
@@ -759,6 +756,10 @@ public class VerseLineViewController {
 
 	boolean notFirstInItem() {
 		return mainController.getVerseLineControllers().indexOf(this) != 0;
+	}
+
+	boolean hasAssignments() {
+		return lastSyllableAssigned != -1;
 	}
 
 }
