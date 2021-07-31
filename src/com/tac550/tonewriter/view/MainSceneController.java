@@ -420,7 +420,7 @@ public class MainSceneController {
 		verseLineBox.getChildren().clear();
 	}
 
-	private boolean hasAssignments() {
+	public boolean hasAssignments() {
 		return verseLineControllers.stream().anyMatch(VerseLineViewController::hasAssignments);
 	}
 

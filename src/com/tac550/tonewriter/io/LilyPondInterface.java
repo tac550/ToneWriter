@@ -234,7 +234,7 @@ public class LilyPondInterface {
 
 	public static String generateItemSource(MainSceneController item, boolean generate_midi) {
 		int midiTempo = 150;
-		if (generate_midi) { // Ask user to indicate preferred MIDI tempo
+		if (generate_midi && item.hasAssignments()) { // Ask user to indicate preferred MIDI tempo
 			boolean done = false;
 			while (!done) {
 				TextInputDialog dialog = new TextInputDialog(String.valueOf(midiTempo));
