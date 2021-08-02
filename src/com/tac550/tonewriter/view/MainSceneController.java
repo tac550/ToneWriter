@@ -378,22 +378,21 @@ public class MainSceneController {
 					continue;
 					// If it's the second-to-last line before the end or a separator, it gets prime, if any.
 				} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.getHasPrime()) {
-					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
+					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {
+							chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
 					continue;
 				}
 
 				// Save the index of the first-repeated chant line, on the first encounter only.
-				if (firstRepeated == 0 && currentChantLine.getFirstRepeated()) {
+				if (firstRepeated == 0 && currentChantLine.getFirstRepeated())
 					firstRepeated = CLNum;
-				}
 
 				// For normal cases do this.
 				if (!currentChantLine.getIsPrime() && !currentChantLine.getIsAlternate()) {
 					ChantLineViewController[] associatedControllers = new ChantLineViewController[currentChantLine.getNumAlts() + 1];
 					associatedControllers[0] = currentChantLine;
-					for (int i = 1; i < associatedControllers.length; i++) {
+					for (int i = 1; i < associatedControllers.length; i++)
 						associatedControllers[i] = chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + i);
-					}
 					verseLineControllers.get(VLNum).setChantLines(associatedControllers);
 				} else {
 					// Do another go-around on the same verse line but with the next chant line.
@@ -402,7 +401,6 @@ public class MainSceneController {
 				CLNum++;
 			}
 		}
-
 	}
 
 	boolean isLastVerseLineOfSection(VerseLineViewController line) {
@@ -461,7 +459,6 @@ public class MainSceneController {
 
 			@Override
 			protected Void call() {
-
 				String[] lines = Syllables.getSyllabificationLines(lastVerseSet, parentStage);
 
 				if (setVerseCancelled) {
@@ -469,9 +466,8 @@ public class MainSceneController {
 					return null;
 				}
 
-				for (String line : lines) {
+				for (String line : lines)
 					createVerseLine(line);
-				}
 
 				applyLoadedVerses(true);
 
@@ -541,9 +537,8 @@ public class MainSceneController {
 		File saveFile = fileChooser.showSaveDialog(parentStage);
 		if (saveFile == null) return false;
 
-		if (!saveFile.getName().endsWith(".tone")) {
+		if (!saveFile.getName().endsWith(".tone"))
 			saveFile = new File(saveFile.getAbsolutePath() + ".tone");
-		}
 
 		if (ToneIO.createToneFile(saveFile)) {
 			toneFile = saveFile;
@@ -555,10 +550,8 @@ public class MainSceneController {
 
 			return true;
 		} else {
-
 			TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while creating the tone!",
 					true, parentStage);
-
 			return false;
 		}
 	}
@@ -771,9 +764,8 @@ public class MainSceneController {
 			dialog.getDialogPane().setContent(grid);
 
 			dialog.setResultConverter(dialogButton -> {
-				if (dialogButton == ButtonType.OK) {
+				if (dialogButton == ButtonType.OK)
 					return new Pair<>(leftField.getText(), rightField.getText());
-				}
 				return null;
 			});
 
@@ -786,7 +778,6 @@ public class MainSceneController {
 
 				if (!(tempLeftText.equals(leftText) && tempRightText.equals(rightText))) {
 					toneEdited();
-
 					setHeaderStrings(tempLeftText, tempRightText);
 				}
 			});
@@ -826,17 +817,14 @@ public class MainSceneController {
 	}
 
 	private void refreshChordKeySignatures(String key) {
-		for (ChantLineViewController chantLineController : chantLineControllers) {
+		for (ChantLineViewController chantLineController : chantLineControllers)
 	    	chantLineController.setKeySignature(key);
-	    }
 	}
 	void refreshChordPreviews() {
 		if (!MainApp.lilyPondAvailable()) return;
 
-		for (ChantLineViewController chantLineController : chantLineControllers) {
+		for (ChantLineViewController chantLineController : chantLineControllers)
 			chantLineController.refreshAllChordPreviews();
-	    }
-
 	}
 
 	public void removeChantLine(ChantLineViewController chantLineViewController) {
@@ -886,15 +874,13 @@ public class MainSceneController {
 	}
 
 	void clearFirstRepeated() {
-		for (ChantLineViewController controller : chantLineControllers) {
+		for (ChantLineViewController controller : chantLineControllers)
 			controller.resetFRState();
-		}
 	}
 	public void setFirstRepeated(String chant_line) {
 		for (ChantLineViewController chantLine : chantLineControllers) {
-			if (chantLine.getName().equals(chant_line)) {
+			if (chantLine.getName().equals(chant_line))
 				chantLine.toggleFirstRepeated();
-			}
 		}
 	}
 
@@ -903,13 +889,12 @@ public class MainSceneController {
 		double scrollPaneHeight = toneScrollPane.getContent().getBoundsInLocal().getHeight();
 		double maxY = cline.getBoundsInParent().getMaxY();
 
-		if (maxY < (viewportHeight / 2)) {
+		if (maxY < (viewportHeight / 2))
 			toneScrollPane.setVvalue(0);
-		} else if ((maxY >= (viewportHeight / 2)) & (maxY <= (scrollPaneHeight - viewportHeight / 2))) {
+		else if ((maxY >= (viewportHeight / 2)) & (maxY <= (scrollPaneHeight - viewportHeight / 2)))
 			toneScrollPane.setVvalue((maxY - (viewportHeight / 2)) / (scrollPaneHeight - viewportHeight));
-		} else if (maxY >= (scrollPaneHeight - (viewportHeight / 2))) {
+		else if (maxY >= (scrollPaneHeight - (viewportHeight / 2)))
 			toneScrollPane.setVvalue(1);
-		}
 	}
 
 	private boolean nonInternalToneLoaded() {
@@ -929,11 +914,11 @@ public class MainSceneController {
 					new ButtonType[] {projectBT, itemBT, ButtonType.CANCEL}, projectBT);
 
 			if (result.isPresent()) {
-				if (result.get() == projectBT) {
+				if (result.get() == projectBT)
 					tempExportMode = ExportMode.PROJECT;
-				} else if (result.get() == itemBT) {
+				else if (result.get() == itemBT)
 					tempExportMode = ExportMode.ITEM;
-				} else throw new RenderFormatException();
+				else throw new RenderFormatException();
 			} else throw new RenderFormatException();
 
 		} else {
