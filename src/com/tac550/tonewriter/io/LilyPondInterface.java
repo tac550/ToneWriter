@@ -604,8 +604,8 @@ public class LilyPondInterface {
 		return measureBeats;
 	}
 
-	private static String removeLastNote(String syllableNoteBuffer) {
-		String[] tokens = syllableNoteBuffer.split(" ");
+	private static String removeLastNote(String syllable_notes) {
+		String[] tokens = syllable_notes.split(" ");
 		// This flag gets set if the previous token removed was in a note group.
 		boolean noteGroup = false;
 		// Work backward through the tokens.
@@ -647,22 +647,22 @@ public class LilyPondInterface {
 		return editedBuffer.toString();
 	}
 
-	private static String applySlursAndBeams(String syllableNoteBuffer) {
+	private static String applySlursAndBeams(String syllable_notes) {
 		boolean addedSlur = false;
 
-		String[] tokens = syllableNoteBuffer.trim().split(" ");
+		String[] tokens = syllable_notes.trim().split(" ");
 
 		// If this part has any hidden notes, or all notes are tied, or the part contains any rests, skip adding a slur.
-		if (syllableNoteBuffer.contains("noteHide")
+		if (syllable_notes.contains("noteHide")
 				|| Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~"))
 				|| Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
-			return syllableNoteBuffer;
+			return syllable_notes;
 
 		String startSymbol = "\\(";
 		String endSymbol = "\\)";
 
 		// If the syllable contains nothing but two eighth chords, apply beam instead of slur
-		// (prevents auto-connecting beam to notes from previous syllable).
+		// (prevents auto-connecting beam to note(s) from previous syllable).
 		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
 				t.contains("8") || !t.matches(".*\\d.*")).count();
 		if (eighthNotes == tokens.length) {
