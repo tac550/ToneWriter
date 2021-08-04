@@ -588,8 +588,6 @@ public class LilyPondInterface {
 			// That's it for each chord in the syllable.
 
 			// SLUR AND BEAM PROCESSING
-
-			// For each part...
 			for (int i = 0; i < 4; i++)
 				syllableNoteBuffers[i] = applySlursAndBeams(syllableNoteBuffers[i]);
 
