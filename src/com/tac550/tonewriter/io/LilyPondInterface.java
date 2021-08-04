@@ -610,23 +610,21 @@ public class LilyPondInterface {
 		// This flag gets set if the previous token removed was in a note group.
 		boolean noteGroup = false;
 		// Work backward through the tokens.
-		for (int i1 = tokens.length - 1; i1 >= 0; i1--) {
-			if (tokens[i1].contains("a") || tokens[i1].contains("b") || tokens[i1].contains("c") ||
-					tokens[i1].contains("d") || tokens[i1].contains("e") || tokens[i1].contains("f") ||
-					tokens[i1].contains("g") || tokens[i1].contains("r")) { // TODO: Might want to rethink this
+		for (int i = tokens.length - 1; i >= 0; i--) {
+			if (tokens[i].matches("[a-gr]")) {
 				if (noteGroup) {
 					// If we hit the beginning of the note group (last token to remove)...
-					if (tokens[i1].contains("<")) {
+					if (tokens[i].contains("<")) {
 						// remove it and we're done.
-						tokens[i1] = "";
+						tokens[i] = "";
 						break;
 					}
-				} else if (tokens[i1].contains(">")) { // If the note we're trying to remove is part of a note group...
+				} else if (tokens[i].contains(">")) { // If the note we're trying to remove is part of a note group...
 					// Set the flag.
 					noteGroup = true;
 				}
 
-				tokens[i1] = "";
+				tokens[i] = "";
 
 				if (!noteGroup)
 					// Stop here because we just removed the previous note.
@@ -634,7 +632,7 @@ public class LilyPondInterface {
 
 			} else {
 				// Remove tokens that aren't notes from the end.
-				tokens[i1] = "";
+				tokens[i] = "";
 			}
 		}
 
