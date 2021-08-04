@@ -176,9 +176,11 @@ public class LilyPondInterface {
 		// The buffer in which we'll store the output file as we build it.
 		List<String> lines = new ArrayList<>(Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8));
 
+		boolean generateHeader = !no_header || items.length == 1;
+
 		// Replacing paper size, title, and tagline info.
 		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		if (!no_header || items.length == 1) {
+		if (generateHeader) {
 			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
 					items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
 							+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
@@ -193,17 +195,11 @@ public class LilyPondInterface {
 				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
 				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
 			}
-
-			lines.set(17, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
-			lines.set(18, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
-			lines.set(19, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
-			lines.set(20, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
-		} else {
-			lines.set(12, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
-			lines.set(13, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
-			lines.set(14, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
-			lines.set(15, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
 		}
+		lines.set(generateHeader ? 17 : 12, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
+		lines.set(generateHeader ? 18 : 13, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
+		lines.set(generateHeader ? 19 : 14, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
+		lines.set(generateHeader ? 20 : 15, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
 
 		// Add a blank line before scores begin
 		lines.add("");
