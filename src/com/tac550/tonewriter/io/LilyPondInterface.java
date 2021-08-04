@@ -8,6 +8,7 @@ import com.tac550.tonewriter.view.*;
 import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LilyPondInterface {
@@ -879,93 +881,25 @@ public class LilyPondInterface {
 				.replace("\"", "\\\"").replace("'", "\u2019");
 	}
 
-	// TODO: Seems to have bugs with note groups of more than 2 notes
-	// Adjusts the octave of the given note according to the octave_data string.
+	// Adjusts the octave of the given note or note group according to the octave_data string.
 	// octave_data should be formatted "''", "'", ",", "", etc.
 	// Each ' shifts the user's input up one octave and each , shifts down one octave.
 	public static String parseNoteRelative(String note_data, String octave_data) {
-
-		// If there is no note, no adjustment is needed, but we do need to return a rest.
-		if (note_data.trim().isEmpty())
-			return "r";
-
-		// We construct the final adjusted note here.
-		StringBuilder finalNoteData = new StringBuilder();
-
-		// This pattern looks for note names in the note_data.
-		Pattern p = Pattern.compile("[abcdefg]");
-		Matcher m = p.matcher(note_data);
-		// Set until we encounter the first match (first note letter).
-		boolean first = true;
-		// Set when we encounter the end of the note group (if that's what we were given)
-		boolean closeGroupFlag;
-		// For each note name found...
-		while (m.find()) {
-			closeGroupFlag = false;
-			int position = m.start();
-
-			/*
-			 * Continue to the next match if this is an add-on character after a note name,
-			 * such as an "f" to indicate flat.
-			 */
-			if (!first && note_data.substring(position - 1, position).matches("[abcdefg]"))
-				continue;
-
-			first = false;
-
-			String workingOctave = octave_data;
-			StringBuilder workingSection;
-			// If the note data contains its first space after the position of the match...
-			if (note_data.contains(" ")
-					&& note_data.indexOf(" ") > position) {
-				// The working section goes from the match to the next space.
-				workingSection = new StringBuilder(note_data.substring(position - 1, note_data.indexOf(" ")));
-				// If the note data contains no spaces but does contain a note group ending...
-			} else if (note_data.contains(">")) {
-				// Working section ends before end of group.
-				workingSection = new StringBuilder(note_data.substring(position, note_data.indexOf(">")));
-				closeGroupFlag = true;
-				// Otherwise...
-			} else {
-				// Working section goes to the end.
-				workingSection = new StringBuilder(note_data.substring(position));
-			}
-
-			// For each quote in the octave data...
-			while (workingOctave.contains("'")) {
-				// Remove one quote.
-				workingOctave = workingOctave.replaceFirst("'", "");
-				if (workingSection.toString().contains(",")) // If we've got comma(s) in the note data...
-					// Remove a comma from the note.
-					workingSection = new StringBuilder(workingSection.toString().replaceFirst(",", ""));
-				else // If we don't have commas in the note data...
-					// Add a quote to the note.
-					workingSection.append("'");
-			}
-
-			// for each comma in the octave data...
-			while (workingOctave.contains(",")) {
-				// Remove one comma.
-				workingOctave = workingOctave.replaceFirst(",", "");
-				if (workingSection.toString().contains("'")) { // If we've got quote(s) in the note data...
-					// Remove a quote from the note.
-					workingSection = new StringBuilder(workingSection.toString().replaceFirst("'", ""));
-				} else { // If we don't have quotes in the note data...
-					// Add a comma to the note.
-					workingSection.append(",");
-				}
-			}
-
-			if (closeGroupFlag) {
-				// Re-add the grouping syntax if this was the last note of a note group.
-				finalNoteData.append(" ").append(workingSection).append(workingOctave).append(">");
-			} else {
-				finalNoteData.append(workingSection).append(workingOctave);
-			}
-
-		}
-
-		return finalNoteData.toString();
+		int adjustment = octaveToNumeric(octave_data);
+		String[] notes = note_data.split(" ");
+		boolean multi = notes.length > 1;
+		return Arrays.stream(notes)
+				.map(s -> s.replaceAll("[<>',]", "")
+						+ numericToOctave(octaveToNumeric(s) + adjustment))
+				.collect(Collectors.joining(" ", multi ? "<" : "", multi ? ">" : ""));
+	}
+	private static int octaveToNumeric(String note) {
+		long up = note.chars().filter(c -> c == '\'').count();
+		long down = note.chars().filter(c -> c == ',').count();
+		return Math.toIntExact(up - down);
+	}
+	private static String numericToOctave(int octave) {
+		return StringUtils.repeat(octave < 0 ? "," : "'", Math.abs(octave));
 	}
 
 	// Converts the UI string for the selected key signature into the format LilyPond expects.
