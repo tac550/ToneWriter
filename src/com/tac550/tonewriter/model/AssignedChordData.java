@@ -40,7 +40,6 @@ public class AssignedChordData {
 			case 3 -> getBass();
 			default -> "";
 		};
-
 	}
 
 	private String getSoprano() {
