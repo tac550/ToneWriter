@@ -296,15 +296,16 @@ public class LilyPondInterface {
 					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n");
 
 			// If the tenor and bass parts are not empty, include a lower staff.
-			if (noteDataPattern.matcher(results[PART_TENOR]).find() || noteDataPattern.matcher(results[PART_BASS]).find())
+			if (noteDataPattern.matcher(results[PART_TENOR]).find() || noteDataPattern.matcher(results[PART_BASS]).find()) {
 				Collections.addAll(lines, "    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves");
-			if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
-			Collections.addAll(lines, "    } <<", "      \\clef bass",
-					"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
-					"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
-					"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
-					"    >>");
+						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves");
+				if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
+				Collections.addAll(lines, "    } <<", "      \\clef bass",
+						"      \\key " + keySignatureToLilyPond(item.getKeySignature()),
+						"      \\new Voice = \"tenor\" { \\voiceOne {" + results[PART_TENOR] + " } }",
+						"      \\new Voice = \"bass\" { \\voiceTwo {" + results[PART_BASS] + " } }",
+						"    >>");
+			}
 
 			Collections.addAll(lines, "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
 					"      defaultBarType = \"|\" % Split barlines delimit phrases",
@@ -863,6 +864,7 @@ public class LilyPondInterface {
 	// octave_data should be formatted "''", "'", ",", "", etc.
 	// Each ' shifts the user's input up one octave and each , shifts down one octave.
 	public static String parseNoteRelative(String note_data, String octave_data) {
+		if (note_data.isBlank()) return "r";
 		int adjustment = octaveToNumeric(octave_data);
 		String[] notes = note_data.split(" ");
 		boolean multi = notes.length > 1;
