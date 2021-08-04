@@ -81,6 +81,8 @@ public class MainSceneController {
 
 	private Consumer<MainSceneController> pendingLoadActions;
 
+	private int midiTempo = 0;
+
 	private File toneFile;
 	private int originalIndex = -1;
 	private String cachedItemSource = "";
@@ -97,7 +99,6 @@ public class MainSceneController {
 	private String lastVerseSet = "";
 
 	private boolean toneEdited = false;
-
 	private boolean verseEdited = false;
 
 	private ExportMode exportMode = ExportMode.NONE;
@@ -974,6 +975,7 @@ public class MainSceneController {
 	void performExport() {
 		try {
 			if (exportMode == ExportMode.ITEM) {
+				if (MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments()) midiTempo = promptMidiTempo();
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
 						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(),
 						new MainSceneController[] {this}, topSceneController.getPaperSize(), topSceneController.getNoHeader(),
@@ -992,7 +994,6 @@ public class MainSceneController {
 	}
 
 	private void showQuickVerseStage(TextField targetField) {
-
 		FXMLLoaderIO.loadFXMLLayoutAsync("quickVerseView.fxml", loader -> {
 			BorderPane rootLayout = loader.getRoot();
 			QuickVerseController controller = loader.getController();
@@ -1012,7 +1013,25 @@ public class MainSceneController {
 				controller.focusFilterField();
 			});
 		});
+	}
 
+	private int promptMidiTempo() {
+		int tempo = 150;
+		while (true) {
+			TextInputDialog dialog = new TextInputDialog(String.valueOf(midiTempo == 0 ? tempo : midiTempo));
+			dialog.setTitle("MIDI Tempo");
+			dialog.setHeaderText("Enter MIDI tempo (quarter-note beats per minute)");
+			dialog.initOwner(parentStage);
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				try {
+					tempo = Integer.parseInt(result.get());
+					return tempo;
+				} catch (NumberFormatException e) {
+					TWUtils.showError("Invalid input.", true);
+				}
+			} else return midiTempo == 0 ? tempo : midiTempo;
+		}
 	}
 
 	void refreshVerseTextStyle() {
@@ -1194,8 +1213,8 @@ public class MainSceneController {
 	boolean isLoadingTone() {
 		return loadingTone;
 	}
-	public Stage getParentStage() {
-		return parentStage;
+	public int getMidiTempo() {
+		return midiTempo;
 	}
 
 	private static class RenderFormatException extends Exception {}
