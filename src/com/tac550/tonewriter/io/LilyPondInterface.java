@@ -661,7 +661,7 @@ public class LilyPondInterface {
 		String startSymbol = "\\(";
 		String endSymbol = "\\)";
 
-		// If the syllable contains nothing but two eighth chords, apply beam instead of slur
+		// If the syllable contains nothing but two eighth notes/groups, apply beam instead of slur
 		// (prevents auto-connecting beam to note(s) from previous syllable).
 		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
 				t.contains("8") || !t.matches(".*\\d.*")).count();
@@ -673,24 +673,28 @@ public class LilyPondInterface {
 		// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
 		StringBuilder finalString = new StringBuilder();
 		// For each token in the buffer...
-		for (int i1 = 0; i1 < tokens.length; i1++) {
+		boolean inAGroup = false;
+		for (int i = 0; i < tokens.length; i++) {
+			if (!inAGroup && i > 0 && tokens[i-1].contains("<")) inAGroup = true;
+			if (inAGroup && tokens[i-1].contains(">")) inAGroup = false;
+
 			// If the token is a barline indicator, append it and the following as if one token
-			if (tokens[i1].equals("$bar")) {
-				finalString.append(" ").append(tokens[i1])
-						.append(" ").append(i1 + 1 < tokens.length ? tokens[i1 + 1] : "");
-				i1++; // Don't try to append i1 + 1 again
+			if (tokens[i].equals("$bar")) {
+				finalString.append(" ").append(tokens[i])
+						.append(" ").append(i + 1 < tokens.length ? tokens[i + 1] : "");
+				i++; // Don't try to append i + 1 again
 				continue;
 			}
-			// If it's not the first token, we haven't added the slur yet, and the previous token was not the beginning of a
-			// note group... (two notes occurring in one part, which will be split across two tokens)
-			if (i1 > 0 && !addedSlur && !tokens[i1 - 1].contains("<")) {
+			// If it's not the first token, we haven't added the slur yet, and we're not in a
+			// note group... (>1 note occurring in one part, which will be split across >1 token)
+			if (i > 0 && !addedSlur && !inAGroup) {
 				// Add the beginning slur parenthesis and the current token.
-				finalString.append(" %s ".formatted(startSymbol)).append(tokens[i1]);
+				finalString.append(" %s ".formatted(startSymbol)).append(tokens[i]);
 				addedSlur = true;
 			} else {
 				// Otherwise skip empty tokens or add the current one.
-				if (tokens[i1].isEmpty()) continue;
-				finalString.append(" ").append(tokens[i1]);
+				if (tokens[i].isEmpty()) continue;
+				finalString.append(" ").append(tokens[i]);
 			}
 		}
 
