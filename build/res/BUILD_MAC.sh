@@ -7,9 +7,9 @@ jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path 
 --add-modules java.xml,java.scripting,java.desktop,java.management,jdk.unsupported,javafx.controls,javafx.fxml,javafx.web,\
 java.naming,jdk.charsets,jdk.crypto.ec,java.sql --output java-runtime/ && \
 jpackage --name ToneWriter --input jar/ --main-jar tonewriter.jar --java-options "--enable-preview -Xms256m -Xmx4096m -Duser.dir=\$ROOTDIR/Contents" \
---icon TWIcon.icns --runtime-image java-runtime/ --type app-image --app-version 1.1.0 --dest ../mac/ && \
+--icon TWIcon.icns --runtime-image java-runtime/ --type app-image --app-version 1.2.0 --dest ../mac/ && \
 cp -a '../../Built-in Tones' '../mac/ToneWriter.app/Contents/Built-in Tones' && \
 cp -a '../../licenses' '../mac/ToneWriter.app/Contents/licenses' && \
 cp -a '../../lilypond' '../mac/ToneWriter.app/Contents/lilypond' && \
 cd ../mac/ && \
-zip -r ToneWriter1.1.0.app.zip ToneWriter.app
+zip -r ToneWriter1.2.0.app.zip ToneWriter.app
