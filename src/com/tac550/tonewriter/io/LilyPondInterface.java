@@ -68,10 +68,10 @@ public class LilyPondInterface {
 			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
 			lines.set(14, "  \\key " + keySignatureToLilyPond(keySignature));
-			lines.set(20, parseNoteRelative(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
-			lines.set(25, parseNoteRelative(parts[PART_ALTO], ADJUSTMENT_ALTO));
-			lines.set(30, parseNoteRelative(parts[PART_TENOR], ADJUSTMENT_TENOR));
-			lines.set(35, parseNoteRelative(parts[PART_BASS], ADJUSTMENT_BASS));
+			lines.set(20, adjustOctave(parts[PART_SOPRANO], ADJUSTMENT_SOPRANO));
+			lines.set(25, adjustOctave(parts[PART_ALTO], ADJUSTMENT_ALTO));
+			lines.set(30, adjustOctave(parts[PART_TENOR], ADJUSTMENT_TENOR));
+			lines.set(35, adjustOctave(parts[PART_BASS], ADJUSTMENT_BASS));
 			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
 			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
@@ -611,7 +611,7 @@ public class LilyPondInterface {
 		boolean noteGroup = false;
 		// Work backward through the tokens.
 		for (int i = tokens.length - 1; i >= 0; i--) {
-			if (tokens[i].matches("[a-gr]")) {
+			if (tokens[i].matches(".*[a-gr].*")) {
 				if (noteGroup) {
 					// If we hit the beginning of the note group (last token to remove)...
 					if (tokens[i].contains("<")) {
@@ -626,8 +626,7 @@ public class LilyPondInterface {
 
 				tokens[i] = "";
 
-				if (!noteGroup)
-					// Stop here because we just removed the previous note.
+				if (!noteGroup) // Stop here because we just removed the previous note.
 					break;
 
 			} else {
@@ -691,7 +690,7 @@ public class LilyPondInterface {
 				finalString.append(" %s ".formatted(startSymbol)).append(tokens[i]);
 				addedSlur = true;
 			} else {
-				// Otherwise skip empty tokens or add the current one.
+				// Otherwise, skip empty tokens or add the current one.
 				if (tokens[i].isEmpty()) continue;
 				finalString.append(" ").append(tokens[i]);
 			}
@@ -807,8 +806,7 @@ public class LilyPondInterface {
 
 			float totalDuration = 0;
 
-			for (String tNote : tiedNotes)
-				// Make one recursive call for each tied note
+			for (String tNote : tiedNotes) // Make one recursive call for each tied note
 				totalDuration += getBeatDuration(tNote);
 
 			return totalDuration;
@@ -861,7 +859,7 @@ public class LilyPondInterface {
 	// Adjusts the octave of the given note or note group according to the octave_data string.
 	// octave_data should be formatted "''", "'", ",", "", etc.
 	// Each ' shifts the user's input up one octave and each , shifts down one octave.
-	public static String parseNoteRelative(String note_data, String octave_data) {
+	public static String adjustOctave(String note_data, String octave_data) {
 		if (note_data.isBlank()) return "r";
 		int adjustment = octaveToNumeric(octave_data);
 		String[] notes = note_data.split(" ");
@@ -880,7 +878,7 @@ public class LilyPondInterface {
 		return StringUtils.repeat(octave < 0 ? "," : "'", Math.abs(octave));
 	}
 
-	// Converts the UI string for the selected key signature into the format LilyPond expects.
+	// Converts the provided UI string for a key signature into the format LilyPond expects.
 	private static String keySignatureToLilyPond(String key_sig) {
 		String keySigString = "";
 
@@ -891,11 +889,10 @@ public class LilyPondInterface {
 		// Add the key's note letter.
 		keySigString += keySigParts[0].substring(0, 1).toLowerCase(Locale.ROOT);
 		// Add sharp or flat, if any.
-		if (keySigParts[0].contains("\u266F")) {
+		if (keySigParts[0].contains("\u266F"))
 			keySigString += "s";
-		} else if (keySigParts[0].contains("\u266D")) {
+		else if (keySigParts[0].contains("\u266D"))
 			keySigString += "f";
-		}
 		// Add " \major" or " \minor".
 		keySigString += (" \\" + keySigParts[1]);
 

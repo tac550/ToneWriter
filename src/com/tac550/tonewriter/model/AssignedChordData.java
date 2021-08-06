@@ -43,19 +43,19 @@ public class AssignedChordData {
 	}
 
 	private String getSoprano() {
-		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[0],
+		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[0],
 				LilyPondInterface.ADJUSTMENT_SOPRANO) + duration;
 	}
 	private String getAlto() {
-		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[1],
+		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[1],
 				LilyPondInterface.ADJUSTMENT_ALTO) + duration;
 	}
 	private String getTenor() {
-		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[2],
+		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[2],
 				LilyPondInterface.ADJUSTMENT_TENOR) + duration;
 	}
 	private String getBass() {
-		return LilyPondInterface.parseNoteRelative(lineController.getChordByIndex(chordIndex).getFields().split("-")[3],
+		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[3],
 				LilyPondInterface.ADJUSTMENT_BASS) + duration;
 	}
 
