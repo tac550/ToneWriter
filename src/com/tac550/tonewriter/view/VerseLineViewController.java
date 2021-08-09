@@ -100,8 +100,7 @@ public class VerseLineViewController {
 
 			selectedChantLine = newVal.intValue();
 
-			if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine))
-				resetChordAssignment();
+			resetIfSelectedNotSimilarToPrevious();
 
 			previousChantLine = associatedChantLines[selectedChantLine].toString();
 		});
@@ -165,11 +164,10 @@ public class VerseLineViewController {
 	}
 
 	private void adjustViewportAreaForScrollbar() {
-		if (scrollBar.isVisible()) {
+		if (scrollBar.isVisible())
 			mainContentPane.setPrefHeight(mainContentPane.getPrefHeight() + scrollBarHeight);
-		} else {
+		else
 			mainContentPane.setPrefHeight(mainContentPane.getPrefHeight() - scrollBarHeight);
-		}
 
 		rootPane.requestLayout();
 	}
@@ -298,17 +296,12 @@ public class VerseLineViewController {
 		tonePhraseChoice.getSelectionModel().select(selectedChantLine);
 
 		// ChoiceBox highlighting if choices are available
-		if (tonePhraseChoice.getItems().size() > 1) {
+		if (tonePhraseChoice.getItems().size() > 1)
 			tonePhraseChoice.setStyle("-fx-base: #fcfc2f");
-		} else {
+		else
 			tonePhraseChoice.setStyle("");
-		}
 
-		// Only reset chord assignments if the new chant line selection is structurally different from the previous one
-		// or has a different name.
-		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine)) {
-			resetChordAssignment();
-		}
+		resetIfSelectedNotSimilarToPrevious();
 
 		changingAssignments = false;
 
@@ -330,6 +323,12 @@ public class VerseLineViewController {
 					topController.resetProjectEditedStatus();
 			});
 		}
+	}
+
+	private void resetIfSelectedNotSimilarToPrevious() {
+		// Only reset chord assignments if the selected chant line is structurally different from the previous one.
+		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine))
+			resetChordAssignment();
 	}
 
 	public void setPendingActions(boolean first_tab, Consumer<VerseLineViewController> actions) {
@@ -355,9 +354,8 @@ public class VerseLineViewController {
 
 		AssignmentAction action = undoActions.pop();
 
-		for (Button button : action.buttons) {
+		for (Button button : action.buttons)
 			chordButtonPane.getChildren().remove(button);
-		}
 
 		for (SyllableText text : action.syllableTexts) {
 			text.removeLastChord();
@@ -460,9 +458,8 @@ public class VerseLineViewController {
 
 	void syllableHovered() {
 		if (notAssigning()) return;
-		if (topController.hoverHighlightEnabled()) {
+		if (topController.hoverHighlightEnabled())
 			getCurrentChord().setHighlighted(true);
-		}
 	}
 	void syllableUnHovered() {
 		if (notAssigning()) return;
@@ -625,9 +622,8 @@ public class VerseLineViewController {
 			}
 		});
 		noteButton.setOnMouseEntered((me) -> {
-			if (topController.hoverHighlightEnabled()) {
+			if (topController.hoverHighlightEnabled())
 				getChordByIndex(chordIndex).setHighlighted(true);
-			}
 		});
 		noteButton.setOnMouseExited((me) -> getChordByIndex(chordIndex).setHighlighted(false));
 
@@ -647,9 +643,8 @@ public class VerseLineViewController {
 			// Get note button with greatest LayoutY value
 			double maxLayoutY = 0;
 			for (Node node : chordButtonPane.getChildren()) {
-				if (node.getLayoutY() > maxLayoutY) {
+				if (node.getLayoutY() > maxLayoutY)
 					maxLayoutY = node.getLayoutY();
-				}
 			}
 			// The following line might do nothing if less than minimum height.
 			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + NOTE_BUTTON_HEIGHT.get()
@@ -699,9 +694,8 @@ public class VerseLineViewController {
 		return tonePhraseChoice.getValue();
 	}
 	public void setTonePhraseChoice(String choice) {
-		if (tonePhraseChoice.getItems().contains(choice)) {
+		if (tonePhraseChoice.getItems().contains(choice))
 			tonePhraseChoice.getSelectionModel().select(choice);
-		}
 	}
 
 	public String getBeforeBar() {
