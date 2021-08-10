@@ -11,8 +11,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class SyllableParser {
 
@@ -28,10 +26,8 @@ public class SyllableParser {
 	        
 	        textField.setText(full_verse);
 	        final HtmlPage resultPage = submitButton.click();
-	        List<String> lines = Arrays.asList(
-	        		resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n"));
 
-			return lines.toArray(new String[0]);
+			return resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n");
 		} catch (FailingHttpStatusCodeException | IOException e) {
 			Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Warning",
 					"Failed to connect to online syllabification service! " +
