@@ -11,19 +11,14 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Syllables {
+public class SyllableParser {
 
 	// Sends text off to the syllabification engine and returns the resulting lines as an array of strings.
 	public static String[] getSyllabificationLines(String full_verse, Stage main_stage) {
-		
-		List<String> lines;
-		
 		try (final WebClient webClient = new WebClient()) {
-
 			webClient.setIncorrectnessListener((a0, a1) -> {});
 
 	        final HtmlPage page = webClient.getPage("https://www.juiciobrennan.com/syllables/");
@@ -33,20 +28,16 @@ public class Syllables {
 	        
 	        textField.setText(full_verse);
 	        final HtmlPage resultPage = submitButton.click();
-	        lines = new ArrayList<>(
-	        		Arrays.asList(resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n")));
+	        List<String> lines = Arrays.asList(
+	        		resultPage.getHtmlElementById("inputText").getTextContent().split("\\r?\\n"));
 
+			return lines.toArray(new String[0]);
 		} catch (FailingHttpStatusCodeException | IOException e) {
-
 			Platform.runLater(() -> TWUtils.showAlert(AlertType.WARNING, "Warning",
-					"Failed to connect to online hyphenator service! " +
-							"Use Edit buttons to break words up into syllables.", true, main_stage));
-
+					"Failed to connect to online syllabification service! " +
+							"Use Edit buttons to break words into syllables.", false, main_stage));
 			// Return the provided text without modification if there's a failure.
 			return full_verse.split("\\r?\\n");
 		}
-		
-		return lines.toArray(new String[0]);
 	}
-	
 }

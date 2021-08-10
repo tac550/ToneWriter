@@ -2,7 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
-import com.tac550.tonewriter.io.Syllables;
+import com.tac550.tonewriter.io.SyllableParser;
 import com.tac550.tonewriter.io.ToneIO;
 import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
@@ -460,7 +460,7 @@ public class MainSceneController {
 
 			@Override
 			protected Void call() {
-				String[] lines = Syllables.getSyllabificationLines(lastVerseSet, parentStage);
+				String[] lines = SyllableParser.getSyllabificationLines(lastVerseSet, parentStage);
 
 				if (setVerseCancelled) {
 					setVerseCancelled = false;
