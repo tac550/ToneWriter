@@ -1,4 +1,4 @@
-package com.tac550.tonewriter.model;
+package com.tac550.tonewriter.view;
 
 public class ToneMenuState {
 

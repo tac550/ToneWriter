@@ -1,7 +1,6 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
-import com.tac550.tonewriter.model.ToneMenuState;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
@@ -112,7 +111,7 @@ public class TopSceneController {
 	private File projectFile;
 	private String projectTitle = "Unnamed Project";
 
-	private String defaultPaperSize = "";
+	private static String defaultPaperSize = "";
 	private String projectPaperSize = "";
 
 	static final List<String> PAPER_SIZES = List.of("junior-legal (8.0 x 5.0 in)",
@@ -368,6 +367,9 @@ public class TopSceneController {
 		menu_item.setGraphic(imageView);
 	}
 
+	public static String getDefaultPaperSize() {
+		return defaultPaperSize;
+	}
 	private void setDefaultPaperSize(String size) {
 		defaultPaperSize = size;
 
