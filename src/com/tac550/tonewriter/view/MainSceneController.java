@@ -4,6 +4,10 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.SyllableParser;
 import com.tac550.tonewriter.io.ToneIO;
+import com.tac550.tonewriter.model.ChantChord;
+import com.tac550.tonewriter.model.ChantPhrase;
+import com.tac550.tonewriter.model.MainChord;
+import com.tac550.tonewriter.model.Tone;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
@@ -873,6 +877,87 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 
+	void loadToneIntoUI(Tone tone) throws IOException {
+		setManualCLAssignmentSilently(tone.isManuallyAssignPhrases());
+		setKeySignature(tone.getKeySignature());
+		setHeaderStrings(tone.getToneText(), tone.getComposerText());
+
+		// If tone is empty, clear all lines and return.
+		if (tone.getChantPhrases().size() < 1) {
+			clearChantLines();
+			return;
+		}
+
+		// Don't reload any UI if tone being loaded has same structure
+		Tone currentTone = generateToneModel();
+		if (ToneIO.tonesSimilar_new(tone, currentTone)) {
+			for (int i = 0; i < tone.getChantPhrases().size(); i++) {
+				if (!tone.getChantPhrases().get(i).toString().replaceAll("\\s+", "")
+						.equals(currentTone.getChantPhrases().get(i).toString().replaceAll("\\s+", ""))) {
+					// If the lines are not identical, modify to match new values.
+					modifyChantLine(tone.getChantPhrases().get(i), chantLineControllers.get(i));
+				}
+			}
+		} else { // Tones don't have the same structure. do a full reload.
+			clearChantLines();
+
+			for (int i = 0; i < tone.getChantPhrases().size(); i++)
+				loadCLineIntoUI(i, tone.getChantPhrases().get(i));
+		}
+
+		recalcCLNames();
+		setFirstRepeated(tone.getFirstRepeated());
+	}
+	void loadCLineIntoUI(int index, ChantPhrase chant_line) throws IOException {
+		ChantLineViewController currentChantLine = null;
+
+		Task<FXMLLoader> currentChantLineLoader = createChantLine(index, false);
+		try {
+			currentChantLine = currentChantLineLoader.get().getController();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		assert currentChantLine != null;
+
+		// CL type parsing
+		if (chant_line.getName().contains("'"))
+			currentChantLine.makePrime();
+		else if (chant_line.getName().contains("alt"))
+			currentChantLine.makeAlternate();
+
+		currentChantLine.setComment(chant_line.getComment());
+
+		MainChord currentMainChord = null;
+
+		for (ChantChord chord : chant_line.getChords()) {
+			ChantChordController newChord = null;
+
+			if (chord.getName().matches("[0-9]")) {
+				currentMainChord = currentChantLine.addRecitingChord();
+				newChord = currentMainChord;
+			} else if (chord.getName().contains("Post")) {
+				assert currentMainChord != null;
+				newChord = currentMainChord.addPostChord();
+			} else if (chord.getName().contains("Prep")) {
+				assert currentMainChord != null;
+				newChord = currentMainChord.addPrepChord();
+			} else if (chant_line.getName().contains("END")) {
+				currentMainChord = currentChantLine.addEndChord();
+				newChord = currentMainChord;
+			}
+			assert newChord != null;
+			newChord.setFields(chord.getFields());
+			newChord.setComment(chord.getComment());
+		}
+	}
+	private void modifyChantLine(ChantPhrase new_line, ChantLineViewController existing_line) {
+		existing_line.setComment(new_line.getComment());
+		for (int i = 0; i < new_line.getChords().size(); i++) {
+			existing_line.getChords().get(i).setComment(new_line.getChords().get(i).getComment());
+			existing_line.getChords().get(i).setFields(new_line.getChords().get(i).getFields());
+		}
+	}
+
 	void clearFirstRepeated() {
 		for (ChantLineViewController controller : chantLineControllers)
 			controller.resetFRState();
@@ -1214,6 +1299,10 @@ public class MainSceneController {
 	}
 	public int getMidiTempo() {
 		return midiTempo;
+	}
+
+	public Tone generateToneModel() { // TODO: Complete.
+		return new Tone.ToneBuilder().buildTone();
 	}
 
 	private static class RenderFormatException extends Exception {}

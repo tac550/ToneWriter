@@ -1,6 +1,9 @@
 package com.tac550.tonewriter.io;
 
+import com.tac550.tonewriter.model.ChantChord;
+import com.tac550.tonewriter.model.ChantPhrase;
 import com.tac550.tonewriter.model.MainChord;
+import com.tac550.tonewriter.model.Tone;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.ChantLineViewController;
@@ -130,7 +133,7 @@ public class ToneIO {
 		return hashBuilder.toString();
 	}
 
-	public boolean loadTone(File toneFile, MainSceneController main_scene) {
+	public boolean loadTone(File toneFile, MainSceneController main_scene) { // TODO: Remove.
 		this.mainScene = main_scene;
 
 		String firstRepeated = "";
@@ -238,13 +241,27 @@ public class ToneIO {
 		return true;
 	}
 
-	private boolean tonesSimilar(String[] chant_lines) {
+	private boolean tonesSimilar(String[] chant_lines) { // TODO: Remove.
 		if (chant_lines.length != chantLines.size())
 			return false;
 
 		int i = 0;
 		for (String line : chant_lines) {
 			if (!chantLines.get(i).isSimilarTo(line))
+				return false;
+
+			i++;
+		}
+
+		return true;
+	}
+	public static boolean tonesSimilar_new(Tone tone1, Tone tone2) {
+		if (tone1.getChantPhrases().size() != tone2.getChantPhrases().size())
+			return false;
+
+		int i = 0;
+		for (ChantPhrase phrase : tone1.getChantPhrases()) {
+			if (!tone2.getChantPhrases().get(i).isSimilarTo(phrase))
 				return false;
 
 			i++;
@@ -267,7 +284,7 @@ public class ToneIO {
 		writer.println();
 	}
 
-	private String readFromSection(String[] section, int line_index, String default_value) {
+	private static String readFromSection(String[] section, int line_index, String default_value) {
 
 		if (line_index < section.length && section[line_index].matches(".*[^\\\\]:.*")) { // Matches colon WITHOUT escape
 			String[] elements = section[line_index].split("[^\\\\]:");
@@ -337,10 +354,9 @@ public class ToneIO {
 				newChord.setComment(comment);
 			}
 		}
-
 	}
 
-	private void modifyChantLine(String chant_line, ChantLineViewController existing_line) {
+	private void modifyChantLine(String chant_line, ChantLineViewController existing_line) { // TODO: Remove.
 		Scanner chantLineScanner = new Scanner(chant_line);
 		String chantLineLine;
 
@@ -401,7 +417,136 @@ public class ToneIO {
 		return assigning;
 	}
 
-	private String extractComment(String[] split_input, int comment_start_offset) {
+	public static Tone loadTone_new(File toneFile) {
+		Tone.ToneBuilder toneBuilder = new Tone.ToneBuilder();
+		String versionSaved;
+		String headerText = null;
+		List<ChantPhrase> phrases = new ArrayList<>();
+		boolean pre0_6;
+		boolean futureVersion;
+
+		try {
+			// Load entire tone file and split it as necessary
+			TextStringBuilder fileStringBuilder = new TextStringBuilder();
+			Files.lines(toneFile.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
+			// Triple newlines delimit sections
+			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
+			String[] header;
+			String[] chantLineStrings;
+			String[] footer;
+			if (sections.length == 3) {
+				header = sections[0].split("\\r?\\n");
+				// Double newlines delimit chant lines
+				chantLineStrings = sections[1].split("\\r?\\n\\r?\\n");
+				footer = sections[2].split("\\r?\\n");
+			} else {
+				header = sections[0].split("\\r?\\n");
+				chantLineStrings = null;
+				footer = null;
+			}
+
+			versionSaved = readFromSection(header, 0, "0");
+			pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
+			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION, 2) == 1;
+
+			toneBuilder.keySignature(readFromSection(header, 1, "C major")
+					.replace("s", "\u266F").replace("f", "\u266D"));
+			if (pre0_6) { // TODO: Test this!
+				headerText = readFromSection(header, 2, "");
+			} else {
+				toneBuilder.toneText(readFromSection(header, 2, ""));
+				toneBuilder.composerText(readFromSection(header, 3, ""));
+			}
+			toneBuilder.manualAssignment(Boolean.parseBoolean(readFromSection(header, pre0_6 ? 3 : 4, "false")));
+
+			if (footer != null)
+				toneBuilder.firstRepeated(readFromSection(footer, 0, ""));
+
+			// Version warning
+			if (futureVersion) {
+				TWUtils.showAlert(AlertType.INFORMATION, "Warning", String.format(Locale.US,
+						"This tone was created with a newer version of %s (%s). Be advised you may encounter problems.",
+						MainApp.APP_NAME, versionSaved), true);
+			} else if (versionSaved.equals("0")) {
+				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone file; it appears to be corrupted", true);
+				return null;
+			}
+
+			if (chantLineStrings != null) {
+				for (String line : chantLineStrings)
+					phrases.add(loadChantLine_new(line));
+			}
+			toneBuilder.chantPhrases(phrases);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (NumberFormatException e) {
+			TWUtils.showError(String.format("This tone file was created in a newer version of %s and is not compatible.",
+					MainApp.APP_NAME), true);
+			return null;
+		}
+
+		if (pre0_6 && headerText != null) { // TODO: Don't check this twice! (see above)
+			String[] headerParts = headerText.split("-", 2);
+			toneBuilder.toneText(headerParts[0].trim());
+			toneBuilder.composerText(headerParts.length > 1 ? headerParts[1].trim() : "");
+		}
+
+		return toneBuilder.buildTone();
+	}
+	private static ChantPhrase loadChantLine_new(String chant_line) throws IOException {
+		ChantPhrase.ChantPhraseBuilder phraseBuilder = new ChantPhrase.ChantPhraseBuilder();
+		List<ChantChord> chords = new ArrayList<>();
+		try (Scanner chantLineScanner = new Scanner(chant_line)) {
+			String chantLineLine;
+
+			phraseBuilder.name(chantLineScanner.nextLine());
+
+			ChantChord currentMainChord = null;
+
+			while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+				// Apply chant line comment
+				if (chantLineLine.startsWith("Comment: ")) {
+					String[] commentData = chantLineLine.split(": ");
+					phraseBuilder.comment(extractComment(commentData, 1));
+
+					continue;
+				}
+
+				String[] chordData = chantLineLine.split(": ");
+				String fields = chordData[1];
+				String[] parts = fields.split("-");
+				String comment = extractComment(chordData, 2);
+
+				ChantChord.ChantChordBuilder chordBuilder = new ChantChord.ChantChordBuilder();
+				chordBuilder.name(chordData[0]);
+				chordBuilder.soprano(parts[0]);
+				chordBuilder.alto(parts[1]);
+				chordBuilder.tenor(parts[2]);
+				chordBuilder.bass(parts[3]);
+				chordBuilder.comment(comment);
+
+				ChantChord currentChord = chordBuilder.buildChord();
+
+				// Add the appropriate chord type.
+				if (chordData[0].contains("Post")) {
+					assert currentMainChord != null;
+					currentMainChord.addPost(currentChord);
+				} else if (chordData[0].contains("Prep")) {
+					assert currentMainChord != null;
+					currentMainChord.addPrep(currentChord);
+				} else {
+					currentMainChord = currentChord;
+				}
+				chords.add(currentChord);
+			}
+			phraseBuilder.chords(chords);
+		}
+		return phraseBuilder.buildChantPhrase();
+	}
+
+	private static String extractComment(String[] split_input, int comment_start_offset) {
 		// Since the comment may include ": "s, we need to account for the possibility that it's been split and re-combine it.
 		return String.join(": ", Arrays.copyOfRange(split_input, comment_start_offset, split_input.length));
 	}

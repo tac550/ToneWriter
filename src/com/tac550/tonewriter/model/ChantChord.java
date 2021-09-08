@@ -53,4 +53,55 @@ public class ChantChord {
 				getTenor().isEmpty() ? " " : getTenor(),
 				getBass().isEmpty() ? " " : getBass());
 	}
+
+	public void addPrep(ChantChord prep) {
+		preps.add(prep);
+	}
+	public void addPost(ChantChord post) {
+		posts.add(post);
+	}
+
+	public static class ChantChordBuilder {
+		private String _name;
+		private String _comment;
+
+		private List<ChantChord> _preps;
+		private List<ChantChord> _posts;
+
+		private String _soprano;
+		private String _alto;
+		private String _tenor;
+		private String _bass;
+
+		public ChantChordBuilder() { }
+
+		public ChantChord buildChord() {
+			return new ChantChord(_name, _comment, _preps, _posts, _soprano, _alto, _tenor, _bass);
+		}
+
+		public ChantChordBuilder name(String _name) {
+			this._name = _name;
+			return this;
+		}
+		public ChantChordBuilder comment(String _comment) {
+			this._comment = _comment;
+			return this;
+		}
+		public ChantChordBuilder soprano(String _soprano) {
+			this._soprano = _soprano;
+			return this;
+		}
+		public ChantChordBuilder alto(String _alto) {
+			this._alto = _alto;
+			return this;
+		}
+		public ChantChordBuilder tenor(String _tenor) {
+			this._tenor = _tenor;
+			return this;
+		}
+		public ChantChordBuilder bass(String _bass) {
+			this._bass = _bass;
+			return this;
+		}
+	}
 }

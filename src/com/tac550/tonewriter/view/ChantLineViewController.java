@@ -688,7 +688,7 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	@Override
-	public String toString() {
+	public String toString() { // TODO: Remove. Instead, generatemodelrepr() -> toString()
 		StringBuilder finalString = new StringBuilder();
 
 		finalString.append(getName()).append(String.format("%n"));
@@ -726,7 +726,7 @@ public class ChantLineViewController implements CommentableView {
 
 	// Compares other_CL, which should be another chant line's String representation, to this line's String representation.
 	// Returns true if their structure is identical (actual names, notes, and comments may vary)
-	public boolean isSimilarTo(String other_CL) {
+	public boolean isSimilarTo(String other_CL) { // TODO: Remove. (Handled in model)
 		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
 				item.split(":")[0]).skip(1).toArray(String[]::new);
 		String[] otherLines = Arrays.stream(other_CL.split("\\r?\\n")).map(item ->
