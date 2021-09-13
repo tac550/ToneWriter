@@ -563,17 +563,17 @@ public class MainSceneController {
 		if (selected_file.exists()) {
 			toneFile = selected_file;
 
-			ToneIO toneReader = getToneReader();
+			Tone loadedTone = ToneIO.loadTone_new(selected_file);
 
 			loadingTone = true;
-			if (toneReader.loadTone(toneFile, this)) {
+			if (loadedTone != null && loadToneIntoUI(loadedTone)) {
 				hideToneHeaderOption.setSelected(hide_header);
 
 				loadingTone = false;
 				return true;
 			} else {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
-				// Since a tone was not loaded (or at least, not correctly),
+				// Since a tone was not loaded (or at least not correctly),
 				toneFile = null;
 
 				loadingTone = false;
@@ -695,9 +695,6 @@ public class MainSceneController {
 	public ToneIO getToneWriter() {
 		return new ToneIO(chantLineControllers, this, keySignature, leftText, rightText);
 	}
-	private ToneIO getToneReader() {
-		return new ToneIO(chantLineControllers, this);
-	}
 
 	/*
 	 * Edit Menu Actions
@@ -816,7 +813,6 @@ public class MainSceneController {
 			if (exportMode == ExportMode.ITEM)
 				exportMode = ExportMode.NONE;
 		}
-
 		refreshChordPreviews();
 	}
 
@@ -877,7 +873,7 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 
-	void loadToneIntoUI(Tone tone) throws IOException {
+	private boolean loadToneIntoUI(Tone tone) {
 		setManualCLAssignmentSilently(tone.isManuallyAssignPhrases());
 		setKeySignature(tone.getKeySignature());
 		setHeaderStrings(tone.getToneText(), tone.getComposerText());
@@ -885,7 +881,7 @@ public class MainSceneController {
 		// If tone is empty, clear all lines and return.
 		if (tone.getChantPhrases().size() < 1) {
 			clearChantLines();
-			return;
+			return true;
 		}
 
 		// Don't reload any UI if tone being loaded has same structure
@@ -900,13 +896,20 @@ public class MainSceneController {
 			}
 		} else { // Tones don't have the same structure. do a full reload.
 			clearChantLines();
-
-			for (int i = 0; i < tone.getChantPhrases().size(); i++)
-				loadCLineIntoUI(i, tone.getChantPhrases().get(i));
+			for (int i = 0; i < tone.getChantPhrases().size(); i++) {
+				try {
+					loadCLineIntoUI(i, tone.getChantPhrases().get(i));
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
+			}
 		}
 
 		recalcCLNames();
 		setFirstRepeated(tone.getFirstRepeated());
+
+		return true;
 	}
 	void loadCLineIntoUI(int index, ChantPhrase chant_line) throws IOException {
 		ChantLineViewController currentChantLine = null;
@@ -941,7 +944,7 @@ public class MainSceneController {
 			} else if (chord.getName().contains("Prep")) {
 				assert currentMainChord != null;
 				newChord = currentMainChord.addPrepChord();
-			} else if (chant_line.getName().contains("END")) {
+			} else if (chord.getName().contains("END")) {
 				currentMainChord = currentChantLine.addEndChord();
 				newChord = currentMainChord;
 			}

@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,16 +63,16 @@ public class ChantChord {
 	}
 
 	public static class ChantChordBuilder {
-		private String _name;
-		private String _comment;
+		private String _name = "";
+		private String _comment = "";
 
-		private List<ChantChord> _preps;
-		private List<ChantChord> _posts;
+		private List<ChantChord> _preps = new ArrayList<>();
+		private List<ChantChord> _posts = new ArrayList<>();
 
-		private String _soprano;
-		private String _alto;
-		private String _tenor;
-		private String _bass;
+		private String _soprano = "r";
+		private String _alto = "r";
+		private String _tenor = "r";
+		private String _bass = "r";
 
 		public ChantChordBuilder() { }
 
