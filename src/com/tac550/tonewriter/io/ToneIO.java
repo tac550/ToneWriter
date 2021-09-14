@@ -138,7 +138,7 @@ public class ToneIO {
 
 		return true;
 	}
-	public static boolean tonesSimilar_new(Tone tone1, Tone tone2) {
+	public static boolean tonesSimilar(Tone tone1, Tone tone2) {
 		if (tone1.getChantPhrases().size() != tone2.getChantPhrases().size())
 			return false;
 
@@ -179,13 +179,8 @@ public class ToneIO {
 		return default_value;
 	}
 
-	public static Tone loadTone_new(File toneFile) {
+	public static Tone loadTone(File toneFile) {
 		Tone.ToneBuilder toneBuilder = new Tone.ToneBuilder();
-		String versionSaved;
-		String headerText = null;
-		List<ChantPhrase> phrases = new ArrayList<>();
-		boolean pre0_6;
-		boolean futureVersion;
 
 		try {
 			// Load entire tone file and split it as necessary
@@ -207,14 +202,15 @@ public class ToneIO {
 				footer = null;
 			}
 
-			versionSaved = readFromSection(header, 0, "0");
-			pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
-			futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION, 2) == 1;
+			// Determine tone version information
+			String versionSaved = readFromSection(header, 0, "0");
+			boolean pre0_6 = TWUtils.versionCompare(versionSaved, "0.6") == 2;
+			boolean futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION, 2) == 1;
 
 			toneBuilder.keySignature(readFromSection(header, 1, "C major")
 					.replace("s", "\u266F").replace("f", "\u266D"));
 			if (pre0_6) {
-				headerText = readFromSection(header, 2, "");
+				String headerText = readFromSection(header, 2, "");
 				String[] headerParts = headerText.split("-", 2);
 				toneBuilder.toneText(headerParts[0].trim());
 				toneBuilder.composerText(headerParts.length > 1 ? headerParts[1].trim() : "");
@@ -237,9 +233,10 @@ public class ToneIO {
 				return null;
 			}
 
+			List<ChantPhrase> phrases = new ArrayList<>();
 			if (chantLineStrings != null) {
 				for (String line : chantLineStrings)
-					phrases.add(loadChantLine_new(line));
+					phrases.add(loadChantLine(line));
 			}
 			toneBuilder.chantPhrases(phrases);
 
@@ -254,7 +251,7 @@ public class ToneIO {
 
 		return toneBuilder.buildTone();
 	}
-	private static ChantPhrase loadChantLine_new(String chant_line) throws IOException {
+	private static ChantPhrase loadChantLine(String chant_line) throws IOException {
 		ChantPhrase.ChantPhraseBuilder phraseBuilder = new ChantPhrase.ChantPhraseBuilder();
 		List<ChantChord> chords = new ArrayList<>();
 		try (Scanner chantLineScanner = new Scanner(chant_line)) {

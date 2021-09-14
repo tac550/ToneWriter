@@ -563,7 +563,7 @@ public class MainSceneController {
 		if (selected_file.exists()) {
 			toneFile = selected_file;
 
-			Tone loadedTone = ToneIO.loadTone_new(selected_file);
+			Tone loadedTone = ToneIO.loadTone(selected_file);
 
 			loadingTone = true;
 			if (loadedTone != null && loadToneIntoUI(loadedTone)) {
@@ -886,7 +886,7 @@ public class MainSceneController {
 
 		// Don't reload any UI if tone being loaded has same structure
 		Tone currentTone = generateToneModel();
-		if (ToneIO.tonesSimilar_new(tone, currentTone)) {
+		if (ToneIO.tonesSimilar(tone, currentTone)) {
 			for (int i = 0; i < tone.getChantPhrases().size(); i++) {
 				if (!tone.getChantPhrases().get(i).toString().replaceAll("\\s+", "")
 						.equals(currentTone.getChantPhrases().get(i).toString().replaceAll("\\s+", ""))) {
