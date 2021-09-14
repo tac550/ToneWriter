@@ -179,13 +179,13 @@ public class ToneIO {
 		return default_value;
 	}
 
-	public static Tone loadTone(File toneFile) {
+	public static Tone loadTone(File tone_file) {
 		Tone.ToneBuilder toneBuilder = new Tone.ToneBuilder();
 
 		try {
 			// Load entire tone file and split it as necessary
 			TextStringBuilder fileStringBuilder = new TextStringBuilder();
-			Files.lines(toneFile.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
+			Files.lines(tone_file.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
 			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
 			String[] header;

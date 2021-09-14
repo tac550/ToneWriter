@@ -783,7 +783,7 @@ public class TopSceneController {
 		List<Tab> tabs = new ArrayList<>(tabPane.getTabs());
 		Collections.reverse(tabs);
 
-		// Prevents tabs from automatically being sequentially selected (and loaded) after the selected one closes
+		// Prevent tabs from automatically being sequentially selected (and loaded) after the selected one closes
 		tabPane.getSelectionModel().select(0);
 
 		for (Tab tab : tabs)
