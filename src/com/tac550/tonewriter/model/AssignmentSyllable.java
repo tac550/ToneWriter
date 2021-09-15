@@ -32,4 +32,37 @@ public class AssignmentSyllable {
 		return assignedChords;
 	}
 
+	public static class AssignmentSyllableBuilder {
+
+		private String _syllableText;
+		private boolean _firstSyllableInWord;
+		private boolean _bold;
+		private boolean _italic;
+
+		private List<AssignedChordData> _assignedChords;
+
+		public AssignmentSyllableBuilder() { }
+
+		public AssignmentSyllableBuilder syllableText(String _syllableText) {
+			this._syllableText = _syllableText;
+			return this;
+		}
+		public AssignmentSyllableBuilder firstSyllableInWord(boolean _firstSyllableInWord) {
+			this._firstSyllableInWord = _firstSyllableInWord;
+			return this;
+		}
+		public AssignmentSyllableBuilder bold(boolean _bold) {
+			this._bold = _bold;
+			return this;
+		}
+		public AssignmentSyllableBuilder italic(boolean _italic) {
+			this._italic = _italic;
+			return this;
+		}
+		public AssignmentSyllableBuilder assignedChords(List<AssignedChordData> _assignedChords) {
+			this._assignedChords = _assignedChords;
+			return this;
+		}
+
+	}
 }
