@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.AssignedChordData;
+import com.tac550.tonewriter.model.Project;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import javafx.concurrent.Task;
@@ -34,7 +35,7 @@ import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 
 public class ProjectIO {
 
-	private static final String RC4Key = "0123456789abcdef";
+	private static final String RC4_KEY = "0123456789abcdef";
 
 	private File tempProjectDirectory;
 
@@ -411,7 +412,7 @@ public class ProjectIO {
 		}
 
 		// Opening project files from future minor version increases is unsupported because the lazy saving system is
-		// likely to corrupt project files for users of newer versions. Patch version defferences do not trigger this.
+		// likely to corrupt project files for users of newer versions. Patch version differences do not trigger this.
 		if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION, 2) == 1) {
 			TWUtils.showAlert(Alert.AlertType.ERROR, "Error", String.format(Locale.US,
 					"This project can only be opened in %s version %s.0 or newer.",
@@ -676,17 +677,123 @@ public class ProjectIO {
 				TWUtils.showError("Failed to read item file " + i, true);
 				return false;
 			}
-
 		}
 
 		TWUtils.cleanUpAutosaves();
 		return true;
 	}
 
+	private Project loadProject_new(File project_file) {
+		Project.ProjectBuilder projectBuilder = new Project.ProjectBuilder();
+
+		// Decrypt project file, outputting to a temp zip. This is not meant to be secure, and simply prevents
+		// other programs from detecting that the file is a zip archive and displaying it as such.
+		File tempZip;
+		try {
+			tempZip = TWUtils.createTWTempFile("Loading", "in-progress.zip");
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temporary zip file!", true);
+			return null;
+		}
+		if (applyCipherFailed(project_file, tempZip)) {
+			TWUtils.showError("Failed to import raw project file!", true);
+			return null;
+		}
+
+		// Create temp directory to unzip project into (delete any old one first)
+		deleteTempDir();
+		try {
+			tempProjectDirectory = TWUtils.createTWTempDir("ProjectLoad-" + project_file.getName());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temp directory for project load!", true);
+			return null;
+		}
+
+		// Unzip the project file
+		try (FileInputStream fis = new FileInputStream(tempZip);
+		     ZipInputStream zis = new ZipInputStream(fis)) {
+			byte[] buffer = new byte[1024];
+
+			ZipEntry zipEntry = zis.getNextEntry();
+			while (zipEntry != null) {
+				File unzippedFile = checkExtractionDestination(tempProjectDirectory, zipEntry);
+				if (!unzippedFile.getParentFile().mkdirs() && !unzippedFile.getParentFile().exists()) {
+					TWUtils.showError("Failed to construct internal temp directory!", true);
+					return null;
+				}
+				try (FileOutputStream fos = new FileOutputStream(unzippedFile)) {
+					int len;
+					while ((len = zis.read(buffer)) > 0)
+						fos.write(buffer, 0, len);
+				} catch (IOException e) {
+					e.printStackTrace();
+					TWUtils.showError("Failed to extract file " + zipEntry.getName(), true);
+				}
+
+				zipEntry = zis.getNextEntry();
+			}
+
+		} catch (IOException e) {
+			TWUtils.showError("Failed to extract project file!", true);
+			return null;
+		}
+
+		// Delete temp zip file
+		if (!tempZip.delete())
+			TWUtils.showError("Failed to delete temporary zip file!", false);
+
+		// Gather project metadata from info file
+		int numItems;
+		String projectVersion;
+		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
+		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile, StandardCharsets.UTF_8))) {
+			projectVersion = readLine(reader).get(0);
+			projectBuilder.title(readLine(reader).get(0));
+			numItems = Integer.parseInt(readLine(reader).get(0));
+
+			// Version checking
+			// Opening project files from future minor version increases is unsupported because the lazy saving system is
+			// likely to corrupt project files for users of newer versions. Patch version differences do not trigger this.
+			if (TWUtils.versionCompare(projectVersion, MainApp.APP_VERSION, 2) == 1) {
+				TWUtils.showAlert(Alert.AlertType.ERROR, "Error", String.format(Locale.US,
+						"This project can only be opened in %s version %s.0 or newer.",
+						MainApp.APP_NAME, TWUtils.truncateVersionNumber(projectVersion, 2)), true);
+				return null;
+			}
+			// Before 1.0: no project-level paper size, spread type, or no-header option.
+			if (TWUtils.versionCompare("1.0", projectVersion) != 1) {
+				List<String> pageSettings = readLine(reader);
+				projectBuilder.paperSize(pageSettings.get(0));
+				projectBuilder.noHeader(Boolean.parseBoolean(pageSettings.get(1)));
+				projectBuilder.evenSpread(Boolean.parseBoolean(pageSettings.get(2)));
+			}
+			// Before 1.2: no margin size settings
+			if (TWUtils.versionCompare("1.2", projectVersion) != 1) {
+				List<String> margins = readLine(reader);
+				projectBuilder.marginInfo(margins.toArray(String[]::new));
+			}
+		} catch (IOException e) {
+			TWUtils.showError("Failed to read project metadata file!", true);
+			return null;
+		}
+
+		// Gather references to tone files
+		Map<String, File> hashtoToneFile = new HashMap<>();
+		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
+		File[] toneDirs = tonesDir.listFiles(); // Directory names are the hash of contained tone.
+		if (tonesDir.exists() && toneDirs != null) {
+			for (File toneDir : toneDirs)
+				hashtoToneFile.put(toneDir.getName(), new File(toneDir.getAbsolutePath()
+						+ File.separator + "Unsaved Tone.tone"));
+		}
+
+		return projectBuilder.buildProject();
+	}
+
 	private static boolean applyCipherFailed(File input, File output) {
 		try (FileInputStream inputStream = new FileInputStream(input);
 		     FileOutputStream outputStream = new FileOutputStream(output)) {
-			Key key = new SecretKeySpec(RC4Key.getBytes(), "RC4");
+			Key key = new SecretKeySpec(RC4_KEY.getBytes(), "RC4");
 			Cipher cipher = Cipher.getInstance("RC4");
 			cipher.init(Cipher.DECRYPT_MODE, key);
 
@@ -719,7 +826,7 @@ public class ProjectIO {
 		return destFile;
 	}
 
-	// Remove existing temp directory, if any.
+	// Remove existing temporary project directory, if any.
 	private void deleteTempDir() {
 		if (tempProjectDirectory != null && tempProjectDirectory.exists()) {
 			try {
