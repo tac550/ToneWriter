@@ -25,10 +25,6 @@ public class ChantPhrase {
 		return chords;
 	}
 
-	public void addChord(ChantChord chord) {
-		chords.add(chord);
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder finalString = new StringBuilder();
