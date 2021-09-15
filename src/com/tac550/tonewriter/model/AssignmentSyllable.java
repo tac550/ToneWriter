@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AssignmentSyllable {
@@ -12,8 +13,8 @@ public class AssignmentSyllable {
 	private final List<AssignedChordData> assignedChords;
 
 	public AssignmentSyllable(String syllable_text, boolean bold, boolean italic, List<AssignedChordData> assigned_chords) {
-		this.syllableText = syllable_text; this.firstSyllableInWord = !syllable_text.startsWith("-");
-		this.bold = bold; this.italic = italic; this.assignedChords = assigned_chords;
+		this.syllableText = syllable_text; this.bold = bold; this.italic = italic; this.assignedChords = assigned_chords;
+		this.firstSyllableInWord = !syllable_text.startsWith("-");
 	}
 
 	public String getSyllableText() {
@@ -34,21 +35,20 @@ public class AssignmentSyllable {
 
 	public static class AssignmentSyllableBuilder {
 
-		private String _syllableText;
-		private boolean _firstSyllableInWord;
-		private boolean _bold;
-		private boolean _italic;
+		private String _syllableText = "Text";
+		private boolean _bold = false;
+		private boolean _italic = false;
 
-		private List<AssignedChordData> _assignedChords;
+		private List<AssignedChordData> _assignedChords = new ArrayList<>();
 
 		public AssignmentSyllableBuilder() { }
 
+		public AssignmentSyllable buildAssignmentSyllable() {
+			return new AssignmentSyllable(_syllableText, _bold, _italic, _assignedChords);
+		}
+
 		public AssignmentSyllableBuilder syllableText(String _syllableText) {
 			this._syllableText = _syllableText;
-			return this;
-		}
-		public AssignmentSyllableBuilder firstSyllableInWord(boolean _firstSyllableInWord) {
-			this._firstSyllableInWord = _firstSyllableInWord;
 			return this;
 		}
 		public AssignmentSyllableBuilder bold(boolean _bold) {
