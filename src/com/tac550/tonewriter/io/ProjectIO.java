@@ -36,7 +36,7 @@ public class ProjectIO {
 
 	private static final String RC4_KEY = "0123456789abcdef";
 
-	private File tempProjectDirectory;
+	private static File tempProjectDirectory;
 
 	public boolean saveProject(File project_file, TopSceneController top_controller) {
 		TWUtils.cleanUpAutosaves();
@@ -681,7 +681,7 @@ public class ProjectIO {
 		return true;
 	}
 
-	private Project loadProject_new(File project_file) {
+	public static Project loadProject_new(File project_file) {
 		Project.ProjectBuilder projectBuilder = new Project.ProjectBuilder();
 
 		// Decrypt project file, outputting to a temp zip. This is not meant to be secure, and simply prevents
@@ -953,7 +953,7 @@ public class ProjectIO {
 	}
 
 	// Remove existing temporary project directory, if any.
-	private void deleteTempDir() {
+	private static void deleteTempDir() {
 		if (tempProjectDirectory != null && tempProjectDirectory.exists()) {
 			try {
 				FileUtils.deleteDirectory(tempProjectDirectory);
@@ -963,7 +963,7 @@ public class ProjectIO {
 		}
 	}
 
-	private List<String> readLine(BufferedReader reader) throws IOException {
+	private static List<String> readLine(BufferedReader reader) throws IOException {
 		String line;
 		if ((line = reader.readLine()) != null)
 			return List.of(line.split("\t", -1));
@@ -971,7 +971,7 @@ public class ProjectIO {
 			return List.of("");
 	}
 
-	private void writeLine(Writer writer, Object... items) throws IOException {
+	private static void writeLine(Writer writer, Object... items) throws IOException {
 		writer.write(Arrays.stream(items).map(String::valueOf).collect(Collectors.joining("\t")) + "\n");
 	}
 

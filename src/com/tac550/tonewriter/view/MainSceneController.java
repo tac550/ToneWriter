@@ -911,7 +911,7 @@ public class MainSceneController {
 
 		return true;
 	}
-	void loadCLineIntoUI(int index, ChantPhrase chant_line) throws IOException {
+	private void loadCLineIntoUI(int index, ChantPhrase chant_line) throws IOException {
 		ChantLineViewController currentChantLine = null;
 
 		Task<FXMLLoader> currentChantLineLoader = createChantLine(index, false);
