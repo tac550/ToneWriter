@@ -7,14 +7,14 @@ import java.util.List;
 
 public class Project {
 
-	private List<ProjectItem> items;
+	private final List<ProjectItem> items;
 
-	private String title;
-	private String paperSize;
-	private boolean noHeader;
-	private boolean evenSpread;
+	private final String title;
+	private final String paperSize;
+	private final boolean noHeader;
+	private final boolean evenSpread;
 
-	private String[] marginInfo;
+	private final String[] marginInfo;
 
 	public Project(List<ProjectItem> items, String title, String paper_size, boolean no_header, boolean even_spread,
 	               String[] margin_info) {

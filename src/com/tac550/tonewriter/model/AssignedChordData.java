@@ -6,16 +6,16 @@ import com.tac550.tonewriter.view.VerseLineViewController;
 
 public class AssignedChordData {
 
-	private final VerseLineViewController lineController;
-
 	private final int chordIndex;
 	private String duration;
 
-	public AssignedChordData(int chord_index, VerseLineViewController line_controller) {
-		lineController = line_controller;
-
+	public AssignedChordData(int chord_index) {
 		chordIndex = chord_index;
 		duration = "4";
+	}
+	public AssignedChordData(int chord_index, String duration) {
+		this.chordIndex = chord_index;
+		this.duration = duration;
 	}
 
 	public void setDuration(String new_duration) {
@@ -25,37 +25,37 @@ public class AssignedChordData {
 		return duration;
 	}
 
-	public ChantChordController getChordController() {
-		return lineController.getChordByIndex(chordIndex);
+	public ChantChordController getChordController(VerseLineViewController line_controller) {
+		return line_controller.getChordByIndex(chordIndex);
 	}
 	public int getChordIndex() {
 		return chordIndex;
 	}
 
-	public String getPart(int part_index) {
+	public String getPart(int part_index, VerseLineViewController vc) {
 		return switch (part_index) {
-			case 0 -> getSoprano();
-			case 1 -> getAlto();
-			case 2 -> getTenor();
-			case 3 -> getBass();
+			case 0 -> getSoprano(vc);
+			case 1 -> getAlto(vc);
+			case 2 -> getTenor(vc);
+			case 3 -> getBass(vc);
 			default -> "";
 		};
 	}
 
-	private String getSoprano() {
-		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[0],
+	private String getSoprano(VerseLineViewController vc) {
+		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[0],
 				LilyPondInterface.ADJUSTMENT_SOPRANO) + duration;
 	}
-	private String getAlto() {
-		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[1],
+	private String getAlto(VerseLineViewController vc) {
+		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[1],
 				LilyPondInterface.ADJUSTMENT_ALTO) + duration;
 	}
-	private String getTenor() {
-		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[2],
+	private String getTenor(VerseLineViewController vc) {
+		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[2],
 				LilyPondInterface.ADJUSTMENT_TENOR) + duration;
 	}
-	private String getBass() {
-		return LilyPondInterface.adjustOctave(lineController.getChordByIndex(chordIndex).getFields().split("-")[3],
+	private String getBass(VerseLineViewController vc) {
+		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[3],
 				LilyPondInterface.ADJUSTMENT_BASS) + duration;
 	}
 

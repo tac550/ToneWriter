@@ -382,7 +382,7 @@ public class LilyPondInterface {
 			StringBuilder verseLine = new StringBuilder();
 			// Number of beats in the line. This determines where the visible barline goes.
 			float measureBeats = generateNotatedLine(parts, List.of(verseLineController.getSyllables()), verseLine,
-					verseLineController.getDisableLineBreaks());
+					verseLineController.getDisableLineBreaks(), verseLineController);
 			// Add barline style indicator to the soprano part.
 			parts[PART_SOPRANO] += String.format(" \\bar \"%s\"", verseLineController.getAfterBar());
 
@@ -392,7 +392,7 @@ public class LilyPondInterface {
 	}
 
 	private static float generateNotatedLine(String[] parts, List<SyllableText> syllableList, StringBuilder verseLine,
-	                                         boolean disableLineBreaks) {
+	                                         boolean disableLineBreaks, VerseLineViewController vc) {
 		float measureBeats = 0;
 		float breakCount = 0;
 
@@ -424,7 +424,7 @@ public class LilyPondInterface {
 				// Add an additional chord indicator for the syllable, unless the soprano part was combined two chords ago,
 				// or it contains a rest. We only check the soprano part because the text is mapped to it.
 				if (chordList.indexOf(chordData) != 0 && !previousNoteCombined[PART_SOPRANO]
-						&& !chordData.getPart(PART_SOPRANO).contains("r")) {
+						&& !chordData.getPart(PART_SOPRANO, vc).contains("r")) {
 					// For chords subsequent to the first for each syllable, we add this to the lyric line
 					// to tell Lilypond this syllable has an additional chord attached to it.
 					syllableTextBuffer.append(" _ ");
@@ -463,11 +463,11 @@ public class LilyPondInterface {
 								hideThisChord = false;
 							else
 								// Otherwise, the previous note is the note from the last chord from the previous syllable.
-								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i);
+								previousNote = previousSyllableChords[previousSyllableChords.length - 1].getPart(i, vc);
 						}
 					} else {
 						// The previous note is the note just before this one on this same syllable.
-						previousNote = chordList.get(chordList.indexOf(chordData) - 1).getPart(i);
+						previousNote = chordList.get(chordList.indexOf(chordData) - 1).getPart(i, vc);
 					}
 
 					// CURRENT NOTE
@@ -477,7 +477,7 @@ public class LilyPondInterface {
 						// Then the current note will be the temporarily designated one.
 						currentNote = tempCurrentNotes[i];
 					else
-						currentNote = chordData.getPart(i);
+						currentNote = chordData.getPart(i, vc);
 
 					currentNoteIsEighth = currentNote.contains("8");
 
@@ -489,7 +489,7 @@ public class LilyPondInterface {
 						if (syllableList.indexOf(syllable) < syllableList.size() - 1
 								&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords().length > 0) {
 							// Then the next note is the note from the first chord of the next syllable.
-							nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i);
+							nextNote = syllableList.get(syllableList.indexOf(syllable) + 1).getAssociatedChords()[0].getPart(i, vc);
 						} else {
 							// This is the last chord associated with the last syllable with chords on it,
 							// so we definitely do not want to hide it (it's the last chord on the page!)
@@ -499,7 +499,7 @@ public class LilyPondInterface {
 						// If there's another chord associated with this syllable...
 					} else {
 						// Then the next note is the note from the next chord on this same syllable.
-						nextNote = chordList.get(chordList.indexOf(chordData) + 1).getPart(i);
+						nextNote = chordList.get(chordList.indexOf(chordData) + 1).getPart(i, vc);
 
 						// Since we have determined that there is at least one more chord on this syllable,
 						// we have to decide whether the current note should be combined with the next note.
@@ -560,9 +560,9 @@ public class LilyPondInterface {
 					if (!noteCombined[i]) {
 						// ...and the one before that was not combined.
 						if (!previousNoteCombined[i]) {
-							syllableNoteBuffers[i] += " " + chordData.getPart(i);
+							syllableNoteBuffers[i] += " " + chordData.getPart(i, vc);
 							// Add duration of this note to the beat total only if we're on the soprano part (we only need to count beats for one part).
-							if (i == 0) measureBeats += getBeatDuration(chordData.getPart(i));
+							if (i == 0) measureBeats += getBeatDuration(chordData.getPart(i, vc));
 						} else {
 							// If the previous note was combined, we clear the temp field for the current part and reset the flag.
 							previousNoteCombined[i] = false;

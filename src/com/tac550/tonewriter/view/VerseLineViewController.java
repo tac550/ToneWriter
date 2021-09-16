@@ -656,7 +656,7 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void handlePlay() {
-		MidiInterface.playAssignedPhrase(getSyllables(), playButton);
+		MidiInterface.playAssignedPhrase(getSyllables(), playButton, this);
 	}
 
 	@FXML private void handleEdit() {

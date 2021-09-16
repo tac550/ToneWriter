@@ -1,7 +1,6 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.AssignedChordData;
-import com.tac550.tonewriter.model.Project;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.*;
 import javafx.concurrent.Task;
@@ -288,11 +287,10 @@ public class ProjectIO {
 			for (VerseLineViewController vLine : controller.getVerseLineControllers()) {
 				StringBuilder line = new StringBuilder("+");
 
-				if (vLine.isSeparator()) {
+				if (vLine.isSeparator())
 					line.append("--------");
-				} else {
+				else
 					line.append(vLine.getTonePhraseChoice());
-				}
 
 				for (SyllableText syllable : vLine.getSyllables()) {
 					line.append("|").append(syllable.getFormattedText().strip());
@@ -786,6 +784,134 @@ public class ProjectIO {
 				hashtoToneFile.put(toneDir.getName(), new File(toneDir.getAbsolutePath()
 						+ File.separator + "Unsaved Tone.tone"));
 		}
+
+		List<ProjectItem> items = new ArrayList<>();
+		// Load however many items are in the save file
+		for (int i = 0; i < numItems; i++) {
+			ProjectItem.ProjectItemBuilder itemBuilder = new ProjectItem.ProjectItemBuilder();
+			File itemFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
+					+ File.separator + i);
+			try (BufferedReader reader = new BufferedReader((new FileReader(itemFile, StandardCharsets.UTF_8)))) {
+
+				String itemVersion;
+				String origToneFilePath;
+
+				// If the first entry in the item is not a version number, we have a pre-1.0 project file.
+				String firstLine = readLine(reader).get(0);
+				if (Pattern.compile("^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$").matcher(firstLine).matches()) {
+					itemVersion = firstLine;
+					origToneFilePath = readLine(reader).get(0);
+				} else {
+					itemVersion = "0.9";
+					origToneFilePath = firstLine;
+				}
+
+				itemBuilder.originalToneFile(new File(separatorsToSystem(origToneFilePath
+						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath())
+						.replace("$PROJECT_DIR", project_file.getParent()))));
+				String toneHash = readLine(reader).get(0);
+				Tone associatedTone = null;
+				if (!toneHash.isEmpty()) {
+					associatedTone = ToneIO.loadTone(hashtoToneFile.get(toneHash));
+					itemBuilder.associatedTone(associatedTone);
+				}
+
+				itemBuilder.toneEdited(Boolean.parseBoolean(readLine(reader).get(0)));
+				List<String> titleSubtitle = readLine(reader);
+				itemBuilder.titleText(titleSubtitle.get(0));
+				itemBuilder.subtitleText(titleSubtitle.get(1));
+				List<String> options = readLine(reader);
+				itemBuilder.titleType(ProjectItem.TitleType.valueOf(options.get(0).toUpperCase(Locale.ROOT)));
+				itemBuilder.hideToneHeader(Boolean.parseBoolean(options.get(1)));
+				itemBuilder.breakBeforeItem(Boolean.parseBoolean(options.get(2)));
+
+				// Before 1.0: No extended text options.
+				itemBuilder.extendedTextSelection(TWUtils.versionCompare("1.0", itemVersion) == 1 ? 0 : Integer.parseInt(options.get(3)));
+				itemBuilder.breakExtendedTextOnlyOnBlank(TWUtils.versionCompare("1.0", itemVersion) != 1 && Boolean.parseBoolean(options.get(4)));
+
+				List<String> topVerseData = readLine(reader);
+				itemBuilder.topVersePrefix(topVerseData.get(0));
+				itemBuilder.topVerse(topVerseData.get(1));
+				itemBuilder.verseAreaText(TWUtils.decodeNewLines(readLine(reader).get(0)));
+				List<String> bottomVerseData = readLine(reader);
+				itemBuilder.bottomVersePrefix(bottomVerseData.get(0));
+				itemBuilder.bottomVerse(bottomVerseData.get(1));
+
+				List<AssignmentLine> assignmentLines = new ArrayList<>();
+
+				List<String> lineEntry;
+				while ((lineEntry = readLine(reader)).get(0).startsWith("+")) {
+					AssignmentLine.AssignmentLineBuilder lineBuilder = new AssignmentLine.AssignmentLineBuilder();
+
+					String[] syllData = lineEntry.get(0).split("\\|");
+
+					ChantPhrase selectedChantPhrase = null;
+					// assignedPhraseName = assigned phrase name (or divider indicator) without leading "+"
+					String assignedPhraseName = syllData[0].substring(1);
+					// If this line is a separator, add it and continue to the next line.
+					if (assignedPhraseName.contains("---")) {
+						assignmentLines.add(lineBuilder.separator(true).buildAssignmentLine());
+						continue;
+					} else if (associatedTone != null) {
+						selectedChantPhrase = associatedTone.getChantPhrases().stream().filter(p ->
+								p.getName().equals(assignedPhraseName)).toList().get(0);
+						lineBuilder.selectedChantPhrase(selectedChantPhrase);
+					}
+
+					List<AssignmentSyllable> syllables = new ArrayList<>();
+					for (int j = 1; j < syllData.length; j++) {
+						AssignmentSyllable.AssignmentSyllableBuilder syllableBuilder = new AssignmentSyllable.AssignmentSyllableBuilder();
+						String[] syllAndAssgmnts = syllData[j].split(" ");
+
+						String syllable;
+						if (syllAndAssgmnts.length == 0)
+							syllable = syllData[j];
+						else
+							syllable = syllAndAssgmnts[0];
+
+						if (syllable.contains("&")) { // Syllable formatting information is present.
+							String[] syllAndFormatting = syllable.split("&");
+							syllable = syllAndFormatting[0];
+							if (syllAndFormatting[1].contains("b"))
+								syllableBuilder.bold(true);
+							if (syllAndFormatting[1].contains("i"))
+								syllableBuilder.italic(true);
+						}
+
+						if (!syllable.startsWith("-"))
+							syllable = " " + syllable;
+
+						String assignments = syllAndAssgmnts.length > 1 ? syllAndAssgmnts[1] : "";
+						syllableBuilder.syllableText(syllable);
+						List<AssignedChordData> chordData = new ArrayList<>();
+						if (selectedChantPhrase != null) {
+							String[] chords = assignments.split(";");
+							for (String chord : chords) {
+								String[] ind_dur = chord.split("-");
+								chordData.add(new AssignedChordData(Integer.parseInt(ind_dur[0]), ind_dur[1]));
+							}
+						}
+						syllableBuilder.assignedChords(chordData);
+						syllables.add(syllableBuilder.buildAssignmentSyllable());
+					}
+					lineBuilder.syllables(syllables);
+
+					// Before 1.0: No custom barlines or line break disabling.
+					if (TWUtils.versionCompare("1.0", itemVersion) != 1)
+						lineBuilder.beforeBar(lineEntry.get(1)).afterBar(lineEntry.get(2))
+								.systemBreakDisabled(Boolean.parseBoolean(lineEntry.get(3)));
+
+					assignmentLines.add(lineBuilder.buildAssignmentLine());
+				}
+				itemBuilder.assignmentLines(assignmentLines);
+				items.add(itemBuilder.buildProjectItem());
+
+			} catch (IOException e) {
+				TWUtils.showError("Failed to read item file " + i, true);
+				return null;
+			}
+		}
+		projectBuilder.items(items);
 
 		return projectBuilder.buildProject();
 	}

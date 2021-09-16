@@ -3,6 +3,7 @@ package com.tac550.tonewriter.io;
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.SyllableText;
+import com.tac550.tonewriter.view.VerseLineViewController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Button;
@@ -17,7 +18,7 @@ public class MidiInterface {
 
 	private static Sequencer sequencer = null;
 
-	public static void playAssignedPhrase(SyllableText[] syllables, Button playButton) {
+	public static void playAssignedPhrase(SyllableText[] syllables, Button playButton, VerseLineViewController vc) {
 		if (sequencer == null) return;
 
 		playButton.setDisable(true);
@@ -36,7 +37,7 @@ public class MidiInterface {
 					buttons.addAll(syllable.getAssociatedButtons());
 
 					for (AssignedChordData chord : syllable.getAssociatedChords()) {
-						String fieldsAndDur = chord.getChordController().getFields() + chord.getDuration();
+						String fieldsAndDur = chord.getChordController(vc).getFields() + chord.getDuration();
 						// Group elements together in sequential lists in map if notes are same and duration is quarter.
 						if (fieldsAndDur.equals(previousFieldsAndDur)
 								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
@@ -71,7 +72,7 @@ public class MidiInterface {
 							}
 						}
 
-						chord.getChordController().playMidi();
+						chord.getChordController(vc).playMidi();
 						// This sleep determines for how long the note plays.
 						// Speeds recitative of more than 3 repeated notes up to a maximum value.
 						// For non-recitative, bases speed on note value, adjusting some manually.

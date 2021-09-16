@@ -6,10 +6,10 @@ import java.util.List;
 
 public class ChantPhrase {
 
-	private String name;
-	private String comment;
+	private final String name;
+	private final String comment;
 
-	private List<ChantChord> chords; // In the order they appear in .tone files.
+	private final List<ChantChord> chords; // In the order they appear in .tone files.
 
 	public ChantPhrase(String name, String comment, List<ChantChord> chords) {
 		this.name = name; this.comment = comment; this.chords = chords;

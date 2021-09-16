@@ -5,7 +5,7 @@ import java.util.List;
 
 public class AssignmentLine {
 
-	private final ChantPhrase selectedChantLine;
+	private final ChantPhrase selectedChantPhrase;
 	private final List<AssignmentSyllable> syllables;
 
 	private final String beforeBar;
@@ -16,12 +16,12 @@ public class AssignmentLine {
 
 	public AssignmentLine(ChantPhrase selected_chant_line, List<AssignmentSyllable> syllables, String before_bar,
 	                      String after_bar, boolean separator, boolean system_breaking_disabled) {
-		this.selectedChantLine = selected_chant_line; this.syllables = syllables; this.beforeBar = before_bar;
+		this.selectedChantPhrase = selected_chant_line; this.syllables = syllables; this.beforeBar = before_bar;
 		this.afterBar = after_bar; this.separator = separator; this.systemBreakingDisabled = system_breaking_disabled;
 	}
 
-	public ChantPhrase getSelectedChantLine() {
-		return selectedChantLine;
+	public ChantPhrase getSelectedChantPhrase() {
+		return selectedChantPhrase;
 	}
 	public List<AssignmentSyllable> getSyllables() {
 		return syllables;
@@ -41,7 +41,7 @@ public class AssignmentLine {
 
 	public static class AssignmentLineBuilder {
 
-		private ChantPhrase _selectedChantLine = null;
+		private ChantPhrase _selectedChantPhrase = null;
 		private List<AssignmentSyllable> _syllables = new ArrayList<>();
 
 		private String _beforeBar = "";
@@ -53,11 +53,11 @@ public class AssignmentLine {
 		public AssignmentLineBuilder() { }
 
 		public AssignmentLine buildAssignmentLine() {
-			return new AssignmentLine(_selectedChantLine, _syllables, _beforeBar, _afterBar, _separator, _systemBreakingDisabled);
+			return new AssignmentLine(_selectedChantPhrase, _syllables, _beforeBar, _afterBar, _separator, _systemBreakingDisabled);
 		}
 
-		public AssignmentLineBuilder selectedChantLine(ChantPhrase _selectedChantLine) {
-			this._selectedChantLine = _selectedChantLine;
+		public AssignmentLineBuilder selectedChantPhrase(ChantPhrase _selectedChantLine) {
+			this._selectedChantPhrase = _selectedChantLine;
 			return this;
 		}
 		public AssignmentLineBuilder syllables(List<AssignmentSyllable> _syllables) {
