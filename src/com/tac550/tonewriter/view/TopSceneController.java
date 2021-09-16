@@ -1,6 +1,7 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.*;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainSceneController.ExportMode;
 import javafx.application.Platform;
@@ -8,9 +9,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -32,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -600,7 +604,8 @@ public class TopSceneController {
 		LilyPondInterface.openLastExportFolder();
 	}
 
-	public void addTab(String with_title, int at_index, String precomp_source, String tone_hash,
+	// TODO: Remove precomp_source and tone_hash parameters
+	public void addTab(String title, int at_index, String precomp_source, String tone_hash,
 					   Consumer<MainSceneController> loading_actions, boolean reset_edited) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
@@ -712,8 +717,8 @@ public class TopSceneController {
 				}
 
 				// Title text for the first tab created (at startup)
-				if (with_title != null)
-					newTabController.setTitle(with_title);
+				if (title != null)
+					newTabController.setTitle(title);
 
 				// If there is a specified index...
 				if (at_index != -1) {
@@ -840,8 +845,10 @@ public class TopSceneController {
 		clearProjectState();
 
 		if (selected_file.exists()) {
-			if (projectIO.openProject(selected_file, this)) {
+			Project loadedProject = ProjectIO.loadProject_new(selected_file);
+			if (loadedProject != null) {
 				projectFile = selected_file;
+				loadProjectIntoUI(loadedProject);
 			} else {
 				clearProjectState();
 				addTab();
@@ -853,6 +860,142 @@ public class TopSceneController {
 		openProject(selected_file);
 
 		projectFile = null;
+	}
+
+	private boolean loadProjectIntoUI(Project project) {
+		setProjectTitle(project.getTitle());
+		setPaperSize(project.getPaperSize());
+		setNoHeader(project.isNoHeader());
+		setEvenSpread(project.isEvenSpread());
+		String[] mi = project.getMarginInfo();
+		setMargins(Float.parseFloat(mi[0]), mi[1], Float.parseFloat(mi[2]), mi[3],
+				Float.parseFloat(mi[4]), mi[5], Float.parseFloat(mi[6]), mi[7]);
+
+		// Create and set up item tabs
+		for (int i = 0; i < project.getItems().size(); i++) {
+			ProjectItem item = project.getItems().get(i);
+			int finalI = i;
+			addTab(item.getTitleText(), i, null, null, ctr -> {
+				final boolean initialProjectEditedState = getProjectEdited();
+
+				// TODO: This will have bugs because it skips some steps which exist in requestOpenTone().
+				if (item.getAssociatedTone() != null)
+					ctr.loadToneIntoUI(item.getAssociatedTone());
+
+				try {
+					if (item.getOriginalToneFile().exists() &&
+							(ctr.getToneWriter().loadedToneSimilarTo(item.getOriginalToneFile()) || item.isToneEdited())) {
+						ctr.swapToneFile(item.getOriginalToneFile());
+					}
+				} catch (IOException e) {
+					TWUtils.showError("Failed to compare original tone file", false);
+					e.printStackTrace();
+				}
+
+				if (item.isToneEdited())
+					ctr.toneEdited(false);
+
+				ctr.setSubtitle(item.getSubtitleText());
+
+				ctr.setOptions(item.getTitleType().toString(), item.isHideToneHeader(), item.isPageBreakBeforeItem(),
+						item.getExtendedTextSelection(), item.isBreakExtendedTextOnlyOnBlank());
+
+				ctr.setTopVerseChoice(item.getTopVersePrefix());
+				ctr.setTopVerse(item.getTopVerse());
+				ctr.setVerseAreaText(item.getVerseAreaText());
+				ctr.setBottomVerseChoice(item.getBottomVersePrefix());
+				ctr.setBottomVerse(item.getBottomVerse());
+
+				for (int j = 0; j < item.getAssignmentLines().size(); j++) {
+					AssignmentLine line = item.getAssignmentLines().get(j);
+					// Create verse line with provided syllable data and save a reference to its controller
+					// TODO: This is wasteful. It just gets split again later.
+					Task<FXMLLoader> verseLineLoader = ctr.createVerseLine(String.join("",
+							line.getSyllables().stream().map(AssignmentSyllable::getSyllableText).toList()));
+					VerseLineViewController verseLine = null;
+					try {
+						verseLine = verseLineLoader.get().getController();
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+					assert verseLine != null;
+
+					verseLine.setPendingActions(finalI == 0, vLine -> {
+						List<String> durations = new ArrayList<>();
+
+						vLine.setTonePhraseChoice(line.getSelectedChantPhrase().getName());
+						vLine.setBarlines(line.getBeforeBar(), line.getAfterBar());
+						vLine.setDisableLineBreaks(vLine.getDisableLineBreaks());
+
+						// Apply syllable formatting.
+						for (int k = 0; k < line.getSyllables().size(); k++) {
+							vLine.getSyllables()[k].setBold(line.getSyllables().get(k).isBold());
+							vLine.getSyllables()[k].setItalic(line.getSyllables().get(k).isItalic());
+						}
+
+						// Assign and/or skip chords as would be done by a user.
+						int startSyll = 0;
+						int lastChordIndex = 0;
+						boolean prevWasEmpty = true;
+
+						outer:
+						for (int k = 0; k < line.getSyllables().size(); k++) {
+							List<AssignedChordData> assignedChords = line.getSyllables().get(k).getAssignedChords();
+							if (assignedChords.isEmpty()) {
+								if (!prevWasEmpty) {
+									vLine.assignChordSilently(startSyll, k - 1);
+									startSyll = k;
+									lastChordIndex++;
+								}
+
+								startSyll++;
+								prevWasEmpty = true;
+								continue;
+							} else {
+								prevWasEmpty = false;
+							}
+
+							int chordNum = 0;
+							for (AssignedChordData chord : assignedChords) {
+								durations.add(chord.getDuration());
+								if (chord.getChordIndex() > lastChordIndex) {
+
+									vLine.assignChordSilently(startSyll, chordNum - 1 >= 0
+											&& assignedChords.get(chordNum - 1).getChordIndex()
+											- lastChordIndex < 1 ? k : k - 1);
+
+									while (lastChordIndex < chord.getChordIndex() - 1) {
+										vLine.skipChord();
+										lastChordIndex++;
+									}
+
+									lastChordIndex++;
+									startSyll = k;
+
+								}
+								if (chordNum == assignedChords.size() - 1 && line.getSyllables().stream().skip(k + 1)
+										.map(AssignmentSyllable::getAssignedChords).allMatch(List::isEmpty)) {
+									while (lastChordIndex < chord.getChordIndex()) {
+										vLine.skipChord();
+										lastChordIndex++;
+									}
+									vLine.assignChordSilently(startSyll, k);
+									break outer;
+								}
+
+								chordNum++;
+							}
+						}
+
+						vLine.setAssignmentDurations(durations);
+					});
+				}
+
+				ctr.applyLoadedVerses(finalI != 0 && initialProjectEditedState);
+			}, true);
+		}
+
+		return true;
 	}
 
 	void projectEdited() {

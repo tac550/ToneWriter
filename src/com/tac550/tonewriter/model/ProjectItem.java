@@ -54,6 +54,9 @@ public class ProjectItem {
 	public Tone getAssociatedTone() {
 		return associatedTone;
 	}
+	public File getOriginalToneFile() {
+		return originalToneFile;
+	}
 	public boolean isToneEdited() {
 		return toneEdited;
 	}

@@ -4,10 +4,7 @@ import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.SyllableParser;
 import com.tac550.tonewriter.io.ToneIO;
-import com.tac550.tonewriter.model.ChantChord;
-import com.tac550.tonewriter.model.ChantPhrase;
-import com.tac550.tonewriter.model.MainChord;
-import com.tac550.tonewriter.model.Tone;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
@@ -873,7 +870,7 @@ public class MainSceneController {
 		recalcCLNames();
 	}
 
-	private boolean loadToneIntoUI(Tone tone) {
+	boolean loadToneIntoUI(Tone tone) {
 		setManualCLAssignmentSilently(tone.isManuallyAssignPhrases());
 		setKeySignature(tone.getKeySignature());
 		setHeaderStrings(tone.getToneText(), tone.getComposerText());
@@ -1130,13 +1127,13 @@ public class MainSceneController {
 	void toneEdited() {
 		toneEdited(true);
 	}
-	public void toneEdited(boolean project_edited) {
+	public void toneEdited(boolean set_project_edited) {
 		if (!toneEdited && isToneSavable() && !loadingTone) {
 			toneEdited = true;
 			updateStageTitle();
 		}
 
-		if (project_edited)
+		if (set_project_edited)
 			topSceneController.projectEdited();
 	}
 	void resetToneEditedStatus() {
