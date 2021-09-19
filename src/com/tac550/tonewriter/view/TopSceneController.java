@@ -845,10 +845,9 @@ public class TopSceneController {
 		clearProjectState();
 
 		if (selected_file.exists()) {
-			Project loadedProject = ProjectIO.loadProject_new(selected_file);
-			if (loadedProject != null) {
+			Project loadedProject = ProjectIO.loadProject(selected_file);
+			if (loadedProject != null && loadProjectIntoUI(loadedProject)) {
 				projectFile = selected_file;
-				loadProjectIntoUI(loadedProject);
 			} else {
 				clearProjectState();
 				addTab();
