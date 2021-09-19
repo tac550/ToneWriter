@@ -556,29 +556,25 @@ public class MainSceneController {
 			return false;
 		}
 	}
-	private boolean tryLoadingTone(File selected_file, boolean hide_header) {
-		if (selected_file.exists()) {
+	private boolean tryLoadingTone(File selected_file, Tone loaded_tone, boolean hide_header) {
+		if (selected_file != null && selected_file.exists()) {
 			toneFile = selected_file;
 
-			Tone loadedTone = ToneIO.loadTone(selected_file);
+			if (loaded_tone == null)
+				loaded_tone = ToneIO.loadTone(selected_file);
+		}
+		loadingTone = true;
+		if (loaded_tone != null && loadToneIntoUI(loaded_tone)) {
+			hideToneHeaderOption.setSelected(hide_header);
 
-			loadingTone = true;
-			if (loadedTone != null && loadToneIntoUI(loadedTone)) {
-				hideToneHeaderOption.setSelected(hide_header);
-
-				loadingTone = false;
-				return true;
-			} else {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
-				// Since a tone was not loaded (or at least not correctly),
-				toneFile = null;
-
-				loadingTone = false;
-				return false;
-			}
-
+			loadingTone = false;
+			return true;
 		} else {
-			TWUtils.showAlert(AlertType.ERROR, "Error", "Requested tone file doesn't exist!", true, parentStage);
+			TWUtils.showAlert(AlertType.ERROR, "Error", "Error loading tone!", true, parentStage);
+			// Since a tone was not loaded (or at least not correctly),
+			toneFile = null;
+
+			loadingTone = false;
 			return false;
 		}
 	}
@@ -797,8 +793,8 @@ public class MainSceneController {
 		topSceneController.setMenuState(toneMenuState);
 	}
 
-	public void requestOpenTone(File tone_file, boolean skip_savecheck, boolean hide_header) {
-		if ((skip_savecheck || checkSaveTone()) && tryLoadingTone(tone_file, hide_header)) {
+	private void requestOpenTone(File tone_file, Tone tone, boolean skip_savecheck, boolean hide_header) {
+		if ((skip_savecheck || checkSaveTone()) && tryLoadingTone(tone_file, tone, hide_header)) {
 			toneMenuState.editOptionsDisabled = false;
 			toneMenuState.saveToneMenuItemDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;
@@ -811,6 +807,12 @@ public class MainSceneController {
 				exportMode = ExportMode.NONE;
 		}
 		refreshChordPreviews();
+	}
+	public void requestOpenTone(File tone_file, boolean skip_savecheck, boolean hide_header) {
+		requestOpenTone(tone_file, null, skip_savecheck, hide_header);
+	}
+	public void requestOpenTone(Tone tone, boolean skip_savecheck, boolean hide_header) {
+		requestOpenTone(null, tone, skip_savecheck, hide_header);
 	}
 
 	private void refreshChordKeySignatures(String key) {

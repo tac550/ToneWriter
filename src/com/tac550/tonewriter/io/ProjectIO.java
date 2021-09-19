@@ -813,6 +813,7 @@ public class ProjectIO {
 				Tone associatedTone = null;
 				if (!toneHash.isEmpty()) {
 					associatedTone = ToneIO.loadTone(hashtoToneFile.get(toneHash));
+					itemBuilder.toneLoadedFrom(hashtoToneFile.get(toneHash));
 					itemBuilder.associatedTone(associatedTone);
 				}
 

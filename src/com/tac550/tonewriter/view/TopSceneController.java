@@ -878,9 +878,10 @@ public class TopSceneController {
 			addTab(item.getTitleText(), i, null, null, ctr -> {
 				final boolean initialProjectEditedState = getProjectEdited();
 
-				// TODO: This will have bugs because it skips some steps which exist in requestOpenTone().
-				if (item.getAssociatedTone() != null)
-					ctr.loadToneIntoUI(item.getAssociatedTone());
+				if (item.getAssociatedTone() != null) {
+					ctr.swapToneFile(item.getLoadedToneFile());
+					ctr.requestOpenTone(item.getAssociatedTone(), true, false);
+				}
 
 				try {
 					if (item.getOriginalToneFile().exists() &&

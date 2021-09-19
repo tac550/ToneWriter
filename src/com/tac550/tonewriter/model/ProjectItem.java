@@ -20,6 +20,7 @@ public class ProjectItem {
 	private final List<AssignmentLine> assignmentLines;
 	private final Tone associatedTone;
 	private final File originalToneFile;
+	private final File toneLoadedFrom;
 	private final boolean toneEdited;
 
 	private final String titleText;
@@ -36,16 +37,16 @@ public class ProjectItem {
 	private final int extendedTextSelection;
 	private final boolean breakExtendedTextOnlyOnBlank;
 
-	public ProjectItem(List<AssignmentLine> assign_lines, Tone assoc_tone, File orig_tone_file, boolean tone_edited,
-					   String title_text, TitleType title_type, String subtitle_text, String verse_area_text,
-					   String top_prefix, String bottom_prefix, String top_verse, String bottom_verse,
+	public ProjectItem(List<AssignmentLine> assign_lines, Tone assoc_tone, File orig_tone_file, File tone_loaded_from,
+	                   boolean tone_edited, String title_text, TitleType title_type, String subtitle_text,
+	                   String verse_area_text, String top_prefix, String bottom_prefix, String top_verse, String bottom_verse,
 					   boolean hide_tone_header, boolean break_before, int extended_text_sel, boolean break_only_on_blank) {
 		this.assignmentLines = assign_lines; this.associatedTone = assoc_tone; this.originalToneFile = orig_tone_file;
-		this.toneEdited = tone_edited;this.titleText = title_text; this.titleType = title_type; this.subtitleText = subtitle_text;
-		this.verseAreaText = verse_area_text; this.topVersePrefix = top_prefix; this.bottomVersePrefix = bottom_prefix;
-		this.topVerse = top_verse; this.bottomVerse = bottom_verse; this.hideToneHeader = hide_tone_header;
-		this.pageBreakBeforeItem = break_before; this.extendedTextSelection = extended_text_sel;
-		this.breakExtendedTextOnlyOnBlank = break_only_on_blank;
+		this.toneLoadedFrom = tone_loaded_from; this.toneEdited = tone_edited;this.titleText = title_text; this.titleType = title_type;
+		this.subtitleText = subtitle_text; this.verseAreaText = verse_area_text; this.topVersePrefix = top_prefix;
+		this.bottomVersePrefix = bottom_prefix; this.topVerse = top_verse; this.bottomVerse = bottom_verse;
+		this.hideToneHeader = hide_tone_header; this.pageBreakBeforeItem = break_before;
+		this.extendedTextSelection = extended_text_sel; this.breakExtendedTextOnlyOnBlank = break_only_on_blank;
 	}
 
 	public List<AssignmentLine> getAssignmentLines() {
@@ -56,6 +57,9 @@ public class ProjectItem {
 	}
 	public File getOriginalToneFile() {
 		return originalToneFile;
+	}
+	public File getLoadedToneFile() {
+		return toneLoadedFrom;
 	}
 	public boolean isToneEdited() {
 		return toneEdited;
@@ -102,6 +106,7 @@ public class ProjectItem {
 		private List<AssignmentLine> _assignmentLines = new ArrayList<>();
 		private Tone _associatedTone = null;
 		private File _originalToneFile = null;
+		private File _toneLoadedFrom = null;
 		private boolean _toneEdited = false;
 
 		private String _titleText = "";
@@ -121,7 +126,7 @@ public class ProjectItem {
 		public ProjectItemBuilder() { }
 
 		public ProjectItem buildProjectItem() {
-			return new ProjectItem(_assignmentLines, _associatedTone, _originalToneFile, _toneEdited, _titleText, _titleType,
+			return new ProjectItem(_assignmentLines, _associatedTone, _originalToneFile, _toneLoadedFrom, _toneEdited, _titleText, _titleType,
 					_subtitleText, _verseAreaText, _topVersePrefix, _bottomVersePrefix, _topVerse, _bottomVerse, _hideToneHeader,
 					_pageBreakBeforeItem, _extendedTextSelection, _breakExtendedTextOnlyOnBlank);
 		}
@@ -136,6 +141,10 @@ public class ProjectItem {
 		}
 		public ProjectItemBuilder originalToneFile(File _originalToneFile) {
 			this._originalToneFile = _originalToneFile;
+			return this;
+		}
+		public ProjectItemBuilder toneLoadedFrom(File _toneLoadedFrom) {
+			this._toneLoadedFrom = _toneLoadedFrom;
 			return this;
 		}
 		public ProjectItemBuilder toneEdited(boolean _toneEdited) {
