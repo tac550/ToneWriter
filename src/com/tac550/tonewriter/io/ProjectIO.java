@@ -855,7 +855,7 @@ public class ProjectIO {
 						continue;
 					} else if (associatedTone != null) {
 						selectedChantPhrase = associatedTone.getChantPhrases().stream().filter(p ->
-								p.getName().equals(assignedPhraseName)).toList().get(0);
+								p.getName().replace("alternate", "alt").equals(assignedPhraseName)).toList().get(0);
 						lineBuilder.selectedChantPhrase(selectedChantPhrase);
 					}
 

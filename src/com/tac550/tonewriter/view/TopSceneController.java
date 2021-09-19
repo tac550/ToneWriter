@@ -924,7 +924,8 @@ public class TopSceneController {
 					verseLine.setPendingActions(finalI == 0, vLine -> {
 						List<String> durations = new ArrayList<>();
 
-						vLine.setTonePhraseChoice(line.getSelectedChantPhrase().getName());
+						vLine.setTonePhraseChoice(line.getSelectedChantPhrase().getName()
+								.replace("alternate", "alt"));
 						vLine.setBarlines(line.getBeforeBar(), line.getAfterBar());
 						vLine.setDisableLineBreaks(vLine.getDisableLineBreaks());
 
