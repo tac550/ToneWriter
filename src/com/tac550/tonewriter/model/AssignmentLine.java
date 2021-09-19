@@ -44,8 +44,8 @@ public class AssignmentLine {
 		private ChantPhrase _selectedChantPhrase = null;
 		private List<AssignmentSyllable> _syllables = new ArrayList<>();
 
-		private String _beforeBar = "";
-		private String _afterBar = "";
+		private String _beforeBar = "unchanged";
+		private String _afterBar = "unchanged";
 
 		private boolean _separator = false;
 		private boolean _systemBreakingDisabled = false;
