@@ -772,4 +772,25 @@ public class ChantLineViewController implements CommentableView {
 		return codeBuilder.toHashCode();
 	}
 
+	public ChantPhrase generatePhraseModel() {
+		List<ChantChord> chords = new ArrayList<>();
+		for (ChantChordController chordController : chantChordControllers) {
+			if (chordController instanceof MainChord mc) {
+				ChantChord currentMain = mc.generateChordModel();
+				chords.add(currentMain);
+				for (PrepChord prep : mc.getPreps()) {
+					ChantChord prepModel = prep.generateChordModel();
+					chords.add(prepModel);
+					currentMain.addPrep(prepModel);
+				}
+				for (int i = mc.getPosts().size() - 1; i >= 0; i--) {
+					ChantChord postModel = mc.getPosts().get(i).generateChordModel();
+					chords.add(postModel);
+					currentMain.addPost(postModel);
+				}
+			}
+		}
+		return new ChantPhrase.ChantPhraseBuilder().name(getName()).comment(getEncodedComment()).chords(chords).buildChantPhrase();
+	}
+
 }

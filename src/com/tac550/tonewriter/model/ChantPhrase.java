@@ -54,7 +54,7 @@ public class ChantPhrase {
 		return finalString.toString();
 	}
 
-	public boolean isSimilarTo(ChantPhrase other) {
+	public boolean isSimilarTo(ChantPhrase other) { // TODO: Compare by content and not string representation.
 		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
 				item.split(":")[0]).skip(1).toArray(String[]::new);
 		String[] otherLines = Arrays.stream(other.toString().split("\\r?\\n")).map(item ->

@@ -4,9 +4,7 @@ import com.tac550.tonewriter.model.ChantChord;
 import com.tac550.tonewriter.model.ChantPhrase;
 import com.tac550.tonewriter.model.Tone;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.ChantLineViewController;
 import com.tac550.tonewriter.view.MainApp;
-import com.tac550.tonewriter.view.MainSceneController;
 import javafx.scene.control.Alert.AlertType;
 import org.apache.commons.text.TextStringBuilder;
 
@@ -25,25 +23,7 @@ public class ToneIO {
 
 	private static final int MAX_RECENT_TONES = 20;
 
-	private final List<ChantLineViewController> chantLines;
-
-	private String poetText;
-	private String composerText;
-	private String keySig;
-	private final MainSceneController associatedMainScene;
-
-	private MainSceneController mainScene;
-
-	public ToneIO(List<ChantLineViewController> lines, MainSceneController main_scene,
-				  String key, String poet, String composer) {
-		chantLines = new ArrayList<>(lines);
-		associatedMainScene = main_scene;
-		keySig = key;
-		poetText = poet;
-		composerText = composer;
-	}
-
-	public boolean saveToneToFile(File toneFile) {
+	public static boolean saveToneToFile(Tone tone, File toneFile) {
 		// Clear out old save data.
 		// noinspection ResultOfMethodCallIgnored
 		toneFile.delete();
@@ -55,7 +35,7 @@ public class ToneIO {
 
 			// Save to the file
 			FileWriter fileWriter = new FileWriter(toneFile, StandardCharsets.UTF_8);
-			saveToneTo(fileWriter);
+			saveToneTo(tone, fileWriter);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -65,54 +45,44 @@ public class ToneIO {
 		return true;
 	}
 
-	private void saveToneTo(Writer destination) {
+	private static void saveToneTo(Tone tone, Writer destination) {
 		try (PrintWriter printWriter = new PrintWriter(destination)) {
 
 			// Header info
 			writePairTo(printWriter, "VERSION", MainApp.APP_VERSION);
-			writePairTo(printWriter, "Key Signature", keySig.replace("\u266F", "s").replace("\u266D", "f"));
-			writePairTo(printWriter, "Tone", poetText);
-			writePairTo(printWriter, "Composer", composerText);
-			writePairTo(printWriter, "Manually Assign Phrases", associatedMainScene.manualCLAssignmentEnabled());
+			writePairTo(printWriter, "Key Signature", tone.getKeySignature().replace("\u266F", "s").replace("\u266D", "f"));
+			writePairTo(printWriter, "Tone", tone.getToneText());
+			writePairTo(printWriter, "Composer", tone.getComposerText());
+			writePairTo(printWriter, "Manually Assign Phrases", tone.isManuallyAssignPhrases());
 			writeBlankLine(printWriter);
 			writeBlankLine(printWriter);
 
-			// Line name which is marked first repeated. Filled when found.
-			String firstRepeated = "";
-
-			// For each chant line...
-			for (ChantLineViewController chantLine : chantLines) {
-
-				if (chantLine.getFirstRepeated())
-					firstRepeated = chantLine.getName();
-
-				printWriter.println(chantLine);
-
-			}
+			for (ChantPhrase chantPhrase : tone.getChantPhrases())
+				printWriter.println(chantPhrase);
 
 			// Footer info
 			writeBlankLine(printWriter);
-			writePairTo(printWriter, "First Repeated", firstRepeated);
+			writePairTo(printWriter, "First Repeated", tone.getFirstRepeated());
 
 		}
 	}
 
-	public String getToneString() {
+	private static String getToneString(Tone tone) {
 		try (StringWriter sw = new StringWriter()) {
-			saveToneTo(sw);
+			saveToneTo(tone, sw);
 			return sw.toString();
 		} catch (IOException e) {
 			return null;
 		}
 	}
-	public String getCurrentToneHash() {
+	public static String getToneHash(Tone tone) {
 
 		StringBuilder hashBuilder = new StringBuilder();
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 
 			// Record MD5 hash of the current tone data (what its file would contain if saved)
-			byte[] hashBytes = md.digest(getToneString().getBytes());
+			byte[] hashBytes = md.digest(Objects.requireNonNull(getToneString(tone)).getBytes());
 			for (byte b : hashBytes)
 				hashBuilder.append(String.format("%02x", b));
 
@@ -124,21 +94,7 @@ public class ToneIO {
 		return hashBuilder.toString();
 	}
 
-	private boolean tonesSimilar(String[] chant_lines) { // TODO: Remove.
-		if (chant_lines.length != chantLines.size())
-			return false;
-
-		int i = 0;
-		for (String line : chant_lines) {
-			if (!chantLines.get(i).isSimilarTo(line))
-				return false;
-
-			i++;
-		}
-
-		return true;
-	}
-	public static boolean tonesSimilar(Tone tone1, Tone tone2) {
+	public static boolean tonesSimilar(Tone tone1, Tone tone2) { // TODO: Remove in favor of model handling this.
 		if (tone1.getChantPhrases().size() != tone2.getChantPhrases().size())
 			return false;
 
@@ -152,18 +108,11 @@ public class ToneIO {
 
 		return true;
 	}
-	public boolean loadedToneSimilarTo(File tone_file) throws IOException {
-		String toneString = Files.readString(tone_file.toPath());
 
-		String[] parts = toneString.split("\\r?\\n\\r?\\n\\r?\\n");
-
-		return tonesSimilar(parts[1].split("\\r?\\n\\r?\\n"));
-	}
-
-	private void writePairTo(PrintWriter writer, String label, Object value) {
+	private static void writePairTo(PrintWriter writer, String label, Object value) {
 		writer.println(String.format("%s: %s", label, String.valueOf(value).replace(":", "\\:")));
 	}
-	private void writeBlankLine(PrintWriter writer) {
+	private static void writeBlankLine(PrintWriter writer) {
 		writer.println();
 	}
 
@@ -276,7 +225,7 @@ public class ToneIO {
 				String comment = extractComment(chordData, 2);
 
 				ChantChord.ChantChordBuilder chordBuilder = new ChantChord.ChantChordBuilder();
-				chordBuilder.name(chordData[0]);
+				chordBuilder.name(chordData[0].trim());
 				chordBuilder.soprano(parts[0]);
 				chordBuilder.alto(parts[1]);
 				chordBuilder.tenor(parts[2]);

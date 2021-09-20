@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
+import com.tac550.tonewriter.model.ChantChord;
 import com.tac550.tonewriter.model.MainChord;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
@@ -283,4 +284,10 @@ public abstract class ChantChordController implements CommentableView {
 	}
 
 	public abstract MainChord getAssociatedMainChord();
+
+	public ChantChord generateChordModel() {
+		String[] fields = getFields().replace("-", " - ").split("-");
+		return new ChantChord.ChantChordBuilder().name(getName()).comment(getEncodedComment()).soprano(fields[0].trim())
+				.alto(fields[1].trim()).tenor(fields[2].trim()).bass(fields[3].trim()).buildChord();
+	}
 }

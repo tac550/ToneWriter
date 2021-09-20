@@ -672,8 +672,7 @@ public class MainSceneController {
 	void handleSaveTone() {
 		if (toneFile == null || !isToneSavable()) return;
 
-		ToneIO toneWriter = getToneWriter();
-		if (!toneWriter.saveToneToFile(toneFile)) {
+		if (!ToneIO.saveToneToFile(generateToneModel(), toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
 		} else { // Save successful
 			resetToneEditedStatus();
@@ -683,10 +682,6 @@ public class MainSceneController {
 	}
 	void handleSaveToneAs() {
 		if (createNewTone()) handleSaveTone();
-	}
-
-	public ToneIO getToneWriter() {
-		return new ToneIO(chantLineControllers, this, keySignature, leftText, rightText);
 	}
 
 	/*
@@ -1303,8 +1298,16 @@ public class MainSceneController {
 		return midiTempo;
 	}
 
-	public Tone generateToneModel() { // TODO: Complete.
-		return new Tone.ToneBuilder().buildTone();
+	public Tone generateToneModel() {
+		List<ChantPhrase> chantPhrases = new ArrayList<>();
+		String firstRepeated = "";
+		for (ChantLineViewController cl : chantLineControllers) {
+			chantPhrases.add(cl.generatePhraseModel());
+			if (cl.getFirstRepeated())
+				firstRepeated = cl.getName();
+		}
+		return new Tone.ToneBuilder().keySignature(keySignature).toneText(leftText).composerText(rightText)
+				.manualAssignment(manualCLAssignment).chantPhrases(chantPhrases).firstRepeated(firstRepeated).buildTone();
 	}
 
 	private static class RenderFormatException extends Exception {}

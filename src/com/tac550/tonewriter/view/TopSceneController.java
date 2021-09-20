@@ -882,15 +882,9 @@ public class TopSceneController {
 					ctr.requestOpenTone(item.getAssociatedTone(), true, false);
 				}
 
-				try {
-					if (item.getOriginalToneFile().exists() &&
-							(ctr.getToneWriter().loadedToneSimilarTo(item.getOriginalToneFile()) || item.isToneEdited())) {
-						ctr.swapToneFile(item.getOriginalToneFile());
-					}
-				} catch (IOException e) {
-					TWUtils.showError("Failed to compare original tone file", false);
-					e.printStackTrace();
-				}
+				if (item.getOriginalToneFile().exists() &&
+						(ToneIO.tonesSimilar(ctr.generateToneModel(), Objects.requireNonNull(ToneIO.loadTone(item.getOriginalToneFile()))) || item.isToneEdited()))
+					ctr.swapToneFile(item.getOriginalToneFile());
 
 				if (item.isToneEdited())
 					ctr.toneEdited(false);

@@ -76,11 +76,11 @@ public class ProjectIO {
 		// Iterate through all the tabs, saving their configurations and saving tones if unique
 		int index = 0;
 		for (MainSceneController controller : top_controller.getTabControllers()) {
+			Tone tone = controller.generateToneModel();
 			File toneFile = controller.getToneFile();
 			String toneHash = "";
 			if (toneFile != null) { // If the tab has a tone loaded...
-				ToneIO toneWriter = controller.getToneWriter();
-				toneHash = toneWriter.getCurrentToneHash();
+				toneHash = ToneIO.getToneHash(tone);
 
 				// Save each unique tone file into "tones" directory
 				if (!uniqueHashes.contains(toneHash)) {
@@ -89,9 +89,8 @@ public class ProjectIO {
 					File toneSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones"
 							+ File.separator + toneHash + File.separator + "Unsaved Tone.tone");
 
-					if (ToneIO.createToneFile(toneSaveFile)) {
-						toneWriter.saveToneToFile(toneSaveFile);
-					}
+					if (ToneIO.createToneFile(toneSaveFile))
+						ToneIO.saveToneToFile(tone, toneSaveFile);
 				}
 			} else if (controller.getCachedToneHash() != null) {
 				uniqueHashes.add(controller.getCachedToneHash());
