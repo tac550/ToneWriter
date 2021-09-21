@@ -783,8 +783,8 @@ public class ChantLineViewController implements CommentableView {
 					chords.add(prepModel);
 					currentMain.addPrep(prepModel);
 				}
-				for (int i = mc.getPosts().size() - 1; i >= 0; i--) {
-					ChantChord postModel = mc.getPosts().get(i).generateChordModel();
+				for (PostChord post : mc.getPosts()) {
+					ChantChord postModel = post.generateChordModel();
 					chords.add(postModel);
 					currentMain.addPost(postModel);
 				}

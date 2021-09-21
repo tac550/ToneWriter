@@ -37,8 +37,8 @@ public class ChantPhrase {
 
 		// For each chord in the chant line...
 		for (ChantChord chord : getChords()) {
-			if (chord.getName().matches("[0-9]")) {
-				finalString.append(String.format("%s: %s%s%n", chord.getName().equals("End") ? "END" : chord.getName(), chord.getFields(),
+			if (chord.getName().matches("[0-9]") || chord.getName().equalsIgnoreCase("End")) {
+				finalString.append(String.format("%s: %s%s%n", chord.getName().equalsIgnoreCase("End") ? "END" : chord.getName(), chord.getFields(),
 						!chord.getComment().isEmpty() ? ": " + chord.getComment() : ""));
 				for (ChantChord prep : chord.getPreps()) { // Preps save out first
 					finalString.append(String.format("\tPrep: %s%s%n", prep.getFields(),
