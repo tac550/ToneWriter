@@ -938,7 +938,7 @@ public class MainSceneController {
 			} else if (chord.getName().contains("Prep")) {
 				assert currentMainChord != null;
 				newChord = currentMainChord.addPrepChord();
-			} else if (chord.getName().contains("END")) {
+			} else if (chord.getName().contains("End")) {
 				currentMainChord = currentChantLine.addEndChord();
 				newChord = currentMainChord;
 			}

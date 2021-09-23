@@ -225,7 +225,7 @@ public class ToneIO {
 				String comment = extractComment(chordData, 2);
 
 				ChantChord.ChantChordBuilder chordBuilder = new ChantChord.ChantChordBuilder();
-				chordBuilder.name(chordData[0].trim());
+				chordBuilder.name(chordData[0].trim().replace("END", "End"));
 				chordBuilder.soprano(parts[0]);
 				chordBuilder.alto(parts[1]);
 				chordBuilder.tenor(parts[2]);

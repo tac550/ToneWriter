@@ -1,7 +1,6 @@
 package com.tac550.tonewriter.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChantPhrase {
@@ -54,13 +53,16 @@ public class ChantPhrase {
 		return finalString.toString();
 	}
 
-	public boolean isSimilarTo(ChantPhrase other) { // TODO: Compare by content and not string representation.
-		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
-				item.split(":")[0]).skip(1).toArray(String[]::new);
-		String[] otherLines = Arrays.stream(other.toString().split("\\r?\\n")).map(item ->
-				item.split(":")[0]).skip(1).toArray(String[]::new);
+	public boolean isSimilarTo(ChantPhrase other) {
+		if (!other.getName().equals(this.getName()) || other.getChords().size() != this.getChords().size())
+			return false;
+		for (int i = 0; i < this.getChords().size(); i++) {
+			System.out.println(other.getChords().get(i).getName() + " VS " + this.getChords().get(i).getName());
+			if (!other.getChords().get(i).getName().equals(this.getChords().get(i).getName()))
+				return false;
+		}
 
-		return Arrays.equals(thisLines, otherLines);
+		return true;
 	}
 
 	public static class ChantPhraseBuilder {
