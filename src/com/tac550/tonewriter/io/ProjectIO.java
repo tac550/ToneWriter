@@ -2,7 +2,7 @@ package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.*;
+import com.tac550.tonewriter.view.MainApp;
 import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
 
@@ -15,7 +15,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -35,25 +34,15 @@ public class ProjectIO {
 
 	private static File tempProjectDirectory;
 
-	public boolean saveProject(File project_file, TopSceneController top_controller) {
+	public static boolean saveProject(File project_file, Project project) {
 		TWUtils.cleanUpAutosaves();
 
 		// Create temp directory in which to construct the final compressed project file
-		if (tempProjectDirectory == null || !tempProjectDirectory.exists()) {
-			try {
-				tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_file.getName());
-			} catch (IOException e) {
-				TWUtils.showError("Failed to create temp directory for project save!", true);
-				return false;
-			}
-		} else {
-			try {
-				FileUtils.copyDirectory(new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"),
-						new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"));
-			} catch (IOException e) {
-				TWUtils.showError("Failed to copy old items!", true);
-				return false;
-			}
+		try {
+			tempProjectDirectory = TWUtils.createTWTempDir("ProjectSave-" + project_file.getName());
+		} catch (IOException e) {
+			TWUtils.showError("Failed to create temp directory for project save!", true);
+			return false;
 		}
 
 		// Add info file and save project metadata into it
@@ -61,10 +50,10 @@ public class ProjectIO {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(projectInfoFile, StandardCharsets.UTF_8))) {
 
 			writeLine(writer, MainApp.APP_VERSION);
-			writeLine(writer, top_controller.getProjectTitle());
-			writeLine(writer, top_controller.getTabCount());
-			writeLine(writer, top_controller.getPaperSize(), top_controller.getNoHeader(), top_controller.getEvenSpread());
-			writeLine(writer, (Object[]) top_controller.getMarginInfo());
+			writeLine(writer, project.getTitle());
+			writeLine(writer, project.getItems().size());
+			writeLine(writer, project.getPaperSize(), project.isNoHeader(), project.isEvenSpread());
+			writeLine(writer, (Object[]) project.getMarginInfo());
 
 		} catch (IOException e) {
 			TWUtils.showError("Failed to create project metadata file!", true);
@@ -75,12 +64,10 @@ public class ProjectIO {
 
 		// Iterate through all the tabs, saving their configurations and saving tones if unique
 		int index = 0;
-		for (MainSceneController controller : top_controller.getTabControllers()) {
-			Tone tone = controller.generateToneModel();
-			File toneFile = controller.getToneFile();
-			String toneHash = "";
-			if (toneFile != null) { // If the tab has a tone loaded...
-				toneHash = ToneIO.getToneHash(tone);
+		for (ProjectItem item : project.getItems()) {
+			String toneHash;
+			if (item.getAssociatedTone() != null) { // If the tab has a tone loaded...
+				toneHash = ToneIO.getToneHash(item.getAssociatedTone());
 
 				// Save each unique tone file into "tones" directory
 				if (!uniqueHashes.contains(toneHash)) {
@@ -90,32 +77,20 @@ public class ProjectIO {
 							+ File.separator + toneHash + File.separator + "Unsaved Tone.tone");
 
 					if (ToneIO.createToneFile(toneSaveFile))
-						ToneIO.saveToneToFile(tone, toneSaveFile);
+						ToneIO.saveToneToFile(item.getAssociatedTone(), toneSaveFile);
 				}
-			} else if (controller.getCachedToneHash() != null) {
-				uniqueHashes.add(controller.getCachedToneHash());
 			}
 
-			// Place each item in a file in "items" directory and named by tab index, but only if the item
-			// has been loaded in the UI (otherwise copy its old entry into the file instead)
+			// Place each item in a file located in "items" directory and named by tab index
 			File itemSaveFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items"
 					+ File.separator + index);
 
-			if (controller.fullyLoaded()) {
-				saveItemToFile(itemSaveFile, controller, toneHash, project_file.getParent());
-			} else {
-				File oldItem = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "items_old"
-						+ File.separator + controller.getOriginalIndex());
-
-				saveCachedItem(itemSaveFile.toPath(), oldItem.toPath());
-
-				// Update old item index to current index value
-				controller.setOriginalIndex(index);
-			}
+			saveItemToFile(itemSaveFile, item, project_file.getParent());
 
 			index++;
 		}
 
+		// TODO: Is this necessary now given we've eliminated project component caching?
 		// Delete any leftover tones (tones required to open the project that are no longer in use)
 		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
 		if (tonesDir.exists())
@@ -142,26 +117,6 @@ public class ProjectIO {
 		} catch (IOException e) {
 			e.printStackTrace();
 			TWUtils.showError("Failed to delete leftover item entries!", false);
-		}
-
-		// Delete items_old directory as it is no longer needed and doesn't belong in the final project file
-		try {
-			File oldItemsDir = new File(tempProjectDirectory.getAbsolutePath()
-					+ File.separator + "items_old");
-			if (oldItemsDir.exists())
-				FileUtils.deleteDirectory(oldItemsDir);
-		} catch (IOException e) {
-			TWUtils.showError("Failed to remove old items directory!", false);
-		}
-
-		// Generate a full project source render and save it inside the project
-		File lilypondFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "render.ly");
-		try {
-			LilyPondInterface.saveToLilyPondFile(lilypondFile, top_controller.getProjectTitle(), top_controller.getTabControllers(),
-					top_controller.getPaperSize(), top_controller.getNoHeader(), top_controller.getEvenSpread(), top_controller.getMarginInfo());
-		} catch (IOException e) {
-			TWUtils.showError("Failed to save project render!", true);
-			return false;
 		}
 
 		// Compress the temp directory and save to a temp zip file
@@ -215,16 +170,7 @@ public class ProjectIO {
 		return true;
 	}
 
-	private void saveCachedItem(Path save_file, Path source_file) {
-		try {
-			Files.copy(source_file, save_file, StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-			TWUtils.showError("Failed to save item from cache!", false);
-		}
-	}
-	private void saveItemToFile(File save_file, MainSceneController controller, String tone_hash,
-								String projectSavePath) {
+	private static void saveItemToFile(File save_file, ProjectItem item, String projectSavePath) {
 		try {
 			// Create new file
 			if (!save_file.exists()) {
@@ -241,27 +187,23 @@ public class ProjectIO {
 
 			// Save to the file
 			try (OutputStream os = new FileOutputStream(save_file)) {
-				saveItemTo(new OutputStreamWriter(os, StandardCharsets.UTF_8), controller, tone_hash, projectSavePath);
+				saveItemTo(new OutputStreamWriter(os, StandardCharsets.UTF_8), item, projectSavePath);
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			TWUtils.showError("Failed to save item \"" + controller.getTitle() + "\"", false);
+			TWUtils.showError("Failed to save item \"" + item.getTitleText() + "\"", false);
 		}
 	}
 
-	private void saveItemTo(Writer destination, MainSceneController controller, String tone_hash,
-							String parent_path) throws IOException {
+	private static void saveItemTo(Writer destination, ProjectItem item, String parent_path) throws IOException {
 		try (PrintWriter writer = new PrintWriter(destination)) {
-
-			// General item data
-			File toneFile = controller.getToneFile();
-
 			// Version info
 			writeLine(writer, MainApp.APP_VERSION);
 
 			// Original tone location; relative path if built-in or in a subdirectory to project file.
-			String tonePath = toneFile != null ? toneFile.getAbsolutePath() : "";
+			File originalToneFile = item.getOriginalToneFile();
+			String tonePath = originalToneFile != null && originalToneFile.isFile() ? originalToneFile.getAbsolutePath() : "";
 			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
 			if (tonePath.startsWith(builtInPath))
 				tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
@@ -269,27 +211,27 @@ public class ProjectIO {
 				tonePath = tonePath.replace(parent_path, "$PROJECT_DIR");
 			writeLine(writer, tonePath);
 
-			writeLine(writer, tone_hash); // Tone hash (may be empty if no tone loaded)
-			writeLine(writer, controller.getToneEdited()); // Tone edited status
-			writeLine(writer, controller.getTitle(), controller.getSubtitle()); // Title + subtitle
-			writeLine(writer, controller.getSelectedTitleOption().getText(), // Options
-					controller.getHideToneHeader(), controller.getPageBreak(), controller.getExtendTextSelection(),
-					controller.getBreakOnlyOnBlank());
-			writeLine(writer, controller.getTopVerseChoice(), controller.getTopVerse()); // Top verse
-			writeLine(writer, TWUtils.encodeNewLines(controller.getVerseAreaText())); // Verse area text
-			writeLine(writer, controller.getBottomVerseChoice(), controller.getBottomVerse()); // Bottom verse
+			writeLine(writer, ToneIO.getToneHash(item.getAssociatedTone())); // Tone hash (empty if no tone loaded)
+			writeLine(writer, item.isToneEdited()); // Tone edited status
+			writeLine(writer, item.getTitleText(), item.getSubtitleText()); // Title + subtitle
+			writeLine(writer, item.getTitleType(), // Options
+					item.isHideToneHeader(), item.isPageBreakBeforeItem(), item.getExtendedTextSelection(),
+					item.isBreakExtendedTextOnlyOnBlank());
+			writeLine(writer, item.getTopVersePrefix(), item.getTopVerse()); // Top verse
+			writeLine(writer, TWUtils.encodeNewLines(item.getVerseAreaText())); // Verse area text
+			writeLine(writer, item.getBottomVersePrefix(), item.getBottomVerse()); // Bottom verse
 
 			// Syllables, assignment, and formatting data
-			for (VerseLineViewController vLine : controller.getVerseLineControllers()) {
+			for (AssignmentLine assnLine : item.getAssignmentLines()) {
 				StringBuilder line = new StringBuilder("+");
 
-				if (vLine.isSeparator())
+				if (assnLine.isSeparator())
 					line.append("--------");
 				else
-					line.append(vLine.getTonePhraseChoice());
+					line.append(TWUtils.shortenPhraseName(assnLine.getSelectedChantPhrase().getName()));
 
-				for (SyllableText syllable : vLine.getSyllables()) {
-					line.append("|").append(syllable.getFormattedText().strip());
+				for (AssignmentSyllable syllable : assnLine.getSyllables()) {
+					line.append("|").append(TWUtils.reverseSmartQuotes(syllable.getSyllableText()).strip());
 
 					String formatData = syllable.getFormatData();
 					if (formatData.length() > 0)
@@ -297,12 +239,11 @@ public class ProjectIO {
 
 					line.append(" ");
 
-					for (AssignedChordData chordData : syllable.getAssociatedChords()) {
+					for (AssignedChordData chordData : syllable.getAssignedChords())
 						line.append(chordData.getChordIndex()).append("-").append(chordData.getDuration()).append(";");
-					}
 				}
 
-				writeLine(writer, line, vLine.getBeforeBar(), vLine.getAfterBar(), vLine.getDisableLineBreaks());
+				writeLine(writer, line, assnLine.getBeforeBar(), assnLine.getAfterBar(), assnLine.isSystemBreakingDisabled());
 			}
 
 		}
@@ -482,7 +423,7 @@ public class ProjectIO {
 						continue;
 					} else if (associatedTone != null) {
 						selectedChantPhrase = associatedTone.getChantPhrases().stream().filter(p ->
-								p.getName().replace("alternate", "alt").equals(assignedPhraseName)).toList().get(0);
+								TWUtils.shortenPhraseName(p.getName()).equals(assignedPhraseName)).toList().get(0);
 						lineBuilder.selectedChantPhrase(selectedChantPhrase);
 					}
 

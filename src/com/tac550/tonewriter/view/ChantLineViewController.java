@@ -102,7 +102,7 @@ public class ChantLineViewController implements CommentableView {
 		
 		// NAME CHOICE
 		
-		// Indicate the the user caused the recalculation to avoid a stack overflow
+		// Indicate the user caused the recalculation to avoid a stack overflow
 		nameChoice.setOnMouseClicked((ov) -> selfTriggered = true);
 		
 		// First repeated line status should not be available for "prime" lines
@@ -170,7 +170,7 @@ public class ChantLineViewController implements CommentableView {
 		return nameChoice.getValue().contains("alternate");
 	}
 	public String getName() {
-		return nameChoice.getValue().replace("Phrase", "").trim();
+		return nameChoice.getValue();
 	}
 	public List<ChantChordController> getChords() {
 		return chantChordControllers;
@@ -790,7 +790,7 @@ public class ChantLineViewController implements CommentableView {
 				}
 			}
 		}
-		return new ChantPhrase.ChantPhraseBuilder().name(getName()).comment(getEncodedComment()).chords(chords).buildChantPhrase();
+		return new ChantPhrase.ChantPhraseBuilder().name(TWUtils.shortenPhraseName(getName())).comment(getEncodedComment()).chords(chords).buildChantPhrase();
 	}
 
 }

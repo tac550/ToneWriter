@@ -84,9 +84,7 @@ public class MainSceneController {
 	private int midiTempo = 0;
 
 	private File toneFile;
-	private int originalIndex = -1;
-	private String cachedItemSource = "";
-	private String cachedToneHash = "";
+	private ProjectItem cachedItemModel = null;
 
 	private String keySignature = "C major";
 	private String leftText = "";
@@ -1169,27 +1167,9 @@ public class MainSceneController {
 	public File getToneFile() {
 		return toneFile;
 	}
-	public int getOriginalIndex() {
-		return originalIndex;
-	}
-	public void setOriginalIndex(int index) {
-		originalIndex = index;
-	}
-	public String getLilyPondSource() {
-		if (fullyLoaded())
-			cachedItemSource = LilyPondInterface.generateItemSource(this, false);
-
-		return cachedItemSource;
-	}
-	// Also removes any leading and trailing whitespace, keeping only one newline at the end.
-	void setLilyPondSource(String source) {
-		cachedItemSource = source.strip() + "\n";
-	}
-	public String getCachedToneHash() {
-		return cachedToneHash;
-	}
-	public void setCachedToneHash(String hash) {
-		cachedToneHash = hash;
+	
+	public void setItemCache(ProjectItem loadedItemCache) {
+		cachedItemModel = loadedItemCache;
 	}
 
 	ObservableStringValue getTitleTextProperty() {
@@ -1236,9 +1216,6 @@ public class MainSceneController {
 	}
 	public boolean getLargeTitle() {
 		return largeTitleOption.isSelected();
-	}
-	public RadioMenuItem getSelectedTitleOption() {
-		return (RadioMenuItem) titleOptions.getSelectedToggle();
 	}
 	public boolean getHideToneHeader() {
 		return hideToneHeaderOption.isSelected();
@@ -1308,6 +1285,19 @@ public class MainSceneController {
 		}
 		return new Tone.ToneBuilder().keySignature(keySignature).toneText(leftText).composerText(rightText)
 				.manualAssignment(manualCLAssignment).chantPhrases(chantPhrases).firstRepeated(firstRepeated).buildTone();
+	}
+
+	ProjectItem generateItemModel() {
+		if (!fullyLoaded() && cachedItemModel != null)
+			return cachedItemModel;
+
+		return new ProjectItem.ProjectItemBuilder().assignmentLines(verseLineControllers.stream().map(VerseLineViewController::generateLineModel).toList())
+				.associatedTone(toneFile != null ? generateToneModel() : null).originalToneFile(toneFile).toneEdited(toneEdited)
+				.titleText(getTitle()).titleType(titleOptions.getSelectedToggle().equals(largeTitleOption) ? ProjectItem.TitleType.LARGE : titleOptions.getSelectedToggle().equals(hiddenTitleOption) ? ProjectItem.TitleType.HIDDEN : ProjectItem.TitleType.NORMAL)
+				.subtitleText(subtitleTextField.getText()).verseAreaText(verseArea.getText()).topVersePrefix(topVerseChoice.getValue())
+				.bottomVersePrefix(bottomVerseChoice.getValue()).topVerse(topVerseField.getText()).bottomVerse(bottomVerseField.getText())
+				.hideToneHeader(hideToneHeaderOption.isSelected()).breakBeforeItem(pageBreakOption.isSelected()).extendedTextSelection(getExtendTextSelection())
+				.breakExtendedTextOnlyOnBlank(breakOnlyOnBlankOption.isSelected()).buildProjectItem();
 	}
 
 	private static class RenderFormatException extends Exception {}

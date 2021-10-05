@@ -270,6 +270,10 @@ public class TWUtils {
 		}
 	}
 
+	public static String shortenPhraseName(String name) {
+		return name.replace("alternate", "alt").replace("Phrase", "").trim();
+	}
+
 	public static void showError(String message, boolean wait) {
 		showAlert(AlertType.ERROR, "Error", message, wait);
 	}

@@ -207,12 +207,8 @@ public class LilyPondInterface {
 		int index = 0;
 		for (MainSceneController item : items) {
 
-			// Bypass caching item source if single-item export (may differ from multi-item export)
-			if (items.length == 1)
-				lines.add(generateItemSource(item, MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false)
-						&& !lilypond_file.getAbsolutePath().startsWith(System.getProperty("java.io.tmpdir"))));
-			else
-				lines.add(item.getLilyPondSource());
+			lines.add(generateItemSource(item, MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false)
+					&& !lilypond_file.getAbsolutePath().startsWith(System.getProperty("java.io.tmpdir"))));
 
 			// Remove page break at beginning of item listing, if present.
 			if (index == 0)

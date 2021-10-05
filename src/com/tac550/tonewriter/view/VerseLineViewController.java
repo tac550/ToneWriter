@@ -3,10 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
-import com.tac550.tonewriter.model.AssignedChordData;
-import com.tac550.tonewriter.model.AssignmentAction;
-import com.tac550.tonewriter.model.RecitingChord;
-import com.tac550.tonewriter.model.VerseLine;
+import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -262,7 +259,7 @@ public class VerseLineViewController {
 		associatedChantLines = chant_lines;
 		tonePhraseChoice.getItems().clear();
 		for (ChantLineViewController chantLine : associatedChantLines)
-			tonePhraseChoice.getItems().add(chantLine.getName().replace("alternate", "alt"));
+			tonePhraseChoice.getItems().add(TWUtils.shortenPhraseName(chantLine.getName()));
 
 		// Determine initial chant line selection.
 		if (mainController.manualCLAssignmentEnabled()) {
@@ -690,9 +687,6 @@ public class VerseLineViewController {
 		topController.showSyllableMenu(syllable);
 	}
 
-	public String getTonePhraseChoice() {
-		return tonePhraseChoice.getValue();
-	}
 	public void setTonePhraseChoice(String choice) {
 		if (tonePhraseChoice.getItems().contains(choice))
 			tonePhraseChoice.getSelectionModel().select(choice);
@@ -754,6 +748,15 @@ public class VerseLineViewController {
 
 	boolean hasAssignments() {
 		return lastSyllableAssigned != -1;
+	}
+
+	AssignmentLine generateLineModel() {
+		List<AssignmentSyllable> syllables = lineTextFlow.getChildren().stream().map(s -> ((SyllableText) s).generateSyllableModel()).toList();
+
+		return new AssignmentLine.AssignmentLineBuilder().selectedChantPhrase(associatedChantLines[selectedChantLine].generatePhraseModel())
+				.syllables(syllables).beforeBar(List.of(VLineEditViewController.barStrings).get(beforeBar.get()))
+				.afterBar(List.of(VLineEditViewController.barStrings).get(afterBar.get())).separator(isSeparatorLine)
+				.systemBreakDisabled(disableLineBreaks).buildAssignmentLine();
 	}
 
 }

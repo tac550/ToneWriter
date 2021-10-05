@@ -76,13 +76,16 @@ public class ToneIO {
 		}
 	}
 	public static String getToneHash(Tone tone) {
+		if (tone == null) return "";
 
 		StringBuilder hashBuilder = new StringBuilder();
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 
-			// Record MD5 hash of the current tone data (what its file would contain if saved)
-			byte[] hashBytes = md.digest(Objects.requireNonNull(getToneString(tone)).getBytes());
+			// Record MD5 hash of the current tone file, excluding first (VERSION) line
+			String toneString = getToneString(tone);
+			toneString = toneString != null ? toneString.substring(toneString.indexOf('\n') + 1) : "";
+			byte[] hashBytes = md.digest(Objects.requireNonNull(toneString).getBytes());
 			for (byte b : hashBytes)
 				hashBuilder.append(String.format("%02x", b));
 

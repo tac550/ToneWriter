@@ -57,7 +57,6 @@ public class ChantPhrase {
 		if (!other.getName().equals(this.getName()) || other.getChords().size() != this.getChords().size())
 			return false;
 		for (int i = 0; i < this.getChords().size(); i++) {
-			System.out.println(other.getChords().get(i).getName() + " VS " + this.getChords().get(i).getName());
 			if (!other.getChords().get(i).getName().equals(this.getChords().get(i).getName()))
 				return false;
 		}

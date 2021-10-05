@@ -20,14 +20,14 @@ public class AssignmentSyllable {
 	public String getSyllableText() {
 		return syllableText;
 	}
-	public boolean isFirstSyllableInWord() {
-		return firstSyllableInWord;
-	}
 	public boolean isBold() {
 		return bold;
 	}
 	public boolean isItalic() {
 		return italic;
+	}
+	public String getFormatData() {
+		return (isBold() ? "b" : "") + (isItalic() ? "i" : "");
 	}
 	public List<AssignedChordData> getAssignedChords() {
 		return assignedChords;

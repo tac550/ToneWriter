@@ -44,8 +44,6 @@ public class TopSceneController {
 
 	private Stage parentStage;
 
-	private final ProjectIO projectIO = new ProjectIO();
-
 	public static final float DEFAULT_MARGIN_SIZE = 13;
 	public static final String DEFAULT_MARGIN_UNITS = "mm";
 
@@ -355,12 +353,12 @@ public class TopSceneController {
 		// Check type of file in arguments
 		if (arg_file != null) {
 			if (FilenameUtils.isExtension(arg_file.getName(), "tone"))
-				addTab(null, 0, null, null,
+				addTab(null, 0, null,
 						ctr -> ctr.requestOpenTone(arg_file, true, false), false);
 			else
-				addTab(null, 0, null, null, ctr -> openProject(arg_file), true);
+				addTab(null, 0, null, ctr -> openProject(arg_file), true);
 		} else {
-			addTab(null, 0, null, null, null, true);
+			addTab(null, 0, null, null, true);
 		}
 	}
 
@@ -400,7 +398,7 @@ public class TopSceneController {
 	 * Project Menu Actions
 	 */
 	@FXML private void addTab() {
-		addTab(null, -1, null, null, null, false);
+		addTab(null, -1, null, null, false);
 		projectEdited();
 	}
 	@FXML private void handleSetProjectTitle() {
@@ -475,7 +473,7 @@ public class TopSceneController {
 	}
 	@FXML private void handleSaveProject() {
 		if (projectFile != null) {
-			if (projectIO.saveProject(projectFile, this))
+			if (ProjectIO.saveProject(projectFile, generateProjectModel()))
 				resetProjectEditedStatus();
 		} else {
 			handleSaveProjectAs();
@@ -493,7 +491,7 @@ public class TopSceneController {
 		if (!saveFile.getName().endsWith(".twproj"))
 			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
 
-		if (projectIO.saveProject(saveFile, this)) {
+		if (ProjectIO.saveProject(saveFile, generateProjectModel())) {
 			projectFile = saveFile;
 			resetProjectEditedStatus();
 		}
@@ -604,8 +602,7 @@ public class TopSceneController {
 		LilyPondInterface.openLastExportFolder();
 	}
 
-	// TODO: Remove precomp_source and tone_hash parameters
-	public void addTab(String title, int at_index, String precomp_source, String tone_hash,
+	public void addTab(String title, int at_index, ProjectItem loadedItemCache,
 					   Consumer<MainSceneController> loading_actions, boolean reset_edited) {
 		// Load layout from fxml file
 		FXMLLoaderIO.loadFXMLLayoutAsync("MainScene.fxml", loader -> {
@@ -613,8 +610,6 @@ public class TopSceneController {
 			SplitPane mainLayout = loader.getRoot();
 			MainSceneController newTabController = loader.getController();
 			newTabController.setStageAndTopScene(parentStage, this);
-
-			newTabController.setOriginalIndex(at_index);
 
 			Tab tab = new Tab();
 
@@ -737,10 +732,8 @@ public class TopSceneController {
 					tab.getContent().requestFocus();
 				}
 
-				if (precomp_source != null)
-					newTabController.setLilyPondSource(precomp_source);
-
-				newTabController.setCachedToneHash(tone_hash);
+				if (loadedItemCache != null)
+					newTabController.setItemCache(loadedItemCache);
 
 				// Save any loading operations for later (when the user switches to the tab or exports the project).
 				newTabController.setPendingLoadActions(loading_actions);
@@ -832,10 +825,10 @@ public class TopSceneController {
 
 		try {
 			String titleFileName = TWUtils.replaceInvalidFileChars(getProjectTitle(), "_") + "-";
-			projectIO.saveProject(
+			ProjectIO.saveProject(
 					TWUtils.createTWTempFile(titleFileName + new SimpleDateFormat("yyyy,MM,dd 'at' HH.mm.ss z")
 							.format(new Date(System.currentTimeMillis())), "Autosave.twproj"),
-					this);
+					generateProjectModel());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -874,7 +867,7 @@ public class TopSceneController {
 		for (int i = 0; i < project.getItems().size(); i++) {
 			ProjectItem item = project.getItems().get(i);
 			int finalI = i;
-			addTab(item.getTitleText(), i, null, null, ctr -> {
+			addTab(item.getTitleText(), i, item, ctr -> {
 				final boolean initialProjectEditedState = getProjectEdited();
 
 				if (item.getAssociatedTone() != null) {
@@ -917,8 +910,7 @@ public class TopSceneController {
 					verseLine.setPendingActions(finalI == 0, vLine -> {
 						List<String> durations = new ArrayList<>();
 
-						vLine.setTonePhraseChoice(line.getSelectedChantPhrase().getName()
-								.replace("alternate", "alt"));
+						vLine.setTonePhraseChoice(TWUtils.shortenPhraseName(line.getSelectedChantPhrase().getName()));
 						vLine.setBarlines(line.getBeforeBar(), line.getAfterBar());
 						vLine.setDisableLineBreaks(vLine.getDisableLineBreaks());
 
@@ -1332,6 +1324,11 @@ public class TopSceneController {
 	private void showCancelExportOption() {
 		cancelExportMenuItem.setGraphic(cancelExportImage);
 		cancelExportMenuItem.setText("Cancel Export");
+	}
+
+	private Project generateProjectModel() {
+		return new Project.ProjectBuilder().items(tabPane.getTabs().stream().map(t -> tabControllerMap.get(t).generateItemModel()).toList())
+				.title(projectTitle).paperSize(projectPaperSize).noHeader(noHeader).evenSpread(evenSpread).marginInfo(getMarginInfo()).buildProject();
 	}
 
 }
