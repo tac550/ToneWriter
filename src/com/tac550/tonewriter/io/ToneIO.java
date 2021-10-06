@@ -97,21 +97,6 @@ public class ToneIO {
 		return hashBuilder.toString();
 	}
 
-	public static boolean tonesSimilar(Tone tone1, Tone tone2) { // TODO: Remove in favor of model handling this.
-		if (tone1.getChantPhrases().size() != tone2.getChantPhrases().size())
-			return false;
-
-		int i = 0;
-		for (ChantPhrase phrase : tone1.getChantPhrases()) {
-			if (!tone2.getChantPhrases().get(i).isSimilarTo(phrase))
-				return false;
-
-			i++;
-		}
-
-		return true;
-	}
-
 	private static void writePairTo(PrintWriter writer, String label, Object value) {
 		writer.println(String.format("%s: %s", label, String.valueOf(value).replace(":", "\\:")));
 	}

@@ -878,7 +878,7 @@ public class MainSceneController {
 
 		// Don't reload any UI if tone being loaded has same structure
 		Tone currentTone = generateToneModel();
-		if (ToneIO.tonesSimilar(tone, currentTone)) {
+		if (tone.isSimilarTo(currentTone)) {
 			for (int i = 0; i < tone.getChantPhrases().size(); i++) {
 				if (!tone.getChantPhrases().get(i).toString().replaceAll("\\s+", "")
 						.equals(currentTone.getChantPhrases().get(i).toString().replaceAll("\\s+", ""))) {

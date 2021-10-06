@@ -876,7 +876,7 @@ public class TopSceneController {
 				}
 
 				if (item.getOriginalToneFile().exists() &&
-						(ToneIO.tonesSimilar(ctr.generateToneModel(), Objects.requireNonNull(ToneIO.loadTone(item.getOriginalToneFile()))) || item.isToneEdited()))
+						(ctr.generateToneModel().isSimilarTo(Objects.requireNonNull(ToneIO.loadTone(item.getOriginalToneFile()))) || item.isToneEdited()))
 					ctr.swapToneFile(item.getOriginalToneFile());
 
 				if (item.isToneEdited())

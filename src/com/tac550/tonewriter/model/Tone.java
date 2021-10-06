@@ -40,6 +40,21 @@ public class Tone {
 		return firstRepeated;
 	}
 
+	public boolean isSimilarTo(Tone other) {
+		if (other.getChantPhrases().size() != this.getChantPhrases().size())
+			return false;
+
+		int i = 0;
+		for (ChantPhrase phrase : this.getChantPhrases()) {
+			if (!other.getChantPhrases().get(i).isSimilarTo(phrase))
+				return false;
+
+			i++;
+		}
+
+		return true;
+	}
+
 	public static class ToneBuilder {
 		private String _keySignature = "C major";
 		private String _toneText = "";
