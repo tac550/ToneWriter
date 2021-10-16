@@ -121,10 +121,12 @@ public class LilyPondInterface {
 				}
 
 				try {
-					if (export_menu != null) Platform.runLater(export_menu::exportSuccess);
-					// After the render is complete, ask the OS to open the resulting PDF file.
-					if (export_menu != null && export_menu.openWhenCompleted())
-						openLastExportPDF();
+					if (export_menu != null) {
+						// After the render is complete, ask the OS to open the resulting PDF file.
+						Platform.runLater(export_menu::exportSuccess);
+						if (export_menu.openWhenCompleted())
+							openLastExportPDF();
+					}
 
 					// Delete the lilypond file if the option to save it isn't set
 					if (!MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false)) {
@@ -134,23 +136,27 @@ public class LilyPondInterface {
 					} // TODO: Consider making sure this has a chance to happen in event of cancellation or failure.
 
 				} catch (Exception e) {
-					if (export_menu != null) Platform.runLater(export_menu::exportFailure);
-					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
-					// if it's not set to be saved).
-					if (export_menu != null && export_menu.openWhenCompleted())
-						openLastExportFolder();
+					if (export_menu != null) {
+						// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
+						// if it's not set to be saved).
+						Platform.runLater(export_menu::exportFailure);
+						if (export_menu.openWhenCompleted())
+							openLastExportFolder();
+					}
 				}
 			});
 		} else {
-			if (export_menu != null) export_menu.exportSuccess();
-			if (export_menu != null && export_menu.openWhenCompleted())
-				openLastExportFolder();
+			if (export_menu != null) {
+				export_menu.exportSuccess();
+				if (export_menu.openWhenCompleted())
+					openLastExportFolder();
+			}
 		}
 
 		return true;
 	}
 
-	public static boolean saveToLilyPondFile(File lilypond_file, String output_title, List<ProjectItem> items, Project project) throws IOException {
+	private static boolean saveToLilyPondFile(File lilypond_file, String output_title, List<ProjectItem> items, Project project) throws IOException {
 
 //		// Create the LilyPond output file, and if it already exists, delete the old one.
 //		if (lilypond_file.exists()) {
