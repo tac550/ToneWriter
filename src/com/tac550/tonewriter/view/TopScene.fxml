@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tooltip?>
@@ -20,7 +19,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.TopSceneController">
    <top>
-      <MenuBar BorderPane.alignment="CENTER">
+      <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
          <menus>
             <Menu text="_Project">
                <items>
@@ -173,19 +172,6 @@
                   <MenuItem fx:id="updateMenuItem" mnemonicParsing="false" onAction="#handleUpdateCheck" text="Check for Updates..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About..." />
-               </items>
-            </Menu>
-            <Menu fx:id="exportProgressMenu" disable="true" text="No recent export">
-               <graphic>
-                  <ProgressIndicator fx:id="exportProgressIndicator" mouseTransparent="true" prefHeight="16.0" prefWidth="16.0" />
-               </graphic>
-               <items>
-                  <MenuItem fx:id="cancelExportMenuItem" mnemonicParsing="false" onAction="#handleCancelExport" text="Cancel Export" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="openPDFMenuItem" disable="true" mnemonicParsing="false" onAction="#handleOpenPDF" text="Open Exported PDF" />
-                  <MenuItem fx:id="openFolderMenuItem" disable="true" mnemonicParsing="false" onAction="#handleOpenExportFolder" text="Open Folder" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <CheckMenuItem fx:id="openWhenCompletedItem" mnemonicParsing="false" selected="true" text="Automatically Open When Completed" />
                </items>
             </Menu>
          </menus>

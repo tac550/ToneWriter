@@ -48,6 +48,7 @@ public class TopSceneController {
 	public static final String DEFAULT_MARGIN_UNITS = "mm";
 
 	private static final double MENU_ICON_SIZE = 30;
+	@FXML private MenuBar menuBar;
 	@FXML private MenuItem addItemMenuItem;
 	@FXML private MenuItem projectTitleMenuItem;
 	@FXML private MenuItem pageSetupMenuItem;
@@ -80,17 +81,7 @@ public class TopSceneController {
 	@FXML private MenuItem aboutMenuItem;
 	@FXML private MenuItem updateMenuItem;
 
-	@FXML private Menu exportProgressMenu;
-	@FXML private ProgressIndicator exportProgressIndicator;
-	private final ImageView exportCompleteImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-check.png")).toExternalForm());
-	private final ImageView exportFailedImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-delete.png")).toExternalForm());
-	private final ImageView exportCancelledImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-ban.png")).toExternalForm());
-	private final ImageView repeatExportImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-sync.png")).toExternalForm());
-	private final ImageView cancelExportImage = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/sign-ban.png")).toExternalForm());
-	@FXML private MenuItem cancelExportMenuItem;
-	@FXML private MenuItem openPDFMenuItem;
-	@FXML private MenuItem openFolderMenuItem;
-	@FXML private CheckMenuItem openWhenCompletedItem;
+	private ExportMenu exportProgressMenu;
 	private boolean currentlyExporting = false;
 	private MainSceneController lastExportTab;
 
@@ -228,6 +219,11 @@ public class TopSceneController {
 		// Init tone edit menu item group
 		toneEditItems = new MenuItem[]{addCLMenuItem, setKeyMenuItem, editHeaderInfoMenuItem, manualCLAssignmentMenuItem};
 
+		// Set up export menu and add to menuBar
+		exportProgressMenu = new ExportMenu(MENU_ICON_SIZE);
+		exportProgressMenu.setParentScene(this);
+		menuBar.getMenus().add(exportProgressMenu);
+
 		// Menu icons
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
@@ -248,14 +244,6 @@ public class TopSceneController {
 		setMenuIcon(manualCLAssignmentMenuItem, "/media/tag-alt.png");
 		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
-		setMenuIcon(openPDFMenuItem, "/media/file-pdf.png");
-		setMenuIcon(openFolderMenuItem, "/media/folder-document.png");
-
-		// Sizing for switching menu icons
-		repeatExportImage.setFitHeight(MENU_ICON_SIZE);
-		repeatExportImage.setFitWidth(MENU_ICON_SIZE);
-		cancelExportImage.setFitHeight(MENU_ICON_SIZE);
-		cancelExportImage.setFitWidth(MENU_ICON_SIZE);
 
 		// Modify LilyPond location editing menu items on Mac
 		if (MainApp.OS_NAME.startsWith("mac"))
@@ -295,19 +283,6 @@ public class TopSceneController {
 			MainApp.prefs.putBoolean(MainApp.PREFS_DARK_MODE, newVal);
 			MainApp.setDarkModeEnabled(newVal);
 		});
-
-		// Auto-open on completed export menu item behavior and initial state
-		openWhenCompletedItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_AUTO_OPEN_EXPORT, true));
-		openWhenCompletedItem.selectedProperty().addListener((ov, oldVal, newVal) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_AUTO_OPEN_EXPORT, newVal));
-
-		// Make sure export status icon sizes match the progress indicator's sizing
-		exportCompleteImage.setFitHeight(exportProgressIndicator.getPrefHeight());
-		exportCompleteImage.setFitWidth(exportProgressIndicator.getPrefWidth());
-		exportFailedImage.setFitHeight(exportProgressIndicator.getPrefHeight());
-		exportFailedImage.setFitWidth(exportProgressIndicator.getPrefWidth());
-		exportCancelledImage.setFitHeight(exportProgressIndicator.getPrefHeight());
-		exportCancelledImage.setFitWidth(exportProgressIndicator.getPrefWidth());
 
 		// Tab pane initialization
 		tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
@@ -362,7 +337,7 @@ public class TopSceneController {
 		}
 	}
 
-	private static void setMenuIcon(MenuItem menu_item, String image_path) {
+	static void setMenuIcon(MenuItem menu_item, String image_path) {
 		ImageView imageView = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource(image_path)).toExternalForm());
 		imageView.setFitHeight(MENU_ICON_SIZE);
 		imageView.setFitWidth(MENU_ICON_SIZE);
@@ -584,22 +559,13 @@ public class TopSceneController {
 		AutoUpdater.updateCheck(parentStage, false);
 	}
 
-	/*
-	 * Export Menu Actions
-	 */
-	@FXML private void handleCancelExport() {
+	void cancelExport() {
 		if (currentlyExporting) {
 			LilyPondInterface.cancelExportProcess();
-			exportMenuCancelled();
+			exportProgressMenu.exportCancelled();
 		} else {
 			lastExportTab.performExport();
 		}
-	}
-	@FXML private void handleOpenPDF() {
-		LilyPondInterface.openLastExportPDF();
-	}
-	@FXML private void handleOpenExportFolder() {
-		LilyPondInterface.openLastExportFolder();
 	}
 
 	public void addTab(String title, int at_index, ProjectItem loadedItemCache,
@@ -751,7 +717,7 @@ public class TopSceneController {
 
 	private void clearProjectState() {
 		clearAllTabs();
-        exportMenuReset();
+        exportProgressMenu.exportReset();
 
 		setProjectTitle("Unnamed Project");
 		projectPaperSize = defaultPaperSize;
@@ -1024,10 +990,6 @@ public class TopSceneController {
 		return hoverHighlightMenuItem.isSelected();
 	}
 
-	public boolean autoOpenCompletedExports() {
-		return openWhenCompletedItem.isSelected();
-	}
-
 	void requestClose(Event ev) {
 		if (!checkSaveProject() || !checkAllToneSaves())
 			ev.consume();
@@ -1088,8 +1050,9 @@ public class TopSceneController {
 	}
 
 	void exportProject() throws IOException {
-		LilyPondInterface.exportItems(defaultExportDirectory, projectOutputFileName, projectTitle,
-				getTabControllers(), projectPaperSize, noHeader, evenSpread, getMarginInfo(), this);
+		Project project = generateProjectModel();
+		LilyPondInterface.exportItems(defaultExportDirectory, projectOutputFileName, projectTitle, project.getItems(),
+				project, exportProgressMenu);
 	}
 
 	void propagateProjectOutputSetting() {
@@ -1127,9 +1090,6 @@ public class TopSceneController {
 		return tabPane.getTabs().size();
 	}
 
-	public String getPaperSize() {
-		return projectPaperSize;
-	}
 	public void setPaperSize(String size) {
 		if (size.isBlank()) {
 			if (!projectPaperSize.equals(defaultPaperSize)) {
@@ -1142,9 +1102,6 @@ public class TopSceneController {
 		}
 	}
 
-	public boolean getNoHeader() {
-		return noHeader;
-	}
 	public void setNoHeader(boolean no_header) {
 		if (noHeader != no_header) {
 			noHeader = no_header;
@@ -1152,9 +1109,6 @@ public class TopSceneController {
 		}
 	}
 
-	public boolean getEvenSpread() {
-		return evenSpread;
-	}
 	public void setEvenSpread(boolean even_spread) {
 		if (evenSpread != even_spread) {
 			evenSpread = even_spread;
@@ -1183,16 +1137,6 @@ public class TopSceneController {
 
 			projectEdited();
 		}
-	}
-
-	public MainSceneController[] getTabControllers() {
-		int tabCount = getTabCount();
-
-		MainSceneController[] mainControllers = new MainSceneController[tabCount];
-		for (int i = 0; i < tabCount; i++)
-			mainControllers[i] = tabControllerMap.get(tabPane.getTabs().get(i));
-
-		return mainControllers;
 	}
 
 	void showNoteMenu(SyllableText syllable, Button noteButton) {
@@ -1267,68 +1211,21 @@ public class TopSceneController {
 		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
 	}
 
-	public void exportMenuWorking() {
-		currentlyExporting = true;
-		exportProgressMenu.setText("E_xport in Progress...");
-		exportProgressMenu.setGraphic(exportProgressIndicator);
-
-		exportProgressMenu.setDisable(false);
-		showCancelExportOption();
-		openPDFMenuItem.setDisable(true);
-		openFolderMenuItem.setDisable(true);
-	}
-	public void exportMenuSuccess() {
-		currentlyExporting = false;
-		exportProgressMenu.setText("E_xport Complete");
-		exportProgressMenu.setGraphic(exportCompleteImage);
-
-		exportProgressMenu.setDisable(false);
-		showRepeatExportOption();
-		openPDFMenuItem.setDisable(!MainApp.lilyPondAvailable());
-		openFolderMenuItem.setDisable(false);
-	}
-	public void exportMenuCancelled() {
-		currentlyExporting = false;
-		exportProgressMenu.setText("E_xport Cancelled");
-		exportProgressMenu.setGraphic(exportCancelledImage);
-
-		exportProgressMenu.setDisable(false);
-		showRepeatExportOption();
-		openPDFMenuItem.setDisable(true);
-		openFolderMenuItem.setDisable(false);
-	}
-	public void exportMenuFailure() {
-		currentlyExporting = false;
-		exportProgressMenu.setText("E_xport Failed");
-		exportProgressMenu.setGraphic(exportFailedImage);
-
-		exportProgressMenu.setDisable(false);
-		showRepeatExportOption();
-		openPDFMenuItem.setDisable(true);
-		openFolderMenuItem.setDisable(false);
-	}
-	private void exportMenuReset() {
-		currentlyExporting = false;
-		exportProgressMenu.setText("No recent export");
-		exportProgressMenu.setGraphic(exportProgressIndicator);
-
-		exportProgressMenu.setDisable(true);
-		openPDFMenuItem.setDisable(true);
-		openFolderMenuItem.setDisable(true);
+	void setCurrentlyExporting(boolean exporting) {
+		currentlyExporting = exporting;
 	}
 
-	private void showRepeatExportOption() {
-		cancelExportMenuItem.setGraphic(repeatExportImage);
-		cancelExportMenuItem.setText("Repeat Last Export");
-	}
-	private void showCancelExportOption() {
-		cancelExportMenuItem.setGraphic(cancelExportImage);
-		cancelExportMenuItem.setText("Cancel Export");
+	ExportMenu getExportProgressMenu() {
+		return exportProgressMenu;
 	}
 
-	private Project generateProjectModel() {
+	Project generateProjectModel() {
 		return new Project.ProjectBuilder().items(tabPane.getTabs().stream().map(t -> tabControllerMap.get(t).generateItemModel()).toList())
 				.title(projectTitle).paperSize(projectPaperSize).noHeader(noHeader).evenSpread(evenSpread).marginInfo(getMarginInfo()).buildProject();
+	}
+	public Project generateProjectModelNoItems() {
+		return new Project.ProjectBuilder().title(projectTitle).paperSize(projectPaperSize).noHeader(noHeader)
+				.evenSpread(evenSpread).marginInfo(getMarginInfo()).buildProject();
 	}
 
 }

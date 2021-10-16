@@ -1,6 +1,8 @@
 package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.model.AssignedChordData;
+import com.tac550.tonewriter.model.Project;
+import com.tac550.tonewriter.model.ProjectItem;
 import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
@@ -53,7 +55,7 @@ public class LilyPondInterface {
 	private static Process lastExportProcess;
 	private static boolean exportCancelled = false;
 
-	// Renders chord previews for the tone UI
+	// Renders chord previews for the tone UI TODO: Decouple from UI code? (some might have to move to view controller)
 	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
 		final String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
 				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
@@ -98,30 +100,30 @@ public class LilyPondInterface {
 	}
 
 	// The function that handles final output.
-	public static boolean exportItems(File saving_dir, String file_name, String project_title, MainSceneController[] items,
-	                                  String paperSize, boolean no_header, boolean even_spread, String[] margin_info, TopSceneController top_scene) throws IOException {
+	public static boolean exportItems(File saving_dir, String file_name, String output_title, List<ProjectItem> items,
+									  Project project, ExportMenu export_menu) throws IOException {
 		exportCancelled = false;
 		lastLilypondFile = new File(saving_dir.getAbsolutePath() + File.separator + file_name + ".ly");
 
-		if (!saveToLilyPondFile(lastLilypondFile, project_title, items, paperSize, no_header, even_spread, margin_info)) {
-			top_scene.exportMenuFailure();
+		if (!saveToLilyPondFile(lastLilypondFile, output_title, items, project)) {
+			if (export_menu != null) export_menu.exportFailure();
 			return false;
 		}
 
 		if (MainApp.lilyPondAvailable()) {
-			top_scene.exportMenuWorking();
+			if (export_menu != null) export_menu.exportWorking();
 
 			executeLilyPondRender(lastLilypondFile, false, () -> {
 				if (exportCancelled) return; // If user cancelled before we got here, stop. // TODO: Potential bug where a LP temp file is left behind?
 				if (lastExportProcess.exitValue() != 0) {
-					Platform.runLater(top_scene::exportMenuFailure);
+					if (export_menu != null) Platform.runLater(export_menu::exportFailure);
 					return;
 				}
 
 				try {
-					Platform.runLater(top_scene::exportMenuSuccess);
+					if (export_menu != null) Platform.runLater(export_menu::exportSuccess);
 					// After the render is complete, ask the OS to open the resulting PDF file.
-					if (top_scene.autoOpenCompletedExports())
+					if (export_menu != null && export_menu.openWhenCompleted())
 						openLastExportPDF();
 
 					// Delete the lilypond file if the option to save it isn't set
@@ -132,96 +134,99 @@ public class LilyPondInterface {
 					} // TODO: Consider making sure this has a chance to happen in event of cancellation or failure.
 
 				} catch (Exception e) {
-					Platform.runLater(top_scene::exportMenuFailure);
+					if (export_menu != null) Platform.runLater(export_menu::exportFailure);
 					// If the final rendered PDF can't be opened, open the folder instead (.ly file should be there even
 					// if it's not set to be saved).
-					if (top_scene.autoOpenCompletedExports())
+					if (export_menu != null && export_menu.openWhenCompleted())
 						openLastExportFolder();
 				}
 			});
 		} else {
-			top_scene.exportMenuSuccess();
-			if (top_scene.autoOpenCompletedExports())
+			if (export_menu != null) export_menu.exportSuccess();
+			if (export_menu != null && export_menu.openWhenCompleted())
 				openLastExportFolder();
 		}
 
 		return true;
 	}
 
-	public static boolean saveToLilyPondFile(File lilypond_file, String project_title, MainSceneController[] items,
-	                                         String paperSize, boolean no_header, boolean even_spread, String[] margin_info) throws IOException {
+	public static boolean saveToLilyPondFile(File lilypond_file, String output_title, List<ProjectItem> items, Project project) throws IOException {
 
-		// Create the LilyPond output file, and if it already exists, delete the old one.
-		if (lilypond_file.exists()) {
-			// Have to do this because macOS doesn't like overwriting existing files
-			if (!lilypond_file.delete()) {
-				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
-			}
-		}
-
-		if (!lilypond_file.createNewFile()) {
-			TWUtils.showError("Failed to create new LilyPond file", true);
-			return false;
-		}
-
-		// Copy the render template file to the output path.
-		try {
-			TWUtils.exportFSResource(no_header && items.length > 1 ? "exportTemplateNoHeader.ly"
-					: "exportTemplate.ly", lilypond_file);
-		} catch (Exception e2) {
-			e2.printStackTrace();
-			return false;
-		}
-
-		// The buffer in which we'll store the output file as we build it.
-		List<String> lines = new ArrayList<>(Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8));
-
-		boolean generateHeader = !no_header || items.length == 1;
-
-		// Replacing paper size, title, and tagline info.
-		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
-		if (generateHeader) {
-			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
-					items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
-							+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + project_title + "\""));
-			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
-					.replace("$APPNAME", MainApp.APP_NAME));
-			if (items.length == 1 && items[0].getLargeTitle()) {
-				lines.set(14, lines.get(14).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
-				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
-			}
-
-			if (!even_spread) {
-				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
-				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
-			}
-		}
-		lines.set(generateHeader ? 17 : 12, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
-		lines.set(generateHeader ? 18 : 13, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
-		lines.set(generateHeader ? 19 : 14, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
-		lines.set(generateHeader ? 20 : 15, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
-
-		// Add a blank line before scores begin
-		lines.add("");
-
-		int index = 0;
-		for (MainSceneController item : items) {
-
-			lines.add(generateItemSource(item, MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false)
-					&& !lilypond_file.getAbsolutePath().startsWith(System.getProperty("java.io.tmpdir"))));
-
-			// Remove page break at beginning of item listing, if present.
-			if (index == 0)
-				lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceFirst("\n\\\\pageBreak\n", ""));
-
-			index++;
-		}
-
-		// Remove extra newline at end of file (result is one blank line)
-		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceAll("\n$", ""));
-
-		// Write the file back out.
-		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
+//		// Create the LilyPond output file, and if it already exists, delete the old one.
+//		if (lilypond_file.exists()) {
+//			// Have to do this because macOS doesn't like overwriting existing files
+//			if (!lilypond_file.delete()) {
+//				TWUtils.showError("Error deleting existing LilyPond file. Continuing anyway...", false);
+//			}
+//		}
+//
+//		if (!lilypond_file.createNewFile()) {
+//			TWUtils.showError("Failed to create new LilyPond file", true);
+//			return false;
+//		}
+//
+//		// If no items were passed, use the items contained in the project model for the export
+//		if (items == null || items.size() == 0)
+//			items = project.getItems();
+//
+//		// Copy the render template file to the output path.
+//		try {
+//			TWUtils.exportFSResource(no_header && items.length > 1 ? "exportTemplateNoHeader.ly"
+//					: "exportTemplate.ly", lilypond_file);
+//		} catch (Exception e2) {
+//			e2.printStackTrace();
+//			return false;
+//		}
+//
+//		// The buffer in which we'll store the output file as we build it.
+//		List<String> lines = new ArrayList<>(Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8));
+//
+//		boolean generateHeader = !no_header || items.length == 1;
+//
+//		// Replacing paper size, title, and tagline info.
+//		lines.set(2, "#(set-default-paper-size \"" + paperSize.split(" \\(")[0] + "\")");
+//		if (generateHeader) {
+//			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
+//					items.length == 1 ? (items[0].getLargeTitle() ? "\\fontsize #3 \"" : "\"")
+//							+ reformatTextForHeaders(items[0].getTitle()) + "\"" : "\"" + output_title + "\""));
+//			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
+//					.replace("$APPNAME", MainApp.APP_NAME));
+//			if (items.length == 1 && items[0].getLargeTitle()) {
+//				lines.set(14, lines.get(14).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+//				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+//			}
+//
+//			if (!even_spread) {
+//				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
+//				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
+//			}
+//		}
+//		lines.set(generateHeader ? 17 : 12, "  top-margin = %s\\%s".formatted(margin_info[0], margin_info[1]));
+//		lines.set(generateHeader ? 18 : 13, "  bottom-margin = %s\\%s".formatted(margin_info[2], margin_info[3]));
+//		lines.set(generateHeader ? 19 : 14, "  left-margin = %s\\%s".formatted(margin_info[4], margin_info[5]));
+//		lines.set(generateHeader ? 20 : 15, "  right-margin = %s\\%s".formatted(margin_info[6], margin_info[7]));
+//
+//		// Add a blank line before scores begin
+//		lines.add("");
+//
+//		int index = 0;
+//		for (MainSceneController item : items) {
+//
+//			lines.add(generateItemSource(item, MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false)
+//					&& !lilypond_file.getAbsolutePath().startsWith(System.getProperty("java.io.tmpdir"))));
+//
+//			// Remove page break at beginning of item listing, if present.
+//			if (index == 0)
+//				lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceFirst("\n\\\\pageBreak\n", ""));
+//
+//			index++;
+//		}
+//
+//		// Remove extra newline at end of file (result is one blank line)
+//		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceAll("\n$", ""));
+//
+//		// Write the file back out.
+//		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
 
 		return true;
 	}
