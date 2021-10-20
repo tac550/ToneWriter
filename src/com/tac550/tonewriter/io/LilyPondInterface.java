@@ -406,7 +406,7 @@ public class LilyPondInterface {
 
 	private static float generateNotatedLine(String[] parts, List<AssignmentSyllable> syllableList, StringBuilder verseLine,
 	                                         boolean disableLineBreaks, AssignmentLine al) {
-		List<ChantChord> inOrderChords = melodyOrderChords(al.getSelectedChantPhrase().getChords());
+		List<ChantChord> inOrderChords = melodyOrderChords(al.getSelectedChantPhrase().getChords()); // TODO: This seems inefficient. It gets done for every verse line but concerns only chant lines.
 
 		float measureBeats = 0;
 		int breakCount = 0;
