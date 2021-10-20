@@ -1052,7 +1052,7 @@ public class TopSceneController {
 	void exportProject() throws IOException {
 		Project project = generateProjectModel();
 		LilyPondInterface.exportItems(defaultExportDirectory, projectOutputFileName, projectTitle, project.getItems(),
-				project, exportProgressMenu);
+				project, exportProgressMenu, false, 150);
 	}
 
 	void propagateProjectOutputSetting() {

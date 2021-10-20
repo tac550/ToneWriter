@@ -1,5 +1,7 @@
 package com.tac550.tonewriter.model;
 
+import com.tac550.tonewriter.io.LilyPondInterface;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +46,8 @@ public class AssignmentLine {
 		private ChantPhrase _selectedChantPhrase = null;
 		private List<AssignmentSyllable> _syllables = new ArrayList<>();
 
-		private String _beforeBar = "unchanged";
-		private String _afterBar = "unchanged";
+		private String _beforeBar = LilyPondInterface.BAR_UNCHANGED;
+		private String _afterBar = LilyPondInterface.BAR_UNCHANGED;
 
 		private boolean _separator = false;
 		private boolean _systemBreakingDisabled = false;

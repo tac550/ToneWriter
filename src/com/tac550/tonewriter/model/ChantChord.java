@@ -54,6 +54,15 @@ public class ChantChord {
 				getTenor().isEmpty() ? " " : getTenor(),
 				getBass().isEmpty() ? " " : getBass());
 	}
+	public String getPart(int index) {
+		return switch (index) {
+			case 0 -> getSoprano();
+			case 1 -> getAlto();
+			case 2 -> getTenor();
+			case 3 -> getBass();
+			default -> "";
+		};
+	}
 
 	public void addPrep(ChantChord prep) {
 		preps.add(prep);
@@ -66,8 +75,8 @@ public class ChantChord {
 		private String _name = "";
 		private String _comment = "";
 
-		private List<ChantChord> _preps = new ArrayList<>();
-		private List<ChantChord> _posts = new ArrayList<>();
+		private final List<ChantChord> _preps = new ArrayList<>();
+		private final List<ChantChord> _posts = new ArrayList<>();
 
 		private String _soprano = "r";
 		private String _alto = "r";

@@ -146,7 +146,7 @@ public class SyllableText extends Text {
 		refreshFont();
 	}
 
-	public String getFormattedText() {
+	private String getFormattedText() {
 		return TWUtils.reverseSmartQuotes(getText());
 	}
 

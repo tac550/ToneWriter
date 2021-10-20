@@ -324,12 +324,12 @@ public class MainSceneController {
 		for (VerseLineViewController verseLine : verseLineControllers) {
 			if (verseLine.notFirstInItem() && !Objects.requireNonNull(prev).isSeparator())
 				verseLine.linkBeforeBarLine(Objects.requireNonNull(prev).afterBarProperty());
-			else if (Arrays.asList(VLineEditViewController.barStrings).indexOf(verseLine.getBeforeBar())
+			else if (Arrays.asList(LilyPondInterface.barStrings).indexOf(verseLine.getBeforeBar())
 					>= VLineEditViewController.firstBarOptionsLimit)
-				verseLine.setBarlines(" ", "unchanged");
+				verseLine.setBarlines(" ", LilyPondInterface.BAR_UNCHANGED);
 
 			if (isLastVerseLineOfSection(verseLine))
-				verseLine.setBarlines("unchanged", "||");
+				verseLine.setBarlines(LilyPondInterface.BAR_UNCHANGED, "||");
 
 			prev = verseLine;
 		}
@@ -832,7 +832,7 @@ public class MainSceneController {
 					verseLineControllers.indexOf(verseLineViewController) - 1);
 
 			if (verseLineViewController.isSeparator() && previousController.getAfterBar().equals("||"))
-				previousController.setBarlines("unchanged", "|");
+				previousController.setBarlines(LilyPondInterface.BAR_UNCHANGED, "|");
 		}
 
 		verseLineBox.getChildren().remove(verseLineViewController.getRootPane());
@@ -1057,7 +1057,8 @@ public class MainSceneController {
 				if (MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments()) midiTempo = promptMidiTempo();
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
 						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(), List.of(generateItemModel()),
-						topSceneController.generateProjectModelNoItems(), topSceneController.getExportProgressMenu())) {
+						topSceneController.generateProjectModelNoItems(), topSceneController.getExportProgressMenu(),
+						MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments(), midiTempo)) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
 							true, parentStage);
 				}
@@ -1195,9 +1196,6 @@ public class MainSceneController {
 	public void setTopVerse(String verse) {
 		topVerseField.setText(verse);
 	}
-	public String getVerseAreaText() {
-		return verseArea.getText();
-	}
 	public void setVerseAreaText(String text) {
 		verseArea.setText(text);
 	}
@@ -1213,33 +1211,17 @@ public class MainSceneController {
 	public void setBottomVerse(String verse) {
 		bottomVerseField.setText(verse);
 	}
-	public boolean getLargeTitle() {
-		return largeTitleOption.isSelected();
-	}
 	public boolean getHideToneHeader() {
 		return hideToneHeaderOption.isSelected();
 	}
-	public boolean getPageBreak() {
-		return pageBreakOption.isSelected();
-	}
 	public int getExtendTextSelection() { // Only one is selected at a time, so 3 = both is not expected.
 		return (extendTextTopOption.isSelected() ? 1 : 0) + (extendTextBottomOption.isSelected() ? 2 : 0);
-	}
-	public boolean getBreakOnlyOnBlank() {
-		return breakOnlyOnBlankOption.isSelected();
-	}
-	public String getFinalTitleContent() {
-		return hiddenTitleOption.isSelected() || exportMode == ExportMode.ITEM ?
-				"" : titleTextField.getText();
 	}
 	public String getTitle() {
 		return titleTextField.getText();
 	}
 	public void setTitle(String title) {
 		titleTextField.setText(title);
-	}
-	public String getSubtitle() {
-		return subtitleTextField.getText();
 	}
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
@@ -1255,12 +1237,6 @@ public class MainSceneController {
 		}
 		breakOnlyOnBlankOption.setSelected(break_only_on_blank);
 	}
-	public String getLeftHeaderText() {
-		return hideToneHeaderOption.isSelected() ? "" : leftText;
-	}
-	public String getRightHeaderText() {
-		return hideToneHeaderOption.isSelected() ? "" : rightText;
-	}
 	public List<VerseLineViewController> getVerseLineControllers() {
 		return verseLineControllers;
 	}
@@ -1269,9 +1245,6 @@ public class MainSceneController {
 	}
 	boolean isLoadingTone() {
 		return loadingTone;
-	}
-	public int getMidiTempo() {
-		return midiTempo;
 	}
 
 	public Tone generateToneModel() {

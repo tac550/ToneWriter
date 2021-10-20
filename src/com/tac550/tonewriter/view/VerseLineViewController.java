@@ -222,11 +222,11 @@ public class VerseLineViewController {
 	}
 
 	public void setBarlines(String before, String after) {
-		boolean updateBefore = !before.equals("unchanged");
-		boolean updateAfter = !after.equals("unchanged");
+		boolean updateBefore = !before.equals(LilyPondInterface.BAR_UNCHANGED);
+		boolean updateAfter = !after.equals(LilyPondInterface.BAR_UNCHANGED);
 
-		if (updateBefore) beforeBar.set(List.of(VLineEditViewController.barStrings).indexOf(before));
-		if (updateAfter) afterBar.set(List.of(VLineEditViewController.barStrings).indexOf(after));
+		if (updateBefore) beforeBar.set(List.of(LilyPondInterface.barStrings).indexOf(before));
+		if (updateAfter) afterBar.set(List.of(LilyPondInterface.barStrings).indexOf(after));
 
 		if (updateBefore || updateAfter)
 			topController.projectEdited();
@@ -693,10 +693,10 @@ public class VerseLineViewController {
 	}
 
 	public String getBeforeBar() {
-		return VLineEditViewController.barStrings[beforeBar.get()];
+		return LilyPondInterface.barStrings[beforeBar.get()];
 	}
 	public String getAfterBar() {
-		return VLineEditViewController.barStrings[afterBar.get()];
+		return LilyPondInterface.barStrings[afterBar.get()];
 	}
 
 	public boolean getDisableLineBreaks() {
@@ -752,10 +752,11 @@ public class VerseLineViewController {
 
 	AssignmentLine generateLineModel() {
 		List<AssignmentSyllable> syllables = lineTextFlow.getChildren().stream().map(s -> ((SyllableText) s).generateSyllableModel()).toList();
+		ChantPhrase selectedPhrase = associatedChantLines != null ? associatedChantLines[selectedChantLine].generatePhraseModel() : null;
 
-		return new AssignmentLine.AssignmentLineBuilder().selectedChantPhrase(associatedChantLines[selectedChantLine].generatePhraseModel())
-				.syllables(syllables).beforeBar(List.of(VLineEditViewController.barStrings).get(beforeBar.get()))
-				.afterBar(List.of(VLineEditViewController.barStrings).get(afterBar.get())).separator(isSeparatorLine)
+		return new AssignmentLine.AssignmentLineBuilder().selectedChantPhrase(selectedPhrase)
+				.syllables(syllables).beforeBar(LilyPondInterface.barStrings[beforeBar.get()])
+				.afterBar(LilyPondInterface.barStrings[afterBar.get()]).separator(isSeparatorLine)
 				.systemBreakDisabled(disableLineBreaks).buildAssignmentLine();
 	}
 

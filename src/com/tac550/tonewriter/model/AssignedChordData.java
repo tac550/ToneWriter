@@ -32,31 +32,4 @@ public class AssignedChordData {
 		return chordIndex;
 	}
 
-	public String getPart(int part_index, VerseLineViewController vc) {
-		return switch (part_index) {
-			case 0 -> getSoprano(vc);
-			case 1 -> getAlto(vc);
-			case 2 -> getTenor(vc);
-			case 3 -> getBass(vc);
-			default -> "";
-		};
-	}
-
-	private String getSoprano(VerseLineViewController vc) {
-		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[0],
-				LilyPondInterface.ADJUSTMENT_SOPRANO) + duration;
-	}
-	private String getAlto(VerseLineViewController vc) {
-		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[1],
-				LilyPondInterface.ADJUSTMENT_ALTO) + duration;
-	}
-	private String getTenor(VerseLineViewController vc) {
-		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[2],
-				LilyPondInterface.ADJUSTMENT_TENOR) + duration;
-	}
-	private String getBass(VerseLineViewController vc) {
-		return LilyPondInterface.adjustOctave(vc.getChordByIndex(chordIndex).getFields().split("-")[3],
-				LilyPondInterface.ADJUSTMENT_BASS) + duration;
-	}
-
 }

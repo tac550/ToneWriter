@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -31,7 +32,6 @@ public class VLineEditViewController {
 
 	// Limit the number of selectable before barline options to the first beforeOptionsLimit items in afterBarStrs.
 	static final int firstBarOptionsLimit = 3;
-	static final String[] barStrings = new String[] {" ", ".|:", "[|:", "|", "||", ":|.|:", ":|][|:", "|.", "'", ":|.", ":|]", "!"};
 	static final Image[] barImages = new Image[] {
 			new Image(Objects.requireNonNull(VLineEditViewController.class.getResource("/media/bars/noBar.png")).toExternalForm()),
 			new Image(Objects.requireNonNull(VLineEditViewController.class.getResource("/media/bars/beginRepeat.png")).toExternalForm()),
@@ -49,9 +49,9 @@ public class VLineEditViewController {
 	void setParentController(VerseLineViewController controller) {
 		parentController = controller;
 
-		setUpBarOptions(parentController.notFirstInItem() ? barStrings.length : firstBarOptionsLimit,
+		setUpBarOptions(parentController.notFirstInItem() ? LilyPondInterface.barStrings.length : firstBarOptionsLimit,
 				beforePane, beforeToggles);
-		setUpBarOptions(barStrings.length, afterPane, afterToggles);
+		setUpBarOptions(LilyPondInterface.barStrings.length, afterPane, afterToggles);
 	}
 
 	private void setUpBarOptions(int barStrs, FlowPane flowPane, ToggleGroup toggleGroup) {
@@ -104,7 +104,7 @@ public class VLineEditViewController {
 		int selectedBefore = beforeToggles.getToggles().indexOf(beforeToggles.getSelectedToggle());
 		int selectedAfter = afterToggles.getToggles().indexOf(afterToggles.getSelectedToggle());
 		if (selectedBefore != initialBeforeBar || selectedAfter != initialAfterBar)
-			parentController.setBarlines(barStrings[selectedBefore], barStrings[selectedAfter]);
+			parentController.setBarlines(LilyPondInterface.barStrings[selectedBefore], LilyPondInterface.barStrings[selectedAfter]);
 
 		// Same for whether to disable line breaks
 		if (disableBreaksCheckBox.isSelected() != parentController.getDisableLineBreaks())
