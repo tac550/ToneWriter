@@ -32,10 +32,12 @@ import javafx.scene.transform.Transform;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
 public class ChantLineViewController implements CommentableView {
 
@@ -687,89 +689,8 @@ public class ChantLineViewController implements CommentableView {
 		mainController.toneEdited();
 	}
 
-	@Override
-	public String toString() { // TODO: Remove. Instead, generatemodelrepr() -> toString()
-		StringBuilder finalString = new StringBuilder();
-
-		finalString.append(getName()).append(String.format("%n"));
-
-		// Place chant line comment on the first line, if any.
-		if (hasComment()) {
-			finalString.append(String.format("Comment: %s%n", getEncodedComment()));
-		}
-
-		// For each chord in the chant line...
-		for (ChantChordController chord : getChords()) {
-			if (chord instanceof RecitingChord rChord) {
-				finalString.append(String.format("%s: %s%s%n", rChord.getName(), rChord.getFields(),
-						rChord.hasComment() ? ": " + rChord.getEncodedComment() : ""));
-				for (PrepChord prep : rChord.getPreps()) { // Preps save out first
-					finalString.append(String.format("\tPrep: %s%s%n", prep.getFields(),
-							prep.hasComment() ? ": " + prep.getEncodedComment() : ""));
-				}
-				for (ChantChordController post : rChord.getPosts()) { // Posts second
-					finalString.append(String.format("\tPost: %s%s%n", post.getFields(),
-							post.hasComment() ? ": " + post.getEncodedComment() : ""));
-				}
-			} else if (chord instanceof EndChord eChord) {
-				finalString.append(String.format("END: %s%s%n", eChord.getFields(),
-						eChord.hasComment() ? ": " + eChord.getEncodedComment() : ""));
-				for (PrepChord prep : eChord.getPreps()) {
-					finalString.append(String.format("\tPrep: %s%s%n", prep.getFields(),
-							prep.hasComment() ? ": " + prep.getEncodedComment() : ""));
-				}
-			}
-		}
-
-		return finalString.toString();
-	}
-
-	// Compares other_CL, which should be another chant line's String representation, to this line's String representation.
-	// Returns true if their structure is identical (actual names, notes, and comments may vary)
-	public boolean isSimilarTo(String other_CL) { // TODO: Remove. (Handled in model)
-		String[] thisLines = Arrays.stream(this.toString().split("\\r?\\n")).map(item ->
-				item.split(":")[0]).skip(1).toArray(String[]::new);
-		String[] otherLines = Arrays.stream(other_CL.split("\\r?\\n")).map(item ->
-				item.split(":")[0]).skip(1).toArray(String[]::new);
-
-		return Arrays.equals(thisLines, otherLines);
-	}
-
 	boolean isLoadingTone() {
 		return mainController.isLoadingTone();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-
-		if (obj == this) return true;
-		if (!(obj instanceof ChantLineViewController cc)) return false;
-
-        if (cc.getChords().size() != this.getChords().size()) return false;
-
-		for (int i = 0; i < this.getChords().size(); i++) {
-			if (!(cc.getChords().get(i).getFields().equals(this.getChords().get(i).getFields())
-					&& cc.getChords().get(i).getName().equals(this.getChords().get(i).getName())
-					&& cc.getChords().get(i).getColor().equals(this.getChords().get(i).getColor())))
-				return false;
-		}
-
-		return true;
-
-	}
-
-	@Override
-	public int hashCode() {
-		HashCodeBuilder codeBuilder = new HashCodeBuilder(17, 31);
-		codeBuilder.append(this.getChords().size());
-
-		for (ChantChordController chord : this.getChords()) {
-			codeBuilder.append(chord.getName());
-			codeBuilder.append(chord.getFields());
-			codeBuilder.append(chord.getColor());
-		}
-
-		return codeBuilder.toHashCode();
 	}
 
 	public ChantPhrase generatePhraseModel() {
@@ -792,5 +713,4 @@ public class ChantLineViewController implements CommentableView {
 		}
 		return new ChantPhrase.ChantPhraseBuilder().name(TWUtils.shortenPhraseName(getName())).comment(getEncodedComment()).chords(chords).buildChantPhrase();
 	}
-
 }

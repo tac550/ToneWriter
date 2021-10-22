@@ -57,7 +57,7 @@ public class VerseLineViewController {
 
 	private ChantLineViewController[] associatedChantLines;
 	private int selectedChantLine = 0;
-	private String previousChantLine = "";
+	private ChantPhrase previousChantLine = null;
 
 	@FXML private ChoiceBox<String> tonePhraseChoice;
 	@FXML private TextFlow lineTextFlow;
@@ -99,7 +99,7 @@ public class VerseLineViewController {
 
 			resetIfSelectedNotSimilarToPrevious();
 
-			previousChantLine = associatedChantLines[selectedChantLine].toString();
+			previousChantLine = associatedChantLines[selectedChantLine].generatePhraseModel();
 		});
 
 		// Interface icons
@@ -264,7 +264,7 @@ public class VerseLineViewController {
 		// Determine initial chant line selection.
 		if (mainController.manualCLAssignmentEnabled()) {
 			// If we're in manual assignment mode, try to auto-select a chant line similar to the previous one.
-			if (!previousChantLine.isEmpty()) {
+			if (previousChantLine != null) {
 				// If we don't find a similar chant line below, default to the previous selection.
 				selectedChantLine = previousSelection;
 
@@ -272,7 +272,7 @@ public class VerseLineViewController {
 				if (!identicalChoices) {
 					int i = 0;
 					for (ChantLineViewController chantLine : associatedChantLines) {
-						if (chantLine.isSimilarTo(previousChantLine)) {
+						if (chantLine.generatePhraseModel().isSimilarTo(previousChantLine)) {
 							// The first time we find a similar chant line, select it and stop searching.
 							selectedChantLine = i;
 							break;
@@ -303,7 +303,7 @@ public class VerseLineViewController {
 		changingAssignments = false;
 
 		// Save chant line information for later.
-		previousChantLine = associatedChantLines[selectedChantLine].toString();
+		previousChantLine = associatedChantLines[selectedChantLine].generatePhraseModel();
 
 		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
 		// Preserve existing project edited state if not first tab, otherwise reset it.
@@ -324,7 +324,7 @@ public class VerseLineViewController {
 
 	private void resetIfSelectedNotSimilarToPrevious() {
 		// Only reset chord assignments if the selected chant line is structurally different from the previous one.
-		if (!associatedChantLines[selectedChantLine].isSimilarTo(previousChantLine))
+		if (!associatedChantLines[selectedChantLine].generatePhraseModel().isSimilarTo(previousChantLine))
 			resetChordAssignment();
 	}
 

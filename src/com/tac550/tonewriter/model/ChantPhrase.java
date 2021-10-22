@@ -54,6 +54,8 @@ public class ChantPhrase {
 	}
 
 	public boolean isSimilarTo(ChantPhrase other) {
+		if (other == null) return false;
+
 		if (!other.getName().equals(this.getName()) || other.getChords().size() != this.getChords().size())
 			return false;
 		for (int i = 0; i < this.getChords().size(); i++) {
