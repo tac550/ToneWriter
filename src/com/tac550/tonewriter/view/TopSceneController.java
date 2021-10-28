@@ -1028,7 +1028,7 @@ public class TopSceneController {
 			MainSceneController controller = tabControllerMap.get(tab);
 
 			// Don't check for tabs that haven't been edited
-			if (!controller.getToneEdited()) continue;
+			if (controller.isToneUnedited()) continue;
 
 			tabPane.getSelectionModel().select(tab);
 			double prevPosition = controller.getDividerPosition();
@@ -1041,7 +1041,7 @@ public class TopSceneController {
 			if (saveCancelled) {
 				tabPane.getSelectionModel().select(prevTab);
 				return false;
-			} else if (!controller.getToneEdited()) { // The user selected Save; update other open instances.
+			} else if (controller.isToneUnedited()) { // The user selected Save; update other open instances.
 				refreshToneInstances(controller.getToneFile(), controller);
 			}
 		}

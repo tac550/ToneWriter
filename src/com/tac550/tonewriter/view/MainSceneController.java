@@ -1135,8 +1135,8 @@ public class MainSceneController {
 		toneEdited = false;
 		updateStageTitle();
 	}
-	public boolean getToneEdited() {
-		return toneEdited;
+	public boolean isToneUnedited() {
+		return !toneEdited;
 	}
 
 	void verseEdited() {
