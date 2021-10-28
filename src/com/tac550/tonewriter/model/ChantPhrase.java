@@ -20,6 +20,9 @@ public class ChantPhrase {
 	public String getComment() {
 		return comment;
 	}
+	public boolean hasComment() {
+		return !comment.isEmpty();
+	}
 	public List<ChantChord> getChords() {
 		return chords;
 	}
@@ -31,21 +34,21 @@ public class ChantPhrase {
 		finalString.append(getName()).append(String.format("%n"));
 
 		// Place chant line comment on the first line, if any.
-		if (!getComment().isEmpty())
+		if (hasComment())
 			finalString.append(String.format("Comment: %s%n", getComment()));
 
 		// For each chord in the chant line...
 		for (ChantChord chord : getChords()) {
 			if (chord.getName().matches("[0-9]") || chord.getName().equalsIgnoreCase("End")) {
 				finalString.append(String.format("%s: %s%s%n", chord.getName().equalsIgnoreCase("End") ? "END" : chord.getName(), chord.getFields(),
-						!chord.getComment().isEmpty() ? ": " + chord.getComment() : ""));
+						chord.hasComment() ? ": " + chord.getComment() : ""));
 				for (ChantChord prep : chord.getPreps()) { // Preps save out first
 					finalString.append(String.format("\tPrep: %s%s%n", prep.getFields(),
-							!prep.getComment().isEmpty() ? ": " + prep.getComment() : ""));
+							prep.hasComment() ? ": " + prep.getComment() : ""));
 				}
 				for (ChantChord post : chord.getPosts()) { // Posts second
 					finalString.append(String.format("\tPost: %s%s%n", post.getFields(),
-							!post.getComment().isEmpty() ? ": " + post.getComment() : ""));
+							post.hasComment() ? ": " + post.getComment() : ""));
 				}
 			}
 		}

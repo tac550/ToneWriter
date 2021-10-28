@@ -34,7 +34,6 @@ public class AboutSceneController {
 		appVersionText.setText(appVersionText.getText().replace("%VERSION%", MainApp.APP_VERSION));
 		
 		appIconView.setImage(MainApp.APP_ICON);
-		
 	}
 	
 	@FXML private void handleClose() {

@@ -1,6 +1,5 @@
 package com.tac550.tonewriter.model;
 
-import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.view.ChantChordController;
 import com.tac550.tonewriter.view.VerseLineViewController;
 

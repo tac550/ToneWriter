@@ -71,7 +71,7 @@ public class ToneOpenViewController {
     }
 
     private static class treeFocusListener implements ChangeListener<Boolean> {
-        TreeView<File> otherTreeView;
+        private final TreeView<File> otherTreeView;
 
         public treeFocusListener(TreeView<File> view) {
             otherTreeView = view;

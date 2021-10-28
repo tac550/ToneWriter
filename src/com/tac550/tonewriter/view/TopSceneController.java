@@ -805,7 +805,8 @@ public class TopSceneController {
 
 		if (selected_file.exists()) {
 			Project loadedProject = ProjectIO.loadProject(selected_file);
-			if (loadedProject != null && loadProjectIntoUI(loadedProject)) {
+			if (loadedProject != null) {
+				loadProjectIntoUI(loadedProject);
 				projectFile = selected_file;
 			} else {
 				clearProjectState();
@@ -820,7 +821,7 @@ public class TopSceneController {
 		projectFile = null;
 	}
 
-	private boolean loadProjectIntoUI(Project project) {
+	private void loadProjectIntoUI(Project project) {
 		setProjectTitle(project.getTitle());
 		setPaperSize(project.getPaperSize());
 		setNoHeader(project.isNoHeader());
@@ -947,8 +948,6 @@ public class TopSceneController {
 				ctr.applyLoadedVerses(finalI != 0 && initialProjectEditedState);
 			}, true);
 		}
-
-		return true;
 	}
 
 	void projectEdited() {

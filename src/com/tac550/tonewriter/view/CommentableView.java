@@ -12,6 +12,5 @@ public interface CommentableView {
 	
 	String getEncodedComment();
 	void setComment(String comment);
-	boolean hasComment();
 
 }

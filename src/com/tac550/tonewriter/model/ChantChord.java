@@ -28,6 +28,9 @@ public class ChantChord {
 	public String getComment() {
 		return comment;
 	}
+	public boolean hasComment() {
+		return !comment.isEmpty();
+	}
 	public List<ChantChord> getPreps() {
 		return preps;
 	}

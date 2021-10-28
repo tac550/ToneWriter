@@ -188,7 +188,7 @@ public class ToneIO {
 
 		return toneBuilder.buildTone();
 	}
-	private static ChantPhrase loadChantLine(String chant_line) throws IOException {
+	private static ChantPhrase loadChantLine(String chant_line) {
 		ChantPhrase.ChantPhraseBuilder phraseBuilder = new ChantPhrase.ChantPhraseBuilder();
 		List<ChantChord> chords = new ArrayList<>();
 		try (Scanner chantLineScanner = new Scanner(chant_line)) {
