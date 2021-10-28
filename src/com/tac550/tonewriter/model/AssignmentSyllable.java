@@ -20,6 +20,9 @@ public class AssignmentSyllable {
 	public String getSyllableText() {
 		return syllableText;
 	}
+	public boolean isFirstSyllableInWord() {
+		return firstSyllableInWord;
+	}
 	public boolean isBold() {
 		return bold;
 	}

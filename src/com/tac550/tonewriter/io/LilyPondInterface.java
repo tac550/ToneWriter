@@ -773,9 +773,9 @@ public class LilyPondInterface {
 
 		// If this is not the last syllable in the text,
 		if (syllableList.indexOf(syllable) < syllableList.size() - 1)
-			// If the next syllable starts with a hyphen, it is part of the same word, so we need to add these dashes immediately after the current syllable.
-			// This ensures that syllables belonging to one word split across a distance are engraved correctly by LilyPond.
-			if (syllableList.get(syllableList.indexOf(syllable) + 1).getSyllableText().startsWith("-"))
+			// If the next syllable doesn't begin a new word, we need to add these dashes immediately after the current syllable.
+			// This ensures correct hyphenation formatting in lyric engraving.
+			if (!syllableList.get(syllableList.indexOf(syllable) + 1).isFirstSyllableInWord())
 				syllableTextBuffer.append(" -- ");
 
 		// Add closing formatting flag if necessary.
