@@ -711,7 +711,7 @@ public class LilyPondInterface {
 		String startSymbol = "\\(";
 		String endSymbol = "\\)";
 
-		// If the syllable contains nothing but two eighth notes/groups, apply beam instead of slur
+		// If the syllable contains nothing but eighth notes, apply beam instead of slur
 		// (prevents auto-connecting beam to note(s) from previous syllable).
 		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
 				t.contains("8") || !t.matches(".*\\d.*")).count();
