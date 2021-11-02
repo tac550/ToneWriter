@@ -22,14 +22,16 @@ import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
 
 import java.awt.Taskbar;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AutoUpdater {
 
@@ -55,24 +57,23 @@ public class AutoUpdater {
 					final HtmlPage releasesPage = webClient.getPage("https://github.com/tac550/ToneWriter/releases");
 
 					// Generate the changelog display HTML and store version numbers.
-					List<HtmlDivision> releaseHeaders = releasesPage.getByXPath("//div[@class='release-header']");
-					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body']");
-					List<String> releaseNumbers = new ArrayList<>();
+					List<String> versionNumbers = retrieveReleaseVersions();
+					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body my-3']");
+                    System.out.println(releaseNotes);
 
 					StringBuilder finalHTMLBuilder = new StringBuilder();
 
 					finalHTMLBuilder.append("<body bgcolor=\"").append(TWUtils.toRGBCode(TWUtils.getUIBaseColor())).append("\">");
 
-					for (int i = 0; i < releaseHeaders.size(); i++) {
-						HtmlDivision header = releaseHeaders.get(i);
-						String releaseTitle = header.getElementsByTagName("a").get(0).getTextContent();
-						String releaseNumber = releaseTitle.replaceAll("[^\\d.]+|\\.(?!\\d)", "");
+                    List<String> versionOptions = new ArrayList<>();
+					for (int i = 0; i < versionNumbers.size(); i++) {
+						String releaseNumber = versionNumbers.get(i);
 
 						int versionDiff = TWUtils.versionCompare(releaseNumber, MainApp.APP_VERSION);
 
 						if (versionDiff == 1 || versionDiff == 0) {
 							// Add the version heading to the output
-							finalHTMLBuilder.append("<h1>").append(releaseTitle).append("</h1>");
+							finalHTMLBuilder.append("<h1>").append("Release ").append(releaseNumber).append("</h1>");
 
 							// Add the associated changelog to the output
 							String body = releaseNotes.get(i).asXml();
@@ -82,14 +83,13 @@ public class AutoUpdater {
 						}
 
 						if (versionDiff == 1)
-							releaseNumbers.add(releaseNumber);
-
+							versionOptions.add(releaseNumber);
 					}
 
 					finalHTMLBuilder.append("</body>");
 
 					// If there's no update and this is the startup check, or the check has been cancelled, stop here.
-					if ((startup && releaseNumbers.size() == 0) || checkCancelled) {
+					if ((startup && versionNumbers.size() == 0) || checkCancelled) {
 						return null;
 					}
 
@@ -106,7 +106,7 @@ public class AutoUpdater {
 						});
 
 						updaterController.setWebViewContent(finalHTMLBuilder.toString());
-						updaterController.setVersionChoices(releaseNumbers);
+						updaterController.setVersionChoices(versionOptions);
 
 						if (updaterStage.getOwner() == null) {
 							updaterStage.initOwner(owner);
@@ -164,6 +164,27 @@ public class AutoUpdater {
 		updateThread.start();
 
 	}
+
+    private static List<String> retrieveReleaseVersions() throws IOException {
+        List<String> versionNumbers = new ArrayList<>();
+        StringBuilder content = new StringBuilder();
+        URL url = new URL("https://api.github.com/repos/tac550/tonewriter/tags");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String respLine;
+        while ((respLine = br.readLine()) != null)
+            content.append(respLine);
+        Pattern pattern = Pattern.compile("\"name\":\"");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            int lastPos = matcher.end();
+
+            String chopped = content.substring(lastPos);
+            versionNumbers.add(chopped.substring(0, chopped.indexOf("\"")));
+        }
+        return versionNumbers;
+    }
 
 	public static void downloadUpdate(String version) {
 
