@@ -3,8 +3,6 @@ package com.tac550.tonewriter.io;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlDivision;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.view.MainApp;
 import com.tac550.tonewriter.view.UpdaterViewController;
@@ -20,16 +18,18 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.io.IOUtils;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
-import java.awt.Taskbar;
+import java.awt.*;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +45,7 @@ public class AutoUpdater {
 
 	public static void updateCheck(Window owner, boolean startup) {
 
-		Task<Void> updateTask = new Task<>() {
+		Task<Void> updateCheckTask = new Task<>() {
 			@Override
 			protected Void call() {
 				try {
@@ -53,45 +53,38 @@ public class AutoUpdater {
 					webClient.getOptions().setJavaScriptEnabled(false);
 					webClient.getOptions().setCssEnabled(false);
 
-					// Get the GitHub Releases page
-					final HtmlPage releasesPage = webClient.getPage("https://github.com/tac550/ToneWriter/releases");
+					// Get the available versions and their associated Markdown changelogs.
+					HashMap<String, String> versionInfo = retrieveReleaseInfo();
 
-					// Generate the changelog display HTML and store version numbers.
-					List<String> versionNumbers = retrieveReleaseVersions();
-					List<HtmlDivision> releaseNotes = releasesPage.getByXPath("//div[@class='markdown-body my-3']");
-                    System.out.println(releaseNotes);
-
+					// The HTML that appears in the updater window's WebView
 					StringBuilder finalHTMLBuilder = new StringBuilder();
-
 					finalHTMLBuilder.append("<body bgcolor=\"").append(TWUtils.toRGBCode(TWUtils.getUIBaseColor())).append("\">");
 
                     List<String> versionOptions = new ArrayList<>();
-					for (int i = 0; i < versionNumbers.size(); i++) {
-						String releaseNumber = versionNumbers.get(i);
-
-						int versionDiff = TWUtils.versionCompare(releaseNumber, MainApp.APP_VERSION);
+					for (String version : versionInfo.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
+						int versionDiff = TWUtils.versionCompare(version, MainApp.APP_VERSION);
 
 						if (versionDiff == 1 || versionDiff == 0) {
-							// Add the version heading to the output
-							finalHTMLBuilder.append("<h1>").append("Release ").append(releaseNumber).append("</h1>");
+							// Add the version heading to the page
+							finalHTMLBuilder.append("<h1>").append("Release ").append(version).append("</h1>");
 
-							// Add the associated changelog to the output
-							String body = releaseNotes.get(i).asXml();
+							// Add the associated changelog to the page
+							Node document = Parser.builder().build().parse(versionInfo.get(version));
+							String body = HtmlRenderer.builder().build().render(document);
 							int afterFirstHeading = body.indexOf("</h1>") + 5;
 							String changelog = body.substring(afterFirstHeading, body.indexOf("<h1>", afterFirstHeading));
 							finalHTMLBuilder.append(changelog);
 						}
 
 						if (versionDiff == 1)
-							versionOptions.add(releaseNumber);
+							versionOptions.add(version);
 					}
 
 					finalHTMLBuilder.append("</body>");
 
 					// If there's no update and this is the startup check, or the check has been cancelled, stop here.
-					if ((startup && versionNumbers.size() == 0) || checkCancelled) {
+					if ((startup && versionOptions.size() == 0) || checkCancelled)
 						return null;
-					}
 
 					Platform.runLater(() -> {
 						FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("updaterView.fxml");
@@ -138,7 +131,11 @@ public class AutoUpdater {
 			}
 		};
 
-		Thread updateThread = new Thread(updateTask);
+		updateCheckTask.setOnFailed(e -> {
+			TWUtils.showError("Update check failed.", false);
+			if (updateAlert != null && updateAlert.isShowing()) updateAlert.close();
+		});
+		Thread updateCheckThread = new Thread(updateCheckTask);
 
 		Platform.runLater(() -> {
 			if (!startup) {
@@ -161,29 +158,34 @@ public class AutoUpdater {
 			}
 		});
 
-		updateThread.start();
-
+		updateCheckThread.start();
 	}
 
-    private static List<String> retrieveReleaseVersions() throws IOException {
-        List<String> versionNumbers = new ArrayList<>();
+    private static HashMap<String, String> retrieveReleaseInfo() throws IOException {
+        HashMap<String, String> versionInfo = new HashMap<>();
         StringBuilder content = new StringBuilder();
-        URL url = new URL("https://api.github.com/repos/tac550/tonewriter/tags");
+        URL url = new URL("https://api.github.com/repos/tac550/tonewriter/releases");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String respLine;
         while ((respLine = br.readLine()) != null)
             content.append(respLine);
-        Pattern pattern = Pattern.compile("\"name\":\"");
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            int lastPos = matcher.end();
+        Pattern versionPattern = Pattern.compile("\"tag_name\":\"");
+        Matcher versionMatcher = versionPattern.matcher(content);
+        while (versionMatcher.find()) {
+            String choppedVersion = content.substring(versionMatcher.end());
 
-            String chopped = content.substring(lastPos);
-            versionNumbers.add(chopped.substring(0, chopped.indexOf("\"")));
+			Pattern notesPattern = Pattern.compile("\"body\":\"");
+			Matcher notesMatcher = notesPattern.matcher(choppedVersion);
+			if (notesMatcher.find()) {
+				String choppedNotes = choppedVersion.substring(notesMatcher.end())
+						.replace("\\r\\n", "\n").replace("\\\"", "\"");
+				versionInfo.put(choppedVersion.substring(0, choppedVersion.indexOf("\"")),
+						choppedNotes.substring(0, choppedNotes.indexOf("\"}")));
+			}
         }
-        return versionNumbers;
+        return versionInfo;
     }
 
 	public static void downloadUpdate(String version) {
