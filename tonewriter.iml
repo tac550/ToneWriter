@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="EclipseModuleManager">
+    <libelement value="jar://$MODULE_DIR$/lib/commonmark-0.18.0.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/commons-codec-1.10.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/commons-io-2.6.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/commons-lang3-3.7.jar!/" />
@@ -18,7 +19,6 @@
     <libelement value="jar://$MODULE_DIR$/lib/jetty-io-9.4.10.v20180503.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/jetty-util-9.4.10.v20180503.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/jetty-xml-9.4.10.v20180503.jar!/" />
-    <libelement value="jar://$MODULE_DIR$/lib/jfxrt.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/neko-htmlunit-2.31.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/serializer-2.7.2.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/websocket-api-9.4.10.v20180503.jar!/" />
@@ -27,7 +27,6 @@
     <libelement value="jar://$MODULE_DIR$/lib/xalan-2.7.2.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/xercesImpl-2.11.0.jar!/" />
     <libelement value="jar://$MODULE_DIR$/lib/xml-apis-1.4.01.jar!/" />
-    <libelement value="jar://$MODULE_DIR$/lib/pdfbox-2.0.13.jar!/" />
     <src_description expected_position="0">
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
     </src_description>
@@ -40,6 +39,15 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
+    <orderEntry type="module-library">
+          <library name="commonmark-0.18.0.jar">
+            <CLASSES>
+              <root url="jar://$MODULE_DIR$/lib/commonmark-0.18.0.jar!/" />
+            </CLASSES>
+            <JAVADOC />
+            <SOURCES />
+          </library>
+        </orderEntry>
     <orderEntry type="module-library">
       <library name="commons-codec-1.10.jar">
         <CLASSES>
@@ -268,7 +276,5 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="lib" level="project" />
-    <orderEntry type="library" name="commonmark-0.18.0 (2)" level="application" />
-    <orderEntry type="library" name="commonmark-0.18.0" level="application" />
   </component>
 </module>
