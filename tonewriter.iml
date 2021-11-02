@@ -269,5 +269,6 @@
     </orderEntry>
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="commonmark-0.18.0 (2)" level="application" />
+    <orderEntry type="library" name="commonmark-0.18.0" level="application" />
   </component>
 </module>
