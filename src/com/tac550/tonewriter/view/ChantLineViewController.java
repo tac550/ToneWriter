@@ -668,9 +668,6 @@ public class ChantLineViewController implements CommentableView {
 			applyCommentGraphic(bubbleImage);
 		}
 	}
-	public boolean hasComment() {
-		return !commentString.isEmpty();
-	}
 	public void applyCommentGraphic(Image image) {
 		ImageView imageView = new ImageView(image);
 		imageView.setFitHeight(15);

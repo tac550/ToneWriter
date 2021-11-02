@@ -139,9 +139,6 @@ public abstract class ChantChordController implements CommentableView {
 	public String getEncodedComment() {
 		return TWUtils.encodeNewLines(commentString);
 	}
-	public boolean hasComment() {
-		return !commentString.isEmpty();
-	}
 
 	public void setFields(String data) {
 		if (data == null || !data.contains("-")) {
