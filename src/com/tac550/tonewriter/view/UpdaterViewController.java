@@ -75,10 +75,10 @@ public class UpdaterViewController {
 		if (versions.size() > 0) {
 			versionChoiceBox.getItems().setAll(versions);
 			versionChoiceBox.getSelectionModel().select(0);
-			updateStatusText.setText("Update available: Release " + versionChoiceBox.getSelectionModel().getSelectedItem()
+			updateStatusText.setText("Update available: Version " + versionChoiceBox.getSelectionModel().getSelectedItem()
 					+ " (current version: " + MainApp.APP_VERSION + ")");
 		} else {
-			updateStatusText.setText("Already up to date! (version " + MainApp.APP_VERSION + ")");
+			updateStatusText.setText("Already up to date! (Version " + MainApp.APP_VERSION + ")");
 			updateButton.setDisable(true);
 			laterButton.setText("Close");
 		}

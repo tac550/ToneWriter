@@ -66,7 +66,7 @@ public class AutoUpdater {
 
 						if (versionDiff == 1 || versionDiff == 0) {
 							// Add the version heading to the page
-							finalHTMLBuilder.append("<h1>").append("Release ").append(version).append("</h1>");
+							finalHTMLBuilder.append("<h1>").append("Version ").append(version).append("</h1>");
 
 							// Add the associated changelog to the page
 							Node document = Parser.builder().build().parse(versionInfo.get(version));
