@@ -40,14 +40,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="module-library">
-          <library name="commonmark-0.18.0.jar">
-            <CLASSES>
-              <root url="jar://$MODULE_DIR$/lib/commonmark-0.18.0.jar!/" />
-            </CLASSES>
-            <JAVADOC />
-            <SOURCES />
-          </library>
-        </orderEntry>
+      <library name="commonmark-0.18.0.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/commonmark-0.18.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="module-library">
       <library name="commons-codec-1.10.jar">
         <CLASSES>

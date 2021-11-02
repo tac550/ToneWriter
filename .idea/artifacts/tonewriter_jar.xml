@@ -28,6 +28,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/htmlunit-core-js-2.31.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-client-9.4.10.v20180503.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/httpmime-4.5.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/commonmark-0.18.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

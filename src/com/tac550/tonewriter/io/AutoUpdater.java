@@ -109,9 +109,8 @@ public class AutoUpdater {
 						updaterStage.show();
 
 						if (Taskbar.isTaskbarSupported()) {
-							if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION)) {
+							if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION))
 								Taskbar.getTaskbar().requestUserAttention(true, true);
-							}
 						}
 
 					});
