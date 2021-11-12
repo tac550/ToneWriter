@@ -813,8 +813,6 @@ public class MainSceneController {
 	    	chantLineController.setKeySignature(key);
 	}
 	void refreshChordPreviews() {
-		if (!MainApp.lilyPondAvailable()) return;
-
 		for (ChantLineViewController chantLineController : chantLineControllers)
 			chantLineController.refreshAllChordPreviews();
 	}
