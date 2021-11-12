@@ -945,9 +945,10 @@ public class MainSceneController {
 	}
 	private void modifyChantLine(ChantPhrase new_line, ChantLineViewController existing_line) {
 		existing_line.setComment(new_line.getComment());
-		for (int i = 0; i < new_line.getChords().size(); i++) {
-			existing_line.getChords().get(i).setComment(new_line.getChords().get(i).getComment());
-			existing_line.getChords().get(i).setFields(new_line.getChords().get(i).getFields());
+		List<ChantChord> inOrderChords = new_line.getChordsMelodyOrder();
+		for (int i = 0; i < inOrderChords.size(); i++) {
+			existing_line.getChords().get(i).setComment(inOrderChords.get(i).getComment());
+			existing_line.getChords().get(i).setFields(inOrderChords.get(i).getFields());
 		}
 	}
 

@@ -406,7 +406,7 @@ public class LilyPondInterface {
 
 	private static float generateNotatedLine(String[] parts, List<AssignmentSyllable> syllableList, StringBuilder verseLine,
 	                                         boolean disableLineBreaks, AssignmentLine al) {
-		List<ChantChord> inOrderChords = melodyOrderChords(al.getSelectedChantPhrase().getChords()); // TODO: This seems inefficient. It gets done for every verse line but concerns only chant lines.
+		List<ChantChord> inOrderChords = al.getSelectedChantPhrase().getChordsMelodyOrder(); // TODO: This seems inefficient. It gets done for every verse line but concerns only chant lines.
 
 		float measureBeats = 0;
 		int breakCount = 0;
@@ -616,40 +616,6 @@ public class LilyPondInterface {
 
 		}
 		return measureBeats;
-	}
-
-	private static List<ChantChord> melodyOrderChords(List<ChantChord> chord_list) {
-		List<ChantChord> inOrder = new ArrayList<>();
-
-		Queue<ChantChord> preps = new ArrayDeque<>();
-		Stack<ChantChord> posts = new Stack<>();
-		ChantChord mainChord = chord_list.get(0); // First chord in save order will always be a main chord.
-		assert mainChord.getName().matches("[0-9]") || mainChord.getName().equalsIgnoreCase("End");
-
-		for (int i = 1; i < chord_list.size(); i++) {
-			ChantChord current = chord_list.get(i);
-			if (current.getName().matches("[0-9]") || current.getName().equalsIgnoreCase("End")) {
-				while (!preps.isEmpty())
-					inOrder.add(preps.remove());
-				inOrder.add(mainChord);
-				while (!posts.isEmpty())
-					inOrder.add(posts.pop());
-
-				mainChord = current;
-			} else if (current.getName().equalsIgnoreCase("Prep")) {
-				preps.add(current);
-			} else {
-				posts.add(current);
-			}
-		}
-
-		while (!preps.isEmpty())
-			inOrder.add(preps.remove());
-		inOrder.add(mainChord);
-		while (!posts.isEmpty())
-			inOrder.add(posts.pop());
-
-		return inOrder;
 	}
 
 	private static String getNoteAndDuration(AssignedChordData chord, List<ChantChord> chords_in_order, int part) {

@@ -1,7 +1,6 @@
 package com.tac550.tonewriter.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ChantPhrase {
 
@@ -25,6 +24,40 @@ public class ChantPhrase {
 	}
 	public List<ChantChord> getChords() {
 		return chords;
+	}
+
+	public List<ChantChord> getChordsMelodyOrder() {
+		List<ChantChord> inOrder = new ArrayList<>();
+
+		Queue<ChantChord> preps = new ArrayDeque<>();
+		Stack<ChantChord> posts = new Stack<>();
+		ChantChord mainChord = chords.get(0); // First chord in save order will always be a main chord.
+		assert mainChord.getName().matches("[0-9]") || mainChord.getName().equalsIgnoreCase("End");
+
+		for (int i = 1; i < chords.size(); i++) {
+			ChantChord current = chords.get(i);
+			if (current.getName().matches("[0-9]") || current.getName().equalsIgnoreCase("End")) {
+				while (!preps.isEmpty())
+					inOrder.add(preps.remove());
+				inOrder.add(mainChord);
+				while (!posts.isEmpty())
+					inOrder.add(posts.pop());
+
+				mainChord = current;
+			} else if (current.getName().equalsIgnoreCase("Prep")) {
+				preps.add(current);
+			} else {
+				posts.add(current);
+			}
+		}
+
+		while (!preps.isEmpty())
+			inOrder.add(preps.remove());
+		inOrder.add(mainChord);
+		while (!posts.isEmpty())
+			inOrder.add(posts.pop());
+
+		return inOrder;
 	}
 
 	@Override
