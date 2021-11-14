@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 1.2.1
 Key Signature: F major
 Tone: Tone 2
 Composer: L’vov/Bakhmetev - Imperial Court Chant
@@ -6,7 +6,7 @@ Manually Assign Phrases: false
 
 
 A
-1: g-e-c-c
+1: g-e-c-c: Skipped if the first syllable is stressed.
 2: a-f-c-f
 	Post: c'-f-ef-<a a,>
 	Post: bf-f-d-<bf bf,>

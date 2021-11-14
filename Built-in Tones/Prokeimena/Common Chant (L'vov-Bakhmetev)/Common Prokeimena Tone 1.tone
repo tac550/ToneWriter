@@ -1,4 +1,4 @@
-VERSION: 1.0
+VERSION: 1.2.1
 Key Signature: F major
 Tone: Tone 1
 Composer: L’vov/Bakhmetev - Common Chant
@@ -16,10 +16,10 @@ Final
 	Prep: bf-f-d-d
 5: g-e-c-c
 6: a-f-c-f
+	Post: g-e-c-c
 	Post: f-d-c-c
 	Post: g-e-c-c
-7: g-e-c-c
-	Post: a-f-c-f
+7: a-f-c-f
 END: a-f-c-f
 	Prep: g-e-c-c
 	Prep: bf-g-c-c
