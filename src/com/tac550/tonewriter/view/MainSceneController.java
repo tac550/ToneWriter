@@ -897,7 +897,8 @@ public class MainSceneController {
 		}
 
 		recalcCLNames();
-		setFirstRepeated(tone.getFirstRepeated());
+		if (!tone.getFirstRepeated().isEmpty())
+			setFirstRepeated(tone.getFirstRepeated());
 
 		return true;
 	}
@@ -956,9 +957,9 @@ public class MainSceneController {
 		for (ChantLineViewController controller : chantLineControllers)
 			controller.resetFRState();
 	}
-	public void setFirstRepeated(String chant_line) {
+	public void setFirstRepeated(String chant_line_letter) {
 		for (ChantLineViewController chantLine : chantLineControllers) {
-			if (chantLine.getName().equals(chant_line))
+			if (chantLine.getName().contains(chant_line_letter))
 				chantLine.toggleFirstRepeated();
 		}
 	}
@@ -1252,7 +1253,7 @@ public class MainSceneController {
 		for (ChantLineViewController cl : chantLineControllers) {
 			chantPhrases.add(cl.generatePhraseModel());
 			if (cl.getFirstRepeated())
-				firstRepeated = cl.getName();
+				firstRepeated = cl.getName().replace("Phrase ", "");
 		}
 		return new Tone.ToneBuilder().keySignature(keySignature).toneText(leftText).composerText(rightText)
 				.manualAssignment(manualCLAssignment).chantPhrases(chantPhrases).firstRepeated(firstRepeated).buildTone();
