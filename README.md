@@ -26,16 +26,16 @@ I'm building ToneWriter against Java 16 on all platforms. This repo contains pro
 
 dependencies: [launch4j 3.14 or later](http://launch4j.sourceforge.net/) (make sure its install directory is on the PATH) and [NSIS](https://sourceforge.net/projects/nsis/) (make sure its install directory is on the PATH). The JDK 16 bin directory must also be on the PATH. The JavaFX SDK 16 jmods directory must be located at build/res for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_WIN.cmd. An artifact definition for ToneWriter.jar is included with the IDEA project files. The installer will be placed in build/win.
+To build a Windows installer executable as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_WIN.cmd. An artifact definition for ToneWriter.jar is included with the IDEA project files. If not using IDEA's artifact builder, be sure to configure the compiler to exclude the .sh script files found in the classpath. The installer will be placed in build/win.
 
 ### macOS
 
 dependencies: Your JDK 16 bin directory must be on the PATH. The JavaFX SDK 16 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_MAC.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. The .app will be placed in build/mac along with a zipped copy.
+To build a .app as you see in release binaries, export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_MAC.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. Before building it, be sure to remove the compiler exclusions for any script files in IDEA's Settings panel. The .app will be placed in build/mac along with a zipped copy.
 
 ### Linux
 
 dependencies: Your JDK 16 bin directory must be on the PATH. The JavaFX SDK 16 jmods directory must be located in the build/res directory for the linker to be able to build the portable Java runtime. Those are available [here](https://gluonhq.com/products/javafx/).
 
-Export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_LIN.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. The resulting ToneWriter.sh script runs the packaged application.
+Export a runnable JAR file named "ToneWriter.jar" (whose main class is MainApp) to build/res and run build/res/BUILD_LIN.sh. An artifact definition for ToneWriter.jar is included with the IDEA project files. Before building it, be sure to remove the compiler exclusions for any script files in IDEA's Settings panel. The resulting ToneWriter.sh script runs the packaged application.
