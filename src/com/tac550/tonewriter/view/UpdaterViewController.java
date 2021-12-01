@@ -31,9 +31,9 @@ public class UpdaterViewController {
 
 	@FXML private void initialize() {
 		// Checkbox initial state and behavior
-		updateOnStartupBox.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, true));
+		updateOnStartupBox.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_CHECK_UPDATE_STARTUP, true));
 		updateOnStartupBox.selectedProperty().addListener((ov, oldVal, newVal) ->
-				MainApp.prefs.putBoolean(MainApp.PREFS_CHECK_UPDATE_APPSTARTUP, newVal));
+				MainApp.prefs.putBoolean(MainApp.PREFS_CHECK_UPDATE_STARTUP, newVal));
 
 		// Open any Web links in the system's default Web browser.
 		webView.getEngine().getLoadWorker().stateProperty().addListener((ov, oldVal, newVal) -> {

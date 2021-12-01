@@ -76,7 +76,7 @@ public class MainApp extends Application {
 	static final String PREFS_PAPER_SIZE = "Paper-Size";
 	static final String PREFS_DARK_MODE = "Dark-Mode-Enabled";
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
-	static final String PREFS_CHECK_UPDATE_APPSTARTUP = "Check-Update-Appstart";
+	static final String PREFS_CHECK_UPDATE_STARTUP = "Check-Update-Appstart";
 	static final String PREFS_AUTO_OPEN_EXPORT = "Auto-Open-Completed-Export";
 
 	// UI Stuff
@@ -183,7 +183,7 @@ public class MainApp extends Application {
 		mainStage.show();
 
 		// Run auto update check
-		if (prefs.getBoolean(PREFS_CHECK_UPDATE_APPSTARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
+		if (prefs.getBoolean(PREFS_CHECK_UPDATE_STARTUP, true)) AutoUpdater.updateCheck(mainStage, true);
 
 		// Makes sure the stage can't be made too small.
 		// The stage opens showing the scene at its pref size. This makes that initial size the minimum.
