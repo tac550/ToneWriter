@@ -513,10 +513,7 @@ public class MainSceneController {
 				handleSaveTone();
 				return true;
 			} else return result.get() == dontSaveButton;
-		} else {
-			// Not returning true, so no save will occur and the prompt will appear again next time.
-			return false;
-		}
+		} else return false;
 	}
 	private boolean isToneSavable() {
 		return (nonInternalToneLoaded() && !TWUtils.isBuiltinTone(toneFile)) || MainApp.developerMode;

@@ -1014,10 +1014,7 @@ public class TopSceneController {
 				handleSaveProject();
 				return true;
 			} else return result.get() == dontSaveButton;
-		} else {
-			// Not returning true, so no save will occur and the prompt will appear again next time.
-			return false;
-		}
+		} else return false;
 	}
 
 	boolean checkAllToneSaves() {
