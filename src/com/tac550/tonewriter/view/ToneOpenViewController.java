@@ -19,7 +19,6 @@ import org.apache.commons.io.comparator.NameFileComparator;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ToneOpenViewController {
 
@@ -91,7 +90,7 @@ public class ToneOpenViewController {
             recentTonesView.getRoot().getChildren().add(new TreeItem<>(new File(NO_RECENTS_MESSAGE)));
         else
             recentTonesView.getRoot().getChildren().addAll(recentTones.stream().distinct()
-                    .map(TreeItem::new).collect(Collectors.toList()));
+                    .map(TreeItem::new).toList());
     }
 
     private void removeRecentTone(File tone_file) {
