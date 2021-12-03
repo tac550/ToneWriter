@@ -446,30 +446,33 @@ public class TopSceneController {
 
 		openProject(selectedFile);
 	}
-	@FXML private void handleSaveProject() {
+	@FXML private boolean handleSaveProject() {
 		if (projectFile != null) {
-			if (ProjectIO.saveProject(projectFile, generateProjectModel()))
-				resetProjectEditedStatus();
+			boolean saveSucceeded = ProjectIO.saveProject(projectFile, generateProjectModel());
+			if (saveSucceeded) resetProjectEditedStatus();
+			return saveSucceeded;
 		} else {
-			handleSaveProjectAs();
+			return handleSaveProjectAs();
 		}
 	}
-	@FXML private void handleSaveProjectAs() {
+	@FXML private boolean handleSaveProjectAs() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Project As");
 		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
 		setInitialProjectDirectory(fileChooser);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
-		if (saveFile == null) return;
+		if (saveFile == null) return false;
 
 		if (!saveFile.getName().endsWith(".twproj"))
 			saveFile = new File(saveFile.getAbsolutePath() + ".twproj");
 
-		if (ProjectIO.saveProject(saveFile, generateProjectModel())) {
+		boolean saveSucceeded = ProjectIO.saveProject(saveFile, generateProjectModel());
+		if (saveSucceeded) {
 			projectFile = saveFile;
 			resetProjectEditedStatus();
 		}
+		return saveSucceeded;
 	}
 
 	@FXML private void handleExport() {
@@ -956,11 +959,11 @@ public class TopSceneController {
 			updateStageTitle();
 		}
 	}
-	public void resetProjectEditedStatus() {
+	void resetProjectEditedStatus() {
 		projectEdited = false;
 		updateStageTitle();
 	}
-	public boolean getProjectEdited() {
+	boolean getProjectEdited() {
 		return projectEdited;
 	}
 
@@ -1011,8 +1014,7 @@ public class TopSceneController {
 
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
-				handleSaveProject();
-				return true;
+				return handleSaveProject();
 			} else return result.get() == dontSaveButton;
 		} else return false;
 	}
