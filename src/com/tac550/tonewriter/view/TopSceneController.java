@@ -1017,7 +1017,7 @@ public class TopSceneController {
 		} else return false;
 	}
 
-	boolean checkAllToneSaves() {
+	private boolean checkAllToneSaves() {
 		Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
 
 		for (Tab tab : tabPane.getTabs()) {
