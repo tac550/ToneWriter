@@ -510,8 +510,7 @@ public class MainSceneController {
 
 		if (result.isPresent()) {
 			if (result.get() == saveButton) {
-				handleSaveTone();
-				return true;
+				return handleSaveTone();
 			} else return result.get() == dontSaveButton;
 		} else return false;
 	}
@@ -664,16 +663,17 @@ public class MainSceneController {
 			});
 		});
 	}
-	void handleSaveTone() {
-		if (toneFile == null || !isToneSavable()) return;
+	boolean handleSaveTone() {
+		if (toneFile == null || !isToneSavable()) return false;
 
 		if (!ToneIO.saveToneToFile(generateToneModel(), toneFile)) {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "Saving error!", true, parentStage);
+			return false;
 		} else { // Save successful
 			resetToneEditedStatus();
 			topSceneController.refreshToneInstances(toneFile, this);
 		}
-
+		return true;
 	}
 	void handleSaveToneAs() {
 		if (createNewTone()) handleSaveTone();
