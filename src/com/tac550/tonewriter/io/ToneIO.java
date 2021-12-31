@@ -50,7 +50,7 @@ public class ToneIO {
 
 			// Header info
 			writePairTo(printWriter, "VERSION", MainApp.APP_VERSION);
-			writePairTo(printWriter, "Key Signature", tone.getKeySignature().replace("\u266F", "s").replace("\u266D", "f"));
+			writePairTo(printWriter, "Key Signature", tone.getKeySignature().replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f"));
 			writePairTo(printWriter, "Tone", tone.getToneText());
 			writePairTo(printWriter, "Composer", tone.getComposerText());
 			writePairTo(printWriter, "Manually Assign Phrases", tone.isManuallyAssignPhrases());
@@ -145,7 +145,7 @@ public class ToneIO {
 			boolean futureVersion = TWUtils.versionCompare(versionSaved, MainApp.APP_VERSION, 2) == 1;
 
 			toneBuilder.keySignature(readFromSection(header, 1, "C major")
-					.replace("s", "\u266F").replace("f", "\u266D"));
+					.replace("s", TWUtils.SHARP).replace("f", TWUtils.FLAT));
 			if (pre0_6) {
 				String headerText = readFromSection(header, 2, "");
 				String[] headerParts = headerText.split("-", 2);

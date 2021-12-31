@@ -43,6 +43,12 @@ public class TWUtils {
 
 	// Strings
 
+	private static final String LEFT_DOUBLE_QUOTE = "\u201C";
+	private static final String RIGHT_DOUBLE_QUOTE = "\u201D";
+	public static final String APOSTROPHE = "\u2019";
+	public static final String SHARP = "\u266F";
+	public static final String FLAT = "\u266D";
+
 	public static String truncateVersionNumber(String version, int len_limit) {
 		return Stream.of(version.split("\\.")).limit(len_limit).collect(Collectors.joining("."));
 	}
@@ -151,21 +157,21 @@ public class TWUtils {
 			lastPos = matcher.end();
 
 			if (lastPos < 2 || lastPos - 1 > text.length())
-				text = text.replaceFirst("\"", "\u201C");
+				text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
 			else if (!Character.isLetterOrDigit(text.charAt(lastPos - 2))
 					&& !punctuation.contains(text.charAt(lastPos - 2)))
-				text = text.replaceFirst("\"", "\u201C");
+				text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
 			else
-				text = text.replaceFirst("\"", "\u201D");
+				text = text.replaceFirst("\"", RIGHT_DOUBLE_QUOTE);
 		}
 
-		text = text.replaceAll("\\\\[\"\u201C\u201D]", "\"");
+		text = text.replaceAll("\\\\[\"\u201C\u201D]", "\""); // \u201C\u201D = “”
 
 		return text;
 	}
 	public static String reverseSmartQuotes(String text) {
 		return text.replace("\"", "\\\"").replace("\\\\", "\\")
-				.replaceAll("[\u201C\u201D]", "\"");
+				.replaceAll("[\u201C\u201D]", "\""); // \u201C\u201D = “”
 	}
 
 	// Filesystem
@@ -261,7 +267,7 @@ public class TWUtils {
 				String changeText = c.getText();
 
 				if (changeText.contains("'"))
-					c.setText(changeText.replace("'", "\u2019"));
+					c.setText(changeText.replace("'", APOSTROPHE));
 				if (changeText.contains("\t"))
 					c.setText(changeText.replace("\t", " "));
 

@@ -58,7 +58,7 @@ public class LilyPondInterface {
 	// Renders chord previews for the tone UI TODO: Decouple from UI code? (some might have to move to view controller)
 	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
 		final String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
-				+ keySignature.replace("\u266F", "s").replace("\u266D", "f ");
+				+ keySignature.replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f ");
 		if (!uniqueChordRenders.containsKey(chordID)) {
 			// First time we're seeing this chord
 			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
@@ -866,12 +866,12 @@ public class LilyPondInterface {
 			}
 		}
 
-		return outputBuffer.toString().replace("'", "\u2019");
+		return outputBuffer.toString().replace("'", TWUtils.APOSTROPHE);
 	}
 
 	private static String reformatTextForHeaders(String input) {
 		return TWUtils.applySmartQuotes(input)
-				.replace("\"", "\\\"").replace("'", "\u2019");
+				.replace("\"", "\\\"").replace("'", TWUtils.APOSTROPHE);
 	}
 
 	// Adjusts the octave of the given note or note group according to the octave_data string.
@@ -908,9 +908,9 @@ public class LilyPondInterface {
 		// Add the key's note letter.
 		keySigString += keySigParts[0].substring(0, 1).toLowerCase(Locale.ROOT);
 		// Add sharp or flat, if any.
-		if (keySigParts[0].contains("\u266F"))
+		if (keySigParts[0].contains(TWUtils.SHARP))
 			keySigString += "s";
-		else if (keySigParts[0].contains("\u266D"))
+		else if (keySigParts[0].contains(TWUtils.FLAT))
 			keySigString += "f";
 		// Add " \major" or " \minor".
 		keySigString += (" \\" + keySigParts[1]);
