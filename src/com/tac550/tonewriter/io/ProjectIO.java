@@ -227,7 +227,7 @@ public class ProjectIO {
 
 				if (assnLine.isSeparator())
 					line.append("--------");
-				else
+				else if (assnLine.getSelectedChantPhrase() != null)
 					line.append(TWUtils.shortenPhraseName(assnLine.getSelectedChantPhrase().getName()));
 
 				for (AssignmentSyllable syllable : assnLine.getSyllables()) {
