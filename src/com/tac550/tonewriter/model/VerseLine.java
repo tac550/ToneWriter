@@ -13,11 +13,7 @@ public class VerseLine {
 	private List<String> syllables;
 
 	public VerseLine(String line_text) {
-		refreshLine(line_text);
-	}
-
-	private void refreshLine(String line) {
-		this.line = TWUtils.applySmartQuotes(line);
+		line = TWUtils.applySmartQuotes(line_text);
 		syllables = splitSyllables(line);
 	}
 
