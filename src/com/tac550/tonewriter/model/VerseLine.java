@@ -8,13 +8,13 @@ import java.util.List;
 
 public class VerseLine {
 
-	private String line;
+	private final String line;
 
-	private List<String> syllables;
+	private final List<String> syllables;
 
 	public VerseLine(String line_text) {
 		line = TWUtils.applySmartQuotes(line_text);
-		syllables = splitSyllables(line);
+		syllables = splitSyllables(line_text);
 	}
 
 	private List<String> splitSyllables(String line) {
