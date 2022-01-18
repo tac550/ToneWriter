@@ -882,7 +882,7 @@ public class TopSceneController {
 
 						vLine.setTonePhraseChoice(TWUtils.shortenPhraseName(line.getSelectedChantPhrase().getName()));
 						vLine.setBarlines(line.getBeforeBar(), line.getAfterBar());
-						vLine.setDisableLineBreaks(vLine.getDisableLineBreaks());
+						vLine.setDisableLineBreaks(line.isSystemBreakingDisabled());
 
 						// Apply syllable formatting.
 						for (int k = 0; k < line.getSyllables().size(); k++) {
