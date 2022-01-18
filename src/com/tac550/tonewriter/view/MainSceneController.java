@@ -322,8 +322,10 @@ public class MainSceneController {
 		// First, update barlines and refresh their display
 		VerseLineViewController prev = null;
 		for (VerseLineViewController verseLine : verseLineControllers) {
-			if (verseLine.notFirstInItem() && !Objects.requireNonNull(prev).isSeparator())
-				verseLine.linkBeforeBarLine(Objects.requireNonNull(prev).afterBarProperty());
+			if (verseLine.isSeparator()) continue;
+
+			if (prev != null)
+				verseLine.linkBeforeBarLine(prev.afterBarProperty());
 			else if (Arrays.asList(LilyPondInterface.barStrings).indexOf(verseLine.getBeforeBar())
 					>= VLineEditViewController.firstBarOptionsLimit)
 				verseLine.setBarlines(" ", LilyPondInterface.BAR_UNCHANGED);

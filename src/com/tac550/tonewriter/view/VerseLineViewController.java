@@ -236,6 +236,9 @@ public class VerseLineViewController {
 		if (beforeBar.isBound())
 			beforeBar.unbindBidirectional(beforeBoundTo);
 
+		// Take the value of the other bar before binding.
+		beforeBar.set(otherBar.get());
+
 		beforeBar.bindBidirectional(otherBar);
 		beforeBoundTo = otherBar;
 	}

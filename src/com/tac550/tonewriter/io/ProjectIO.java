@@ -409,6 +409,7 @@ public class ProjectIO {
 				List<AssignmentLine> assignmentLines = new ArrayList<>();
 
 				List<String> lineEntry;
+				boolean previousWasSeparator = false;
 				while ((lineEntry = readLine(reader)).get(0).startsWith("+")) {
 					AssignmentLine.AssignmentLineBuilder lineBuilder = new AssignmentLine.AssignmentLineBuilder();
 
@@ -420,6 +421,7 @@ public class ProjectIO {
 					// If this line is a separator, add it and continue to the next line.
 					if (assignedPhraseName.contains("---")) {
 						assignmentLines.add(lineBuilder.separator(true).buildAssignmentLine());
+						previousWasSeparator = true;
 						continue;
 					} else if (associatedTone != null) {
 						selectedChantPhrase = associatedTone.getChantPhrases().stream().filter(p ->
@@ -467,10 +469,12 @@ public class ProjectIO {
 
 					// Before 1.0: No custom barlines or line break disabling.
 					if (TWUtils.versionCompare("1.0", itemVersion) != 1)
-						lineBuilder.beforeBar(lineEntry.get(1)).afterBar(lineEntry.get(2))
-								.systemBreakDisabled(Boolean.parseBoolean(lineEntry.get(3)));
+						lineBuilder.beforeBar(previousWasSeparator && lineEntry.get(1).equals(" ") ?
+										LilyPondInterface.BAR_UNCHANGED : lineEntry.get(1))
+								.afterBar(lineEntry.get(2)).systemBreakDisabled(Boolean.parseBoolean(lineEntry.get(3)));
 
 					assignmentLines.add(lineBuilder.buildAssignmentLine());
+					previousWasSeparator = false;
 				}
 				itemBuilder.assignmentLines(assignmentLines);
 				items.add(itemBuilder.buildProjectItem());
