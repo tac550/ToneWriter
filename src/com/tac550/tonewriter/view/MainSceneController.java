@@ -1252,7 +1252,7 @@ public class MainSceneController {
 		for (ChantLineViewController cl : chantLineControllers) {
 			chantPhrases.add(cl.generatePhraseModel());
 			if (cl.getFirstRepeated())
-				firstRepeated = cl.getName().replace("Phrase ", "");
+				firstRepeated = TWUtils.shortenPhraseName(cl.getName());
 		}
 		return new Tone.ToneBuilder().keySignature(keySignature).toneText(leftText).composerText(rightText)
 				.manualAssignment(manualCLAssignment).chantPhrases(chantPhrases).firstRepeated(firstRepeated).buildTone();
