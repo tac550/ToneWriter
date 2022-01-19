@@ -138,7 +138,7 @@ public class ChantLineViewController implements CommentableView {
 					"Phrase " + new_letter));
 		} else {
 			nameChoice.setItems(FXCollections.observableArrayList(
-				    "Phrase " + new_letter, --new_letter + "'",
+				    "Phrase " + new_letter, "Phrase " + --new_letter + "'",
 					new_letter + " alternate " + next_alternate));
 			
 			setFirstRepeatedAvailable(true);
