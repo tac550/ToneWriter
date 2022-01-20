@@ -271,7 +271,7 @@ public class VerseLineViewController {
 				// If we don't find a similar chant line below, default to the previous selection.
 				selectedChantLine = previousSelection;
 
-				// If the chant line choices are identical (all chant lines are equal, just take the previous selection.
+				// If the chant line choices are identical (nothing is changing), just take the previous selection.
 				if (!identicalChoices) {
 					int i = 0;
 					for (ChantLineViewController chantLine : associatedChantLines) {
