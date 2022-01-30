@@ -100,7 +100,6 @@ public class MainApp extends Application {
 	private static TopSceneController topSceneController;
 
 	public static void main(String[] args) {
-
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
 		if (noOtherAppInstanceRunning())
@@ -109,16 +108,14 @@ public class MainApp extends Application {
 		establishFileLock();
 
 		// OS-specific fixes
-		if (OS_NAME.startsWith("mac")) {
-			System.setProperty("prism.lcdtext", "false"); // This fixes some nasty text rendering issues on macOS 10.15
-		}
+		if (OS_NAME.startsWith("mac"))
+			System.setProperty("prism.lcdtext", "false"); // Fix text rendering issues on macOS 10.15
 
 		launch(args);
 	}
 
 	@Override
 	public void start(Stage main_stage) {
-
 		showSplash();
 
 		// Set up preferences system
@@ -128,14 +125,13 @@ public class MainApp extends Application {
 		darkModeEnabled = prefs.getBoolean(PREFS_DARK_MODE, getSystemDarkMode());
 
 		// Initialize LilyPond
-
 		refreshLilyPondLocation();
 
 		if (!lilyPondAvailable() && !OS_NAME.startsWith("lin")) {
 			if (OS_NAME.startsWith("win")) // If the Windows LilyPond installation is no good, prompt initialization
 				promptWinLilyPondInstall();
 			if (OS_NAME.startsWith("mac") && !lilyPondDirectory.getAbsolutePath().equals(getPlatformSpecificDefaultLPDir()))
-				// If the MacOS LilyPond default setup is no good, this is probably an access issue
+				// If the MacOS LilyPond default setup is no good, this is probably a permissions issue
 				attemptFixLilyPondMacAccess();
 
 			// Final availability determination after initialization attempt
@@ -159,14 +155,12 @@ public class MainApp extends Application {
 		}
 	}
 
-	/*
-	 * This fixes the application not closing correctly if the user played midi.
-	 */
 	@Override
 	public void stop() {
 		if (noOtherAppInstanceRunning())
 			TWUtils.cleanUpTempFiles();
 
+		// Fix the application not closing correctly if the user played midi.
 		MidiInterface.closeMidiSystem();
 	}
 
@@ -225,7 +219,6 @@ public class MainApp extends Application {
 		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		splashStage.setX((primScreenBounds.getWidth() - splashStage.getWidth()) / 2);
 		splashStage.setY((primScreenBounds.getHeight() - splashStage.getHeight()) / 2);
-
 	}
 
 	private Node[] createSplashContent() {
