@@ -620,10 +620,9 @@ public class MainApp extends Application {
 	}
 
 	private static String getRequiredLPVersion() {
-		// Cache the required version so we don't keep checking the file
-		if (requiredLPVersion != null) {
+		// Return cached required version, if any.
+		if (requiredLPVersion != null)
 			return requiredLPVersion;
-		}
 
 		try {
 			String versionLine = new BufferedReader(new InputStreamReader(
