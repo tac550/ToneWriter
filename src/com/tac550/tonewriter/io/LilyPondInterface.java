@@ -219,8 +219,7 @@ public class LilyPondInterface {
 		int index = 0;
 		for (ProjectItem item : items) {
 
-			lines.add(generateItemSource(item, item.getTitleType() == ProjectItem.TitleType.HIDDEN
-					|| items.size() == 1 ? "" : item.getTitleText(), gen_midi, midi_tempo));
+			lines.add(generateItemSource(item, gen_midi, midi_tempo));
 
 			// Remove page break at beginning of item listing, if present.
 			if (index == 0)
@@ -238,7 +237,7 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	private static String generateItemSource(ProjectItem item, String title, boolean generate_midi, int midi_tempo) {
+	private static String generateItemSource(ProjectItem item, boolean generate_midi, int midi_tempo) {
 		List<String> lines = new ArrayList<>();
 
 		// Comment for purposes of future parsing of output (for internal project file renders)
@@ -259,13 +258,14 @@ public class LilyPondInterface {
 
 		// Manual title markup goes here, if any.
 		// This allows displaying title and subtitle before top text.
-		if (!title.isEmpty() || !item.getSubtitleText().isEmpty()) {
+		if ((item.getTitleType() != ProjectItem.TitleType.HIDDEN && !item.getTitleText().isEmpty())
+				|| !item.getSubtitleText().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {");
 
 			// Title, if not hidden...
-			if (!title.isEmpty())
+			if (item.getTitleType() != ProjectItem.TitleType.HIDDEN && !item.getTitleText().isEmpty())
 				Collections.addAll(lines, "  \\fill-line \\bold %s{\\justify { %s } }".formatted(item.getTitleType() == ProjectItem.TitleType.LARGE ?
-						"\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(title)));
+						"\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(item.getTitleText())));
 			// ...and subtitle, if present
 			if (!item.getSubtitleText().isEmpty())
 				Collections.addAll(lines, "  \\fill-line %s{\\justify { %s } } \\vspace #0.5".formatted(
