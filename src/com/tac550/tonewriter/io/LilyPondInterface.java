@@ -195,7 +195,7 @@ public class LilyPondInterface {
 		if (generateHeader) {
 			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
 					items.size() == 1 ? (items.get(0).getTitleType() == ProjectItem.TitleType.LARGE ? "\\fontsize #3 \"" : "\"")
-							+ reformatTextForHeaders(items.get(0).getTitleText()) + "\"" : "\"" + output_title + "\""));
+							+ reformatTextForHeaders(items.get(0).getTitleText()) + "\"" : "\"" + reformatTextForHeaders(output_title) + "\""));
 			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 					.replace("$APPNAME", MainApp.APP_NAME));
 			if (items.size() == 1 && items.get(0).getTitleType() == ProjectItem.TitleType.LARGE) {
