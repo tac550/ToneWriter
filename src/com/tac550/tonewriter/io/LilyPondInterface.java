@@ -855,9 +855,8 @@ public class LilyPondInterface {
 				StringBuilder working_token = new StringBuilder(current_token);
 
 				// Insert the escape character before each occurrence of a double quote in the syllable.
-				for (int index = working_token.indexOf("\""); index >= 0; index = working_token.indexOf("\"", index + 2)) {
+				for (int index = working_token.indexOf("\""); index >= 0; index = working_token.indexOf("\"", index + 2))
 					working_token.insert(index, "\\");
-				}
 
 				// Surround the syllable without a leading space with quotes.
 				outputBuffer.append("\"").append(working_token).append("\"");
