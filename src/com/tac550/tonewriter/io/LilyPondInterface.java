@@ -591,7 +591,7 @@ public class LilyPondInterface {
 
 				// Decide whether to place an invisible barline after this chord (allows for line breaking here).
 				// Individual lines can disable this. Also, don't  try subdividing if this is the last chord in the
-				// phrase, we haven't reached the beat threshold for adding an optional break, the next syllable is th
+				// phrase, we haven't reached the beat threshold for adding an optional break, the next syllable is the
 				// last and has only one chord, or the note which would precede the possible break point is an eighth note.
 				if (!disableLineBreaks && !lastChordInLine && measureBeats > measureBreakBeatThreshold
 						* breakCount + measureBreakBeatThreshold && (syllableList.indexOf(syllable) != syllableList.size() - 2
