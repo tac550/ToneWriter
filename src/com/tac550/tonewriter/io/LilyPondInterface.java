@@ -219,7 +219,7 @@ public class LilyPondInterface {
 		int index = 0;
 		for (ProjectItem item : items) {
 
-			lines.add(generateItemSource(item, gen_midi, midi_tempo));
+			lines.add(generateItemSource(item, gen_midi, midi_tempo, items.size() == 1));
 
 			// Remove page break at beginning of item listing, if present.
 			if (index == 0)
@@ -237,7 +237,7 @@ public class LilyPondInterface {
 		return true;
 	}
 
-	private static String generateItemSource(ProjectItem item, boolean generate_midi, int midi_tempo) {
+	private static String generateItemSource(ProjectItem item, boolean generate_midi, int midi_tempo, boolean single_item) {
 		List<String> lines = new ArrayList<>();
 
 		// Comment for purposes of future parsing of output (for internal project file renders)
@@ -262,8 +262,8 @@ public class LilyPondInterface {
 				|| !item.getSubtitleText().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {");
 
-			// Title, if not hidden...
-			if (item.getTitleType() != ProjectItem.TitleType.HIDDEN && !item.getTitleText().isEmpty())
+			// Title, if not hidden and not the only item...
+			if (!single_item && item.getTitleType() != ProjectItem.TitleType.HIDDEN && !item.getTitleText().isEmpty())
 				Collections.addAll(lines, "  \\fill-line \\bold %s{\\justify { %s } }".formatted(item.getTitleType() == ProjectItem.TitleType.LARGE ?
 						"\\fontsize #3 " : "\\fontsize #1 ", reformatTextForNotation(item.getTitleText())));
 			// ...and subtitle, if present
