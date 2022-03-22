@@ -65,7 +65,7 @@ public class ToneOpenViewController {
         // Recent view context menu setup
         recentToneMenu.getItems().addAll(openFolderItem, removeItem);
         openFolderItem.setOnAction(ev ->
-                DesktopInterface.openFile(recentTonesView.getSelectionModel().getSelectedItem().getValue().getParentFile()));
+                DesktopInterface.highlightFile(recentTonesView.getSelectionModel().getSelectedItem().getValue()));
         removeItem.setOnAction(ev -> removeRecentTone(recentTonesView.getSelectionModel().getSelectedItem().getValue()));
     }
 

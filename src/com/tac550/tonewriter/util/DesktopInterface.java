@@ -39,6 +39,20 @@ public class DesktopInterface {
             TWUtils.showError("File does not exist.", true);
         }
     }
+    public static void highlightFile(File file) {
+        if (file.exists()) {
+            if (checkSuppported())
+                new Thread(() -> {
+                    try { // The below call is seemingly not implemented on Windows 10 as of OpenJDK 17
+                        Desktop.getDesktop().browseFileDirectory(file);
+                    } catch (UnsupportedOperationException e) {
+                        openFile(file.getParentFile());
+                    }
+                }).start();
+        } else {
+            openFile(file.getParentFile());
+        }
+    }
     public static void browseURI(String uri) {
         if (checkSuppported())
             new Thread(() -> {

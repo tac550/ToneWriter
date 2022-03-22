@@ -954,7 +954,7 @@ public class LilyPondInterface {
 	}
 
 	public static void openLastExportFolder() {
-		DesktopInterface.openFile(lastLilypondFile.getParentFile());
+		DesktopInterface.highlightFile(lastLilypondFile);
 	}
 
 	public static void openLastExportPDF() {
