@@ -14,7 +14,7 @@ public class DesktopInterface {
     private static boolean supported = false;
     private static boolean checkedSupported = false;
 
-    private static boolean checkSuppported() {
+    private static boolean checkSupported() {
         if (!checkedSupported) {
             supported = Desktop.isDesktopSupported();
             if (!supported)
@@ -27,7 +27,7 @@ public class DesktopInterface {
 
     public static void openFile(File file) {
         if (file.exists()) {
-            if (checkSuppported())
+            if (checkSupported())
                 new Thread(() -> {
                     try {
                         Desktop.getDesktop().open(file);
@@ -41,7 +41,7 @@ public class DesktopInterface {
     }
     public static void highlightFile(File file) {
         if (file.exists()) {
-            if (checkSuppported())
+            if (checkSupported())
                 new Thread(() -> {
                     try { // The below call is seemingly not implemented on Windows 10 as of OpenJDK 17
                         Desktop.getDesktop().browseFileDirectory(file);
@@ -54,7 +54,7 @@ public class DesktopInterface {
         }
     }
     public static void browseURI(String uri) {
-        if (checkSuppported())
+        if (checkSupported())
             new Thread(() -> {
                 try {
                     Desktop.getDesktop().browse(new URI(uri));
