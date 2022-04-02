@@ -452,11 +452,11 @@ public class ProjectIO {
 						if (!syllable.startsWith("-"))
 							syllable = " " + syllable;
 
-						String assignments = syllAndAssgmnts.length > 1 ? syllAndAssgmnts[1] : "";
 						syllableBuilder.syllableText(syllable);
+
 						List<AssignedChordData> chordData = new ArrayList<>();
-						if (selectedChantPhrase != null) {
-							String[] chords = assignments.split(";");
+						if (syllAndAssgmnts.length > 1 && selectedChantPhrase != null) {
+							String[] chords = syllAndAssgmnts[1].split(";");
 							for (String chord : chords) {
 								String[] ind_dur = chord.split("-");
 								chordData.add(new AssignedChordData(Integer.parseInt(ind_dur[0]), ind_dur[1]));
