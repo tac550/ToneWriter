@@ -143,7 +143,8 @@ public class TopSceneController {
 	// Syllable formatting context menus
 	private static final CheckMenuItem boldMenuItem = new CheckMenuItem("Bold");
 	private static final CheckMenuItem italicMenuItem = new CheckMenuItem("Italic");
-	private static final ContextMenu syllableMenu = new ContextMenu(boldMenuItem, italicMenuItem);
+	private static final CheckMenuItem forceHyphenMenuItem = new CheckMenuItem("Always Show Hyphen");
+	private static final ContextMenu syllableMenu = new ContextMenu(boldMenuItem, italicMenuItem, new SeparatorMenuItem(), forceHyphenMenuItem);
 
 	static {
 		Collections.addAll(durationMapping, LilyPondInterface.NOTE_EIGHTH, LilyPondInterface.NOTE_QUARTER,
@@ -888,6 +889,7 @@ public class TopSceneController {
 						for (int k = 0; k < line.getSyllables().size(); k++) {
 							vLine.getSyllables()[k].setBold(line.getSyllables().get(k).isBold());
 							vLine.getSyllables()[k].setItalic(line.getSyllables().get(k).isItalic());
+							vLine.getSyllables()[k].setForceHyphen(line.getSyllables().get(k).isForcingHyphen());
 						}
 
 						// Assign and/or skip chords as would be done by a user.
@@ -1167,10 +1169,16 @@ public class TopSceneController {
 			syllable.setItalic(italicMenuItem.isSelected());
 			projectEdited();
 		});
+		forceHyphenMenuItem.setOnAction(event -> {
+			syllable.setForceHyphen(forceHyphenMenuItem.isSelected());
+			projectEdited();
+		});
 
 		// Initial state
 		boldMenuItem.setSelected(syllable.getBold());
 		italicMenuItem.setSelected(syllable.getItalic());
+		forceHyphenMenuItem.setSelected(syllable.getForceHyphen());
+		forceHyphenMenuItem.setDisable(!syllable.getText().startsWith("-"));
 
 		// Showing / Positioning
 		syllableMenu.show(syllable, Side.TOP, 0, 0);

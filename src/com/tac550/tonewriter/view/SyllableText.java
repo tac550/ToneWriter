@@ -27,6 +27,7 @@ public class SyllableText extends Text {
 	// Formatting
 	private boolean bold = false;
 	private boolean italic = false;
+	private boolean forceHyphen = false;
 
 	private static final int fontSize = 28;
 	private static final Font regularFont = Font.loadFont(Objects.requireNonNull(SyllableText.class.getResource("/styles/fonts/OpenSans-Regular.ttf")).toExternalForm(), fontSize);
@@ -73,9 +74,8 @@ public class SyllableText extends Text {
 				}
 			}
 
-			if (event.getButton() == MouseButton.SECONDARY && !event.isControlDown()) {
+			if (event.getButton() == MouseButton.SECONDARY && !event.isControlDown())
 				verseController.showSyllableMenu(this);
-			}
 		});
 
 		// Drag assignment events
@@ -97,6 +97,11 @@ public class SyllableText extends Text {
 				button.setLayoutX(newVal.doubleValue());
 		});
 
+		// Listen for changes to this syllable's text and disable the option to force hyphen visibility if there is none
+		textProperty().addListener((ov, oldVal, newVal) -> {
+			if (!newVal.startsWith("-") && forceHyphen)
+				forceHyphen = false;
+		});
 	}
 
 	void applyDefaultFill() {
@@ -136,6 +141,9 @@ public class SyllableText extends Text {
 	public boolean getItalic() {
 		return italic;
 	}
+	public boolean getForceHyphen() {
+		return forceHyphen;
+	}
 	public void setBold(boolean a_bold) {
 		bold = a_bold;
 		refreshFont();
@@ -143,6 +151,9 @@ public class SyllableText extends Text {
 	public void setItalic(boolean a_italic) {
 		italic = a_italic;
 		refreshFont();
+	}
+	public void setForceHyphen(boolean force_hyphen) {
+		forceHyphen = force_hyphen;
 	}
 
 	void deactivate() {
@@ -207,7 +218,7 @@ public class SyllableText extends Text {
 
 	AssignmentSyllable generateSyllableModel() {
 		return new AssignmentSyllable.AssignmentSyllableBuilder().syllableText(getText())
-				.bold(bold).italic(italic).assignedChords(associatedChords).buildAssignmentSyllable();
+				.bold(bold).italic(italic).forceHyphen(forceHyphen).assignedChords(associatedChords).buildAssignmentSyllable();
 	}
 
 }

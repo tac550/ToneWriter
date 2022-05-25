@@ -447,6 +447,8 @@ public class ProjectIO {
 								syllableBuilder.bold(true);
 							if (syllAndFormatting[1].contains("i"))
 								syllableBuilder.italic(true);
+							if (syllAndFormatting[1].contains("h"))
+								syllableBuilder.forceHyphen(true);
 						}
 
 						if (!syllable.startsWith("-"))
