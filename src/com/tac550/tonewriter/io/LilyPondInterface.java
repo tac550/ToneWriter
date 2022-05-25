@@ -432,7 +432,7 @@ public class LilyPondInterface {
 			// For each chord assigned to the syllable...
 
 			if (!chordList.isEmpty())
-				addSyllaleToLyrics(syllableList, syllable, syllableTextBuffer);
+				addSyllableToLyrics(syllableList, syllable, syllableTextBuffer);
 
 			for (AssignedChordData chordData : chordList) {
 
@@ -729,7 +729,7 @@ public class LilyPondInterface {
 		return result;
 	}
 
-	private static void addSyllaleToLyrics(List<AssignmentSyllable> syllableList, AssignmentSyllable syllable, StringBuilder syllableTextBuffer) {
+	private static void addSyllableToLyrics(List<AssignmentSyllable> syllableList, AssignmentSyllable syllable, StringBuilder syllableTextBuffer) {
 		// Add any formatting flags for the syllable first.
 		syllableTextBuffer.append(syllable.isBold() ? " \\lyricBold " : "")
 				.append(syllable.isItalic() ? " \\lyricItalic " : "");
