@@ -181,8 +181,9 @@ public class VerseLineViewController {
 			separatorPane.setVisible(false);
 			mainContentPane.setVisible(true);
 
-			// Create the verseLine object, replacing any excess spaces with a single space.
-			verseLine = new VerseLine(line_text.strip().replaceAll(" +", " "));
+			// Create the verseLine with the given text, removing any leading hyphens and replacing any excess spaces.
+			verseLine = new VerseLine(line_text.strip().replaceAll("^-+", "").replace(" -", "-")
+					.replaceAll(" +", " "));
 
 			// If the number of syllables is the same as before, just change the content of the text elements.
 			// This way assignments are not lost when making small changes.
