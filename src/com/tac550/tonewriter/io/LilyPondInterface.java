@@ -732,7 +732,8 @@ public class LilyPondInterface {
 	private static void addSyllableToLyrics(List<AssignmentSyllable> syllableList, AssignmentSyllable syllable, StringBuilder syllableTextBuffer) {
 		// Add any formatting flags for the syllable first.
 		syllableTextBuffer.append(syllable.isBold() ? " \\lyricBold " : "")
-				.append(syllable.isItalic() ? " \\lyricItalic " : "");
+				.append(syllable.isItalic() ? " \\lyricItalic " : "")
+				.append(syllableList.indexOf(syllable) < syllableList.size() - 1 && syllableList.get(syllableList.indexOf(syllable) + 1).isForcingHyphen() ? " \\forceHyphen " : "");
 
 		// Add syllable to the text buffer, throwing away any (presumably leading) hyphens beforehand.
 		syllableTextBuffer.append(reformatTextForNotation(syllable.getSyllableText().replace("-", "")));

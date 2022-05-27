@@ -33,3 +33,7 @@ lyricRevert = {
   \revert Lyrics.LyricText.font-series
   \revert Lyrics.LyricText.font-shape
 }
+
+forceHyphen = \lyricmode {
+  \once \override LyricHyphen.minimum-distance = #1
+}
