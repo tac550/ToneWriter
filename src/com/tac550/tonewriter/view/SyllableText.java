@@ -128,7 +128,7 @@ public class SyllableText extends Text {
 	}
 
 	public Color getColor() {
-		return (Color) getFill();
+		return defaultColor;
 	}
 	public void setColor(Color color) {
 		defaultColor = color;

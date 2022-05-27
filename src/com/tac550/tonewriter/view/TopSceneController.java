@@ -27,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
@@ -1173,6 +1174,18 @@ public class TopSceneController {
 			syllable.setForceHyphen(forceHyphenMenuItem.isSelected());
 			projectEdited();
 		});
+
+		// Handle highlighting the syllable to show which one the menu is modifying.
+		// The check ensures that we don't permanently change the syllable's base color to the highlight color
+		// (this would happen if the user were to right-click an already-highlighted syllable).
+		Color highlightColor = Color.web("#ff5959");
+		if (!syllable.getColor().equals(highlightColor)) {
+			Color previousColor = syllable.getColor();
+			syllableMenu.setOnHiding(event -> syllable.setColor(previousColor));
+
+			// Highlight syllable
+			syllable.setColor(highlightColor);
+		}
 
 		// Initial state
 		boldMenuItem.setSelected(syllable.getBold());
