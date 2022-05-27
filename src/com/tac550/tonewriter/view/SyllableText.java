@@ -104,7 +104,7 @@ public class SyllableText extends Text {
 		});
 	}
 
-	void applyDefaultFill() {
+	public void applyDefaultFill() {
 		setFill(defaultColor);
 	}
 

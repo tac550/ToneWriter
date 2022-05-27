@@ -54,7 +54,6 @@ public class MidiInterface {
 				int buttonIndex = 0;
 				key = 0;
 				SyllableText lastSyllable = null;
-				Color oldSyllableColor = null;
 				while (chordMap.containsKey(key)) {
 					for (AssignedChordData chord : chordMap.get(key)) {
 						Button currentButton = buttons.get(buttonIndex);
@@ -64,10 +63,9 @@ public class MidiInterface {
 						for (SyllableText syll : syllables) {
 							if (syll.getAssociatedButtons().contains(currentButton) && syll != lastSyllable) {
 								if (lastSyllable != null)
-									lastSyllable.setColor(oldSyllableColor);
+									lastSyllable.applyDefaultFill();
 
-								oldSyllableColor = syll.getColor();
-								Platform.runLater(() -> syll.setColor(Color.web("#edbd11")));
+								Platform.runLater(() -> syll.setFill(Color.web("#edbd11")));
 								lastSyllable = syll;
 							}
 						}
@@ -89,7 +87,7 @@ public class MidiInterface {
 					key++;
 				}
 				if (lastSyllable != null)
-					lastSyllable.setColor(oldSyllableColor);
+					lastSyllable.applyDefaultFill();
 
 				playButton.setDisable(false);
 				return null;
