@@ -230,13 +230,13 @@ public class TopSceneController {
 		setMenuIcon(addItemMenuItem, "/media/sign-add.png");
 		setMenuIcon(projectTitleMenuItem, bookIconPath);
 		setMenuIcon(pageSetupMenuItem, "/media/file-exe.png");
-		setMenuIcon(newProjectMenuItem, "/media/file-sound.png");
+		setMenuIcon(newProjectMenuItem, "/media/file-text.png");
 		setMenuIcon(openProjectMenuItem, "/media/folder.png");
 		setMenuIcon(saveProjectMenuItem, "/media/floppy.png");
 		setMenuIcon(saveProjectAsMenuItem, "/media/floppy-add.png");
 		setMenuIcon(exportPDFMenuItem, "/media/box-out.png");
 		setMenuIcon(exitMenuItem, "/media/sign-error.png");
-		setMenuIcon(newToneMenuItem, "/media/file-text.png");
+		setMenuIcon(newToneMenuItem, "/media/file-sound.png");
 		setMenuIcon(openToneMenuItem, "/media/folder.png");
 		setMenuIcon(saveToneMenuItem, "/media/floppy.png");
 		setMenuIcon(saveToneAsMenuItem, "/media/floppy-add.png");
