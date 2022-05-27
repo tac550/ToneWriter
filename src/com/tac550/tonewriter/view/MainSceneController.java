@@ -545,6 +545,8 @@ public class MainSceneController {
 			toneMenuState.editOptionsDisabled = false;
 			applyToneMenuState();
 
+			ToneIO.bumpRecentTone(saveFile);
+
 			return true;
 		} else {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while creating the tone!",
