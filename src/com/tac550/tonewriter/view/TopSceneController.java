@@ -1183,7 +1183,6 @@ public class TopSceneController {
 			Color previousColor = syllable.getColor();
 			syllableMenu.setOnHiding(event -> syllable.setColor(previousColor));
 
-			// Highlight syllable
 			syllable.setColor(highlightColor);
 		}
 
