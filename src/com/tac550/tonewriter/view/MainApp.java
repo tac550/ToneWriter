@@ -32,24 +32,22 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.*;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MainApp extends Application {
 
@@ -103,10 +101,9 @@ public class MainApp extends Application {
 	public static void main(String[] args) {
 		System.out.println("Developer mode: " + (developerMode ? "enabled" : "disabled"));
 
-		if (noOtherAppInstanceRunning())
-			TWUtils.cleanUpTempFiles();
+		TWUtils.cleanUpAllTempFiles();
 
-		establishFileLock();
+		TWUtils.establishFileLock();
 
 		// OS-specific fixes
 		if (OS_NAME.startsWith("mac"))
@@ -158,8 +155,7 @@ public class MainApp extends Application {
 
 	@Override
 	public void stop() {
-		if (noOtherAppInstanceRunning())
-			TWUtils.cleanUpTempFiles();
+		TWUtils.cleanUpAllTempFiles();
 
 		// Fix the application not closing correctly if the user played midi.
 		MidiInterface.closeMidiSystem();
@@ -665,42 +661,4 @@ public class MainApp extends Application {
 			});
 		});
 	}
-
-	private static void establishFileLock() {
-		String pid = String.valueOf(ProcessHandle.current().pid());
-
-		try {
-			Files.write(TWUtils.createTWTempFile("", "FileLock").toPath(), List.of(pid));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	private static boolean noOtherAppInstanceRunning() {
-		boolean instanceRunning = false;
-
-		Set<Long> livePIDs = ProcessHandle.allProcesses()
-				.filter(ProcessHandle::isAlive)
-				.map(ProcessHandle::pid)
-				.collect(Collectors.toSet());
-
-		try (Stream<Path> fileLocksStream = Files.list(Path.of(System.getProperty("java.io.tmpdir")))
-				.filter(Files::isRegularFile)
-				.filter(path -> FilenameUtils.removeExtension(path.getFileName().toString()).endsWith("-FileLock"))) {
-
-			Set<Path> fileLocks = fileLocksStream.collect(Collectors.toSet());
-			for (Path path : fileLocks) {
-				long pid = Long.parseLong(Files.readString(path).strip());
-				if (!livePIDs.contains(pid))
-					Files.delete(path);
-				else if (pid != ProcessHandle.current().pid())
-					instanceRunning = true;
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return !instanceRunning;
-	}
-
 }

@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -193,9 +194,10 @@ public class TWUtils {
 						(prefix.isEmpty() ? "" : prefix + "-")).toFile();
 	}
 
-	// Cleans up all ToneWriter temp files
-	public static void cleanUpTempFiles() {
-		cleanUpTempFiles("");
+	// Cleans up all ToneWriter temp files, but only if this is the only active instance
+	public static void cleanUpAllTempFiles() {
+		if (noOtherAppInstanceRunning())
+			cleanUpTempFiles("");
 	}
 	public static void cleanUpAutosaves() {
 		cleanUpTempFiles("-Autosave");
@@ -257,6 +259,44 @@ public class TWUtils {
 
 	public static boolean isBuiltinTone(File tone_file) {
 		return tone_file.getAbsolutePath().contains(File.separator + MainApp.BUILT_IN_TONE_DIR.getName() + File.separator);
+	}
+
+	// Creates a temp file which contains this process's pid to register it as a running instance of the app.
+	public static void establishFileLock() {
+		String pid = String.valueOf(ProcessHandle.current().pid());
+
+		try {
+			Files.write(TWUtils.createTWTempFile("", "FileLock").toPath(), List.of(pid));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	private static boolean noOtherAppInstanceRunning() {
+		boolean instanceRunning = false;
+
+		Set<Long> livePIDs = ProcessHandle.allProcesses()
+				.filter(ProcessHandle::isAlive)
+				.map(ProcessHandle::pid)
+				.collect(Collectors.toSet());
+
+		try (Stream<Path> fileLocksStream = Files.list(Path.of(System.getProperty("java.io.tmpdir")))
+				.filter(Files::isRegularFile)
+				.filter(path -> FilenameUtils.removeExtension(path.getFileName().toString()).endsWith("-FileLock"))) {
+
+			Set<Path> fileLocks = fileLocksStream.collect(Collectors.toSet());
+			for (Path path : fileLocks) {
+				long pid = Long.parseLong(Files.readString(path).strip());
+				if (!livePIDs.contains(pid))
+					Files.delete(path);
+				else if (pid != ProcessHandle.current().pid())
+					instanceRunning = true;
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !instanceRunning;
 	}
 
 	// UI
