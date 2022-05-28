@@ -49,6 +49,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MainApp extends Application {
 
@@ -682,12 +683,11 @@ public class MainApp extends Application {
 				.map(ProcessHandle::pid)
 				.collect(Collectors.toSet());
 
-		try {
-			Set<Path> fileLocks = Files.list(Path.of(System.getProperty("java.io.tmpdir")))
-					.filter(Files::isRegularFile)
-					.filter(path -> FilenameUtils.removeExtension(path.getFileName().toString()).endsWith("-FileLock"))
-					.collect(Collectors.toSet());
+		try (Stream<Path> fileLocksStream = Files.list(Path.of(System.getProperty("java.io.tmpdir")))
+				.filter(Files::isRegularFile)
+				.filter(path -> FilenameUtils.removeExtension(path.getFileName().toString()).endsWith("-FileLock"))) {
 
+			Set<Path> fileLocks = fileLocksStream.collect(Collectors.toSet());
 			for (Path path : fileLocks) {
 				long pid = Long.parseLong(Files.readString(path).strip());
 				if (!livePIDs.contains(pid))
