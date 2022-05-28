@@ -24,8 +24,6 @@ import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.awt.*;
 import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -125,7 +123,6 @@ public class AutoUpdater {
 					if (updateAlert != null && updateAlert.isShowing())
 						updateAlert.close();
 				});
-
 				return null;
 			}
 		};
@@ -151,9 +148,7 @@ public class AutoUpdater {
 					updateAlert.setOnShowing(event -> checkCancelled = false);
 
 				}
-
 				updateAlert.show();
-
 			}
 		});
 
@@ -236,7 +231,6 @@ public class AutoUpdater {
 							"An error occurred while processing the download.", true));
 					return false;
 				}
-
 				return true;
 			}
 		};
@@ -267,7 +261,6 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while running installer!", true));
-
 				return;
 			}
 
@@ -281,7 +274,6 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while generating temp files!", true));
-
 				return;
 			}
 
@@ -291,13 +283,10 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Error while exporting installer script!", true));
-
 				return;
 			}
 
-			// Get PID representing this process's JVM. TODO: Switch to new Process API long pid = ProcessHandle.current().pid();
-			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-			String pid = bean.getName().split("@")[0];
+			long pid = ProcessHandle.current().pid(); // TODO: Test on Mac
 
 			try {
 				String installDest = userDir.getParentFile().getParentFile().getAbsolutePath();
@@ -306,13 +295,12 @@ public class AutoUpdater {
 
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()});
 				String[] cmdlist = new String[] {"osascript", "-e", String.format("do shell script \"%s\" with administrator privileges", String.join(" ",
-						new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), installDest}))};
+						new String[] {scriptFile.getAbsolutePath(), String.valueOf(pid), downloaded_file.getAbsolutePath(), installDest}))};
 				Runtime.getRuntime().exec(cmdlist);
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Failed to run installer script!", true));
-
 				return;
 			}
 
@@ -326,7 +314,6 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"I/O error occurred while generating temp files!", true));
-
 				return;
 			}
 
@@ -336,22 +323,18 @@ public class AutoUpdater {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Error while exporting installer script!", true));
-
 				return;
 			}
 
-			// Get PID representing this process's JVM. TODO: Switch to new Process API long pid = ProcessHandle.current().pid();
-			RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
-			String pid = bean.getName().split("@")[0];
+			long pid = ProcessHandle.current().pid();
 
 			try {
 				Runtime.getRuntime().exec(new String[] {"chmod", "+x", scriptFile.getAbsolutePath()}).waitFor();
-				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), pid, downloaded_file.getAbsolutePath(), userDir.getParentFile().getAbsolutePath()});
+				Runtime.getRuntime().exec(new String[] {scriptFile.getAbsolutePath(), String.valueOf(pid), downloaded_file.getAbsolutePath(), userDir.getParentFile().getAbsolutePath()});
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
 						"Failed to run installer script!", true));
-
 				return;
 			}
 
