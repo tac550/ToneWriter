@@ -125,7 +125,7 @@ public class MainApp extends Application {
 		// Initialize LilyPond
 		refreshLilyPondLocation();
 
-		if (!lilyPondAvailable() && !OS_NAME.startsWith("lin")) {
+		if (!OS_NAME.startsWith("lin") && !lilyPondAvailable()) {
 			if (OS_NAME.startsWith("win")) // If the Windows LilyPond installation is no good, prompt initialization
 				promptWinLilyPondInstall();
 			if (OS_NAME.startsWith("mac") && !lilyPondDirectory.getAbsolutePath().equals(getPlatformSpecificDefaultLPDir()))
@@ -376,8 +376,9 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win")) {
 
 			try {
-				Process process = Runtime.getRuntime().exec(
-						"reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize /v AppsUseLightTheme");
+				Process process = new ProcessBuilder(
+						"reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+						"/v", "AppsUseLightTheme").start();
 
 				AtomicReference<Character> r = new AtomicReference<>();
 				Thread reader = new Thread(() -> {
@@ -426,6 +427,7 @@ public class MainApp extends Application {
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
 				String.format("Welcome to %s! LilyPond must be %s in order to continue " +
+								// TODO: Can Linux UI be removed?
 								(OS_NAME.startsWith("lin") ? "(likely available in your distro's repositories)." :
 										"(Will install to default location)."), APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
@@ -455,7 +457,8 @@ public class MainApp extends Application {
 				Optional<ButtonType> uninsResult = TWUtils.showAlert(AlertType.CONFIRMATION, "Uninstall",
 						"Previous LilyPond installation will be removed.", true);
 				if (uninsResult.isPresent() && uninsResult.get() == ButtonType.OK) {
-					Process uninsProc = Runtime.getRuntime().exec(String.format("cmd /c \"%s\"", uninstallerLocation));
+					Process uninsProc = new ProcessBuilder("cmd", "/c",
+							String.format("\"%s\"", uninstallerLocation)).start();
 					uninsProc.waitFor();
 
 					AtomicBoolean done = new AtomicBoolean(false);
@@ -463,8 +466,8 @@ public class MainApp extends Application {
 					while (!done.get() && loops < 3) {
 						Thread.sleep(1000);
 						String line;
-						Process p = Runtime.getRuntime().exec
-								(System.getenv("windir") + "\\system32\\" + "tasklist.exe");
+						Process p = new ProcessBuilder(System.getenv("windir")
+								+ "\\system32\\" + "tasklist.exe").start();
 						try (BufferedReader input =
 								new BufferedReader(new InputStreamReader(p.getInputStream()))) {
 							while ((line = input.readLine()) != null) {
@@ -481,9 +484,9 @@ public class MainApp extends Application {
 			}
 
 			// Install bundled version
-			Process process = Runtime.getRuntime().exec(String.format("cmd /c \"lilypond\\%s\"",
+			Process process = new ProcessBuilder("cmd", "/c", String.format("\"lilypond\\%s\"",
 					Objects.requireNonNull(bundledLPDir.listFiles(
-							file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName()));
+							file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName())).start();
 			process.waitFor();
 			if (process.exitValue() != 0) {
 				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);

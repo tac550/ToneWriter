@@ -256,7 +256,7 @@ public class AutoUpdater {
 		if (MainApp.OS_NAME.startsWith("win")) {
 
 			try {
-				Runtime.getRuntime().exec("cmd /c " + downloaded_file.getAbsolutePath() + " /D=" + userDir);
+				new ProcessBuilder("cmd", "/c", downloaded_file.getAbsolutePath(), "/D=" + userDir).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 				Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.ERROR, "Error",
