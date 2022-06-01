@@ -251,7 +251,7 @@ public class LilyPondInterface {
 		String[] results = generateNotationAndLyrics(item.getAssignmentLines());
 
 		// Pattern which matches valid LilyPond notes
-		Pattern noteDataPattern = Pattern.compile("[a-g][\\S]*[0-9]");
+		Pattern noteDataPattern = Pattern.compile("[a-g]\\S*\\d");
 
 		// Check all four parts for any note data - if any exists, we need to include a staff or staves.
 		boolean createStaff = Stream.of(results).limit(4).anyMatch(part -> noteDataPattern.matcher(part).find());
@@ -777,11 +777,11 @@ public class LilyPondInterface {
 	// Returns either a single note whose duration is the sum of the two given notes' durations with their original pitch, or returns the two notes combined with a tie.
 	private static String combineNotes(String curr, String next) {
 		// This string replaces duration information from the current note with %s so we can "format in" its new duration (if the duration combination method is chosen later).
-		String noteFormat = curr.replaceAll("[0-9]+", "%s").replace(".", "");
+		String noteFormat = curr.replaceAll("\\d+", "%s").replace(".", "");
 		// The duration of the current note.
-		float durCurrent = Float.parseFloat(curr.replaceAll("[\\D]", ""));
+		float durCurrent = Float.parseFloat(curr.replaceAll("\\D", ""));
 		// The duration of the next note.
-		float durNext = Float.parseFloat(next.replaceAll("[\\D]", ""));
+		float durNext = Float.parseFloat(next.replaceAll("\\D", ""));
 
 		// Inverse durations (so they read as fractions of a whole note in x/4 time).
 		durCurrent = 1 / durCurrent;
@@ -831,7 +831,7 @@ public class LilyPondInterface {
 
 		} else {
 			// Calculate the duration of the note.
-			float beats = 4 / Float.parseFloat(note.replaceAll("[\\D]", ""));
+			float beats = 4 / Float.parseFloat(note.replaceAll("\\D", ""));
 
 			if (note.contains(".")) beats += (beats / 2);
 

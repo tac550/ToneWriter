@@ -762,7 +762,7 @@ public class MainSceneController {
 			result.ifPresent(leftRightText -> {
 				String tempLeftText = leftRightText.getKey();
 				String tempRightText = leftRightText.getValue();
-				if (leftRightText.getKey().matches("[0-9]")) tempLeftText = "Tone " + tempLeftText;
+				if (leftRightText.getKey().matches("\\d")) tempLeftText = "Tone " + tempLeftText;
 
 				if (!(tempLeftText.equals(leftText) && tempRightText.equals(rightText))) {
 					toneEdited();
@@ -927,7 +927,7 @@ public class MainSceneController {
 		for (ChantChord chord : chant_line.getChords()) {
 			ChantChordController newChord = null;
 
-			if (chord.getName().matches("[0-9]")) {
+			if (chord.getName().matches("\\d")) {
 				currentMainChord = currentChantLine.addRecitingChord();
 				newChord = currentMainChord;
 			} else if (chord.getName().contains("Post")) {

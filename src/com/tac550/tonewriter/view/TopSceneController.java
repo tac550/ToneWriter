@@ -666,7 +666,7 @@ public class TopSceneController {
 					// Otherwise give the new tab a generic title
 					String prevTitle = prevTabController.getTitle();
 					if (!prevTitle.isEmpty() && Character.isDigit(prevTitle.charAt(prevTitle.length() - 1))) {
-						Pattern lastIntPattern = Pattern.compile("([0-9]+)$");
+						Pattern lastIntPattern = Pattern.compile("(\\d+)$");
 						Matcher matcher = lastIntPattern.matcher(prevTitle);
 						if (matcher.find()) {
 							String prevNum = matcher.group();

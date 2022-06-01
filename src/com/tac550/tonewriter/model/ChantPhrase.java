@@ -32,11 +32,11 @@ public class ChantPhrase {
 		Queue<ChantChord> preps = new ArrayDeque<>();
 		Stack<ChantChord> posts = new Stack<>();
 		ChantChord mainChord = chords.get(0); // First chord in save order will always be a main chord.
-		assert mainChord.getName().matches("[0-9]") || mainChord.getName().equalsIgnoreCase("End");
+		assert mainChord.getName().matches("\\d") || mainChord.getName().equalsIgnoreCase("End");
 
 		for (int i = 1; i < chords.size(); i++) {
 			ChantChord current = chords.get(i);
-			if (current.getName().matches("[0-9]") || current.getName().equalsIgnoreCase("End")) {
+			if (current.getName().matches("\\d") || current.getName().equalsIgnoreCase("End")) {
 				while (!preps.isEmpty())
 					inOrder.add(preps.remove());
 				inOrder.add(mainChord);
@@ -72,7 +72,7 @@ public class ChantPhrase {
 
 		// For each chord in the chant line...
 		for (ChantChord chord : getChords()) {
-			if (chord.getName().matches("[0-9]") || chord.getName().equalsIgnoreCase("End")) {
+			if (chord.getName().matches("\\d") || chord.getName().equalsIgnoreCase("End")) {
 				finalString.append(String.format("%s: %s%s%n", chord.getName().equalsIgnoreCase("End") ? "END" : chord.getName(), chord.getFields(),
 						chord.hasComment() ? ": " + chord.getComment() : ""));
 				for (ChantChord prep : chord.getPreps()) { // Preps save out first
