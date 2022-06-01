@@ -381,14 +381,12 @@ public class ProjectIO {
 				Tone associatedTone = null;
 				if (!toneHash.isEmpty()) {
 					associatedTone = ToneIO.loadTone(hashtoToneFile.get(toneHash));
-					itemBuilder.toneLoadedFrom(hashtoToneFile.get(toneHash));
-					itemBuilder.associatedTone(associatedTone);
+					itemBuilder.toneLoadedFrom(hashtoToneFile.get(toneHash)).associatedTone(associatedTone);
 				}
 
 				itemBuilder.toneEdited(Boolean.parseBoolean(readLine(reader).get(0)));
 				List<String> titleSubtitle = readLine(reader);
-				itemBuilder.titleText(titleSubtitle.get(0));
-				itemBuilder.subtitleText(titleSubtitle.get(1));
+				itemBuilder.titleText(titleSubtitle.get(0)).subtitleText(titleSubtitle.get(1));
 				List<String> options = readLine(reader);
 				itemBuilder.titleType(ProjectItem.TitleType.valueOf(options.get(0).toUpperCase(Locale.ROOT)));
 				itemBuilder.hideToneHeader(Boolean.parseBoolean(options.get(1)));
@@ -399,12 +397,10 @@ public class ProjectIO {
 				itemBuilder.breakExtendedTextOnlyOnBlank(TWUtils.versionCompare("1.0", itemVersion) != 1 && Boolean.parseBoolean(options.get(4)));
 
 				List<String> topVerseData = readLine(reader);
-				itemBuilder.topVersePrefix(topVerseData.get(0));
-				itemBuilder.topVerse(topVerseData.get(1));
+				itemBuilder.topVersePrefix(topVerseData.get(0)).topVerse(topVerseData.get(1));
 				itemBuilder.verseAreaText(TWUtils.decodeNewLines(readLine(reader).get(0)));
 				List<String> bottomVerseData = readLine(reader);
-				itemBuilder.bottomVersePrefix(bottomVerseData.get(0));
-				itemBuilder.bottomVerse(bottomVerseData.get(1));
+				itemBuilder.bottomVersePrefix(bottomVerseData.get(0)).bottomVerse(bottomVerseData.get(1));
 
 				List<AssignmentLine> assignmentLines = new ArrayList<>();
 
