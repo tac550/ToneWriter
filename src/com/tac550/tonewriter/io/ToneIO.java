@@ -119,10 +119,10 @@ public class ToneIO {
 	public static Tone loadTone(File tone_file) {
 		Tone.ToneBuilder toneBuilder = new Tone.ToneBuilder();
 
-		try {
-			// Load entire tone file and split it as necessary
+		// Load entire tone file and split it as necessary
+		try (Stream<String> fileStream = Files.lines(tone_file.toPath(), StandardCharsets.UTF_8)) {
 			TextStringBuilder fileStringBuilder = new TextStringBuilder();
-			Files.lines(tone_file.toPath(), StandardCharsets.UTF_8).forEach(fileStringBuilder::appendln);
+			fileStream.forEach(fileStringBuilder::appendln);
 			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
 			String[] header;
