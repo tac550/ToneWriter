@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 1.2.2
 Key Signature: G major
 Tone: Tone 8
 Composer: B. Ledkovsky - Kievan Chant
@@ -15,13 +15,14 @@ A
 END: a-e-c-a
 
 B
-1: c'-g-e-g: Skipped on very short phrases.
+1: c'-g-e-c: Skipped on very short phrases.
 	Prep: a-e-c-a: Skipped on very short phrases.
 	Prep: b-g-d-g
 	Prep: c'-g-e-g
 	Prep: d'-g-f-g
-	Post: b-g-d-g
-2: c'-g-e-c
+2: c'-g-e-g: Skipped on very short phrases./n/nUsed as an alternative to the previous chord on shorter phrases.
+3: c'-g-e-c
+	Prep: b-g-d-g
 END: b-g-d-g
 	Prep: d'-g-f-b,
 	Prep: c'-g-e-c
