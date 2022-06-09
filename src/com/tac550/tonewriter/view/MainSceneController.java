@@ -1222,7 +1222,7 @@ public class MainSceneController {
 		return titleTextField.getText();
 	}
 	public void setTitle(String title) {
-		titleTextField.setText(title);
+		Platform.runLater(() -> titleTextField.setText(title));
 	}
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);

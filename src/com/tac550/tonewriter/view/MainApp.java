@@ -182,9 +182,6 @@ public class MainApp extends Application {
 		mainStage.setMinHeight(mainStage.getHeight());
 
 		// Start the application maximized.
-		// This also mitigates an issue with UI widgets disappearing when hovered (assuming the user keeps it maximized).
-		// TODO: This issue needs a more comprehensive fix.
-		// https://stackoverflow.com/questions/38308591/javafx-ui-elements-hover-style-not-rendering-correctly-after-resizing-applicatio
 		mainStage.setMaximized(true);
 
 		attemptProjectRecovery();

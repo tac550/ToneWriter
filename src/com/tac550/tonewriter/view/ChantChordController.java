@@ -174,7 +174,7 @@ public abstract class ChantChordController implements CommentableView {
 
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
-			chordView.setImage(noLilyPondImage);
+			Platform.runLater(() -> chordView.setImage(noLilyPondImage));
 			return;
 		}
 
@@ -185,8 +185,8 @@ public abstract class ChantChordController implements CommentableView {
 		}
 	}
 
-	public void setMediaFilesDirectly(File[] files) {
-		chordView.setImage(new Image(files[0].toURI().toString()));
+	public void setMediaFiles(File[] files) {
+		Platform.runLater(() -> chordView.setImage(new Image(files[0].toURI().toString())));
 		midiFile = files[1];
 	}
 

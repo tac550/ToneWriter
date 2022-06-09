@@ -1,5 +1,6 @@
 package com.tac550.tonewriter.view;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -43,23 +44,24 @@ public class PageSetupViewController {
 
 	void setMargins(float top, String top_units, float bottom, String bottom_units,
 					float left, String left_units, float right, String right_units) {
+		Platform.runLater(() -> {
+			equalMarginsCheckBox.setSelected(top == bottom && top == left && top == right && top_units.equals(bottom_units)
+					&& top_units.equals(left_units) && top_units.equals(right_units));
 
-		equalMarginsCheckBox.setSelected(top == bottom && top == left && top == right && top_units.equals(bottom_units)
-				&& top_units.equals(left_units) && top_units.equals(right_units));
+			topMargin.setText(String.valueOf(top));
+			if (!equalMarginsCheckBox.isSelected()) {
+				bottomMargin.setText(String.valueOf(bottom));
+				leftMargin.setText(String.valueOf(left));
+				rightMargin.setText(String.valueOf(right));
+			}
 
-		topMargin.setText(String.valueOf(top));
-		if (!equalMarginsCheckBox.isSelected()) {
-			bottomMargin.setText(String.valueOf(bottom));
-			leftMargin.setText(String.valueOf(left));
-			rightMargin.setText(String.valueOf(right));
-		}
-
-		topUnits.setValue(top_units);
-		if (!equalMarginsCheckBox.isSelected()) {
-			bottomUnits.setValue(bottom_units);
-			leftUnits.setValue(left_units);
-			rightUnits.setValue(right_units);
-		}
+			topUnits.setValue(top_units);
+			if (!equalMarginsCheckBox.isSelected()) {
+				bottomUnits.setValue(bottom_units);
+				leftUnits.setValue(left_units);
+				rightUnits.setValue(right_units);
+			}
+		});
 	}
 
 	@FXML private void initialize() {

@@ -663,7 +663,7 @@ public class TopSceneController {
 					}
 
 					// Increment the number at the end of the previous tab's title, if any.
-					// Otherwise give the new tab a generic title
+					// Otherwise, give the new tab a generic title
 					String prevTitle = prevTabController.getTitle();
 					if (!prevTitle.isEmpty() && Character.isDigit(prevTitle.charAt(prevTitle.length() - 1))) {
 						Pattern lastIntPattern = Pattern.compile("(\\d+)$");
