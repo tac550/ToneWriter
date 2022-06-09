@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 1.2.2
 Key Signature: G major
 Tone: Tone 7
 Composer: B. Ledkovsky - Kievan Chant
@@ -13,7 +13,7 @@ A
 4: c'-g-e-c
 END: b-g-d-g
 
-A alternate 1
+A alt 1
 1: g-d-b,-g
 2: b-g-d-g
 	Prep: a-fs-d-d
@@ -22,7 +22,7 @@ A alternate 1
 4: c'-g-e-c
 END: b-g-d-g
 
-A alternate 2
+A alt 2
 1: g-d-b,-g
 	Post: a-d-c-g
 2: b-g-d-g
@@ -44,9 +44,9 @@ END: g-d-b,-g
 Final
 1: a-fs-d-d
 2: b-g-d-g
-	Post: d'-g-f-b,
-	Post: c'-g-e-c
-3: b-g-d-g
+3: d'-g-f-b,
+	Prep: c'-g-e-c
+4: b-g-d-g
 	Prep: c'-g-e-c
 END: a-e-c-a
 	Prep: c'-g-e-e
