@@ -556,32 +556,14 @@ public class VerseLineViewController {
 			SyllableText currentText = (SyllableText) lineTextFlow.getChildren().get(i);
 			undoFrame.syllableTexts.add(currentText);
 
-			Button noteButton;
+			Button noteButton = createChordButton(currentText, getCurrentChord());
 
-			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size()
-					&& i == last_syll) { // Final instance of the last chord in the chant line gets special duration.
-				if (mainController.isLastVerseLineOfSection(this)) {
-					noteButton = createChordButton(currentText, getCurrentChord());
+			undoFrame.buttons.add(noteButton);
+			currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 
-					undoFrame.buttons.add(noteButton);
-					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
-					currentText.setNoteDuration(LilyPondInterface.NOTE_WHOLE,
-							currentText.getAssociatedButtons().size() - 1);
-				} else {
-					noteButton = createChordButton(currentText, getCurrentChord());
-
-					undoFrame.buttons.add(noteButton);
-					currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
-					currentText.setNoteDuration(LilyPondInterface.NOTE_HALF,
-							currentText.getAssociatedButtons().size() - 1);
-				}
-			} else {
-				noteButton = createChordButton(currentText, getCurrentChord());
-
-				undoFrame.buttons.add(noteButton);
-				currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
-			}
-
+			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size() && i == last_syll)
+				currentText.setNoteDuration(mainController.isLastVerseLineOfSection(this) ? LilyPondInterface.NOTE_WHOLE : LilyPondInterface.NOTE_HALF,
+						currentText.getAssociatedButtons().size() - 1);
 		}
 
 		lastSyllableAssigned = last_syll;
