@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 1.2.2
 Key Signature: G major
 Tone: Tone 4
 Composer: B. Ledkovsky - Kievan Chant
@@ -15,19 +15,19 @@ A
 B
 1: e-e-g,-e
 	Post: fs-e-a,-e
-2: a-fs-c-d
-	Prep: g-e-b,-e
-	Post: g-g-b,-d
+2: g-e-b,-e
 3: a-fs-c-d
+	Post: g-g-b,-d
+4: a-fs-c-d
 END: g-d-b,-g
 
 C
 1: g-d-b,-g
-	Post: b-g-d-g
 	Post: a-d-c-g
-2: g-d-b,-g
+2: b-g-d-g
+3: g-d-b,-g
 	Prep: a-d-c-fs
-3: a-fs-c-d
+4: a-fs-c-d
 END: g-d-b,-g
 
 D
@@ -38,8 +38,8 @@ END: a-fs-c-d
 
 E
 1: a-fs-c-d
+2: g-d-b,-g
 END: fs-d-a,-d
-	Prep: g-d-b,-g
 	Prep: a-d-c-g
 	Prep: b-d-d-g
 	Prep: a-d-c-fs
