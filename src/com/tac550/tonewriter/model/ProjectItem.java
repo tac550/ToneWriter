@@ -7,7 +7,7 @@ import java.util.List;
 public class ProjectItem {
 
 	public enum TitleType {
-		NORMAL, LARGE, HIDDEN;
+		HIDDEN, NORMAL, LARGE;
 		@Override public String toString() {
 			return switch (this) {
 				case NORMAL -> "Normal";

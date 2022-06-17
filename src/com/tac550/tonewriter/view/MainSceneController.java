@@ -66,9 +66,7 @@ public class MainSceneController {
 	@FXML private StackPane verseTextHintPane;
 
 	@FXML private MenuButton optionsButton;
-	@FXML private ToggleGroup titleOptions;
-	@FXML private RadioMenuItem largeTitleOption;
-	@FXML private RadioMenuItem hiddenTitleOption;
+	private final ToggleGroup titleOptions = new ToggleGroup();
 
 	@FXML private CheckMenuItem hideToneHeaderOption;
 	@FXML private CheckMenuItem pageBreakOption;
@@ -199,9 +197,20 @@ public class MainSceneController {
 		bottomVerseChoice.valueProperty().addListener(change -> topSceneController.projectEdited());
 		bottomVerseField.textProperty().addListener(change -> topSceneController.projectEdited());
 
-		for (Toggle item : titleOptions.getToggles())
-			item.selectedProperty().addListener(change -> topSceneController.projectEdited());
+		// Add Options menu items for title types
+		for (ProjectItem.TitleType type : ProjectItem.TitleType.values()) {
+			RadioMenuItem menuItem = new RadioMenuItem(type.toString());
+			titleOptions.getToggles().add(menuItem);
 
+			// Select Normal option by default.
+			if (type == ProjectItem.TitleType.NORMAL)
+				menuItem.setSelected(true);
+
+			menuItem.selectedProperty().addListener(change -> topSceneController.projectEdited());
+			optionsButton.getItems().add(1, menuItem);
+		}
+
+		// Set project-edited listener for remaining menu items
 		for (MenuItem item : optionsButton.getItems()) {
 			if (item instanceof CheckMenuItem checkItem)
 				checkItem.selectedProperty().addListener(change -> topSceneController.projectEdited());
@@ -1057,7 +1066,7 @@ public class MainSceneController {
 			if (exportMode == ExportMode.ITEM) {
 				if (MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments()) midiTempo = promptMidiTempo();
 				if (!LilyPondInterface.exportItems(itemSavingDirectory, itemExportFileName,
-						hiddenTitleOption.isSelected() ? "" : titleTextField.getText(), List.of(generateItemModel()),
+						getTitleType() == ProjectItem.TitleType.HIDDEN ? "" : titleTextField.getText(), List.of(generateItemModel()),
 						topSceneController.generateProjectModelNoItems(), topSceneController.getExportProgressMenu(),
 						MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_MIDI_FILE, false) && hasAssignments(), midiTempo)) {
 					TWUtils.showAlert(AlertType.ERROR, "Error", "An error occurred while exporting!",
@@ -1225,15 +1234,14 @@ public class MainSceneController {
 		Platform.runLater(() -> titleTextField.setText(title));
 	}
 	public ProjectItem.TitleType getTitleType() {
-		return titleOptions.getSelectedToggle().equals(largeTitleOption) ? ProjectItem.TitleType.LARGE :
-				titleOptions.getSelectedToggle().equals(hiddenTitleOption) ? ProjectItem.TitleType.HIDDEN : ProjectItem.TitleType.NORMAL;
+		return ProjectItem.TitleType.valueOf(((RadioMenuItem)titleOptions.getSelectedToggle()).getText().toUpperCase(Locale.ROOT));
 	}
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
 	}
-	public void setOptions(String title_format, boolean hide_header, boolean page_break, int extended_text, boolean break_only_on_blank) {
+	public void setOptions(ProjectItem.TitleType title_type, boolean hide_header, boolean page_break, int extended_text, boolean break_only_on_blank) {
 		titleOptions.selectToggle(titleOptions.getToggles().stream()
-				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_format)).toArray(Toggle[]::new)[0]);
+				.filter(toggle -> ((RadioMenuItem) toggle).getText().equals(title_type.toString())).toArray(Toggle[]::new)[0]);
 		hideToneHeaderOption.setSelected(hide_header);
 		pageBreakOption.setSelected(page_break);
 		switch (extended_text) {

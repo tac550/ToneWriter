@@ -629,7 +629,7 @@ public class TopSceneController {
 
 					// If previous tab's title is hidden, hide new tab's title.
 					if (prevTabController.getTitleType() == ProjectItem.TitleType.HIDDEN)
-						newTabController.setOptions(ProjectItem.TitleType.HIDDEN.toString(), newTabController.getHideToneHeader(), false, 0, false);
+						newTabController.setOptions(ProjectItem.TitleType.HIDDEN, newTabController.getHideToneHeader(), false, 0, false);
 
 					// Increment any verses used from the built-in verse finder data.
 					try {
@@ -860,7 +860,7 @@ public class TopSceneController {
 
 				ctr.setSubtitle(item.getSubtitleText());
 
-				ctr.setOptions(item.getTitleType().toString(), item.isHideToneHeader(), item.isPageBreakBeforeItem(),
+				ctr.setOptions(item.getTitleType(), item.isHideToneHeader(), item.isPageBreakBeforeItem(),
 						item.getExtendedTextSelection(), item.isBreakExtendedTextOnlyOnBlank());
 
 				ctr.setTopVerseChoice(item.getTopVersePrefix());

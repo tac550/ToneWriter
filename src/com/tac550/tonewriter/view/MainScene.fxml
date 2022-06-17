@@ -7,12 +7,10 @@
 <?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -26,7 +24,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<SplitPane fx:id="mainSplitPane" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
+<SplitPane fx:id="mainSplitPane" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.MainSceneController">
    <items>
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
          <children>
@@ -81,13 +79,6 @@
                                                 </HBox>
                                              </content>
                                           </CustomMenuItem>
-                                          <RadioMenuItem fx:id="largeTitleOption" mnemonicParsing="false" text="Large">
-                                             <toggleGroup>
-                                                <ToggleGroup fx:id="titleOptions" />
-                                             </toggleGroup>
-                                          </RadioMenuItem>
-                                          <RadioMenuItem mnemonicParsing="false" selected="true" text="Normal" toggleGroup="$titleOptions" />
-                                          <RadioMenuItem fx:id="hiddenTitleOption" mnemonicParsing="false" text="Hidden" toggleGroup="$titleOptions" />
                                           <CustomMenuItem mnemonicParsing="false" text="Header Separator">
                                              <content>
                                                 <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
