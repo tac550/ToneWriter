@@ -1224,6 +1224,10 @@ public class MainSceneController {
 	public void setTitle(String title) {
 		Platform.runLater(() -> titleTextField.setText(title));
 	}
+	public ProjectItem.TitleType getTitleType() {
+		return titleOptions.getSelectedToggle().equals(largeTitleOption) ? ProjectItem.TitleType.LARGE :
+				titleOptions.getSelectedToggle().equals(hiddenTitleOption) ? ProjectItem.TitleType.HIDDEN : ProjectItem.TitleType.NORMAL;
+	}
 	public void setSubtitle(String subtitle) {
 		subtitleTextField.setText(subtitle);
 	}
@@ -1266,11 +1270,10 @@ public class MainSceneController {
 
 		return new ProjectItem.ProjectItemBuilder().assignmentLines(verseLineControllers.stream().map(VerseLineViewController::generateLineModel).toList())
 				.associatedTone(toneFile != null ? generateToneModel() : null).originalToneFile(toneFile).toneEdited(toneEdited)
-				.titleText(getTitle()).titleType(titleOptions.getSelectedToggle().equals(largeTitleOption) ? ProjectItem.TitleType.LARGE : titleOptions.getSelectedToggle().equals(hiddenTitleOption) ? ProjectItem.TitleType.HIDDEN : ProjectItem.TitleType.NORMAL)
-				.subtitleText(subtitleTextField.getText()).verseAreaText(verseArea.getText()).topVersePrefix(topVerseChoice.getValue())
-				.bottomVersePrefix(bottomVerseChoice.getValue()).topVerse(topVerseField.getText()).bottomVerse(bottomVerseField.getText())
-				.hideToneHeader(hideToneHeaderOption.isSelected()).breakBeforeItem(pageBreakOption.isSelected()).extendedTextSelection(getExtendTextSelection())
-				.breakExtendedTextOnlyOnBlank(breakOnlyOnBlankOption.isSelected()).buildProjectItem();
+				.titleText(getTitle()).titleType(getTitleType()).subtitleText(subtitleTextField.getText()).verseAreaText(verseArea.getText())
+				.topVersePrefix(topVerseChoice.getValue()).bottomVersePrefix(bottomVerseChoice.getValue()).topVerse(topVerseField.getText())
+				.bottomVerse(bottomVerseField.getText()).hideToneHeader(hideToneHeaderOption.isSelected()).breakBeforeItem(pageBreakOption.isSelected())
+				.extendedTextSelection(getExtendTextSelection()).breakExtendedTextOnlyOnBlank(breakOnlyOnBlankOption.isSelected()).buildProjectItem();
 	}
 
 	private static class RenderFormatException extends Exception {}

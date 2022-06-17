@@ -627,6 +627,10 @@ public class TopSceneController {
 					if (prevTabController.getExportMode() == ExportMode.PROJECT)
 						newTabController.setProjectOutputMode();
 
+					// If previous tab's title is hidden, hide new tab's title.
+					if (prevTabController.getTitleType() == ProjectItem.TitleType.HIDDEN)
+						newTabController.setOptions(ProjectItem.TitleType.HIDDEN.toString(), newTabController.getHideToneHeader(), false, 0, false);
+
 					// Increment any verses used from the built-in verse finder data.
 					try {
 						List<String> verses = QuickVerseIO.getBuiltinVerses();
