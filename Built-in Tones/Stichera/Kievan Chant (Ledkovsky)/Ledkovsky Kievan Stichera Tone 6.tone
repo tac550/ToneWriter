@@ -1,4 +1,4 @@
-VERSION: 0.7
+VERSION: 1.2.2
 Key Signature: G major
 Tone: Tone 6
 Composer: B. Ledkovsky - Kievan Chant
@@ -14,8 +14,9 @@ A
 END: a-e-c-a
 
 B
-1: b-g-d-g
-2: a-g-c-g
+1: a-e-c-a: Often skipped on short phrases or if the second syllable isn't stressed
+2: b-g-d-g
+3: a-g-c-g
 END: g-d-b,-g
 
 C
