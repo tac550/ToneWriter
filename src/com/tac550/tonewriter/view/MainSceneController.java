@@ -1231,7 +1231,7 @@ public class MainSceneController {
 		return titleTextField.getText();
 	}
 	public void setTitle(String title) {
-		Platform.runLater(() -> titleTextField.setText(title));
+		titleTextField.setText(title);
 	}
 	public ProjectItem.TitleType getTitleType() {
 		return ProjectItem.TitleType.valueOf(((RadioMenuItem)titleOptions.getSelectedToggle()).getText().toUpperCase(Locale.ROOT));
