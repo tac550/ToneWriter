@@ -15,13 +15,13 @@ A
 END: a-e-c-a
 
 B
-1: c'-g-e-c: Skipped on very short phrases.
-	Prep: a-e-c-a: Skipped on very short phrases.
-	Prep: b-g-d-g
+1: b-g-d-g
+	Prep: a-e-c-a: Skipped on shorter phrases.
+2: c'-g-e-c: Skipped on very short phrases.
 	Prep: c'-g-e-g
 	Prep: d'-g-f-g
-2: c'-g-e-g: Skipped on very short phrases./n/nUsed as an alternative to the previous chord on shorter phrases.
-3: c'-g-e-c
+3: c'-g-e-g: Skipped on very short phrases./n/nUsed as an alternative to the previous chord on shorter phrases.
+4: c'-g-e-c
 	Prep: b-g-d-g
 END: b-g-d-g
 	Prep: d'-g-f-b,
