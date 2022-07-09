@@ -460,7 +460,7 @@ public class TopSceneController {
 	@FXML private boolean handleSaveProjectAs() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Project As");
-		fileChooser.setInitialFileName(TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
+		fileChooser.setInitialFileName(projectFile != null ? getProjectFileName() : TWUtils.replaceInvalidFileChars(projectTitle, "_") + ".twproj");
 		setInitialProjectDirectory(fileChooser);
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("ToneWriter Project file (*.twproj)", "*.twproj"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
