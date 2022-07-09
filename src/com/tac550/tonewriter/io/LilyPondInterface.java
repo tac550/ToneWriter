@@ -280,8 +280,8 @@ public class LilyPondInterface {
 					item.getVerseAreaText(), item.isBreakExtendedTextOnlyOnBlank())) + (createStaff ? "\\noPageBreak\n" : ""));
 		} else if (!item.getTopVerse().isEmpty()) {
 			Collections.addAll(lines, "\\markup \\column {",
-					String.format("  \\vspace #0.5 \\justify { \\halign #-1 \\bold {%s} %s \\vspace #0.5",
-							item.getTopVersePrefix(), reformatTextForNotation(item.getTopVerse()) + " } "),
+					String.format("  \\vspace #0.5 \\justify { \\halign #-1 %s%s \\vspace #0.5",
+							formatVersePrefixSelection(item.getTopVersePrefix()), reformatTextForNotation(item.getTopVerse()) + " } "),
 					"}\n",
 					createStaff ? "\\noPageBreak\n" : "");
 		}
@@ -334,12 +334,16 @@ public class LilyPondInterface {
 		} else if (!item.getBottomVerse().isEmpty()) {
 			Collections.addAll(lines, createStaff ? "\\noPageBreak\n" : "",
 					"\\markup \\column {",
-					String.format("  \\justify { \\halign #-1 \\bold {%s} %s \\vspace #1",
-							item.getBottomVersePrefix(), reformatTextForNotation(item.getBottomVerse()) + " } "),
+					String.format("  \\justify { \\halign #-1 %s%s \\vspace #1",
+							formatVersePrefixSelection(item.getBottomVersePrefix()), reformatTextForNotation(item.getBottomVerse()) + " } "),
 					"}\n");
 		}
 
 		return String.join("\n", lines);
+	}
+
+	private static String formatVersePrefixSelection(String prefix) {
+		return prefix.equals("(None)") ? "" : String.format("\\bold {%s} ", prefix);
 	}
 
 	private static String generateExtendedText(String verse_choice, String extended_text, boolean break_only_on_blank) {
@@ -347,8 +351,9 @@ public class LilyPondInterface {
 
 		String[] lines = extended_text.split("\n");
 
-		resultText.append(String.format("\\markup \\column { \\vspace #1 \\justify { \\halign #-1 \\bold {%s} %s } \\vspace #0.125 }%s\n",
-				verse_choice, lines[0], break_only_on_blank && lines.length > 1 && !lines[1].isBlank() ? " \\noPageBreak" : ""));
+		resultText.append(String.format("\\markup \\column { \\vspace #1 \\justify { \\halign #-1 %s%s } \\vspace #0.125 }%s\n",
+				formatVersePrefixSelection(verse_choice), lines[0],
+				break_only_on_blank && lines.length > 1 && !lines[1].isBlank() ? " \\noPageBreak" : ""));
 
 		int blankLineCounter = 0;
 		for (int i = 1; i < lines.length; i++) {

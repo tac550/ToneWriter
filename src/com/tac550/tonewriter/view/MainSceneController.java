@@ -128,6 +128,7 @@ public class MainSceneController {
 			box.getItems().add("Priest:");
 			box.getItems().add("Deacon:");
 			box.getItems().add("v:");
+			box.getItems().add("(None)");
 			box.getSelectionModel().select(0);
 		});
 
@@ -234,7 +235,6 @@ public class MainSceneController {
 	}
 
 	public Task<FXMLLoader> createVerseLine(String line) {
-
 		Task<FXMLLoader> loaderTask = FXMLLoaderIO.loadFXMLLayoutAsync("verseLineView.fxml", loader -> {
 			VerseLineViewController controller = loader.getController();
 			controller.setParentControllers(this, topSceneController);
@@ -246,9 +246,7 @@ public class MainSceneController {
 		return loaderTask;
 	}
 	public Task<FXMLLoader> createChantLine(int index, boolean recalculateNames) {
-
 		return FXMLLoaderIO.loadFXMLLayoutAsync("chantLineView.fxml", loader -> {
-
 			ChantLineViewController controller = loader.getController();
 			GridPane chantLineLayout = loader.getRoot();
 			controller.setMainController(this);
