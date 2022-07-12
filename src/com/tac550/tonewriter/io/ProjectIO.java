@@ -426,7 +426,8 @@ public class ProjectIO {
 					}
 
 					List<AssignmentSyllable> syllables = new ArrayList<>();
-					for (int j = 1; j < syllData.length; j++) {
+					int startJ = 1;
+					for (int j = startJ; j < syllData.length; j++) {
 						AssignmentSyllable.AssignmentSyllableBuilder syllableBuilder = new AssignmentSyllable.AssignmentSyllableBuilder();
 						String[] syllAndAssgmnts = syllData[j].split(" ");
 
@@ -447,7 +448,7 @@ public class ProjectIO {
 								syllableBuilder.forceHyphen(true);
 						}
 
-						if (!syllable.startsWith("-"))
+						if (!syllable.startsWith("-") && j > startJ)
 							syllable = " " + syllable;
 
 						syllableBuilder.syllableText(syllable);
