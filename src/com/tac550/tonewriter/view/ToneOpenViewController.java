@@ -141,8 +141,7 @@ public class ToneOpenViewController {
     @FXML private void handleBrowse() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Tone");
-        File openToneFile = mainController.getToneFile();
-        fileChooser.setInitialDirectory(openToneFile != null && openToneFile.exists() ? openToneFile.getParentFile() : MainApp.getPlatformSpecificInitialChooserDir());
+        fileChooser.setInitialDirectory(mainController.getInitialToneChooserDir());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 
         File selectedFile = fileChooser.showOpenDialog(builtinTonesView.getScene().getWindow());

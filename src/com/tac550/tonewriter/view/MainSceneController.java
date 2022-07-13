@@ -532,10 +532,7 @@ public class MainSceneController {
 		fileChooser.setTitle("Save Tone As");
 		fileChooser.setInitialFileName(".tone");
 
-		if (toneFile != null && isToneSavable() && nonInternalToneLoaded())
-			fileChooser.setInitialDirectory(toneFile.getParentFile());
-		else
-			fileChooser.setInitialDirectory(MainApp.getPlatformSpecificInitialChooserDir());
+		fileChooser.setInitialDirectory(getInitialToneChooserDir());
 
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("TONE file (*.tone)", "*.tone"));
 		File saveFile = fileChooser.showSaveDialog(parentStage);
@@ -1174,6 +1171,13 @@ public class MainSceneController {
 
 	public File getToneFile() {
 		return toneFile;
+	}
+
+	public File getInitialToneChooserDir() {
+		if (toneFile != null && isToneSavable() && nonInternalToneLoaded())
+			return toneFile.getParentFile();
+		else
+			return MainApp.getPlatformSpecificInitialChooserDir();
 	}
 	
 	public void setItemCache(ProjectItem loadedItemCache) {
