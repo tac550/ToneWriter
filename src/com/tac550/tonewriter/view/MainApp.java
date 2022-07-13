@@ -423,21 +423,16 @@ public class MainApp extends Application {
 		ButtonType updateLilyPond = new ButtonType(isLilyPondInstalled() ? "Update" : "Install", ButtonBar.ButtonData.OK_DONE);
 
 		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
-				String.format("Welcome to %s! LilyPond must be %s in order to continue " +
-								// TODO: Can Linux UI be removed?
-								(OS_NAME.startsWith("lin") ? "(likely available in your distro's repositories)." :
-										"(Will install to default location)."), APP_NAME,
+				String.format("Welcome to %s! LilyPond must be %s in order to continue (Will install to default location).", APP_NAME,
 						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
-				OS_NAME.startsWith("lin") ? new ButtonType[] {ButtonType.CANCEL, locateInstall} :
-						new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall}, locateInstall);
+				new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall}, locateInstall);
 
 		if (result.isPresent()) {
 			if (result.get() == ButtonType.CANCEL) return; // continue without change
 			else if (result.get() == locateInstall) { // Set directory and continue
 				setLilyPondDir(splashStage, true);
-				if (!isLilyPondVersionCompatible()) { // Try again if version incompatible
-					promptWinLilyPondInstall();
-				}
+				// Try again if version incompatible
+				if (!isLilyPondVersionCompatible()) promptWinLilyPondInstall();
 				return;
 			}
 		} else return; // No result, probably pressed close button; continue without change
@@ -581,7 +576,6 @@ public class MainApp extends Application {
 	}
 
 	private static boolean isLilyPondInstalled() {
-		// First check that LilyPond is available
 		return new File(getLilyPondPath() + getPlatformSpecificLPExecutable()).exists();
 	}
 
