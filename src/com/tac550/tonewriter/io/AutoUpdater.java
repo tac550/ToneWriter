@@ -286,7 +286,7 @@ public class AutoUpdater {
 				return;
 			}
 
-			long pid = ProcessHandle.current().pid(); // TODO: Test on Mac
+			long pid = ProcessHandle.current().pid();
 
 			try {
 				String installDest = userDir.getParentFile().getParentFile().getAbsolutePath();
