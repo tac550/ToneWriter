@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 public class MainApp extends Application {
 
 	public static final String APP_NAME = "ToneWriter";
-	public static final String APP_VERSION = "1.2.2";
+	public static final String APP_VERSION = "1.3.0";
 	public static final Image APP_ICON = new Image(Objects.requireNonNull(MainApp.class.getResourceAsStream("/media/AppIcon.png")));
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ROOT);
 
