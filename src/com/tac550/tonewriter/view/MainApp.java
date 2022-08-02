@@ -129,7 +129,7 @@ public class MainApp extends Application {
 			if (OS_NAME.startsWith("win")) // If the Windows LilyPond installation is no good, prompt initialization
 				promptWinLilyPondInstall();
 			if (OS_NAME.startsWith("mac") && !lilyPondDirectory.getAbsolutePath().equals(getPlatformSpecificDefaultLPDir()))
-				// If the MacOS LilyPond default setup is no good, this is probably a permissions issue
+				// If the macOS LilyPond default setup is no good, this is probably a permissions issue
 				attemptFixLilyPondMacAccess();
 
 			// Final availability determination after initialization attempt
