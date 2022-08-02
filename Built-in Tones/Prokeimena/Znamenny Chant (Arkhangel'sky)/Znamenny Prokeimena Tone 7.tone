@@ -8,14 +8,14 @@ Manually Assign Phrases: false
 Final
 1: a-fs-d-d
 2: b-g-d-g
-3: b-g-d-g
-	Prep: c'-g-e-c
+3: c'-g-e-c
 4: b-g-d-g
+5: b-g-d-g
 	Prep: a-g-c-g
 	Post: c'-g-e-c'
-5: d'-g-d-b
+6: d'-g-d-b
 	Post: c'-g-e-c'
-6: b-g-d-g
+7: b-g-d-g
 END: a-e-c-a
 	Prep: c'-g-e-c
 	Prep: b-g-d-g
