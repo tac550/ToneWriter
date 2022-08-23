@@ -415,10 +415,10 @@ public class ChantPhraseViewController implements CommentableView {
 					chordViewControllers.clear();
 					chordViewControllers.addAll(controllers);
 
-					if (draggingController.get() instanceof SubChordView draggingChord
-							&& targetController instanceof SubChordView targetChord)
+					if (draggingController.get() instanceof SubChordView draggingSubChord
+							&& targetController instanceof SubChordView targetSubChord)
 						draggingController.get().getAssociatedMainChord().rotatePrepsOrPosts(
-								draggingChord, targetChord);
+								draggingSubChord, targetSubChord);
 
 					recalcCHNames();
 					edited();
