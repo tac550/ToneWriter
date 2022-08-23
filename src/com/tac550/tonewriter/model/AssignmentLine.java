@@ -58,8 +58,8 @@ public class AssignmentLine {
 			return new AssignmentLine(_selectedChantPhrase, _syllables, _beforeBar, _afterBar, _separator, _systemBreakingDisabled);
 		}
 
-		public AssignmentLineBuilder selectedChantPhrase(ChantPhrase _selectedChantLine) {
-			this._selectedChantPhrase = _selectedChantLine;
+		public AssignmentLineBuilder selectedChantPhrase(ChantPhrase _selectedChantPhrase) {
+			this._selectedChantPhrase = _selectedChantPhrase;
 			return this;
 		}
 		public AssignmentLineBuilder syllables(List<AssignmentSyllable> _syllables) {

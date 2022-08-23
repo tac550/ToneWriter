@@ -92,7 +92,7 @@
                      </accelerator>
                   </MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="addCLMenuItem" disable="true" mnemonicParsing="false" onAction="#handleCreateChantLine" text="Add Chant Phrase" />
+                  <MenuItem fx:id="addCLMenuItem" disable="true" mnemonicParsing="false" onAction="#handleCreateChantPhrase" text="Add Chant Phrase" />
                   <MenuItem fx:id="setKeyMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSetKeySignature" text="Set Key Signature..." />
                   <MenuItem fx:id="editHeaderInfoMenuItem" disable="true" mnemonicParsing="false" onAction="#handleSetHeaderInfo" text="Edit Header Info..." />
                   <CheckMenuItem fx:id="manualCLAssignmentMenuItem" disable="true" mnemonicParsing="false" onAction="#handleToggleManualCLAssignment" text="Assign Phrases Manually" />

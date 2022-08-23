@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ChantChord {
+public class Chord {
 
 	private final String name;
 	private final String comment;
 
-	private final List<ChantChord> preps;
-	private final List<ChantChord> posts;
+	private final List<Chord> preps;
+	private final List<Chord> posts;
 
 	private final String soprano;
 	private final String alto;
 	private final String tenor;
 	private final String bass;
 
-	public ChantChord(String name, String comment, List<ChantChord> preps, List<ChantChord> posts, String soprano, String alto, String tenor, String bass) {
+	public Chord(String name, String comment, List<Chord> preps, List<Chord> posts, String soprano, String alto, String tenor, String bass) {
 		this.name = name; this.comment = comment; this.preps = preps; this.posts = posts;
 		this.soprano = soprano; this.alto = alto; this.tenor = tenor; this.bass = bass;
 	}
@@ -31,10 +31,10 @@ public class ChantChord {
 	public boolean hasComment() {
 		return !comment.isEmpty();
 	}
-	public List<ChantChord> getPreps() {
+	public List<Chord> getPreps() {
 		return preps;
 	}
-	public List<ChantChord> getPosts() {
+	public List<Chord> getPosts() {
 		return posts;
 	}
 	public String getSoprano() {
@@ -67,52 +67,52 @@ public class ChantChord {
 		};
 	}
 
-	public void addPrep(ChantChord prep) {
+	public void addPrep(Chord prep) {
 		preps.add(prep);
 	}
-	public void addPost(ChantChord post) {
+	public void addPost(Chord post) {
 		posts.add(post);
 	}
 
-	public static class ChantChordBuilder {
+	public static class ChordBuilder {
 		private String _name = "";
 		private String _comment = "";
 
-		private final List<ChantChord> _preps = new ArrayList<>();
-		private final List<ChantChord> _posts = new ArrayList<>();
+		private final List<Chord> _preps = new ArrayList<>();
+		private final List<Chord> _posts = new ArrayList<>();
 
 		private String _soprano = "r";
 		private String _alto = "r";
 		private String _tenor = "r";
 		private String _bass = "r";
 
-		public ChantChordBuilder() { }
+		public ChordBuilder() { }
 
-		public ChantChord buildChord() {
-			return new ChantChord(_name, _comment, _preps, _posts, _soprano, _alto, _tenor, _bass);
+		public Chord buildChord() {
+			return new Chord(_name, _comment, _preps, _posts, _soprano, _alto, _tenor, _bass);
 		}
 
-		public ChantChordBuilder name(String _name) {
+		public ChordBuilder name(String _name) {
 			this._name = _name;
 			return this;
 		}
-		public ChantChordBuilder comment(String _comment) {
+		public ChordBuilder comment(String _comment) {
 			this._comment = _comment;
 			return this;
 		}
-		public ChantChordBuilder soprano(String _soprano) {
+		public ChordBuilder soprano(String _soprano) {
 			this._soprano = _soprano;
 			return this;
 		}
-		public ChantChordBuilder alto(String _alto) {
+		public ChordBuilder alto(String _alto) {
 			this._alto = _alto;
 			return this;
 		}
-		public ChantChordBuilder tenor(String _tenor) {
+		public ChordBuilder tenor(String _tenor) {
 			this._tenor = _tenor;
 			return this;
 		}
-		public ChantChordBuilder bass(String _bass) {
+		public ChordBuilder bass(String _bass) {
 			this._bass = _bass;
 			return this;
 		}

@@ -55,9 +55,9 @@ public class VerseLineViewController {
 
 	private boolean disableLineBreaks = false;
 
-	private ChantLineViewController[] associatedChantLines;
-	private int selectedChantLine = 0;
-	private ChantPhrase previousChantLine = null;
+	private ChantPhraseViewController[] associatedChantPhrases;
+	private int selectedChantPhrase = 0;
+	private ChantPhrase previousChantPhrase = null;
 
 	@FXML private ChoiceBox<String> tonePhraseChoice;
 	@FXML private TextFlow lineTextFlow;
@@ -95,11 +95,11 @@ public class VerseLineViewController {
 		tonePhraseChoice.getSelectionModel().selectedIndexProperty().addListener((ov, oldVal, newVal) -> {
 			if (changingAssignments) return;
 
-			selectedChantLine = newVal.intValue();
+			selectedChantPhrase = newVal.intValue();
 
 			resetIfSelectedNotSimilarToPrevious();
 
-			previousChantLine = associatedChantLines[selectedChantLine].generatePhraseModel();
+			previousChantPhrase = associatedChantPhrases[selectedChantPhrase].generatePhraseModel();
 		});
 
 		// Interface icons
@@ -248,37 +248,37 @@ public class VerseLineViewController {
 		return verseLine.getLine();
 	}
 
-	void setChantLines(ChantLineViewController[] chant_lines) {
-		setChantLines(chant_lines, -1);
+	void setPhraseChoices(ChantPhraseViewController[] chant_lines) {
+		setPhraseChoices(chant_lines, -1);
 	}
 
-	void setChantLines(ChantLineViewController[] chant_lines, int initial_choice) {
+	void setPhraseChoices(ChantPhraseViewController[] chant_lines, int initial_choice) {
 		changingAssignments = true;
 
 		int previousSelection = tonePhraseChoice.getSelectionModel().getSelectedIndex() == -1 ? 0 :
 				tonePhraseChoice.getSelectionModel().getSelectedIndex();
 
-		boolean identicalChoices = Arrays.equals(associatedChantLines, chant_lines);
+		boolean identicalChoices = Arrays.equals(associatedChantPhrases, chant_lines);
 		// Load in new chant line choices
-		associatedChantLines = chant_lines;
+		associatedChantPhrases = chant_lines;
 		tonePhraseChoice.getItems().clear();
-		for (ChantLineViewController chantLine : associatedChantLines)
-			tonePhraseChoice.getItems().add(TWUtils.shortenPhraseName(chantLine.getName()));
+		for (ChantPhraseViewController chantPhrase : associatedChantPhrases)
+			tonePhraseChoice.getItems().add(TWUtils.shortenPhraseName(chantPhrase.getName()));
 
 		// Determine initial chant line selection.
 		if (mainController.manualCLAssignmentEnabled()) {
 			// If we're in manual assignment mode, try to auto-select a chant line similar to the previous one.
-			if (previousChantLine != null) {
+			if (previousChantPhrase != null) {
 				// If we don't find a similar chant line below, default to the previous selection.
-				selectedChantLine = previousSelection;
+				selectedChantPhrase = previousSelection;
 
 				// If the chant line choices are identical (nothing is changing), just take the previous selection.
 				if (!identicalChoices) {
 					int i = 0;
-					for (ChantLineViewController chantLine : associatedChantLines) {
-						if (chantLine.generatePhraseModel().isSimilarTo(previousChantLine)) {
+					for (ChantPhraseViewController chantPhrase : associatedChantPhrases) {
+						if (chantPhrase.generatePhraseModel().isSimilarTo(previousChantPhrase)) {
 							// The first time we find a similar chant line, select it and stop searching.
-							selectedChantLine = i;
+							selectedChantPhrase = i;
 							break;
 						}
 
@@ -288,13 +288,13 @@ public class VerseLineViewController {
 
 			} else {
 				// If there is no previous chant line, or it was empty, select the previous index (usually has same letter)
-				selectedChantLine = initial_choice > -1 ? initial_choice : 0;
+				selectedChantPhrase = initial_choice > -1 ? initial_choice : 0;
 			}
 		} else {
 			// If we're not in manual assignment mode, just select the first by default.
-			selectedChantLine = 0;
+			selectedChantPhrase = 0;
 		}
-		tonePhraseChoice.getSelectionModel().select(selectedChantLine);
+		tonePhraseChoice.getSelectionModel().select(selectedChantPhrase);
 
 		// ChoiceBox highlighting if choices are available
 		if (tonePhraseChoice.getItems().size() > 1)
@@ -307,7 +307,7 @@ public class VerseLineViewController {
 		changingAssignments = false;
 
 		// Save chant line information for later.
-		previousChantLine = associatedChantLines[selectedChantLine].generatePhraseModel();
+		previousChantPhrase = associatedChantPhrases[selectedChantPhrase].generatePhraseModel();
 
 		// Run pending actions, if any, now that a tone has been loaded and the phrase choices assigned.
 		// Preserve existing project edited state if not first tab, otherwise reset it.
@@ -328,7 +328,7 @@ public class VerseLineViewController {
 
 	private void resetIfSelectedNotSimilarToPrevious() {
 		// Only reset chord assignments if the selected chant line is structurally different from the previous one.
-		if (!associatedChantLines[selectedChantLine].generatePhraseModel().isSimilarTo(previousChantLine))
+		if (!associatedChantPhrases[selectedChantPhrase].generatePhraseModel().isSimilarTo(previousChantPhrase))
 			resetChordAssignment();
 	}
 
@@ -376,21 +376,21 @@ public class VerseLineViewController {
 		return rootPane;
 	}
 
-	private ChantChordController getCurrentChord() {
-		return associatedChantLines[selectedChantLine].getChords().get(nextChordIndex == 0 ? 0 : nextChordIndex - 1);
+	private ChordViewController getCurrentChord() {
+		return associatedChantPhrases[selectedChantPhrase].getChords().get(nextChordIndex == 0 ? 0 : nextChordIndex - 1);
 	}
-	public ChantChordController getChordByIndex(int index) {
-		return associatedChantLines[selectedChantLine].getChords().get(index);
+	public ChordViewController getChordByIndex(int index) {
+		return associatedChantPhrases[selectedChantPhrase].getChords().get(index);
 	}
 
 	private boolean notAssigning() {
-		return associatedChantLines == null || doneAssigning;
+		return associatedChantPhrases == null || doneAssigning;
 	}
 
 	private void nextChordAssignment() {
-		if (associatedChantLines == null) return;
+		if (associatedChantPhrases == null) return;
 		// If we have not placed or skipped the last chord...
-		if (nextChordIndex < associatedChantLines[selectedChantLine].getChords().size()) {
+		if (nextChordIndex < associatedChantPhrases[selectedChantPhrase].getChords().size()) {
 			doneAssigning = false;
 
 			chordEntryText.setText(getChordByIndex(nextChordIndex).getName());
@@ -401,7 +401,7 @@ public class VerseLineViewController {
 			// Special disabling based on prep/post/normal
 			deactivateAll();
 
-			if (!(getCurrentChord() instanceof RecitingChord)) {
+			if (!(getCurrentChord() instanceof RecitingChordView)) {
 				if (nextChordIndex == 1) { // If no chords have been assigned yet...
 					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
 				} else {
@@ -471,7 +471,7 @@ public class VerseLineViewController {
 		if (notAssigning()) return;
 
 		// Only allow drag operation to continue if assigning a reciting chord.
-		if (getCurrentChord() instanceof RecitingChord) {
+		if (getCurrentChord() instanceof RecitingChordView) {
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
 
@@ -561,7 +561,7 @@ public class VerseLineViewController {
 			undoFrame.buttons.add(noteButton);
 			currentText.select(nextChordIndex == 0 ? 0 : nextChordIndex - 1, getCurrentChord().getColor(), noteButton);
 
-			if (nextChordIndex == associatedChantLines[selectedChantLine].getChords().size() && i == last_syll)
+			if (nextChordIndex == associatedChantPhrases[selectedChantPhrase].getChords().size() && i == last_syll)
 				currentText.setNoteDuration(mainController.isLastVerseLineOfSection(this) ? LilyPondInterface.NOTE_WHOLE : LilyPondInterface.NOTE_HALF,
 						currentText.getAssociatedButtons().size() - 1);
 		}
@@ -575,9 +575,9 @@ public class VerseLineViewController {
 		undoActions.push(undoFrame);
 	}
 
-	private Button createChordButton(SyllableText syllable, ChantChordController chord) {
+	private Button createChordButton(SyllableText syllable, ChordViewController chord) {
 		int buttonIndex = syllable.getAssociatedButtons().size();
-		int chordIndex = associatedChantLines[selectedChantLine].getChords().indexOf(chord);
+		int chordIndex = associatedChantPhrases[selectedChantPhrase].getChords().indexOf(chord);
 
 		Button noteButton = new Button(getCurrentChord().getName());
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(getCurrentChord().getColor())));
@@ -738,7 +738,7 @@ public class VerseLineViewController {
 
 	AssignmentLine generateLineModel() {
 		List<AssignmentSyllable> syllables = lineTextFlow.getChildren().stream().map(s -> ((SyllableText) s).generateSyllableModel()).toList();
-		ChantPhrase selectedPhrase = associatedChantLines != null ? associatedChantLines[selectedChantLine].generatePhraseModel() : null;
+		ChantPhrase selectedPhrase = associatedChantPhrases != null ? associatedChantPhrases[selectedChantPhrase].generatePhraseModel() : null;
 
 		return new AssignmentLine.AssignmentLineBuilder().selectedChantPhrase(selectedPhrase)
 				.syllables(syllables).beforeBar(LilyPondInterface.barStrings[beforeBar.get()])

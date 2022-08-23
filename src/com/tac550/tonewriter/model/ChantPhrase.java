@@ -7,9 +7,9 @@ public class ChantPhrase {
 	private final String name;
 	private final String comment;
 
-	private final List<ChantChord> chords; // In the order they appear in .tone files.
+	private final List<Chord> chords; // In the order they appear in .tone files.
 
-	public ChantPhrase(String name, String comment, List<ChantChord> chords) {
+	public ChantPhrase(String name, String comment, List<Chord> chords) {
 		this.name = name; this.comment = comment; this.chords = chords;
 	}
 
@@ -22,20 +22,20 @@ public class ChantPhrase {
 	public boolean hasComment() {
 		return !comment.isEmpty();
 	}
-	public List<ChantChord> getChords() {
+	public List<Chord> getChords() {
 		return chords;
 	}
 
-	public List<ChantChord> getChordsMelodyOrder() {
-		List<ChantChord> inOrder = new ArrayList<>();
+	public List<Chord> getChordsMelodyOrder() {
+		List<Chord> inOrder = new ArrayList<>();
 
-		Queue<ChantChord> preps = new ArrayDeque<>();
-		Stack<ChantChord> posts = new Stack<>();
-		ChantChord mainChord = chords.get(0); // First chord in save order will always be a main chord.
+		Queue<Chord> preps = new ArrayDeque<>();
+		Stack<Chord> posts = new Stack<>();
+		Chord mainChord = chords.get(0); // First chord in save order will always be a main chord.
 		assert mainChord.getName().matches("\\d") || mainChord.getName().equalsIgnoreCase("End");
 
 		for (int i = 1; i < chords.size(); i++) {
-			ChantChord current = chords.get(i);
+			Chord current = chords.get(i);
 			if (current.getName().matches("\\d") || current.getName().equalsIgnoreCase("End")) {
 				while (!preps.isEmpty())
 					inOrder.add(preps.remove());
@@ -71,15 +71,15 @@ public class ChantPhrase {
 			finalString.append(String.format("Comment: %s%n", getComment()));
 
 		// For each chord in the chant line...
-		for (ChantChord chord : getChords()) {
+		for (Chord chord : getChords()) {
 			if (chord.getName().matches("\\d") || chord.getName().equalsIgnoreCase("End")) {
 				finalString.append(String.format("%s: %s%s%n", chord.getName().equalsIgnoreCase("End") ? "END" : chord.getName(), chord.getFields(),
 						chord.hasComment() ? ": " + chord.getComment() : ""));
-				for (ChantChord prep : chord.getPreps()) { // Preps save out first
+				for (Chord prep : chord.getPreps()) { // Preps save out first
 					finalString.append(String.format("\tPrep: %s%s%n", prep.getFields(),
 							prep.hasComment() ? ": " + prep.getComment() : ""));
 				}
-				for (ChantChord post : chord.getPosts()) { // Posts second
+				for (Chord post : chord.getPosts()) { // Posts second
 					finalString.append(String.format("\tPost: %s%s%n", post.getFields(),
 							post.hasComment() ? ": " + post.getComment() : ""));
 				}
@@ -106,7 +106,7 @@ public class ChantPhrase {
 		private String _name = "";
 		private String _comment = "";
 
-		private List<ChantChord> _chords = new ArrayList<>();
+		private List<Chord> _chords = new ArrayList<>();
 
 		public ChantPhraseBuilder() { }
 
@@ -122,7 +122,7 @@ public class ChantPhrase {
 			this._comment = _comment;
 			return this;
 		}
-		public ChantPhraseBuilder chords(List<ChantChord> _chords) {
+		public ChantPhraseBuilder chords(List<Chord> _chords) {
 			this._chords = _chords;
 			return this;
 		}

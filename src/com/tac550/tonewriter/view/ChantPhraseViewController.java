@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class ChantLineViewController implements CommentableView {
+public class ChantPhraseViewController implements CommentableView {
 
 	private MainSceneController mainController;
 	
@@ -62,7 +62,7 @@ public class ChantLineViewController implements CommentableView {
 	@FXML private Button playButton;
 	
 	@FXML private HBox chordBox;
-	private final List<ChantChordController> chantChordControllers = new ArrayList<>();
+	private final List<ChordViewController> chordViewControllers = new ArrayList<>();
 	
 	private boolean makePrimeLater = false;
 	private boolean makeAlternateLater = false;
@@ -70,7 +70,7 @@ public class ChantLineViewController implements CommentableView {
 	// Fields related to drag reordering of chords
 	private static final String CHORD_DRAG_KEY = "ToneWriter chord: ";
 	private final ObjectProperty<AnchorPane> draggingChord = new SimpleObjectProperty<>();
-	private final ObjectProperty<ChantChordController> draggingController = new SimpleObjectProperty<>();
+	private final ObjectProperty<ChordViewController> draggingController = new SimpleObjectProperty<>();
 
 	// Fields for automatic drag-scrolling
 	AnimationTimer autoScroller;
@@ -162,20 +162,20 @@ public class ChantLineViewController implements CommentableView {
 		firstRepeated = false;
 		firstRepeatedButton.setStyle("");
 	}
-	public boolean getFirstRepeated() {
+	public boolean isFirstRepeated() {
 		return firstRepeated;
 	}
-	boolean getIsPrime() {
+	boolean isPrime() {
 		return nameChoice.getValue().contains("'");
 	}
-	boolean getIsAlternate() {
+	boolean isAlternate() {
 		return nameChoice.getValue().contains("alternate");
 	}
 	public String getName() {
 		return nameChoice.getValue();
 	}
-	public List<ChantChordController> getChords() {
-		return chantChordControllers;
+	public List<ChordViewController> getChords() {
+		return chordViewControllers;
 	}
 
 	private void setFirstRepeatedAvailable(boolean available) {
@@ -203,8 +203,8 @@ public class ChantLineViewController implements CommentableView {
 	}
 	private int countRecitingChords() {
 		int count = 0;
-		for (ChantChordController chord : chantChordControllers) {
-			if (chord instanceof RecitingChord) {
+		for (ChordViewController chord : chordViewControllers) {
+			if (chord instanceof RecitingChordView) {
 				count++;
 			}
 		}
@@ -212,7 +212,7 @@ public class ChantLineViewController implements CommentableView {
 	}
 	private int countEndChords() {
 		int result = 0;
-		for (ChantChordController chord : chantChordControllers) {
+		for (ChordViewController chord : chordViewControllers) {
 			if (chord.getColor() == MainApp.END_CHORD_COLOR) {
 				result++;
 			}
@@ -224,16 +224,16 @@ public class ChantLineViewController implements CommentableView {
 		return mainPane;
 	}
 
-	private void addChord(int position, ChantChordController other_controller) throws IOException {
+	private void addChord(int position, ChordViewController other_controller) throws IOException {
 		// Load layout from fxml file
 		FXMLLoader loader = new FXMLLoader();
 		loader.setControllerFactory(aClass -> other_controller);
-		loader.setLocation(MainApp.class.getResource("chantChordView.fxml"));
+		loader.setLocation(MainApp.class.getResource("ChordView.fxml"));
 
 		AnchorPane chordPane = loader.load();
-		ChantChordController controller = loader.getController();
+		ChordViewController controller = loader.getController();
 
-		chantChordControllers.add(position, controller);
+		chordViewControllers.add(position, controller);
 		chordBox.getChildren().add(position, chordPane);
 
 		// Drag-reordering behavior
@@ -319,19 +319,19 @@ public class ChantLineViewController implements CommentableView {
 
 				int sourceIndex = chordBox.getChildren().indexOf(draggingChord.get());
 				int hoveredIndex = chordBox.getChildren().indexOf(chordPane);
-				ChantChordController hoveredChord = chantChordControllers.get(hoveredIndex);
-				ChantChordController otherChord = null;
-				if (sourceIndex < hoveredIndex && hoveredIndex < chantChordControllers.size() - 1) {
-					otherChord = chantChordControllers.get(hoveredIndex + 1);
+				ChordViewController hoveredChord = chordViewControllers.get(hoveredIndex);
+				ChordViewController otherChord = null;
+				if (sourceIndex < hoveredIndex && hoveredIndex < chordViewControllers.size() - 1) {
+					otherChord = chordViewControllers.get(hoveredIndex + 1);
 				} else if (sourceIndex > hoveredIndex && hoveredIndex > 0) {
-					otherChord = chantChordControllers.get(hoveredIndex - 1);
+					otherChord = chordViewControllers.get(hoveredIndex - 1);
 				} else if (sourceIndex == hoveredIndex) { // Don't accept moves with equal source and target
 					event.consume();
 					return;
 				}
 
 				// Move validation
-				if (draggingController.get() instanceof RecitingChord) {
+				if (draggingController.get() instanceof RecitingChordView) {
 					// Disallow any move that would place it (and its preps/posts) in the middle of any other main chord's preps/posts.
 					if (otherChord != null) {
 						if (otherChord.getAssociatedMainChord() == hoveredChord.getAssociatedMainChord()
@@ -341,18 +341,18 @@ public class ChantLineViewController implements CommentableView {
 							return;
 						}
 					} else {
-						if (hoveredChord instanceof EndChord) {
+						if (hoveredChord instanceof EndChordView) {
 							event.consume();
 							return;
 						}
 					}
-				} else if (draggingController.get() instanceof EndChord) {
+				} else if (draggingController.get() instanceof EndChordView) {
 					// Disallow all moves.
 					event.consume();
 					return;
-				} else if (draggingController.get() instanceof SubChord) {
+				} else if (draggingController.get() instanceof SubChordView) {
 					// Disallow any move outside its own group of preps or posts.
-					if (!(hoveredChord instanceof SubChord)
+					if (!(hoveredChord instanceof SubChordView)
 							|| hoveredChord.getClass() != draggingController.get().getClass()
 							|| hoveredChord.getAssociatedMainChord() != draggingController.get().getAssociatedMainChord()) {
 						event.consume();
@@ -372,7 +372,7 @@ public class ChantLineViewController implements CommentableView {
 		chordPane.setOnDragExited(event -> {
 			if (draggingChord.get() == null || draggingController.get() == null) return;
 
-			ChantChordController exitedChord = chantChordControllers.get(chordBox.getChildren().indexOf(chordPane));
+			ChordViewController exitedChord = chordViewControllers.get(chordBox.getChildren().indexOf(chordPane));
 			exitedChord.clearInsertionIndication();
 		});
 		chordPane.setOnDragDropped(event -> {
@@ -383,15 +383,15 @@ public class ChantLineViewController implements CommentableView {
 				int sourceIndex = chordBox.getChildren().indexOf(source);
 				int targetIndex = chordBox.getChildren().indexOf(chordPane);
 				List<Node> nodes = new ArrayList<>(chordBox.getChildren());
-				List<ChantChordController> controllers = new ArrayList<>(chantChordControllers);
+				List<ChordViewController> controllers = new ArrayList<>(chordViewControllers);
 				if (sourceIndex != targetIndex) {
 
-					int numPreps = draggingController.get() instanceof RecitingChord rDraggingChord ?
+					int numPreps = draggingController.get() instanceof RecitingChordView rDraggingChord ?
 							rDraggingChord.getPreps().size() : 0;
-					int numPosts = draggingController.get() instanceof RecitingChord rDraggingChord ?
+					int numPosts = draggingController.get() instanceof RecitingChordView rDraggingChord ?
 							rDraggingChord.getPosts().size() : 0;
 
-					ChantChordController targetController = chantChordControllers.get(targetIndex);
+					ChordViewController targetController = chordViewControllers.get(targetIndex);
 
 					int distance = 1 + numPreps + numPosts;
 
@@ -412,11 +412,11 @@ public class ChantLineViewController implements CommentableView {
 
 					chordBox.getChildren().clear();
 					chordBox.getChildren().addAll(nodes);
-					chantChordControllers.clear();
-					chantChordControllers.addAll(controllers);
+					chordViewControllers.clear();
+					chordViewControllers.addAll(controllers);
 
-					if (draggingController.get() instanceof SubChord draggingChord
-							&& targetController instanceof SubChord targetChord)
+					if (draggingController.get() instanceof SubChordView draggingChord
+							&& targetController instanceof SubChordView targetChord)
 						draggingController.get().getAssociatedMainChord().rotatePrepsOrPosts(
 								draggingChord, targetChord);
 
@@ -434,18 +434,18 @@ public class ChantLineViewController implements CommentableView {
 			draggingController.set(null);
 		});
 
-		controller.setChantLineController(this);
+		controller.setChantPhraseController(this);
 		controller.setKeySignature(mainController.getKeySignature());
 
 	}
-	public RecitingChord addRecitingChord() throws IOException {
+	public RecitingChordView addRecitingChord() throws IOException {
 		if (countRecitingChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
 			return null;
 		}
 		// Add to end of lists but before any ending chords
-		int position = chantChordControllers.size() - countEndChords();
+		int position = chordViewControllers.size() - countEndChords();
 
-		RecitingChord controller = new RecitingChord();
+		RecitingChordView controller = new RecitingChordView();
 
 		addChord(position, controller);
 
@@ -453,11 +453,11 @@ public class ChantLineViewController implements CommentableView {
 
 		return controller;
 	}
-	public PrepChord addPrepChord(MainChord caller_chord, Color chord_color) throws IOException {
+	public PrepChordView addPrepChord(MainChordView caller_chord, Color chord_color) throws IOException {
 
-		int before_reciting_chord = chantChordControllers.indexOf(caller_chord);
+		int before_reciting_chord = chordViewControllers.indexOf(caller_chord);
 
-		PrepChord controller = new PrepChord();
+		PrepChordView controller = new PrepChordView();
 
 		addChord(before_reciting_chord, controller);
 
@@ -466,11 +466,11 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	public PostChord addPostChord(MainChord caller_chord, Color chord_color) throws IOException {
+	public PostChordView addPostChord(MainChordView caller_chord, Color chord_color) throws IOException {
 
-		int after_reciting_chord = chantChordControllers.indexOf(caller_chord) + 1;
+		int after_reciting_chord = chordViewControllers.indexOf(caller_chord) + 1;
 
-		PostChord controller = new PostChord();
+		PostChordView controller = new PostChordView();
 
 		addChord(after_reciting_chord, controller);
 
@@ -479,11 +479,11 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	public EndChord addEndChord() throws IOException {
+	public EndChordView addEndChord() throws IOException {
 
-		int last_position = chantChordControllers.size();
+		int last_position = chordViewControllers.size();
 
-		EndChord controller = new EndChord();
+		EndChordView controller = new EndChordView();
 
 		addChord(last_position, controller);
 
@@ -492,19 +492,19 @@ public class ChantLineViewController implements CommentableView {
 		
 		return controller;
 	}
-	public void removeChord(ChantChordController chord) {
+	public void removeChord(ChordViewController chord) {
 		chordBox.getChildren().remove(chord.getMainPane());
-		chantChordControllers.remove(chord);
+		chordViewControllers.remove(chord);
 		recalcCHNames();
 	}
 	private void removeEndingChords() {
-		List<ChantChordController> chordsToDelete = new ArrayList<>();
-		for (ChantChordController chord : chantChordControllers) {
-			if (chord instanceof EndChord) {
+		List<ChordViewController> chordsToDelete = new ArrayList<>();
+		for (ChordViewController chord : chordViewControllers) {
+			if (chord instanceof EndChordView) {
 				chordsToDelete.add(chord);
 			}
 		}
-		for (ChantChordController chord : chordsToDelete) {
+		for (ChordViewController chord : chordsToDelete) {
 			chord.delete();
 		}
 	}
@@ -534,8 +534,8 @@ public class ChantLineViewController implements CommentableView {
 	
 	private void recalcCHNames() {
 		int currentNumber = 0;
-		for (ChantChordController chantChord : chantChordControllers) {
-			if (chantChord instanceof RecitingChord rChord) {
+		for (ChordViewController chantChord : chordViewControllers) {
+			if (chantChord instanceof RecitingChordView rChord) {
                 rChord.setNumber(currentNumber + 1);
                 rChord.setColor(MainApp.CHORD_COLORS[currentNumber]);
 				currentNumber++;
@@ -548,13 +548,13 @@ public class ChantLineViewController implements CommentableView {
 	}
 	
 	void setKeySignature(String new_key) {
-		for (ChantChordController chord : chantChordControllers) {
+		for (ChordViewController chord : chordViewControllers) {
 			chord.setKeySignature(new_key);
 		}
 	}
 
 	void refreshAllChordPreviews() {
-		for (ChantChordController chord : chantChordControllers) {
+		for (ChordViewController chord : chordViewControllers) {
 			chord.refreshChordPreview();
 		}
 	}
@@ -570,13 +570,13 @@ public class ChantLineViewController implements CommentableView {
 	}
 	
 	@FXML public void delete() {
-		mainController.removeChantLine(this);
+		mainController.removeChantPhrase(this);
 	}
 	@FXML public void moveUp() {
-		mainController.chantLineUp(this);
+		mainController.chantPhraseUp(this);
 	}
 	@FXML public void moveDown() {
-		mainController.chantLineDown(this);
+		mainController.chantPhraseDown(this);
 	}
 	@FXML public void toggleFirstRepeated() {
 		edited();
@@ -642,7 +642,7 @@ public class ChantLineViewController implements CommentableView {
 	@FXML private void handlePlay() {
 		new Thread(() -> {
 
-			for (ChantChordController controller : chantChordControllers) {
+			for (ChordViewController controller : chordViewControllers) {
 				controller.playMidi();
 
 				try {
@@ -691,18 +691,18 @@ public class ChantLineViewController implements CommentableView {
 	}
 
 	public ChantPhrase generatePhraseModel() {
-		List<ChantChord> chords = new ArrayList<>();
-		for (ChantChordController chordController : chantChordControllers) {
-			if (chordController instanceof MainChord mc) {
-				ChantChord currentMain = mc.generateChordModel();
+		List<Chord> chords = new ArrayList<>();
+		for (ChordViewController chordController : chordViewControllers) {
+			if (chordController instanceof MainChordView mc) {
+				Chord currentMain = mc.generateChordModel();
 				chords.add(currentMain);
-				for (PrepChord prep : mc.getPreps()) {
-					ChantChord prepModel = prep.generateChordModel();
+				for (PrepChordView prep : mc.getPreps()) {
+					Chord prepModel = prep.generateChordModel();
 					chords.add(prepModel);
 					currentMain.addPrep(prepModel);
 				}
-				for (PostChord post : mc.getPosts()) {
-					ChantChord postModel = post.generateChordModel();
+				for (PostChordView post : mc.getPosts()) {
+					Chord postModel = post.generateChordModel();
 					chords.add(postModel);
 					currentMain.addPost(postModel);
 				}

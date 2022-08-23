@@ -3,8 +3,8 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
-import com.tac550.tonewriter.model.ChantChord;
-import com.tac550.tonewriter.model.MainChord;
+import com.tac550.tonewriter.model.Chord;
+import com.tac550.tonewriter.model.MainChordView;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -28,9 +28,9 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
-public abstract class ChantChordController implements CommentableView {
+public abstract class ChordViewController implements CommentableView {
 	
-	protected ChantLineViewController chantLineController;
+	protected ChantPhraseViewController chantPhraseController;
 
 	private File midiFile;
 	
@@ -43,7 +43,7 @@ public abstract class ChantChordController implements CommentableView {
 	private TextField lastFocusedField;
 	private String lastFocusedContents;
 
-	private static final Image noLilyPondImage = new Image(Objects.requireNonNull(ChantChordController.class.getResource("/media/NoLilyPondMessage.png")).toExternalForm());
+	private static final Image noLilyPondImage = new Image(Objects.requireNonNull(ChordViewController.class.getResource("/media/NoLilyPondMessage.png")).toExternalForm());
 	
 	@FXML private AnchorPane mainPane;
 	
@@ -62,7 +62,7 @@ public abstract class ChantChordController implements CommentableView {
 		// Fields
 		for (TextField field : new TextField[] {SField, AField, TField, BField}) {
 			// Listening for user-generated edits to the part fields.
-			field.textProperty().addListener((ov, oldVal, newVal) -> chantLineController.edited());
+			field.textProperty().addListener((ov, oldVal, newVal) -> chantPhraseController.edited());
 			field.focusedProperty().addListener((ov, oldVal, newVal) -> {
 				if (!newVal) { // Re-render when focus switched away only if the contents of this field changed
 					if (lastFocusedField == field && !field.getText().equals(lastFocusedContents)) {
@@ -102,8 +102,8 @@ public abstract class ChantChordController implements CommentableView {
 
 	}
 	
-	void setChantLineController(ChantLineViewController parent) {
-		chantLineController = parent;
+	void setChantPhraseController(ChantPhraseViewController parent) {
+		chantPhraseController = parent;
 		
 		if (!MainApp.lilyPondAvailable()) return;
 		
@@ -155,7 +155,7 @@ public abstract class ChantChordController implements CommentableView {
 	public void setComment(String comment) {
 		if (commentString.equals(comment)) return;
 
-		chantLineController.edited();
+		chantPhraseController.edited();
 		commentString = TWUtils.decodeNewLines(comment);
 		if (!comment.isEmpty()) {
 			applyCommentGraphic(activeBubbleImage);
@@ -170,7 +170,7 @@ public abstract class ChantChordController implements CommentableView {
 
 	@FXML void refreshChordPreview() {
 
-		if (chantLineController.isLoadingTone()) return; // Avoid unnecessary refreshes while loading a tone
+		if (chantPhraseController.isLoadingTone()) return; // Avoid unnecessary refreshes while loading a tone
 
 		if (!MainApp.lilyPondAvailable()) {
 			playButton.setDisable(true);
@@ -191,18 +191,18 @@ public abstract class ChantChordController implements CommentableView {
 	}
 
 	@FXML private void addPrepChord() throws IOException {
-		if (this instanceof MainChord thisMainChord) {
+		if (this instanceof MainChordView thisMainChord) {
 			thisMainChord.addPrepChord();
 		}
 	}
 	@FXML private void addPostChord() throws IOException {
-		if (this instanceof MainChord thisMainChord) {
+		if (this instanceof MainChordView thisMainChord) {
 			thisMainChord.addPostChord();
 		}
 	}
 
 	@FXML public void remove() {
-		chantLineController.edited();
+		chantPhraseController.edited();
 		delete();
 	}
 	public abstract void delete(); // Deletes this chord and its associated preps and posts.
@@ -267,7 +267,7 @@ public abstract class ChantChordController implements CommentableView {
 		// Set or reset highlight colors
 		setMainElementsColor(highlighted ? new Color(0.922, 0.286, 0.035, 0) : chordColor);
 		// Set scroll position
-		if (highlighted) chantLineController.scrollChordIntoView(mainPane);
+		if (highlighted) chantPhraseController.scrollChordIntoView(mainPane);
 	}
 
 	void indicateInsertionLeft() {
@@ -280,11 +280,11 @@ public abstract class ChantChordController implements CommentableView {
 		setMainElementsColor(chordColor);
 	}
 
-	public abstract MainChord getAssociatedMainChord();
+	public abstract MainChordView getAssociatedMainChord();
 
-	public ChantChord generateChordModel() {
+	public Chord generateChordModel() {
 		String[] fields = getFields().replace("-", " - ").split("-");
-		return new ChantChord.ChantChordBuilder().name(getName()).comment(getEncodedComment()).soprano(fields[0].trim())
+		return new Chord.ChordBuilder().name(getName()).comment(getEncodedComment()).soprano(fields[0].trim())
 				.alto(fields[1].trim()).tenor(fields[2].trim()).bass(fields[3].trim()).buildChord();
 	}
 }

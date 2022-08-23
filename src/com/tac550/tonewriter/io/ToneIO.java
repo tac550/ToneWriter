@@ -1,6 +1,6 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.ChantChord;
+import com.tac550.tonewriter.model.Chord;
 import com.tac550.tonewriter.model.ChantPhrase;
 import com.tac550.tonewriter.model.Tone;
 import com.tac550.tonewriter.util.TWUtils;
@@ -126,16 +126,16 @@ public class ToneIO {
 			// Triple newlines delimit sections
 			String[] sections = fileStringBuilder.toString().split("\\r?\\n\\r?\\n\\r?\\n");
 			String[] header;
-			String[] chantLineStrings;
+			String[] chantPhraseStrings;
 			String[] footer;
 			if (sections.length == 3) {
 				header = sections[0].split("\\r?\\n");
 				// Double newlines delimit chant lines
-				chantLineStrings = sections[1].split("\\r?\\n\\r?\\n");
+				chantPhraseStrings = sections[1].split("\\r?\\n\\r?\\n");
 				footer = sections[2].split("\\r?\\n");
 			} else {
 				header = sections[0].split("\\r?\\n");
-				chantLineStrings = null;
+				chantPhraseStrings = null;
 				footer = null;
 			}
 
@@ -171,9 +171,9 @@ public class ToneIO {
 			}
 
 			List<ChantPhrase> phrases = new ArrayList<>();
-			if (chantLineStrings != null) {
-				for (String line : chantLineStrings)
-					phrases.add(loadChantLine(line));
+			if (chantPhraseStrings != null) {
+				for (String line : chantPhraseStrings)
+					phrases.add(loadChantPhrase(line));
 			}
 			toneBuilder.chantPhrases(phrases);
 
@@ -188,31 +188,31 @@ public class ToneIO {
 
 		return toneBuilder.buildTone();
 	}
-	private static ChantPhrase loadChantLine(String chant_line) {
+	private static ChantPhrase loadChantPhrase(String chant_line) {
 		ChantPhrase.ChantPhraseBuilder phraseBuilder = new ChantPhrase.ChantPhraseBuilder();
-		List<ChantChord> chords = new ArrayList<>();
-		try (Scanner chantLineScanner = new Scanner(chant_line)) {
-			String chantLineLine;
+		List<Chord> chords = new ArrayList<>();
+		try (Scanner phraseScanner = new Scanner(chant_line)) {
+			String chantPhraseLine;
 
-			phraseBuilder.name(chantLineScanner.nextLine());
+			phraseBuilder.name(phraseScanner.nextLine());
 
-			ChantChord currentMainChord = null;
+			Chord currentMainChord = null;
 
-			while (chantLineScanner.hasNextLine() && (chantLineLine = chantLineScanner.nextLine()) != null) {
+			while (phraseScanner.hasNextLine() && (chantPhraseLine = phraseScanner.nextLine()) != null) {
 				// Apply chant line comment
-				if (chantLineLine.startsWith("Comment: ")) {
-					String[] commentData = chantLineLine.split(": ");
+				if (chantPhraseLine.startsWith("Comment: ")) {
+					String[] commentData = chantPhraseLine.split(": ");
 					phraseBuilder.comment(extractComment(commentData, 1));
 
 					continue;
 				}
 
-				String[] chordData = chantLineLine.split(": ");
+				String[] chordData = chantPhraseLine.split(": ");
 				String fields = chordData[1];
 				String[] parts = fields.split("-");
 				String comment = extractComment(chordData, 2);
 
-				ChantChord.ChantChordBuilder chordBuilder = new ChantChord.ChantChordBuilder();
+				Chord.ChordBuilder chordBuilder = new Chord.ChordBuilder();
 				chordBuilder.name(chordData[0].trim().replace("END", "End"));
 				chordBuilder.soprano(parts[0]);
 				chordBuilder.alto(parts[1]);
@@ -220,7 +220,7 @@ public class ToneIO {
 				chordBuilder.bass(parts[3]);
 				chordBuilder.comment(comment);
 
-				ChantChord currentChord = chordBuilder.buildChord();
+				Chord currentChord = chordBuilder.buildChord();
 
 				// Add the appropriate chord type.
 				if (chordData[0].contains("Post")) {

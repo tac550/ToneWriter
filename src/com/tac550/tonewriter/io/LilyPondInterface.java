@@ -4,7 +4,7 @@ import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.ChantChordController;
+import com.tac550.tonewriter.view.ChordViewController;
 import com.tac550.tonewriter.view.ExportMenu;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.application.Platform;
@@ -49,14 +49,14 @@ public class LilyPondInterface {
 
 	// Fields for chord preview rendering system
 	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
-	private static final Map<String, List<ChantChordController>> pendingChordControllers = new HashMap<>();
+	private static final Map<String, List<ChordViewController>> pendingChordControllers = new HashMap<>();
 
 	private static File lastLilypondFile;
 	private static Process lastExportProcess;
 	private static boolean exportCancelled = false;
 
 	// Renders chord previews for the tone UI TODO: Decouple from UI code? (some might have to move to view controller)
-	public static void renderChord(ChantChordController chordView, String keySignature) throws IOException {
+	public static void renderChord(ChordViewController chordView, String keySignature) throws IOException {
 		final String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
 				+ keySignature.replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f ");
 		if (!uniqueChordRenders.containsKey(chordID)) {
@@ -84,7 +84,7 @@ public class LilyPondInterface {
 			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
 			executeLilyPondRender(lilypondFile, true, () -> {
 				uniqueChordRenders.put(chordID, results);
-				for (ChantChordController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>()))
+				for (ChordViewController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>()))
 					controller.setMediaFiles(uniqueChordRenders.get(chordID));
 
 				pendingChordControllers.remove(chordID);
@@ -411,7 +411,7 @@ public class LilyPondInterface {
 
 	private static float generateNotatedLine(String[] parts, List<AssignmentSyllable> syllableList, StringBuilder verseLine,
 	                                         boolean disableLineBreaks, AssignmentLine al) {
-		List<ChantChord> inOrderChords = al.getSelectedChantPhrase().getChordsMelodyOrder(); // TODO: This seems inefficient. It gets done for every verse line but concerns only chant lines.
+		List<Chord> inOrderChords = al.getSelectedChantPhrase().getChordsMelodyOrder(); // TODO: This seems inefficient. It gets done for every verse line but concerns only chant lines.
 
 		float measureBeats = 0;
 		int breakCount = 0;
@@ -623,7 +623,7 @@ public class LilyPondInterface {
 		return measureBeats;
 	}
 
-	private static String getNoteAndDuration(AssignedChordData chord, List<ChantChord> chords_in_order, int part) {
+	private static String getNoteAndDuration(AssignedChordData chord, List<Chord> chords_in_order, int part) {
 		return adjustOctave(chords_in_order.get(chord.getChordIndex()).getPart(part),
 				PART_ADJUSTMENTS[part]) + chord.getDuration();
 	}

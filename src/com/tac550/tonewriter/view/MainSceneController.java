@@ -105,11 +105,11 @@ public class MainSceneController {
 		: MainApp.getPlatformSpecificInitialChooserDir();
 
 	@FXML private ScrollPane toneScrollPane;
-	@FXML private VBox chantLineBox;
-	private final List<ChantLineViewController> chantLineControllers = new ArrayList<>();
+	@FXML private VBox chantPhraseBox;
+	private final List<ChantPhraseViewController> chantPhraseControllers = new ArrayList<>();
 	private boolean loadingTone = false;
 
-	private final List<ChantLineViewController> mainChantLines = new ArrayList<>();
+	private final List<ChantPhraseViewController> mainChantPhrases = new ArrayList<>();
 
 	@FXML private VBox verseLineBox;
 	private final List<VerseLineViewController> verseLineControllers = new ArrayList<>();
@@ -245,15 +245,15 @@ public class MainSceneController {
 
 		return loaderTask;
 	}
-	public Task<FXMLLoader> createChantLine(int index, boolean recalculateNames) {
-		return FXMLLoaderIO.loadFXMLLayoutAsync("chantLineView.fxml", loader -> {
-			ChantLineViewController controller = loader.getController();
-			GridPane chantLineLayout = loader.getRoot();
+	public Task<FXMLLoader> createChantPhrase(int index, boolean recalculateNames) {
+		return FXMLLoaderIO.loadFXMLLayoutAsync("ChantPhraseView.fxml", loader -> {
+			ChantPhraseViewController controller = loader.getController();
+			GridPane phraseLayout = loader.getRoot();
 			controller.setMainController(this);
 
-			chantLineControllers.add(index, controller);
+			chantPhraseControllers.add(index, controller);
 			Platform.runLater(() -> {
-				chantLineBox.getChildren().add(index, chantLineLayout);
+				chantPhraseBox.getChildren().add(index, phraseLayout);
 				if (recalculateNames) recalcCLNames();
 			});
 		});
@@ -285,36 +285,36 @@ public class MainSceneController {
 		boolean previousWasPrime = false;
 		int nextAlternate = 1;
 		char currentLetter = 65;
-		ChantLineViewController prevMainLine = null;
-		mainChantLines.clear();
+		ChantPhraseViewController prevMainLine = null;
+		mainChantPhrases.clear();
 
-		for (ChantLineViewController chantLine : chantLineControllers) {
-			if (chantLineControllers.get(chantLineControllers.size()-1) != chantLine) { // If not the last
-				chantLine.setName(currentLetter, previousWasPrime, nextAlternate);
+		for (ChantPhraseViewController chantPhrase : chantPhraseControllers) {
+			if (chantPhraseControllers.get(chantPhraseControllers.size()-1) != chantPhrase) { // If not the last
+				chantPhrase.setName(currentLetter, previousWasPrime, nextAlternate);
 				previousWasPrime = false;
 
-				chantLine.setNumAlts(0);
-				chantLine.setHasPrime(false);
+				chantPhrase.setNumAlts(0);
+				chantPhrase.setHasPrime(false);
 
-				if (chantLine.getIsPrime()) { // Prime chant line
+				if (chantPhrase.isPrime()) { // Prime chant line
 					if (prevMainLine != null)
 						prevMainLine.setHasPrime(true);
 
 					previousWasPrime = true;
-				} else if (chantLine.getIsAlternate()) { // Alternate chant line
+				} else if (chantPhrase.isAlternate()) { // Alternate chant line
 					nextAlternate++;
 				} else { // Normal chant line
 					if (prevMainLine != null)
 						prevMainLine.setNumAlts(nextAlternate - 1);
 
-					prevMainLine = chantLine;
-					mainChantLines.add(chantLine);
+					prevMainLine = chantPhrase;
+					mainChantPhrases.add(chantPhrase);
 
 					nextAlternate = 1;
 					currentLetter++;
 				}
 			} else {
-				chantLine.makeFinal();
+				chantPhrase.makeFinal();
 				// If this is not the only chant line...
 				if (prevMainLine != null)
 					prevMainLine.setNumAlts(nextAlternate - 1);
@@ -353,10 +353,10 @@ public class MainSceneController {
 
 				// Default last chant line selection to Final Phrase.
 				if (isLastVerseLineOfSection(verseLine)) {
-					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]),
-							chantLineControllers.size() - 1);
+					verseLine.setPhraseChoices(chantPhraseControllers.toArray(new ChantPhraseViewController[0]),
+							chantPhraseControllers.size() - 1);
 				} else {
-					verseLine.setChantLines(chantLineControllers.toArray(new ChantLineViewController[0]));
+					verseLine.setPhraseChoices(chantPhraseControllers.toArray(new ChantPhraseViewController[0]));
 				}
 			}
 
@@ -366,42 +366,42 @@ public class MainSceneController {
 			int CLNum = 0; // For retrieving proper chant line
 			for (int VLNum = 0; VLNum < verseLineControllers.size(); VLNum++) {
 				// Correct counter overflow for the chant line list (there will usually be more verse lines than chant lines)
-				if (CLNum == mainChantLines.size()) {
+				if (CLNum == mainChantPhrases.size()) {
 					CLNum = firstRepeated;
 
 					// If there are no main chant lines, use the Final Phrase.
-					if (mainChantLines.isEmpty()) {
-						verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
+					if (mainChantPhrases.isEmpty()) {
+						verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.get(chantPhraseControllers.size()-1)});
 						continue;
 					}
 				}
 
-				ChantLineViewController currentChantLine = mainChantLines.get(CLNum);
+				ChantPhraseViewController currentPhrase = mainChantPhrases.get(CLNum);
 
 				// If it's the last line before the end or a separator, it gets the Final Phrase.
 				if (isLastVerseLineOfSection(verseLineControllers.get(VLNum))) {
-					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {chantLineControllers.get(chantLineControllers.size()-1)});
+					verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.get(chantPhraseControllers.size()-1)});
 					CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
 					VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
 					continue;
 					// If it's the second-to-last line before the end or a separator, it gets prime, if any.
-				} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentChantLine.getHasPrime()) {
-					verseLineControllers.get(VLNum).setChantLines(new ChantLineViewController[] {
-							chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + 1 + currentChantLine.getNumAlts())});
+				} else if ((VLNum + 2 == verseLineControllers.size() || verseLineControllers.get(VLNum + 2).isSeparator()) && currentPhrase.getHasPrime()) {
+					verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {
+							chantPhraseControllers.get(chantPhraseControllers.indexOf(currentPhrase) + 1 + currentPhrase.getNumAlts())});
 					continue;
 				}
 
 				// Save the index of the first-repeated chant line, on the first encounter only.
-				if (firstRepeated == 0 && currentChantLine.getFirstRepeated())
+				if (firstRepeated == 0 && currentPhrase.isFirstRepeated())
 					firstRepeated = CLNum;
 
 				// For normal cases do this.
-				if (!currentChantLine.getIsPrime() && !currentChantLine.getIsAlternate()) {
-					ChantLineViewController[] associatedControllers = new ChantLineViewController[currentChantLine.getNumAlts() + 1];
-					associatedControllers[0] = currentChantLine;
+				if (!currentPhrase.isPrime() && !currentPhrase.isAlternate()) {
+					ChantPhraseViewController[] associatedControllers = new ChantPhraseViewController[currentPhrase.getNumAlts() + 1];
+					associatedControllers[0] = currentPhrase;
 					for (int i = 1; i < associatedControllers.length; i++)
-						associatedControllers[i] = chantLineControllers.get(chantLineControllers.indexOf(currentChantLine) + i);
-					verseLineControllers.get(VLNum).setChantLines(associatedControllers);
+						associatedControllers[i] = chantPhraseControllers.get(chantPhraseControllers.indexOf(currentPhrase) + i);
+					verseLineControllers.get(VLNum).setPhraseChoices(associatedControllers);
 				} else {
 					// Do another go-around on the same verse line but with the next chant line.
 					VLNum--;
@@ -416,9 +416,9 @@ public class MainSceneController {
 				|| verseLineControllers.get(verseLineControllers.indexOf(line) + 1).isSeparator());
 	}
 
-	public void clearChantLines() {
-		chantLineControllers.clear();
-		chantLineBox.getChildren().clear();
+	public void clearChantPhrases() {
+		chantPhraseControllers.clear();
+		chantPhraseBox.getChildren().clear();
 	}
 
 	private void clearVerseLines() {
@@ -638,7 +638,7 @@ public class MainSceneController {
 	 */
 	void handleNewTone() {
 		if (checkSaveTone() && createNewTone()) {
-			clearChantLines();
+			clearChantPhrases();
 			toneMenuState.editOptionsDisabled = false;
 			toneMenuState.saveToneAsMenuItemDisabled = false;
 
@@ -647,7 +647,7 @@ public class MainSceneController {
 			keySignature = "C major";
 			toneMenuState.manualCLAssignmentSelected = false;
 
-			Task<FXMLLoader> loaderTask = createChantLine(0, true);
+			Task<FXMLLoader> loaderTask = createChantPhrase(0, true);
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
@@ -814,17 +814,17 @@ public class MainSceneController {
 	}
 
 	private void refreshChordKeySignatures(String key) {
-		for (ChantLineViewController chantLineController : chantLineControllers)
-	    	chantLineController.setKeySignature(key);
+		for (ChantPhraseViewController chantPhrase : chantPhraseControllers)
+	    	chantPhrase.setKeySignature(key);
 	}
 	void refreshChordPreviews() {
-		for (ChantLineViewController chantLineController : chantLineControllers)
-			chantLineController.refreshAllChordPreviews();
+		for (ChantPhraseViewController chantPhrase : chantPhraseControllers)
+			chantPhrase.refreshAllChordPreviews();
 	}
 
-	public void removeChantLine(ChantLineViewController chantLineViewController) {
-		chantLineBox.getChildren().remove(chantLineViewController.getMainPane());
-		chantLineControllers.remove(chantLineViewController);
+	public void removeChantPhrase(ChantPhraseViewController chantPhrase) {
+		chantPhraseBox.getChildren().remove(chantPhrase.getMainPane());
+		chantPhraseControllers.remove(chantPhrase);
 		recalcCLNames();
 	}
 	void removeVerseLine(VerseLineViewController verseLineViewController) {
@@ -845,25 +845,25 @@ public class MainSceneController {
 
 		syncCVLMapping();
 	}
-	void chantLineUp(ChantLineViewController chantLineViewController) {
-		int i = chantLineControllers.indexOf(chantLineViewController);
+	void chantPhraseUp(ChantPhraseViewController chantPhraseViewController) {
+		int i = chantPhraseControllers.indexOf(chantPhraseViewController);
 		int j = i-1;
 
-		ObservableList<Node> workingCollection = FXCollections.observableArrayList(chantLineBox.getChildren());
+		ObservableList<Node> workingCollection = FXCollections.observableArrayList(chantPhraseBox.getChildren());
 		Collections.swap(workingCollection, i, j);
-		chantLineBox.getChildren().setAll(workingCollection);
-		Collections.swap(chantLineControllers, i, j);
+		chantPhraseBox.getChildren().setAll(workingCollection);
+		Collections.swap(chantPhraseControllers, i, j);
 
 		recalcCLNames();
 	}
-	void chantLineDown(ChantLineViewController chantLineViewController) {
-		int i = chantLineControllers.indexOf(chantLineViewController);
+	void chantPhraseDown(ChantPhraseViewController chantPhraseViewController) {
+		int i = chantPhraseControllers.indexOf(chantPhraseViewController);
 		int j = i + 1;
 
-		ObservableList<Node> workingCollection = FXCollections.observableArrayList(chantLineBox.getChildren());
+		ObservableList<Node> workingCollection = FXCollections.observableArrayList(chantPhraseBox.getChildren());
 		Collections.swap(workingCollection, i, j);
-		chantLineBox.getChildren().setAll(workingCollection);
-		Collections.swap(chantLineControllers, i, j);
+		chantPhraseBox.getChildren().setAll(workingCollection);
+		Collections.swap(chantPhraseControllers, i, j);
 
 		recalcCLNames();
 	}
@@ -875,7 +875,7 @@ public class MainSceneController {
 
 		// If tone is empty, clear all lines and return.
 		if (tone.getChantPhrases().size() < 1) {
-			clearChantLines();
+			clearChantPhrases();
 			return true;
 		}
 
@@ -886,14 +886,14 @@ public class MainSceneController {
 				if (!tone.getChantPhrases().get(i).toString().replaceAll("\\s+", "")
 						.equals(currentTone.getChantPhrases().get(i).toString().replaceAll("\\s+", ""))) {
 					// If the lines are not identical, modify to match new values.
-					modifyChantLine(tone.getChantPhrases().get(i), chantLineControllers.get(i));
+					modifyChantPhrase(chantPhraseControllers.get(i), tone.getChantPhrases().get(i));
 				}
 			}
 		} else { // Tones don't have the same structure. do a full reload.
-			clearChantLines();
+			clearChantPhrases();
 			for (int i = 0; i < tone.getChantPhrases().size(); i++) {
 				try {
-					loadCLineIntoUI(i, tone.getChantPhrases().get(i));
+					loadChantPhraseIntoUI(i, tone.getChantPhrases().get(i));
 				} catch (IOException e) {
 					e.printStackTrace();
 					return false;
@@ -907,51 +907,51 @@ public class MainSceneController {
 
 		return true;
 	}
-	private void loadCLineIntoUI(int index, ChantPhrase chant_line) throws IOException {
-		ChantLineViewController currentChantLine = null;
+	private void loadChantPhraseIntoUI(int index, ChantPhrase phrase) throws IOException {
+		ChantPhraseViewController newPhraseUI = null;
 
-		Task<FXMLLoader> currentChantLineLoader = createChantLine(index, false);
+		Task<FXMLLoader> currentPhraseUILoader = createChantPhrase(index, false);
 		try {
-			currentChantLine = currentChantLineLoader.get().getController();
+			newPhraseUI = currentPhraseUILoader.get().getController();
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
-		assert currentChantLine != null;
+		assert newPhraseUI != null;
 
 		// CL type parsing
-		if (chant_line.getName().contains("'"))
-			currentChantLine.makePrime();
-		else if (chant_line.getName().contains("alt"))
-			currentChantLine.makeAlternate();
+		if (phrase.getName().contains("'"))
+			newPhraseUI.makePrime();
+		else if (phrase.getName().contains("alt"))
+			newPhraseUI.makeAlternate();
 
-		currentChantLine.setComment(chant_line.getComment());
+		newPhraseUI.setComment(phrase.getComment());
 
-		MainChord currentMainChord = null;
+		MainChordView currentMainChord = null;
 
-		for (ChantChord chord : chant_line.getChords()) {
-			ChantChordController newChord = null;
+		for (Chord chord : phrase.getChords()) {
+			ChordViewController newChordUI = null;
 
 			if (chord.getName().matches("\\d")) {
-				currentMainChord = currentChantLine.addRecitingChord();
-				newChord = currentMainChord;
+				currentMainChord = newPhraseUI.addRecitingChord();
+				newChordUI = currentMainChord;
 			} else if (chord.getName().contains("Post")) {
 				assert currentMainChord != null;
-				newChord = currentMainChord.addPostChord();
+				newChordUI = currentMainChord.addPostChord();
 			} else if (chord.getName().contains("Prep")) {
 				assert currentMainChord != null;
-				newChord = currentMainChord.addPrepChord();
+				newChordUI = currentMainChord.addPrepChord();
 			} else if (chord.getName().contains("End")) {
-				currentMainChord = currentChantLine.addEndChord();
-				newChord = currentMainChord;
+				currentMainChord = newPhraseUI.addEndChord();
+				newChordUI = currentMainChord;
 			}
-			assert newChord != null;
-			newChord.setFields(chord.getFields());
-			newChord.setComment(chord.getComment());
+			assert newChordUI != null;
+			newChordUI.setFields(chord.getFields());
+			newChordUI.setComment(chord.getComment());
 		}
 	}
-	private void modifyChantLine(ChantPhrase new_line, ChantLineViewController existing_line) {
+	private void modifyChantPhrase(ChantPhraseViewController existing_line, ChantPhrase new_line) {
 		existing_line.setComment(new_line.getComment());
-		List<ChantChord> inOrderChords = new_line.getChordsMelodyOrder();
+		List<Chord> inOrderChords = new_line.getChordsMelodyOrder();
 		for (int i = 0; i < inOrderChords.size(); i++) {
 			existing_line.getChords().get(i).setComment(inOrderChords.get(i).getComment());
 			existing_line.getChords().get(i).setFields(inOrderChords.get(i).getFields());
@@ -959,13 +959,13 @@ public class MainSceneController {
 	}
 
 	void clearFirstRepeated() {
-		for (ChantLineViewController controller : chantLineControllers)
+		for (ChantPhraseViewController controller : chantPhraseControllers)
 			controller.resetFRState();
 	}
 	public void setFirstRepeated(String chant_line_letter) {
-		for (ChantLineViewController chantLine : chantLineControllers) {
-			if (chantLine.getName().contains(chant_line_letter))
-				chantLine.toggleFirstRepeated();
+		for (ChantPhraseViewController chantPhrase : chantPhraseControllers) {
+			if (chantPhrase.getName().contains(chant_line_letter))
+				chantPhrase.toggleFirstRepeated();
 		}
 	}
 
@@ -1265,9 +1265,9 @@ public class MainSceneController {
 	public Tone generateToneModel() {
 		List<ChantPhrase> chantPhrases = new ArrayList<>();
 		String firstRepeated = "";
-		for (ChantLineViewController cl : chantLineControllers) {
+		for (ChantPhraseViewController cl : chantPhraseControllers) {
 			chantPhrases.add(cl.generatePhraseModel());
-			if (cl.getFirstRepeated())
+			if (cl.isFirstRepeated())
 				firstRepeated = TWUtils.shortenPhraseName(cl.getName());
 		}
 		return new Tone.ToneBuilder().keySignature(keySignature).toneText(leftText).composerText(rightText)

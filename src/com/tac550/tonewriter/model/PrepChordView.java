@@ -2,18 +2,18 @@ package com.tac550.tonewriter.model;
 
 import javafx.fxml.FXML;
 
-public class PostChord extends SubChord {
+public class PrepChordView extends SubChordView {
 
 	@FXML protected void initialize() {
 		super.initialize();
-		numText.setText("Post");
+		numText.setText("Prep");
 		disableButtons();
 	}
 
 	@Override
 	public void delete() {
-		getAssociatedMainChord().getPosts().remove(this);
-		chantLineController.removeChord(this);
+		getAssociatedMainChord().getPreps().remove(this);
+		chantPhraseController.removeChord(this);
 	}
 
 }

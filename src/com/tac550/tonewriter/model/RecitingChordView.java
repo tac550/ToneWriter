@@ -2,7 +2,7 @@ package com.tac550.tonewriter.model;
 
 import javafx.scene.paint.Color;
 
-public class RecitingChord extends MainChord {
+public class RecitingChordView extends MainChordView {
 
 	public void setNumber(int number) {
 		numText.setText(String.valueOf(number));
@@ -12,9 +12,9 @@ public class RecitingChord extends MainChord {
 	public void setColor(Color color) {
 		super.setColor(color);
 
-		for (PrepChord chord : prepChords) {
+		for (PrepChordView chord : prepChords) {
 			chord.setColor(color);
-		} for (PostChord chord : postChords) {
+		} for (PostChordView chord : postChords) {
 			chord.setColor(color);
 		}
 	}

@@ -505,8 +505,8 @@ public class TopSceneController {
 	/*
 	 * Edit Menu Actions
 	 */
-	@FXML private void handleCreateChantLine() {
-		getSelectedTabScene().createChantLine(0, true);
+	@FXML private void handleCreateChantPhrase() {
+		getSelectedTabScene().createChantPhrase(0, true);
 	}
 	@FXML private void handleSetKeySignature() {
 		getSelectedTabScene().handleSetKeySignature();

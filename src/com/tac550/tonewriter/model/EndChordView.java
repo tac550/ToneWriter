@@ -2,7 +2,7 @@ package com.tac550.tonewriter.model;
 
 import javafx.fxml.FXML;
 
-public class EndChord extends MainChord {
+public class EndChordView extends MainChordView {
 
 	@FXML protected void initialize() {
 		super.initialize();
