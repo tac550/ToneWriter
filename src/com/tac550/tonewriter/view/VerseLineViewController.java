@@ -360,7 +360,7 @@ public class VerseLineViewController {
 
 		for (SyllableText text : action.syllableTexts) {
 			text.removeLastChord();
-			text.reactivate();
+			text.activate();
 		}
 
 		lastSyllableAssigned = action.previousLastSyllableAssigned;
@@ -403,19 +403,19 @@ public class VerseLineViewController {
 
 			if (!(getCurrentChord() instanceof RecitingChordView)) {
 				if (nextChordIndex == 1) { // If no chords have been assigned yet...
-					((SyllableText) lineTextFlow.getChildren().get(0)).reactivate(); // Activate only the first syllable.
+					((SyllableText) lineTextFlow.getChildren().get(0)).activate(); // Activate only the first syllable.
 				} else {
 					// Activate current syllable.
-					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).reactivate();
+					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).activate();
 					if (lastSyllableAssigned < lineTextFlow.getChildren().size() - 1) { // Avoid error if there is no next SyllableText
 						// Activate next syllable. (repeats above operation if lastSyllableAssigned is -1)
-						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).reactivate();
+						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).activate();
 					}
 				}
 			} else { // If current chord is a reciting (numbered) chord
 				for (int i = lastSyllableAssigned; i < lineTextFlow.getChildren().size(); i++) {
 					if (i < 0) continue; // In case we haven't assigned anything yet (lastSyllableAssigned is -1)
-					((SyllableText) lineTextFlow.getChildren().get(i)).reactivate();
+					((SyllableText) lineTextFlow.getChildren().get(i)).activate();
 				}
 			}
 

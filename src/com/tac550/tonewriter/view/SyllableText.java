@@ -160,7 +160,7 @@ public class SyllableText extends Text {
 		applyDefaultFill();
 		active = false;
 	}
-	void reactivate() {
+	void activate() {
 		applyDefaultFill();
 		active = true;
 	}
