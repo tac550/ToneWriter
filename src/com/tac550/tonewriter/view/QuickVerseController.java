@@ -55,6 +55,11 @@ public class QuickVerseController {
 	        	resultField.setText(filteredData.get(0));
 	    });
 
+		filterInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+			if (event.getCode() == KeyCode.ESCAPE)
+				handleCancel();
+		});
+
 	    // Verse list setup
 	    verseList = new ListView<>(filteredData);
 	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
