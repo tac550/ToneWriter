@@ -25,91 +25,91 @@ public class QuickVerseController {
 	@FXML private BorderPane mainPane;
 
 	@FXML private Button youThouSwitch;
-	
+
 	@FXML private TextField filterInput;
 	@FXML private TextField resultField;
 
 	private TextField targetField;
-	
+
 	private ListView<String> verseList;
-	
+
 	private final ObservableList<String> verses = FXCollections.observableArrayList();
-	
+
 	@FXML private void initialize() {
 
 		// Set text for youThouSwitch button.
 		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false))
 			youThouSwitch.setText("Switch to You/Your");
-		
-		// Filter field setup
-	    FilteredList<String> filteredData = new FilteredList<>(verses, s -> true);
-	    filterInput.textProperty().addListener(obs -> {
-	        String filter = filterInput.getText();
-	        if (filter == null || filter.isEmpty())
-	            filteredData.setPredicate(s -> true);
-	        else
-	            filteredData.setPredicate(s -> s.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT)));
 
-	        // Automatically place top filter result in result field
-	        if (filteredData.size() > 0)
-	        	resultField.setText(filteredData.get(0));
-	    });
+		// Filter field setup
+		FilteredList<String> filteredData = new FilteredList<>(verses, s -> true);
+		filterInput.textProperty().addListener(obs -> {
+			String filter = filterInput.getText();
+			if (filter == null || filter.isEmpty())
+				filteredData.setPredicate(s -> true);
+			else
+				filteredData.setPredicate(s -> s.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT)));
+
+			// Automatically place top filter result in result field
+			if (filteredData.size() > 0)
+				resultField.setText(filteredData.get(0));
+		});
 
 		filterInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 			if (event.getCode() == KeyCode.ESCAPE)
 				handleCancel();
 		});
 
-	    // Verse list setup
-	    verseList = new ListView<>(filteredData);
-	    verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
-			    resultField.setText(newVal));
-	    verseList.setOnMouseClicked((me) -> {
-	    	if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2)
-	    		handleOK();
-	    });
-	    
-	    // Verse list cell factory (for deletion context menus)
-	    verseList.setCellFactory(listV -> {
+		// Verse list setup
+		verseList = new ListView<>(filteredData);
+		verseList.getSelectionModel().selectedItemProperty().addListener((ov, oldVal, newVal) ->
+				resultField.setText(newVal));
+		verseList.setOnMouseClicked((me) -> {
+			if (me.getButton().equals(MouseButton.PRIMARY) && me.getClickCount() == 2)
+				handleOK();
+		});
 
-            ListCell<String> cell = new ListCell<>();
+		// Verse list cell factory (for deletion context menus)
+		verseList.setCellFactory(listV -> {
 
-            ContextMenu contextMenu = new ContextMenu();
+			ListCell<String> cell = new ListCell<>();
 
-            MenuItem deleteItem = new MenuItem();
-            deleteItem.textProperty().bind(Bindings.format("Remove \"%s\"", cell.itemProperty()));
-            deleteItem.setOnAction(event -> {
-            	try {
-                	// Only remove the verse if it was a custom one (QuickVerseIO.removeCustomVerse returns true)
+			ContextMenu contextMenu = new ContextMenu();
+
+			MenuItem deleteItem = new MenuItem();
+			deleteItem.textProperty().bind(Bindings.format("Remove \"%s\"", cell.itemProperty()));
+			deleteItem.setOnAction(event -> {
+				try {
+					// Only remove the verse if it was a custom one (QuickVerseIO.removeCustomVerse returns true)
 					if (QuickVerseIO.removeCustomVerse(cell.itemProperty().get()))
 						verses.remove(cell.itemProperty().get());
 					else
 						TWUtils.showAlert(AlertType.INFORMATION, "Deletion",
 								"Can't delete this verse because it's built-in.", true, getStage());
-            	} catch (IOException e) {
+				} catch (IOException e) {
 					e.printStackTrace();
 					TWUtils.showAlert(AlertType.ERROR, "Error", "IO Error while deleting verse!",
 							true, getStage());
 				}
-            });
-            contextMenu.getItems().add(deleteItem);
+			});
+			contextMenu.getItems().add(deleteItem);
 
-            cell.textProperty().bind(cell.itemProperty());
+			cell.textProperty().bind(cell.itemProperty());
 
-            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-                if (isNowEmpty)
-                    cell.setContextMenu(null);
-                else
-                    cell.setContextMenu(contextMenu);
-            });
-            return cell;
-        });
-	    
-	    // Add elements to the UI
-	    mainPane.setCenter(verseList);
-	    
-	    // Set up keyboard events
-	    EventHandler<KeyEvent> keyHandler = ke -> {
+			cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+				if (isNowEmpty)
+					cell.setContextMenu(null);
+				else
+					cell.setContextMenu(contextMenu);
+			});
+			return cell;
+		});
+
+		// Add elements to the UI
+		mainPane.setCenter(verseList);
+
+		// Set up keyboard events
+		EventHandler<KeyEvent> keyHandler = ke -> {
 			if (ke.getCode() == KeyCode.ESCAPE)
 				handleCancel();
 
@@ -119,7 +119,7 @@ public class QuickVerseController {
 			if (ke.getCode() == KeyCode.UP && verseList.getSelectionModel().isSelected(0))
 				filterInput.requestFocus();
 		};
-	    
+
 		// Set escape, enter, and up key behavior for scene and list view
 		mainPane.setOnKeyPressed(keyHandler);
 		verseList.setOnKeyPressed(keyHandler);
@@ -143,7 +143,7 @@ public class QuickVerseController {
 	void focusFilterField() {
 		filterInput.requestFocus();
 	}
-	
+
 	@FXML private void handleSwitchYouThou() {
 		if (MainApp.prefs.getBoolean(MainApp.PREFS_THOU_THY, false)) {
 			youThouSwitch.setText("Switch to Thou/Thy");
@@ -154,10 +154,10 @@ public class QuickVerseController {
 		}
 
 		filterInput.requestFocus();
-		
+
 		refreshVerses();
 	}
-	
+
 	@FXML private void handleAddToList() {
 		try {
 			if (!verses.contains(resultField.getText())) {
@@ -172,7 +172,7 @@ public class QuickVerseController {
 			TWUtils.showAlert(AlertType.ERROR, "Error", "IO Error saving verse!", true, getStage());
 		}
 	}
-	
+
 	@FXML private void handleOK() {
 		if (!resultField.getText().isEmpty()) {
 			targetField.setText(resultField.getText());
@@ -184,15 +184,15 @@ public class QuickVerseController {
 
 		closeStage();
 	}
-	
+
 	@FXML private void handleCancel() {
 		resultField.clear();
 		closeStage();
 	}
-	
+
 	private void refreshVerses() {
 		verses.clear();
-		
+
 		// Built-in verses
 		try {
 			for (String item : QuickVerseIO.getBuiltinVerses())
@@ -202,7 +202,7 @@ public class QuickVerseController {
 			verses.add("ERROR READING INTERNAL FILE");
 			e.printStackTrace();
 		}
-		
+
 		// Custom verses
 		try {
 			verses.addAll(QuickVerseIO.getCustomVerses());
@@ -210,9 +210,9 @@ public class QuickVerseController {
 			verses.add("ERROR READING EXTERNAL FILE");
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void closeStage() {
 		getStage().close();
 	}
@@ -220,5 +220,5 @@ public class QuickVerseController {
 	private Stage getStage() {
 		return (Stage) mainPane.getScene().getWindow();
 	}
-	
+
 }
