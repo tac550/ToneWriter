@@ -26,8 +26,8 @@ public class LilyPondInterface {
 	public static final String[] barStrings = new String[] {" ", ".|:", "[|:", "|", "||", ":|.|:", ":|][|:", "|.", "'", ":|.", ":|]", "!"};
 	public static final String BAR_UNCHANGED = "unchanged";
 
-	// Constants for how much to adjust notes for each part when applying relative octaves.
-	// Each ' shifts the user's input up one octave and each , shifts the same down one octave.
+	// Constants for how much to adjust notes for each part ({S, A, T, B}) when applying relative octaves.
+	// Each `'` shifts the user's input up one octave and each `,` shifts the same down one octave.
 	// Changing these will cause previously-saved tone data to be read with incorrect octaves.
 	public static final String[] PART_ADJUSTMENTS = {"'", "'", "'", ""};
 
