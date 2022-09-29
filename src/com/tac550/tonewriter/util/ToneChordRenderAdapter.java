@@ -63,8 +63,8 @@ public class ToneChordRenderAdapter {
             final String chordID = generateChordId(chord, key_sig);
 
             if (!uniqueChordRenders.containsKey(chordID)) {
-                uniqueChordRenders.put(chordID, null);
                 uniqueChordSig.put(chordID, new DoneSignal());
+                uniqueChordRenders.put(chordID, null);
                 try {
                     LilyPondInterface.renderChord(chord, key_sig, (files -> {
                         uniqueChordRenders.put(chordID, files);
