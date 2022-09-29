@@ -18,6 +18,7 @@ public class MidiInterface {
 
 	private static Sequencer sequencer = null;
 
+	// TODO: Decouple from UI
 	public static void playAssignedPhrase(SyllableText[] syllables, Button playButton, VerseLineViewController vc) {
 		if (sequencer == null) return;
 

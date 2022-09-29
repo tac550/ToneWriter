@@ -4,7 +4,7 @@ import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.DesktopInterface;
 import com.tac550.tonewriter.util.ProcessExitDetector;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.ChordViewController;
+import com.tac550.tonewriter.util.ToneChordRenderAdapter;
 import com.tac550.tonewriter.view.ExportMenu;
 import com.tac550.tonewriter.view.MainApp;
 import javafx.application.Platform;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,56 +48,30 @@ public class LilyPondInterface {
 
 	private static final int measureBreakBeatThreshold = 8;
 
-	// Fields for chord preview rendering system
-	private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
-	private static final Map<String, List<ChordViewController>> pendingChordControllers = new HashMap<>();
-
 	private static File lastLilypondFile;
 	private static Process lastExportProcess;
 	private static boolean exportCancelled = false;
 
-	// Renders chord previews for the tone UI TODO: Decouple from UI code? (some might have to move to view controller)
-	public static void renderChord(ChordViewController chordView, String keySignature) throws IOException {
-		final String chordID = chordView.getFields().replace("<", "(").replace(">", ")") + "-"
-				+ keySignature.replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f ");
-		if (!uniqueChordRenders.containsKey(chordID)) {
-			// First time we're seeing this chord
-			File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
+	public static void renderChord(Chord chord, String key_sig, Consumer<File[]> exit_tasks) throws IOException {
+		final String chordID = ToneChordRenderAdapter.generateChordId(chord, key_sig);
+		File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
 
-			uniqueChordRenders.put(chordID, null);
+		String[] parts = chord.getFields().split("-");
 
-			String[] parts = chordView.getFields().split("-");
+		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
 
-			List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
+		lines.set(14, "  \\key " + keySignatureToLilyPond(key_sig));
+		lines.set(20, adjustOctave(parts[PART_SOPRANO], PART_ADJUSTMENTS[PART_SOPRANO]));
+		lines.set(25, adjustOctave(parts[PART_ALTO], PART_ADJUSTMENTS[PART_ALTO]));
+		lines.set(30, adjustOctave(parts[PART_TENOR], PART_ADJUSTMENTS[PART_TENOR]));
+		lines.set(35, adjustOctave(parts[PART_BASS], PART_ADJUSTMENTS[PART_BASS]));
+		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
 
-			lines.set(14, "  \\key " + keySignatureToLilyPond(keySignature));
-			lines.set(20, adjustOctave(parts[PART_SOPRANO], PART_ADJUSTMENTS[PART_SOPRANO]));
-			lines.set(25, adjustOctave(parts[PART_ALTO], PART_ADJUSTMENTS[PART_ALTO]));
-			lines.set(30, adjustOctave(parts[PART_TENOR], PART_ADJUSTMENTS[PART_TENOR]));
-			lines.set(35, adjustOctave(parts[PART_BASS], PART_ADJUSTMENTS[PART_BASS]));
-			Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
+		File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
+				MainApp.getPlatformSpecificMidiExtension()));
 
-			File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
-			File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
-					MainApp.getPlatformSpecificMidiExtension()));
-
-			File[] results = new File[]{outputFile, midiFile};
-			pendingChordControllers.put(chordID, new ArrayList<>(Collections.singletonList(chordView)));
-			executeLilyPondRender(lilypondFile, true, () -> {
-				uniqueChordRenders.put(chordID, results);
-				for (ChordViewController controller : pendingChordControllers.getOrDefault(chordID, new ArrayList<>()))
-					controller.setMediaFiles(uniqueChordRenders.get(chordID));
-
-				pendingChordControllers.remove(chordID);
-			});
-		} else if (uniqueChordRenders.get(chordID) == null) {
-			// Render already started; automatically acquire the render when it's finished.
-			pendingChordControllers.get(chordID).add(chordView);
-		} else {
-			// Chord already rendered; use existing files.
-			chordView.setMediaFiles(uniqueChordRenders.get(chordID));
-		}
-
+		executeLilyPondRender(lilypondFile, true, () -> exit_tasks.accept(new File[] {outputFile, midiFile}));
 	}
 
 	// The function that handles final output.

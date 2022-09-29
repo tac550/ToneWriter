@@ -1,11 +1,11 @@
 package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.FXMLLoaderIO;
-import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.model.Chord;
 import com.tac550.tonewriter.model.MainChordView;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.util.ToneChordRenderAdapter;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -128,7 +128,7 @@ public abstract class ChordViewController implements CommentableView {
 	public String getName() {
 		return numText.getText();
 	}
-	public String getFields() {
+	public String getFields() { // TODO Chord data-related function; should be removed
 		return String.format(Locale.US,
 				"%s-%s-%s-%s",
 				SField.getText().isEmpty() ? " " : SField.getText(),
@@ -178,14 +178,13 @@ public abstract class ChordViewController implements CommentableView {
 			return;
 		}
 
-		try {
-			LilyPondInterface.renderChord(this, keySignature);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ToneChordRenderAdapter.renderChord(generateChordModel(), keySignature, this::setMediaFiles);
 	}
 
-	public void setMediaFiles(File[] files) {
+	private void setMediaFiles(File[] files) {
+		if (files.length < 2)
+			return;
+
 		Platform.runLater(() -> chordView.setImage(new Image(files[0].toURI().toString())));
 		midiFile = files[1];
 	}
