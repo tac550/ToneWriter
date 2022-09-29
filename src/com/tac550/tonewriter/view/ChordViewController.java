@@ -105,9 +105,8 @@ public abstract class ChordViewController implements CommentableView {
 	void setChantPhraseController(ChantPhraseViewController parent) {
 		chantPhraseController = parent;
 		
-		if (!MainApp.lilyPondAvailable()) return;
-		
-		refreshChordPreview();
+		if (MainApp.lilyPondAvailable())
+			refreshChordPreview();
 	}
 	public void setColor(Color color) {
 		chordColor = color;
