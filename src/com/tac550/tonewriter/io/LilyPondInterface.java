@@ -56,22 +56,26 @@ public class LilyPondInterface {
 		final String chordID = ToneChordRenderAdapter.generateChordId(chord, key_sig);
 		File lilypondFile = LilyPondInterface.createTempLYChordFile(chordID);
 
-		String[] parts = chord.getFields().split("-");
-
-		List<String> lines = Files.readAllLines(lilypondFile.toPath(), StandardCharsets.UTF_8);
-
-		lines.set(14, "  \\key " + keySignatureToLilyPond(key_sig));
-		lines.set(20, adjustOctave(parts[PART_SOPRANO], PART_ADJUSTMENTS[PART_SOPRANO]));
-		lines.set(25, adjustOctave(parts[PART_ALTO], PART_ADJUSTMENTS[PART_ALTO]));
-		lines.set(30, adjustOctave(parts[PART_TENOR], PART_ADJUSTMENTS[PART_TENOR]));
-		lines.set(35, adjustOctave(parts[PART_BASS], PART_ADJUSTMENTS[PART_BASS]));
-		Files.write(lilypondFile.toPath(), lines, StandardCharsets.UTF_8);
+		buildLilyPondSourceForChordRender(chord, key_sig, lilypondFile);
 
 		File outputFile = new File(lilypondFile.getAbsolutePath().replace(".ly", ".png"));
 		File midiFile = new File(lilypondFile.getAbsolutePath().replace(".ly",
 				MainApp.getPlatformSpecificMidiExtension()));
 
 		executeLilyPondRender(lilypondFile, true, () -> exit_tasks.accept(new File[] {outputFile, midiFile}));
+	}
+
+	private static void buildLilyPondSourceForChordRender(Chord chord, String key_sig, File lilypond_file) throws IOException {
+		String[] parts = chord.getFields().split("-");
+
+		List<String> lines = Files.readAllLines(lilypond_file.toPath(), StandardCharsets.UTF_8);
+
+		lines.set(14, "  \\key " + keySignatureToLilyPond(key_sig));
+		lines.set(20, adjustOctave(parts[PART_SOPRANO], PART_ADJUSTMENTS[PART_SOPRANO]));
+		lines.set(25, adjustOctave(parts[PART_ALTO], PART_ADJUSTMENTS[PART_ALTO]));
+		lines.set(30, adjustOctave(parts[PART_TENOR], PART_ADJUSTMENTS[PART_TENOR]));
+		lines.set(35, adjustOctave(parts[PART_BASS], PART_ADJUSTMENTS[PART_BASS]));
+		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
 	}
 
 	// The function that handles final output.
