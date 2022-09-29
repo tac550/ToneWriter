@@ -245,7 +245,7 @@ public class MainSceneController {
 
 		return loaderTask;
 	}
-	public Task<FXMLLoader> createChantPhrase(int index, boolean recalculateNames) {
+	private Task<FXMLLoader> createChantPhrase(int index, boolean recalculateNames) {
 		return FXMLLoaderIO.loadFXMLLayoutAsync("ChantPhraseView.fxml", loader -> {
 			ChantPhraseViewController controller = loader.getController();
 			GridPane phraseLayout = loader.getRoot();
@@ -920,8 +920,8 @@ public class MainSceneController {
 			e.printStackTrace();
 		}
 		assert newPhraseUI != null;
-
 		// CL type parsing
+
 		if (phrase.getName().contains("'"))
 			newPhraseUI.makePrime();
 		else if (phrase.getName().contains("alt"))
