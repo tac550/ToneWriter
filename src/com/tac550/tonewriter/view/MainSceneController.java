@@ -258,6 +258,9 @@ public class MainSceneController {
 			});
 		});
 	}
+	public Task<FXMLLoader> createChantPhrase() {
+		return createChantPhrase(chantPhraseControllers.size(), true);
+	}
 
 	public void applyLoadedVerses(boolean project_edited_after) {
 		Platform.runLater(() -> {
@@ -647,7 +650,7 @@ public class MainSceneController {
 			keySignature = "C major";
 			toneMenuState.manualCLAssignmentSelected = false;
 
-			Task<FXMLLoader> loaderTask = createChantPhrase(0, true);
+			Task<FXMLLoader> loaderTask = createChantPhrase();
 			loaderTask.setOnSucceeded(event -> handleSaveTone()); // So that the tone is loadable
 		}
 	}
