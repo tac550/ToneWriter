@@ -26,6 +26,7 @@ public class ToneChordRenderAdapter {
 
     private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
     private static final Map<String, DoneSignal> uniqueChordSig = new HashMap<>();
+    private static final Lock sigMapLock = new ReentrantLock();
 
     public static String generateChordId(Chord chord, String key_sig) {
         return chord.getFields().replace("<", "(").replace(">", ")") + "-"
@@ -63,7 +64,9 @@ public class ToneChordRenderAdapter {
             final String chordID = generateChordId(chord, key_sig);
 
             if (!uniqueChordRenders.containsKey(chordID)) {
+                sigMapLock.lock();
                 uniqueChordSig.put(chordID, new DoneSignal());
+                sigMapLock.unlock();
                 uniqueChordRenders.put(chordID, null);
                 try {
                     LilyPondInterface.renderChord(chord, key_sig, (files -> {
