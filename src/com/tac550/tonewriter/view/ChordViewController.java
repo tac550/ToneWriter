@@ -212,7 +212,18 @@ public abstract class ChordViewController implements CommentableView {
 		setFields(MainSceneController.copiedChord);
 	}
 	@FXML public void playMidi() {
-		MidiInterface.playChord(midiFile, playButton);
+		MidiInterface.playChord(midiFile);
+
+		// Thread which highlights and un-highlights the play button.
+		new Thread(() -> {
+			Platform.runLater(() -> playButton.setStyle("-fx-base: #fffa61"));
+			try {
+				Thread.sleep(1000);
+				Platform.runLater(() -> playButton.setStyle(""));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 	@FXML private void editComment() {
 

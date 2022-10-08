@@ -99,7 +99,7 @@ public class MidiInterface {
 		midiThread.start();
 	}
 
-	public static void playChord(File midiFile, Button playButton) {
+	public static void playChord(File midiFile) {
 		if (sequencer == null) return;
 
 		// Playing the midi file
@@ -109,17 +109,6 @@ public class MidiInterface {
 				sequencer.stop();
 				sequencer.setSequence(javax.sound.midi.MidiSystem.getSequence(midiFile));
 				sequencer.start();
-
-				// Thread which highlights and unhighlights the play button.
-				new Thread(() -> {
-					Platform.runLater(() -> playButton.setStyle("-fx-base: #fffa61"));
-					try {
-						Thread.sleep(1000);
-						Platform.runLater(() -> playButton.setStyle(""));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}).start();
 
 				return null;
 			}
@@ -132,9 +121,8 @@ public class MidiInterface {
 	public static void setUpMidiSystem() { // TODO: Hangs app on Linux if run after resuming from suspend
 		// Set up sequencer if not already done
 		try {
-			if (sequencer == null) {
+			if (sequencer == null)
 				sequencer = javax.sound.midi.MidiSystem.getSequencer();
-			}
 
 			sequencer.open();
 		} catch (MidiUnavailableException e) {
