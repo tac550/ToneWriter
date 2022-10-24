@@ -10,6 +10,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -639,7 +640,85 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void handlePlay() {
-		MidiInterface.playAssignedPhrase(getSyllables(), playButton, this);
+		if (!MidiInterface.sequencerActive()) return;
+
+		SyllableText[] syllables = getSyllables();
+
+		playButton.setDisable(true);
+
+		Task<Void> midiTask = new Task<>() {
+			@Override
+			protected Void call() throws Exception {
+				// Setup before playing
+				List<Button> buttons = new ArrayList<>();
+				Map<Integer, List<AssignedChordData>> chordMap = new HashMap<>();
+				int key = -1;
+
+				String previousFieldsAndDur = null;
+				for (SyllableText syllable : syllables) {
+					// Place all the buttons into the buttons list in the order they occur
+					buttons.addAll(syllable.getAssociatedButtons());
+
+					for (AssignedChordData chord : syllable.getAssociatedChords()) {
+						String fieldsAndDur = getChordByIndex(chord.getChordIndex()).getFields() + chord.getDuration();
+						// Group elements together in sequential lists in map if notes are same and duration is quarter.
+						if (fieldsAndDur.equals(previousFieldsAndDur)
+								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
+							chordMap.get(key).add(chord);
+						} else {
+							chordMap.put(++key, new ArrayList<>(Collections.singletonList(chord)));
+						}
+
+						previousFieldsAndDur = fieldsAndDur;
+					}
+				}
+
+				// Playing loop
+				int buttonIndex = 0;
+				key = 0;
+				SyllableText lastSyllable = null;
+				while (chordMap.containsKey(key)) {
+					for (AssignedChordData chord : chordMap.get(key)) {
+						Button currentButton = buttons.get(buttonIndex);
+						String oldButtonStyle = currentButton.getStyle();
+						Platform.runLater(() -> currentButton.setStyle("-fx-base: #fffa61"));
+
+						for (SyllableText syll : syllables) {
+							if (syll.getAssociatedButtons().contains(currentButton) && syll != lastSyllable) {
+								if (lastSyllable != null)
+									lastSyllable.applyDefaultFill();
+
+								Platform.runLater(() -> syll.setFill(Color.web("#edbd11")));
+								lastSyllable = syll;
+							}
+						}
+
+						getChordByIndex(chord.getChordIndex()).playMidi();
+						// This sleep determines for how long the note plays.
+						// Speeds recitative of more than 3 repeated notes up to a maximum value.
+						// For non-recitative, bases speed on note value, adjusting some manually.
+						// noinspection BusyWait
+						Thread.sleep((1000
+								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 5)
+								: Integer.parseInt(chord.getDuration().replace("8", "6")
+								.replace("4.", "3").replace("2.", "2"))))
+								+ (chord.getDuration().contains("2.") ? 200 : 0));
+
+						currentButton.setStyle(oldButtonStyle);
+						buttonIndex++;
+					}
+					key++;
+				}
+				if (lastSyllable != null)
+					lastSyllable.applyDefaultFill();
+
+				playButton.setDisable(false);
+				return null;
+			}
+		};
+
+		Thread midiThread = new Thread(midiTask);
+		midiThread.start();
 	}
 
 	@FXML private void handleEdit() {

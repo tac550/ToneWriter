@@ -1,8 +1,5 @@
 package com.tac550.tonewriter.model;
 
-import com.tac550.tonewriter.view.ChordViewController;
-import com.tac550.tonewriter.view.VerseLineViewController;
-
 public class AssignedChordData {
 
 	private final int chordIndex;
@@ -24,9 +21,6 @@ public class AssignedChordData {
 		return duration;
 	}
 
-	public ChordViewController getChordController(VerseLineViewController line_controller) {
-		return line_controller.getChordByIndex(chordIndex);
-	}
 	public int getChordIndex() {
 		return chordIndex;
 	}

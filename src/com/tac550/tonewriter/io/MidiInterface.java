@@ -1,102 +1,18 @@
 package com.tac550.tonewriter.io;
 
-import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.util.TWUtils;
-import com.tac550.tonewriter.view.SyllableText;
-import com.tac550.tonewriter.view.VerseLineViewController;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.Button;
-import javafx.scene.paint.Color;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import java.io.File;
-import java.util.*;
 
 public class MidiInterface {
 
 	private static Sequencer sequencer = null;
 
-	// TODO: Decouple from UI
-	public static void playAssignedPhrase(SyllableText[] syllables, Button playButton, VerseLineViewController vc) {
-		if (sequencer == null) return;
-
-		playButton.setDisable(true);
-
-		Task<Void> midiTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				// Setup before playing
-				List<Button> buttons = new ArrayList<>();
-				Map<Integer, List<AssignedChordData>> chordMap = new HashMap<>();
-				int key = -1;
-
-				String previousFieldsAndDur = null;
-				for (SyllableText syllable : syllables) {
-					// Place all the buttons into the buttons list in the order they occur
-					buttons.addAll(syllable.getAssociatedButtons());
-
-					for (AssignedChordData chord : syllable.getAssociatedChords()) {
-						String fieldsAndDur = chord.getChordController(vc).getFields() + chord.getDuration();
-						// Group elements together in sequential lists in map if notes are same and duration is quarter.
-						if (fieldsAndDur.equals(previousFieldsAndDur)
-								&& chord.getDuration().equals(LilyPondInterface.NOTE_QUARTER)) {
-							chordMap.get(key).add(chord);
-						} else {
-							chordMap.put(++key, new ArrayList<>(Collections.singletonList(chord)));
-						}
-
-						previousFieldsAndDur = fieldsAndDur;
-					}
-				}
-
-				// Playing loop
-				int buttonIndex = 0;
-				key = 0;
-				SyllableText lastSyllable = null;
-				while (chordMap.containsKey(key)) {
-					for (AssignedChordData chord : chordMap.get(key)) {
-						Button currentButton = buttons.get(buttonIndex);
-						String oldButtonStyle = currentButton.getStyle();
-						Platform.runLater(() -> currentButton.setStyle("-fx-base: #fffa61"));
-
-						for (SyllableText syll : syllables) {
-							if (syll.getAssociatedButtons().contains(currentButton) && syll != lastSyllable) {
-								if (lastSyllable != null)
-									lastSyllable.applyDefaultFill();
-
-								Platform.runLater(() -> syll.setFill(Color.web("#edbd11")));
-								lastSyllable = syll;
-							}
-						}
-
-						chord.getChordController(vc).playMidi();
-						// This sleep determines for how long the note plays.
-						// Speeds recitative of more than 3 repeated notes up to a maximum value.
-						// For non-recitative, bases speed on note value, adjusting some manually.
-						// noinspection BusyWait
-						Thread.sleep((1000
-								/ (chordMap.get(key).size() > 3 ? Math.min(chordMap.get(key).size(), 5)
-								: Integer.parseInt(chord.getDuration().replace("8", "6")
-								.replace("4.", "3").replace("2.", "2"))))
-								+ (chord.getDuration().contains("2.") ? 200 : 0));
-
-						currentButton.setStyle(oldButtonStyle);
-						buttonIndex++;
-					}
-					key++;
-				}
-				if (lastSyllable != null)
-					lastSyllable.applyDefaultFill();
-
-				playButton.setDisable(false);
-				return null;
-			}
-		};
-
-		Thread midiThread = new Thread(midiTask);
-		midiThread.start();
+	public static boolean sequencerActive() {
+		return sequencer != null;
 	}
 
 	public static void playChord(File midiFile) {
