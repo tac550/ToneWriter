@@ -15,7 +15,7 @@ public class MidiInterface {
 		return sequencer != null;
 	}
 
-	public static void playChord(File midiFile) {
+	public static void playMidiFile(File midiFile) {
 		if (sequencer == null) return;
 
 		// Playing the midi file
