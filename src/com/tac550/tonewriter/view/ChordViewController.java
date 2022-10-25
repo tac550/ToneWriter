@@ -3,7 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.model.Chord;
-import com.tac550.tonewriter.model.MainChordView;
+import com.tac550.tonewriter.view.chord.MainChordView;
 import com.tac550.tonewriter.util.TWUtils;
 import com.tac550.tonewriter.util.ToneChordRenderAdapter;
 import javafx.application.Platform;

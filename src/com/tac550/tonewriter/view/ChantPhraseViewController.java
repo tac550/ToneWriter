@@ -3,6 +3,7 @@ package com.tac550.tonewriter.view;
 import com.tac550.tonewriter.io.FXMLLoaderIO;
 import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.chord.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;

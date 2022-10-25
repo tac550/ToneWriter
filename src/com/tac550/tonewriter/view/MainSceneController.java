@@ -6,6 +6,7 @@ import com.tac550.tonewriter.io.SyllableParser;
 import com.tac550.tonewriter.io.ToneIO;
 import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.chord.MainChordView;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;

@@ -5,6 +5,7 @@ import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.io.MidiInterface;
 import com.tac550.tonewriter.model.*;
 import com.tac550.tonewriter.util.TWUtils;
+import com.tac550.tonewriter.view.chord.RecitingChordView;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

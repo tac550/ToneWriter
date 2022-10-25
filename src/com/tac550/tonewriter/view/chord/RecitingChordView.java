@@ -1,4 +1,4 @@
-package com.tac550.tonewriter.model;
+package com.tac550.tonewriter.view.chord;
 
 import javafx.scene.paint.Color;
 
