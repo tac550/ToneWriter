@@ -56,7 +56,7 @@ public class TWUtils {
 
 	/**
 	 * Compares two version strings.
-	 * Use this instead of String.compareTo() for a non-lexicographical
+	 * <p> Use this instead of String.compareTo() for a non-lexicographical
 	 * comparison that works for version strings. e.g. "1.10".compareTo("1.6").
 	 *
 	 * @param v1 a string of alpha numerals separated by decimal points.
