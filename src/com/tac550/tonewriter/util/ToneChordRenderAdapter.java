@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 public class ToneChordRenderAdapter {
 
     public static class DoneSignal {
-        public Lock lock;
-        public Condition cond;
+        public final Lock lock;
+        public final Condition cond;
 
         public DoneSignal() {
             lock = new ReentrantLock();
