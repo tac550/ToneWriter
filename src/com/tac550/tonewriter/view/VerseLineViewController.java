@@ -39,6 +39,7 @@ public class VerseLineViewController {
 
 	// How tall to make note buttons
 	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
+	private static final double EXPANDED_VIEW_PADDING = 5;
 
 	@FXML private StackPane rootPane;
 	@FXML private GridPane mainContentPane;
@@ -614,29 +615,33 @@ public class VerseLineViewController {
 		return noteButton;
 	}
 
-	@FXML private void toggleExpand() {
+	private double scrollBarCurrentPixels() {
+		return scrollBar.isVisible() ? scrollBarHeight : 0;
+	}
 
-		double scrollBarPadding = scrollBar.isVisible() ? scrollBarHeight : 0;
+	// Gets the LayoutY value of the lowest NoteButton in this line
+	private double greatestNoteButtonLayoutY() {
+		double maxLayoutY = 0;
+		for (Node node : chordButtonPane.getChildren())
+			if (node.getLayoutY() > maxLayoutY)
+				maxLayoutY = node.getLayoutY();
+
+		return maxLayoutY;
+	}
+
+	@FXML private void toggleExpand() {
+		double scrollBarPadding = scrollBarCurrentPixels();
 
 		if (view_expanded) {
 			mainContentPane.setPrefHeight(defaultHeight + scrollBarPadding);
 			expandButton.setGraphic(plusIcon);
-
-			view_expanded = false;
 		} else {
-			// Get note button with greatest LayoutY value
-			double maxLayoutY = 0;
-			for (Node node : chordButtonPane.getChildren()) {
-				if (node.getLayoutY() > maxLayoutY)
-					maxLayoutY = node.getLayoutY();
-			}
-			// The following line might do nothing if less than minimum height.
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + 5 + maxLayoutY + NOTE_BUTTON_HEIGHT.get()
-					+ scrollBarPadding);
+			mainContentPane.setPrefHeight(textRow.getPrefHeight() + EXPANDED_VIEW_PADDING
+					+ greatestNoteButtonLayoutY() + NOTE_BUTTON_HEIGHT.get() + scrollBarPadding);
 			expandButton.setGraphic(minusIcon);
-
-			view_expanded = true;
 		}
+
+		view_expanded = !view_expanded;
 	}
 
 	@FXML private void handlePlay() {
