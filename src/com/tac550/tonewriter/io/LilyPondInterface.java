@@ -178,19 +178,19 @@ public class LilyPondInterface {
 			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 					.replace("$APPNAME", MainApp.APP_NAME));
 			if (items.size() == 1 && items.get(0).getTitleType() == ProjectItem.TitleType.LARGE) {
-				lines.set(14, lines.get(14).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
+				lines.set(16, lines.get(16).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 			}
 
 			if (!project.isEvenSpread()) {
-				lines.set(14, lines.get(14).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
-				lines.set(15, lines.get(15).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
+				lines.set(15, lines.get(15).replace("  evenHeaderMarkup =", "  oddHeaderMarkup ="));
+				lines.set(16, lines.get(16).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
 			}
 		}
-		lines.set(generateHeader ? 17 : 12, "  top-margin = %s\\%s".formatted(project.getMarginInfo()[0], project.getMarginInfo()[1]));
-		lines.set(generateHeader ? 18 : 13, "  bottom-margin = %s\\%s".formatted(project.getMarginInfo()[2], project.getMarginInfo()[3]));
-		lines.set(generateHeader ? 19 : 14, "  left-margin = %s\\%s".formatted(project.getMarginInfo()[4], project.getMarginInfo()[5]));
-		lines.set(generateHeader ? 20 : 15, "  right-margin = %s\\%s".formatted(project.getMarginInfo()[6], project.getMarginInfo()[7]));
+		lines.set(generateHeader ? 18 : 13, "  top-margin = %s\\%s".formatted(project.getMarginInfo()[0], project.getMarginInfo()[1]));
+		lines.set(generateHeader ? 19 : 14, "  bottom-margin = %s\\%s".formatted(project.getMarginInfo()[2], project.getMarginInfo()[3]));
+		lines.set(generateHeader ? 20 : 15, "  left-margin = %s\\%s".formatted(project.getMarginInfo()[4], project.getMarginInfo()[5]));
+		lines.set(generateHeader ? 21 : 16, "  right-margin = %s\\%s".formatted(project.getMarginInfo()[6], project.getMarginInfo()[7]));
 
 		// Add a blank line before scores begin
 		lines.add("");
