@@ -757,6 +757,9 @@ public class VerseLineViewController {
 	void showSyllableMenu(SyllableText syllable) {
 		topController.showSyllableMenu(syllable);
 	}
+	void hideSyllableMenu() {
+		topController.hideSyllableMenu();
+	}
 
 	public void setTonePhraseChoice(String choice) {
 		if (tonePhraseChoice.getItems().contains(choice))

@@ -64,6 +64,7 @@ public class SyllableText extends Text {
 			if (active) {
 				if (event.getButton() == MouseButton.PRIMARY) {
 					verseController.syllableUnHovered();
+					verseController.hideSyllableMenu();
 
 					clicked = true;
 					verseController.syllableClicked(this);
@@ -164,7 +165,7 @@ public class SyllableText extends Text {
 		applyDefaultFill();
 		active = true;
 	}
-	
+
 	void setNoteDuration(String duration, int chord_index) {
 		associatedChords.get(chord_index).setDuration(duration);
 	}

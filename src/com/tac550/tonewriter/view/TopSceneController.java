@@ -1200,6 +1200,10 @@ public class TopSceneController {
 		syllableMenu.show(syllable, Side.TOP, 0, 0);
 	}
 
+	void hideSyllableMenu() {
+		syllableMenu.hide();
+	}
+
 	void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
