@@ -39,7 +39,6 @@ public class FXMLLoaderIO {
 		loaderThread.start();
 
 		return loaderTask;
-
 	}
 
 	public static FXMLLoader loadFXMLLayout(String filename) {
