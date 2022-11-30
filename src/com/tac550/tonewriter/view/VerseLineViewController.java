@@ -689,13 +689,13 @@ public class VerseLineViewController {
 						String oldButtonStyle = currentButton.getStyle();
 						Platform.runLater(() -> currentButton.setStyle("-fx-base: #fffa61"));
 
-						for (SyllableText syll : syllables) {
-							if (syll.getAssociatedButtons().contains(currentButton) && syll != lastSyllable) {
+						for (SyllableText syllable : syllables) {
+							if (syllable.getAssociatedButtons().contains(currentButton) && syllable != lastSyllable) {
 								if (lastSyllable != null)
-									lastSyllable.applyDefaultFill();
+									Platform.runLater(lastSyllable::applyDefaultFill);
 
-								Platform.runLater(() -> syll.setFill(Color.web("#edbd11")));
-								lastSyllable = syll;
+								Platform.runLater(() -> syllable.setFill(Color.web("#edbd11")));
+								lastSyllable = syllable;
 							}
 						}
 
@@ -710,13 +710,13 @@ public class VerseLineViewController {
 								.replace("4.", "3").replace("2.", "2"))))
 								+ (chord.getDuration().contains("2.") ? 200 : 0));
 
-						currentButton.setStyle(oldButtonStyle);
+						Platform.runLater(() -> currentButton.setStyle(oldButtonStyle));
 						buttonIndex++;
 					}
 					key++;
 				}
 				if (lastSyllable != null)
-					lastSyllable.applyDefaultFill();
+					Platform.runLater(lastSyllable::applyDefaultFill);
 
 				playButton.setDisable(false);
 				return null;
