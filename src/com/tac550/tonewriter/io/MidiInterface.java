@@ -1,11 +1,12 @@
 package com.tac550.tonewriter.io;
 
 import com.tac550.tonewriter.util.TWUtils;
-import javafx.concurrent.Task;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Sequencer;
 import java.io.File;
+import java.io.IOException;
 
 public class MidiInterface {
 
@@ -18,19 +19,15 @@ public class MidiInterface {
 	public static void playMidiFile(File midiFile) {
 		if (sequencer == null) return;
 
-		// Playing the midi file
-		Task<Void> midiTask = new Task<>() {
-			@Override
-			protected Void call() throws Exception {
-				sequencer.stop();
+		Thread midiThread = new Thread(() -> {
+			sequencer.stop();
+			try {
 				sequencer.setSequence(javax.sound.midi.MidiSystem.getSequence(midiFile));
-				sequencer.start();
-
-				return null;
+			} catch (InvalidMidiDataException | IOException e) {
+				throw new RuntimeException(e);
 			}
-		};
-
-		Thread midiThread = new Thread(midiTask);
+			sequencer.start();
+		});
 		midiThread.start();
 	}
 
