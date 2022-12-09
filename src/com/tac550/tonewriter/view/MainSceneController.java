@@ -451,7 +451,9 @@ public class MainSceneController {
 		clearVerseLines();
 		verseEdited = false;
 
-		lastVerseSet = verseArea.getText();
+		// Dashes, hyphens, and minuses surrounded by non-whitespace in the original text are converted to em-dashes.
+		// This allows us to know which hyphens should be forced to be visible by default.
+		lastVerseSet = verseArea.getText().replaceAll("(?<!\\s)[[-\u2010\u2011\u2012\u2013\u2014]+](?!\\s)", "\u2014");
 
 		if (lastVerseSet.isEmpty()) {
 			setVerseButton.setVisible(false);
@@ -466,7 +468,7 @@ public class MainSceneController {
 		setVerseProgressBox.setVisible(true);
 		setVersePane.setMouseTransparent(false);
 
-		// Sends off the contents of the verse field (trimmed, and with any multi-spaces reduced to one) to be broken into syllables.
+		// Sends off the contents of the verse field to be broken into syllables.
 		Task<Void> syllabificationTask = new Task<>() {
 
 			@Override

@@ -200,13 +200,12 @@ public class VerseLineViewController {
 					i++;
 				}
 			} else {
-
 				if (hasAssignments())
 					resetChordAssignment();
 
 				lineTextFlow.getChildren().clear();
 
-				for (String syllable : verseLine.getSyllables()) {
+				for (String syllable : syllables) {
 					SyllableText text = new SyllableText(syllable);
 					text.setParent(this);
 					text.setTextAlignment(TextAlignment.CENTER);

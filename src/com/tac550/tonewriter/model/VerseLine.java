@@ -19,13 +19,17 @@ public class VerseLine {
 
 	private List<String> splitSyllables(String line) {
 		List<String> new_syllables = new ArrayList<>(Arrays.asList(
-				line.replace("-", "_-").replace(" ", "_ ").split("_")));
+				// Em-dashes (\u2014), minuses (-), and spaces ( ) are acceptable syllable separators.
+				// To keep the separators in the resulting strings, place an underscore before each occurrence of these
+				// and split at the underscores.
+				line.replace("\u2014", "_\u2014").replace("-", "_-")
+						.replace(" ", "_ ").split("_")));
 
 		return new_syllables.stream().map(TWUtils::applySmartQuotes).toList();
 	}
 
 	public String getLine() {
-		return TWUtils.reverseSmartQuotes(line);
+		return TWUtils.reverseSmartQuotes(line).replace("\u2014", "-");
 	}
 	public List<String> getSyllables() {
 		return syllables;

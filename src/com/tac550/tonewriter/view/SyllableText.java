@@ -43,7 +43,14 @@ public class SyllableText extends Text {
 	}
 	
 	public SyllableText(String text) {
-		super(text);
+		super();
+
+		if (text.startsWith("\u2014")) {
+			setText(text.replace("\u2014", "-"));
+			forceHyphen = true;
+		} else {
+			setText(text);
+		}
 
 		setFont(regularFont);
 		applyDefaultFill();
