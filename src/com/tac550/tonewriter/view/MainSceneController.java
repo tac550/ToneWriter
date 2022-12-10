@@ -670,6 +670,7 @@ public class MainSceneController {
 				openToneStage.initModality(Modality.APPLICATION_MODAL);
 				openToneStage.getIcons().add(MainApp.APP_ICON);
 				openToneStage.setScene(new Scene(rootLayout));
+				openToneStage.initOwner(parentStage);
 
 				openToneStage.show();
 				openToneStage.setMinWidth(openToneStage.getWidth());
