@@ -271,8 +271,9 @@ public class VerseLineViewController {
 		if (mainController.manualCLAssignmentEnabled()) {
 			// If we're in manual assignment mode, try to auto-select a chant line similar to the previous one.
 			if (previousChantPhrase != null) {
-				// If we don't find a similar chant line below, default to the previous selection.
-				selectedChantPhrase = previousSelection;
+				// If we don't find a similar chant line below, default to the previous selection if it's within the new
+				// range of available chant phrases; otherwise select the first.
+				selectedChantPhrase = associatedChantPhrases.length > previousSelection ? previousSelection : 0;
 
 				// If the chant line choices are identical (nothing is changing), just take the previous selection.
 				if (!identicalChoices) {
