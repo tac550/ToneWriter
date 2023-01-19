@@ -114,8 +114,9 @@ public class VerseLineViewController {
 		minusIcon.setFitHeight(iconSize);
 		minusIcon.setFitWidth(iconSize);
 
-		// Buttons' initial states
+		// Button appearance
 		expandButton.setGraphic(plusIcon);
+		expandButton.setVisible(false);
 		playButton.setText("\u25B6");
 
 		// Default height used when toggling Expand off.
@@ -434,6 +435,9 @@ public class VerseLineViewController {
 				syllable.deactivate();
 		}
 
+		// Update view expansion UI
+		expandButton.setVisible(view_expanded || expansionNecessary());
+
 		topController.projectEdited();
 	}
 
@@ -617,7 +621,7 @@ public class VerseLineViewController {
 	}
 
 	private double scrollBarCurrentPixels() {
-		return scrollBar.isVisible() ? scrollBarHeight : 0;
+		return (scrollBar != null && scrollBar.isVisible()) ? scrollBarHeight : 0;
 	}
 
 	// Gets the LayoutY value of the lowest NoteButton in this line
@@ -631,18 +635,29 @@ public class VerseLineViewController {
 	}
 
 	@FXML private void toggleExpand() {
-		double scrollBarPadding = scrollBarCurrentPixels();
+		if (!expansionNecessary())
+			expandButton.setVisible(false);
 
 		if (view_expanded) {
-			mainContentPane.setPrefHeight(defaultHeight + scrollBarPadding);
+			mainContentPane.setPrefHeight(getDefaultPaneHeight());
 			expandButton.setGraphic(plusIcon);
 		} else {
-			mainContentPane.setPrefHeight(textRow.getPrefHeight() + EXPANDED_VIEW_PADDING
-					+ greatestNoteButtonLayoutY() + NOTE_BUTTON_HEIGHT.get() + scrollBarPadding);
+			mainContentPane.setPrefHeight(getExpandedPaneHeight());
 			expandButton.setGraphic(minusIcon);
 		}
 
 		view_expanded = !view_expanded;
+	}
+
+	private boolean expansionNecessary() {
+		return getExpandedPaneHeight() > getDefaultPaneHeight();
+	}
+	private double getDefaultPaneHeight() {
+		return defaultHeight + scrollBarCurrentPixels();
+	}
+	private double getExpandedPaneHeight() {
+		return textRow.getPrefHeight() + EXPANDED_VIEW_PADDING
+				+ greatestNoteButtonLayoutY() + NOTE_BUTTON_HEIGHT.get() + scrollBarCurrentPixels();
 	}
 
 	@FXML private void handlePlay() {
