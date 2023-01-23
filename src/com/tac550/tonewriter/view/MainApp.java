@@ -77,6 +77,7 @@ public class MainApp extends Application {
 	static final String PREFS_HOVER_HIGHLIGHT = "Hover-Highlight-Enabled";
 	static final String PREFS_CHECK_UPDATE_STARTUP = "Check-Update-Appstart";
 	static final String PREFS_AUTO_OPEN_EXPORT = "Auto-Open-Completed-Export";
+	static final String PREFS_MAXIMIZED_LAST_EXIT = "Maximized-On-Last-Exit";
 
 	// UI Stuff
 	// The colors that each chord group will take. The maximum number of chord groups is determined by the length of this array.
@@ -181,8 +182,9 @@ public class MainApp extends Application {
 		mainStage.setMinWidth(mainStage.getWidth());
 		mainStage.setMinHeight(mainStage.getHeight());
 
-		// Start the application maximized.
-		mainStage.setMaximized(true);
+		// Start the application maximized if it was maximized at last exit.
+		if (prefs.getBoolean(PREFS_MAXIMIZED_LAST_EXIT, false))
+			mainStage.setMaximized(true);
 
 		attemptProjectRecovery();
 	}

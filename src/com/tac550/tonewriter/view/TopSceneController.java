@@ -424,10 +424,7 @@ public class TopSceneController {
 
 	@FXML private void handleNewProject() {
 		// Create new project in existing window
-		Event event = new Event(null, null, null);
-		requestClose(event);
-		if (event.isConsumed())
-			return;
+		if (closeAttemptRejected()) return;
 
 		clearProjectState();
 		addTab();
@@ -441,10 +438,7 @@ public class TopSceneController {
 		if (selectedFile == null) return;
 
 		// Open project in existing window
-		Event event = new Event(null, null, null);
-		requestClose(event);
-		if (event.isConsumed())
-			return;
+		if (closeAttemptRejected()) return;
 
 		openProject(selectedFile);
 	}
@@ -1000,8 +994,11 @@ public class TopSceneController {
 	}
 
 	void requestClose(Event ev) {
-		if (!checkSaveProject() || !checkAllToneSaves())
-			ev.consume();
+		if (closeAttemptRejected()) ev.consume();
+	}
+
+	private boolean closeAttemptRejected() {
+		return !checkSaveProject() || !checkAllToneSaves();
 	}
 
 	/*
