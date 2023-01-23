@@ -995,6 +995,7 @@ public class TopSceneController {
 
 	void requestClose(Event ev) {
 		if (closeAttemptRejected()) ev.consume();
+		else MainApp.prefs.putBoolean(MainApp.PREFS_MAXIMIZED_LAST_EXIT, parentStage.isMaximized());
 	}
 
 	private boolean closeAttemptRejected() {
