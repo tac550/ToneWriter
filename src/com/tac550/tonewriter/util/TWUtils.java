@@ -54,6 +54,12 @@ public class TWUtils {
 		return Stream.of(version.split("\\.")).limit(len_limit).collect(Collectors.joining("."));
 	}
 
+	public static String convertAccidentalSymbols(String string) {
+		// The extra space in the replacement for TWUtils.FLAT ("f ") in the key signature is necessary
+		// because, for purposes of display, the original string doesn't include a space after the symbol.
+		return string.replace(SHARP, "s").replace(FLAT, "f ");
+	}
+
 	/**
 	 * Compares two version strings.
 	 * <p> Use this instead of String.compareTo() for a non-lexicographical

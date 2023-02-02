@@ -50,7 +50,7 @@ public class ToneIO {
 
 			// Header info
 			writePairTo(printWriter, "VERSION", MainApp.APP_VERSION);
-			writePairTo(printWriter, "Key Signature", tone.getKeySignature().replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f"));
+			writePairTo(printWriter, "Key Signature", TWUtils.convertAccidentalSymbols(tone.getKeySignature()));
 			writePairTo(printWriter, "Tone", tone.getToneText());
 			writePairTo(printWriter, "Composer", tone.getComposerText());
 			writePairTo(printWriter, "Manually Assign Phrases", tone.isManuallyAssignPhrases());

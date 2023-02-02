@@ -30,7 +30,7 @@ public class ToneChordRenderAdapter {
 
     public static String generateChordId(Chord chord, String key_sig) {
         return chord.getFields().replace("<", "(").replace(">", ")") + "-"
-                + key_sig.replace(TWUtils.SHARP, "s").replace(TWUtils.FLAT, "f ");
+                + TWUtils.convertAccidentalSymbols(key_sig);
     }
 
     public static void renderChord(Chord chord, String key_sig, Consumer<File[]> exit_actions) {
