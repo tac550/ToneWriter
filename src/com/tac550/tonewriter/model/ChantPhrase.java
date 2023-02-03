@@ -66,7 +66,7 @@ public class ChantPhrase {
 
 		finalString.append(getName()).append(String.format("%n"));
 
-		// Place chant line comment on the first line, if any.
+		// Place chant line comment on the next line, if any.
 		if (hasComment())
 			finalString.append(String.format("Comment: %s%n", getComment()));
 
