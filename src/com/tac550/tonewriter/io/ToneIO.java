@@ -130,7 +130,7 @@ public class ToneIO {
 			String[] footer;
 			if (sections.length == 3) {
 				header = sections[0].split("\\r?\\n");
-				// Double newlines delimit chant lines
+				// Double newlines delimit chant phrases
 				chantPhraseStrings = sections[1].split("\\r?\\n\\r?\\n");
 				footer = sections[2].split("\\r?\\n");
 			} else {
