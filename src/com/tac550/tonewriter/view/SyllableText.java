@@ -2,6 +2,7 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.model.AssignmentSyllable;
+import com.tac550.tonewriter.util.TWUtils;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
@@ -225,7 +226,7 @@ public class SyllableText extends Text {
 	}
 
 	AssignmentSyllable generateSyllableModel() {
-		return new AssignmentSyllable.AssignmentSyllableBuilder().syllableText(getText())
+		return new AssignmentSyllable.AssignmentSyllableBuilder().syllableText(TWUtils.reverseSmartQuotes(getText()))
 				.bold(bold).italic(italic).forceHyphen(forceHyphen).assignedChords(associatedChords).buildAssignmentSyllable();
 	}
 

@@ -231,7 +231,7 @@ public class ProjectIO {
 					line.append(TWUtils.shortenPhraseName(assnLine.getSelectedChantPhrase().getName()));
 
 				for (AssignmentSyllable syllable : assnLine.getSyllables()) {
-					line.append("|").append(TWUtils.reverseSmartQuotes(syllable.getSyllableText()).strip());
+					line.append("|").append(syllable.getSyllableText().strip());
 
 					String formatData = syllable.getFormatData();
 					if (formatData.length() > 0)
