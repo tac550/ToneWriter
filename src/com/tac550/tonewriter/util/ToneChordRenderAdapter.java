@@ -25,6 +25,7 @@ public class ToneChordRenderAdapter {
     }
 
     private static final Map<String, File[]> uniqueChordRenders = new HashMap<>();
+    private static final Lock renderMapLock = new ReentrantLock();
     private static final Map<String, DoneSignal> uniqueChordSig = new HashMap<>();
     private static final Lock sigMapLock = new ReentrantLock();
 
@@ -63,14 +64,18 @@ public class ToneChordRenderAdapter {
         public void run() {
             final String chordID = generateChordId(chord, key_sig);
 
+            renderMapLock.lock();
             if (!uniqueChordRenders.containsKey(chordID)) {
+                uniqueChordRenders.put(chordID, null);
+                renderMapLock.unlock();
                 sigMapLock.lock();
                 uniqueChordSig.put(chordID, new DoneSignal());
                 sigMapLock.unlock();
-                uniqueChordRenders.put(chordID, null);
                 try {
                     LilyPondInterface.renderChord(chord, key_sig, (files -> {
+                        renderMapLock.lock();
                         uniqueChordRenders.put(chordID, files);
+                        renderMapLock.unlock();
                         DoneSignal sig = uniqueChordSig.get(chordID);
                         sig.lock.lock();
                         sig.cond.signalAll();
@@ -84,6 +89,7 @@ public class ToneChordRenderAdapter {
                     uniqueChordSig.get(chordID).lock.unlock();
                 }
             } else if (uniqueChordRenders.get(chordID) == null) {
+                renderMapLock.unlock();
                 uniqueChordSig.get(chordID).lock.lock();
                 try {
                     uniqueChordSig.get(chordID).cond.await();
@@ -92,9 +98,13 @@ public class ToneChordRenderAdapter {
                 } finally {
                     uniqueChordSig.get(chordID).lock.unlock();
                 }
+            } else {
+                renderMapLock.unlock();
             }
 
+            renderMapLock.lock();
             results = uniqueChordRenders.get(chordID);
+            renderMapLock.unlock();
         }
 
         public File[] getResults() {
