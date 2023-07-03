@@ -67,10 +67,10 @@ public class ToneChordRenderAdapter {
             renderMapLock.lock();
             if (!uniqueChordRenders.containsKey(chordID)) {
                 uniqueChordRenders.put(chordID, null);
-                renderMapLock.unlock();
                 sigMapLock.lock();
                 uniqueChordSig.put(chordID, new DoneSignal());
                 sigMapLock.unlock();
+                renderMapLock.unlock();
                 try {
                     LilyPondInterface.renderChord(chord, key_sig, (files -> {
                         renderMapLock.lock();
