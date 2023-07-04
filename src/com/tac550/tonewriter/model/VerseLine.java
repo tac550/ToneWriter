@@ -25,7 +25,8 @@ public class VerseLine {
 				line.replace("\u2014", "_\u2014").replace("-", "_-")
 						.replace(" ", "_ ").split("_")));
 
-		return new_syllables.stream().map(TWUtils::applySmartQuotes).toList();
+		// Filter out syllables that are just single hyphens and apply smart quotes to each syllable.
+		return new_syllables.stream().filter(str -> !str.equals("-")).map(TWUtils::applySmartQuotes).toList();
 	}
 
 	public String getLine() {
