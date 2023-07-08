@@ -877,6 +877,8 @@ public class TopSceneController {
 					}
 					assert verseLine != null;
 
+					if (verseLine.isSeparator()) continue;
+
 					verseLine.setPendingActions(finalI == 0, vLine -> {
 						List<String> durations = new ArrayList<>();
 
