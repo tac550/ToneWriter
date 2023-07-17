@@ -1020,7 +1020,7 @@ public class MainSceneController {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Export As");
 		fileChooser.setInitialFileName(String.format("%s.pdf",
-				tempExportMode == ExportMode.ITEM ? TWUtils.replaceInvalidFileChars(titleTextField.getText(), "_")
+				tempExportMode == ExportMode.ITEM && topSceneController.getTabCount() > 1 ? TWUtils.replaceInvalidFileChars(titleTextField.getText(), "_")
 						: FilenameUtils.removeExtension(topSceneController.getProjectFileName())));
 		fileChooser.setInitialDirectory(tempExportMode == ExportMode.ITEM && topSceneController.getTabCount() > 1 ? itemSavingDirectory :
 				topSceneController.getProjectFile() != null ? topSceneController.getProjectFile().getParentFile() : topSceneController.defaultExportDirectory);
