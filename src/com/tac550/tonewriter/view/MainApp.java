@@ -15,7 +15,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
@@ -43,7 +42,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -87,10 +85,6 @@ public class MainApp extends Application {
 
 	private static boolean darkModeEnabled = false;
 
-	// LilyPond stuff.
-	private static final File bundledLPDir = new File(new File("lilypond" + File.separator).getAbsolutePath());
-	// Not sure why I have to do the above line. If I use the relative path Java thinks it doesn't exist
-
 	private static String requiredLPVersion;
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
@@ -127,8 +121,6 @@ public class MainApp extends Application {
 		refreshLilyPondLocation();
 
 		if (!OS_NAME.startsWith("lin") && !lilyPondAvailable()) {
-			if (OS_NAME.startsWith("win")) // If the Windows LilyPond installation is no good, prompt initialization
-				promptWinLilyPondInstall();
 			if (OS_NAME.startsWith("mac") && !lilyPondDirectory.getAbsolutePath().equals(getPlatformSpecificDefaultLPDir()))
 				// If the macOS LilyPond default setup is no good, this is probably a permissions issue
 				attemptFixLilyPondMacAccess();
@@ -317,7 +309,7 @@ public class MainApp extends Application {
 	// Returns the directory where built-in LilyPond is installed.
 	private static String getPlatformSpecificDefaultLPDir() {
 		if (OS_NAME.startsWith("win"))
-			return System.getenv("ProgramFiles(X86)") + "\\LilyPond\\usr\\bin";
+			return "lilypond\\bin";
 		if (OS_NAME.startsWith("mac"))
 			return "lilypond";
 		if (OS_NAME.startsWith("lin"))
@@ -414,81 +406,6 @@ public class MainApp extends Application {
 		return new File(MainApp.developerMode ? System.getProperty("user.home") + File.separator + "Downloads"
 				: MainApp.OS_NAME.startsWith("mac") ? System.getProperty("user.home") + File.separator + "Documents"
 				: FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
-	}
-
-	private static void promptWinLilyPondInstall() {
-
-		// First, prompt the user asking how to proceed
-		// (either to locate a compatible LilyPond installation, continue anyway, or install the bundled one).
-
-		ButtonType locateInstall = new ButtonType("Locate LilyPond Installation");
-		ButtonType updateLilyPond = new ButtonType(isLilyPondInstalled() ? "Update" : "Install", ButtonBar.ButtonData.OK_DONE);
-
-		Optional<ButtonType> result = TWUtils.showAlert(AlertType.INFORMATION, "First Time Setup",
-				String.format("Welcome to %s! LilyPond must be %s in order to continue (Will install to default location).", APP_NAME,
-						isLilyPondInstalled() ? "updated to version " + getRequiredLPVersion() : "installed"), true, null,
-				new ButtonType[] {updateLilyPond, ButtonType.CANCEL, locateInstall}, locateInstall);
-
-		if (result.isPresent()) {
-			if (result.get() == ButtonType.CANCEL) return; // continue without change
-			else if (result.get() == locateInstall) { // Set directory and continue
-				setLilyPondDir(splashStage, true);
-				// Try again if version incompatible
-				if (!isLilyPondVersionCompatible()) promptWinLilyPondInstall();
-				return;
-			}
-		} else return; // No result, probably pressed close button; continue without change
-
-		// Reset to default directory for after installation
-		resetLilyPondDir(true);
-
-		try {
-			// Uninstall old version if present
-			String uninstallerLocation = new File(Objects.requireNonNull(getPlatformSpecificDefaultLPDir()))
-					.getParentFile().getParentFile().getAbsolutePath() + "\\uninstall.exe";
-
-			if (new File(uninstallerLocation).exists()) {
-				Optional<ButtonType> uninsResult = TWUtils.showAlert(AlertType.CONFIRMATION, "Uninstall",
-						"Previous LilyPond installation will be removed.", true);
-				if (uninsResult.isPresent() && uninsResult.get() == ButtonType.OK) {
-					Process uninsProc = new ProcessBuilder("cmd", "/c",
-							String.format("\"%s\"", uninstallerLocation)).start();
-					uninsProc.waitFor();
-
-					AtomicBoolean done = new AtomicBoolean(false);
-					int loops = 0;
-					while (!done.get() && loops < 3) {
-						Thread.sleep(1000);
-						String line;
-						Process p = new ProcessBuilder(System.getenv("windir")
-								+ "\\system32\\" + "tasklist.exe").start();
-						try (BufferedReader input =
-								new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-							while ((line = input.readLine()) != null) {
-								if (line.startsWith("Au_.exe ")) {
-									loops = 0;
-									break;
-								}
-							}
-							loops++;
-						}
-					}
-
-				} else return;
-			}
-
-			// Install bundled version
-			Process process = new ProcessBuilder("cmd", "/c", String.format("\"lilypond\\%s\"",
-					Objects.requireNonNull(bundledLPDir.listFiles(
-							file -> !file.isHidden() && !file.getName().startsWith(".")))[0].getName())).start();
-			process.waitFor();
-			if (process.exitValue() != 0) {
-				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond installation failed!", true);
-			}
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	private static void attemptFixLilyPondMacAccess() {
