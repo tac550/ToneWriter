@@ -454,12 +454,12 @@ public class MainApp extends Application {
 		DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select the folder containing the LilyPond executable");
 		directoryChooser.setInitialDirectory(new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificRootDir())));
-		File savingDirectory = directoryChooser.showDialog(owner);
-		if (savingDirectory == null) return;
+		File selectedDirectory = directoryChooser.showDialog(owner);
+		if (selectedDirectory == null) return;
 
 		String previousLocation = prefs.get(PREFS_LILYPOND_LOCATION, null);
-		prefs.put(PREFS_LILYPOND_LOCATION, savingDirectory.getAbsolutePath());
-		if (new File(savingDirectory.getAbsolutePath() + File.separator + getPlatformSpecificLPExecutable()).exists()) {
+		prefs.put(PREFS_LILYPOND_LOCATION, selectedDirectory.getAbsolutePath());
+		if (new File(selectedDirectory.getAbsolutePath() + File.separator + getPlatformSpecificLPExecutable()).exists()) {
 			refreshLilyPondLocation();
 			if (!isLilyPondVersionCompatible())
 				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond version must be " +
@@ -476,7 +476,6 @@ public class MainApp extends Application {
 					"That folder does not contain a valid LilyPond executable.", true, owner);
 
 			setLilyPondDir(owner, startup);
-
 		}
 	}
 
