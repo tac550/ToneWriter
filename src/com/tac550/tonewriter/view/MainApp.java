@@ -299,11 +299,7 @@ public class MainApp extends Application {
 	public static String getPlatformSpecificLPExecutable() {
 		if (OS_NAME.startsWith("win"))
 			return "\\lilypond.exe";
-		if (OS_NAME.startsWith("mac"))
-			return "/LilyPond.app/Contents/Resources/bin/lilypond";
-		if (OS_NAME.startsWith("lin"))
-			return "/lilypond";
-		else return null;
+		else return "/lilypond";
 	}
 
 	// Returns the directory where built-in LilyPond is installed.
@@ -311,7 +307,7 @@ public class MainApp extends Application {
 		if (OS_NAME.startsWith("win"))
 			return "lilypond\\bin";
 		if (OS_NAME.startsWith("mac"))
-			return "lilypond";
+			return "lilypond/bin";
 		if (OS_NAME.startsWith("lin"))
 			return "/usr/bin";
 		else return null;

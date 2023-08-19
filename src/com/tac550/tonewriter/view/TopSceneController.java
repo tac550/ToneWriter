@@ -75,7 +75,6 @@ public class TopSceneController {
 	@FXML private CheckMenuItem hoverHighlightMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private CheckMenuItem saveMIDIMenuItem;
-	@FXML private MenuItem setLilyPondLocationItem;
 	@FXML private MenuItem resetLilyPondLocationItem;
 	@FXML private CheckMenuItem darkModeMenuItem;
 
@@ -247,9 +246,6 @@ public class TopSceneController {
 		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
 
-		// Modify LilyPond location editing menu items on Mac
-		if (MainApp.OS_NAME.startsWith("mac"))
-			setLilyPondLocationItem.setText("Locate LilyPond.app");
 		if (MainApp.OS_NAME.startsWith("lin"))
 			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
 
