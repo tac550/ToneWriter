@@ -519,7 +519,7 @@ public class TopSceneController {
 		MainApp.setLilyPondDir(parentStage, false);
 	}
 	@FXML private void handleResetLilyPondDir() {
-		MainApp.resetLilyPondDir(false);
+		MainApp.resetLilyPondDir();
 	}
 	@FXML private void handleSetDefaultPaperSize() {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(defaultPaperSize, PAPER_SIZES);

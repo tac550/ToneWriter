@@ -265,7 +265,7 @@ public class MainApp extends Application {
 			// Launching with tone/project loading TODO: Implement Mac support for this
 			List<String> params = getParameters().getRaw();
 			File fileToOpen = null;
-			if (params.size() > 0) {
+			if (!params.isEmpty()) {
 				File openFile = new File(params.get(0));
 				if (openFile.isFile()) fileToOpen = openFile;
 			}
@@ -479,10 +479,10 @@ public class MainApp extends Application {
 		}
 	}
 
-	static void resetLilyPondDir(boolean startup) {
+	static void resetLilyPondDir() {
 		MainApp.prefs.remove(MainApp.PREFS_LILYPOND_LOCATION);
 		refreshLilyPondLocation();
-		if (!startup) topSceneController.refreshAllChordPreviews();
+		topSceneController.refreshAllChordPreviews();
 	}
 
 	private static void refreshLilyPondLocation() {
