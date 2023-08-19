@@ -2,7 +2,6 @@ package com.tac550.tonewriter.view;
 
 import com.tac550.tonewriter.io.AutoUpdater;
 import com.tac550.tonewriter.util.DesktopInterface;
-import com.tac550.tonewriter.util.TWUtils;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -24,7 +23,6 @@ public class UpdaterViewController {
 
 	@FXML private BorderPane mainPane;
 
-	private boolean webViewSupported = true;
 	private WebView webView;
 	@FXML private TextFlow releasesLinkText;
 
@@ -42,38 +40,32 @@ public class UpdaterViewController {
 		updateOnStartupBox.selectedProperty().addListener((ov, oldVal, newVal) ->
 				MainApp.prefs.putBoolean(MainApp.PREFS_CHECK_UPDATE_STARTUP, newVal));
 
-		// JavaFX 18 WebView crashes on macOS 10.13.x (High Sierra) and presumably older versions also.
-		if (MainApp.OS_NAME.startsWith("mac") && TWUtils.versionCompare("10.13.0", System.getProperty("os.version"), 2) < 2)
-			webViewSupported = false;
+		mainPane.getChildren().remove(releasesLinkText);
 
-		if (webViewSupported) {
-			mainPane.getChildren().remove(releasesLinkText);
+		webView = new WebView();
+		mainPane.setCenter(webView);
 
-			webView = new WebView();
-			mainPane.setCenter(webView);
+		// Open any Web links in the system's default Web browser.
+		webView.getEngine().getLoadWorker().stateProperty().addListener((ov, oldVal, newVal) -> {
+			if (newVal == Worker.State.SUCCEEDED) {
 
-			// Open any Web links in the system's default Web browser.
-			webView.getEngine().getLoadWorker().stateProperty().addListener((ov, oldVal, newVal) -> {
-				if (newVal == Worker.State.SUCCEEDED) {
+				NodeList nodeList = webView.getEngine().getDocument().getElementsByTagName("a");
+				for (int i = 0; i < nodeList.getLength(); i++) {
+					Node node = nodeList.item(i);
+					EventTarget eventTarget = (EventTarget) node;
+					eventTarget.addEventListener("click", event -> {
+						EventTarget target = event.getCurrentTarget();
+						HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
+						String href = anchorElement.getHref();
 
-					NodeList nodeList = webView.getEngine().getDocument().getElementsByTagName("a");
-					for (int i = 0; i < nodeList.getLength(); i++) {
-						Node node = nodeList.item(i);
-						EventTarget eventTarget = (EventTarget) node;
-						eventTarget.addEventListener("click", event -> {
-							EventTarget target = event.getCurrentTarget();
-							HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-							String href = anchorElement.getHref();
+						DesktopInterface.browseURI(href);
 
-							DesktopInterface.browseURI(href);
-
-							event.preventDefault();
-						}, false);
-					}
-
+						event.preventDefault();
+					}, false);
 				}
-			});
-		}
+
+			}
+		});
 	}
 
 	@FXML private void handleUpdate() {
@@ -90,12 +82,11 @@ public class UpdaterViewController {
 	}
 
 	public void setWebViewContent(String page_text) {
-		if (webViewSupported)
-			webView.getEngine().loadContent(page_text);
+		webView.getEngine().loadContent(page_text);
 	}
 
 	public void setVersionChoices(List<String> versions) {
-		if (versions.size() > 0) {
+		if (!versions.isEmpty()) {
 			versionChoiceBox.getItems().setAll(versions);
 			versionChoiceBox.getSelectionModel().select(0);
 			updateStatusText.setText("Update available: Version " + versionChoiceBox.getSelectionModel().getSelectedItem()
