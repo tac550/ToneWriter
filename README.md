@@ -16,7 +16,7 @@ Please feel free to fork this repo and send in pull requests! I'm happy to accep
 
 ## Building / Debugging
 
-On Linux, you need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. Version 2.20.x or greater is required.
+On Linux, you need to have [LilyPond](http://lilypond.org/) installed for most features of ToneWriter to work. Version 2.22.x or greater is required.
 
 On Windows and macOS, you need to place official LilyPond binaries in a directory named `lilypond` at the root of the project.
 The binary gets included automatically by the packaging scripts for distribution.
