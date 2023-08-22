@@ -457,9 +457,7 @@ public class MainApp extends Application {
 		prefs.put(PREFS_LILYPOND_LOCATION, selectedDirectory.getAbsolutePath());
 		if (new File(selectedDirectory.getAbsolutePath() + File.separator + getPlatformSpecificLPExecutable()).exists()) {
 			refreshLilyPondLocation();
-			if (!isLilyPondVersionCompatible())
-				TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond version must be " +
-						getRequiredLPVersion() + " or above. This one is " + getInstalledLPVersion(), true);
+			checkLilyPondVersionCompatibility();
 			if (!startup) topSceneController.refreshAllChordPreviews();
 		} else {
 			if (previousLocation == null) {
@@ -486,15 +484,21 @@ public class MainApp extends Application {
 
 		lilyPondDirectory = new File(prefs.get(PREFS_LILYPOND_LOCATION, getPlatformSpecificDefaultLPDir()));
 
-		lilyPondAvailable = isLilyPondInstalled() && isLilyPondVersionCompatible();
+		lilyPondAvailable = isLilyPondInstalled() && checkLilyPondVersionCompatibility();
 	}
 
 	private static boolean isLilyPondInstalled() {
 		return new File(getLilyPondPath() + getPlatformSpecificLPExecutable()).exists();
 	}
 
-	private static boolean isLilyPondVersionCompatible() {
-		return TWUtils.versionCompare(getInstalledLPVersion(), getRequiredLPVersion()) != 2;
+	private static boolean checkLilyPondVersionCompatibility() {
+		if (TWUtils.versionCompare(getInstalledLPVersion(), getRequiredLPVersion()) != 2) {
+			return true;
+		} else {
+			TWUtils.showAlert(AlertType.ERROR, "Error", "LilyPond version must be " +
+					getRequiredLPVersion() + " or above. This one is " + getInstalledLPVersion(), true);
+			return false;
+		}
 	}
 
 	private static String getInstalledLPVersion() {
