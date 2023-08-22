@@ -41,18 +41,18 @@ verse = \lyricmode { }
 \score {
   \new PianoStaff <<
     \new Staff \with {
-      \once \override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves
+      \once \override Staff.TimeSignature.stencil = ##f % Hides the time signatures in the upper staves
       midiInstrument = #"choir aahs"
     } <<
       \new Voice = "soprano" { \voiceOne \soprano }
       \new Voice { \voiceTwo \alto }
     >>
     \new Lyrics \with {
-      \override VerticalAxisGroup #'staff-affinity = #CENTER
+      \override VerticalAxisGroup.staff-affinity = #CENTER
     } \lyricsto "soprano" \verse
     
     \new Staff \with {
-      \once \override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves
+      \once \override Staff.TimeSignature.stencil = ##f % Hides the time signatures in the lower staves
       midiInstrument = #"choir aahs"
     } <<
       \clef bass
@@ -64,7 +64,6 @@ verse = \lyricmode { }
   \layout {
     \context {
       \Score
-      defaultBarType = "" % Hides any auto-generated barlines
       \remove "Bar_number_engraver" % removes the bar numbers at the start of each system
     }
   }
