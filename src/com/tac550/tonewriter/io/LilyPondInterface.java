@@ -274,18 +274,18 @@ public class LilyPondInterface {
 					"  }\n");
 
 			Collections.addAll(lines, "  \\new ChoirStaff <<", "    \\new Staff \\with {",
-					"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the upper staves");
+					"      \\once \\override Staff.TimeSignature.stencil = ##f % Hides the time signatures in the upper staves");
 			if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
 			Collections.addAll(lines, "    } <<", "      \\key " + keySignatureToLilyPond(item.getAssociatedTone().getKeySignature()),
 					"      \\new Voice = \"soprano\" { \\voiceOne {" + results[PART_SOPRANO] + " } }",
 					"      \\new Voice = \"alto\" { \\voiceTwo {" + results[PART_ALTO] + " } }",
-					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup #'staff-affinity = #CENTER",
+					"    >>", "    \\new Lyrics \\with {", "      \\override VerticalAxisGroup.staff-affinity = #CENTER",
 					"    } \\lyricsto \"soprano\" { \\lyricmode {" + results[4] + " } }\n");
 
 			// If the tenor and bass parts are not empty, include a lower staff.
 			if (noteDataPattern.matcher(results[PART_TENOR]).find() || noteDataPattern.matcher(results[PART_BASS]).find()) {
 				Collections.addAll(lines, "    \\new Staff \\with {",
-						"      \\once \\override Staff.TimeSignature #'stencil = ##f % Hides the time signatures in the lower staves");
+						"      \\once \\override Staff.TimeSignature.stencil = ##f % Hides the time signatures in the lower staves");
 				if (generate_midi) lines.add("      midiInstrument = #\"choir aahs\"");
 				Collections.addAll(lines, "    } <<", "      \\clef bass",
 						"      \\key " + keySignatureToLilyPond(item.getAssociatedTone().getKeySignature()),
@@ -295,7 +295,6 @@ public class LilyPondInterface {
 			}
 
 			Collections.addAll(lines, "  >>\n", "  \\layout {", "    \\context {", "      \\Score",
-					"      defaultBarType = \"|\" % Split barlines delimit phrases",
 					"      \\remove \"Bar_number_engraver\" % removes the bar numbers at the start of each system",
 					"      \\accidentalStyle neo-modern-voice-cautionary",
 					"    }", "  }");

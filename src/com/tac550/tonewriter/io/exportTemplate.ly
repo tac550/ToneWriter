@@ -1,4 +1,4 @@
-\version "2.22.0"
+\version "2.24.0"
 
 #(set-default-paper-size "letter")
 
@@ -13,8 +13,8 @@
 
 \paper {
   print-all-headers = ##t
-  evenHeaderMarkup = \markup { \fill-line { \on-the-fly #not-first-page \fromproperty #'page:page-number-string \on-the-fly #not-first-page \fromproperty #'header:instrument "" } }
-  oddHeaderMarkup = \markup { \fill-line { "" \on-the-fly #not-first-page \fromproperty #'header:instrument \on-the-fly #not-first-page \fromproperty #'page:page-number-string } }
+  evenHeaderMarkup = \markup { \fill-line { \unless \on-first-page \fromproperty #'page:page-number-string \unless \on-first-page \fromproperty #'header:instrument "" } }
+  oddHeaderMarkup = \markup { \fill-line { "" \unless \on-first-page \fromproperty #'header:instrument \unless \on-first-page \fromproperty #'page:page-number-string } }
   ragged-bottom = ##t
   top-margin = 13.0\mm
   bottom-margin = 13.0\mm
