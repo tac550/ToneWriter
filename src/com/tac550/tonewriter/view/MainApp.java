@@ -306,11 +306,7 @@ public class MainApp extends Application {
 	private static String getPlatformSpecificDefaultLPDir() {
 		if (OS_NAME.startsWith("win"))
 			return "lilypond\\bin";
-		if (OS_NAME.startsWith("mac"))
-			return "lilypond/bin";
-		if (OS_NAME.startsWith("lin"))
-			return "/usr/bin";
-		else return null;
+		else return "lilypond/bin";
 	}
 
 	// Returns the extension for midi files produced by LilyPond on the current platform.
