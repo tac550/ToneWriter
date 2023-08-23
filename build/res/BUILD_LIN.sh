@@ -7,6 +7,7 @@ jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path 
 java.naming,jdk.charsets,jdk.crypto.ec,java.sql --output ../lin/java-runtime && \
 cp jar/tonewriter.jar ../lin/jar/ && \
 cp -r "../../Built-in Tones" "../lin/Built-in Tones" && \
+cp -a "../../lilypond" "../lin/lilypond" && \
 cp -r ../../licenses ../lin/licenses && \
 cp ToneWriter.sh ../lin && \
 cd .. && \
