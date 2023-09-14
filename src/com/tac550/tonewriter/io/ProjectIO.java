@@ -314,8 +314,6 @@ public class ProjectIO {
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile, StandardCharsets.UTF_8))) {
 			projectVersion = readLine(reader).get(0);
-			projectBuilder.title(readLine(reader).get(0));
-			numItems = Integer.parseInt(readLine(reader).get(0));
 
 			// Version checking
 			// Opening project files from future minor version increases is unsupported because the lazy saving system is
@@ -326,6 +324,10 @@ public class ProjectIO {
 						MainApp.APP_NAME, TWUtils.truncateVersionNumber(projectVersion, 2)), true);
 				return null;
 			}
+
+			projectBuilder.title(readLine(reader).get(0));
+			numItems = Integer.parseInt(readLine(reader).get(0));
+
 			// Before 1.0: no project-level paper size, spread type, or no-header option.
 			if (TWUtils.versionCompare("1.0", projectVersion) != 1) {
 				List<String> pageSettings = readLine(reader);
