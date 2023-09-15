@@ -168,11 +168,12 @@ public abstract class ChordViewController implements CommentableView {
 	}
 
 	@FXML void refreshChordPreview() {
-
 		if (chantPhraseController.isLoadingTone()) return; // Avoid unnecessary refreshes while loading a tone
 
-		if (!MainApp.lilyPondAvailable()) {
-			playButton.setDisable(true);
+		boolean available = MainApp.lilyPondAvailable();
+		playButton.setDisable(!available);
+
+		if (!available) {
 			Platform.runLater(() -> chordView.setImage(noLilyPondImage));
 			return;
 		}

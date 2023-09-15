@@ -249,15 +249,7 @@ public class TopSceneController {
 		if (MainApp.OS_NAME.startsWith("lin"))
 			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
 
-		// If Lilypond isn't present, disable midi options and the ability not to save LilyPond files.
-		if (!MainApp.lilyPondAvailable()) {
-			saveLPMenuItem.setSelected(true);
-			saveLPMenuItem.setDisable(true);
-			playMidiMenuItem.setSelected(false);
-			playMidiMenuItem.setDisable(true);
-			saveMIDIMenuItem.setSelected(false);
-			saveMIDIMenuItem.setDisable(true);
-		}
+		updateLilyPondMenuItemState();
 
 		// Initial state and behavior for "Save LilyPond file" option
 		saveLPMenuItem.setSelected(MainApp.prefs.getBoolean(MainApp.PREFS_SAVE_LILYPOND_FILE, false));
@@ -332,6 +324,20 @@ public class TopSceneController {
 				addTab(null, 0, null, ctr -> openProject(arg_file), true);
 		} else {
 			addTab(null, 0, null, null, true);
+		}
+	}
+
+	private void updateLilyPondMenuItemState() {
+		// If Lilypond isn't available, disable midi options and the ability not to save LilyPond files.
+		boolean available = MainApp.lilyPondAvailable();
+		saveLPMenuItem.setDisable(!available);
+		playMidiMenuItem.setDisable(!available);
+		saveMIDIMenuItem.setDisable(!available);
+
+		if (!available) {
+			saveLPMenuItem.setSelected(true);
+			playMidiMenuItem.setSelected(false);
+			saveMIDIMenuItem.setSelected(false);
 		}
 	}
 
@@ -513,9 +519,11 @@ public class TopSceneController {
 	 */
 	@FXML private void handleSetLilyPondDir() {
 		MainApp.setLilyPondDir(parentStage, false);
+		updateLilyPondMenuItemState();
 	}
 	@FXML private void handleResetLilyPondDir() {
 		MainApp.resetLilyPondDir();
+		updateLilyPondMenuItemState();
 	}
 	@FXML private void handleSetDefaultPaperSize() {
 		ChoiceDialog<String> dialog = new ChoiceDialog<>(defaultPaperSize, PAPER_SIZES);
