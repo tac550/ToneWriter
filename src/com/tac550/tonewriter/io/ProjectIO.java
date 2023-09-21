@@ -201,14 +201,7 @@ public class ProjectIO {
 			// Version info
 			writeLine(writer, MainApp.APP_VERSION);
 
-			// Original tone location; relative path if built-in or in a subdirectory to project file.
-			File originalToneFile = item.getOriginalToneFile();
-			String tonePath = originalToneFile != null && originalToneFile.isFile() ? originalToneFile.getAbsolutePath() : "";
-			String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
-			if (tonePath.startsWith(builtInPath))
-				tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
-			else if (tonePath.startsWith(parent_path))
-				tonePath = tonePath.replace(parent_path, "$PROJECT_DIR");
+			String tonePath = getTonePath(item, parent_path);
 			writeLine(writer, tonePath);
 
 			writeLine(writer, ToneIO.getToneHash(item.getAssociatedTone())); // Tone hash (empty if no tone loaded)
@@ -234,7 +227,7 @@ public class ProjectIO {
 					line.append("|").append(syllable.getSyllableText().strip());
 
 					String formatData = syllable.getFormatData();
-					if (formatData.length() > 0)
+					if (!formatData.isEmpty())
 						line.append("&").append(formatData);
 
 					line.append(" ");
@@ -247,6 +240,18 @@ public class ProjectIO {
 			}
 
 		}
+	}
+
+	// Get original tone location; relative path if built-in or in a subdirectory to project file.
+	private static String getTonePath(ProjectItem item, String parent_path) {
+		File originalToneFile = item.getOriginalToneFile();
+		String tonePath = originalToneFile != null && originalToneFile.isFile() ? originalToneFile.getAbsolutePath() : "";
+		String builtInPath = MainApp.BUILT_IN_TONE_DIR.getAbsolutePath();
+		if (tonePath.startsWith(builtInPath))
+			tonePath = tonePath.replace(builtInPath, "$BUILT_IN_DIR");
+		else if (tonePath.startsWith(parent_path))
+			tonePath = tonePath.replace(parent_path, "$PROJECT_DIR");
+		return tonePath;
 	}
 
 	public static Project loadProject(File project_file) {
