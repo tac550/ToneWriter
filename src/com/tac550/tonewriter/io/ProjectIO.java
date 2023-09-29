@@ -13,15 +13,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -88,35 +85,6 @@ public class ProjectIO {
 			saveItemToFile(itemSaveFile, item, project_file.getParent());
 
 			index++;
-		}
-
-		// TODO: Is this necessary now given we've eliminated project component caching?
-		// Delete any leftover tones (tones required to open the project that are no longer in use)
-		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
-		if (tonesDir.exists())
-			try (Stream<Path> dirs = Files.list(tonesDir.toPath())) {
-				dirs.filter(path -> !uniqueHashes.contains(path.getFileName().toString()))
-						.forEach(path -> {
-							try { FileUtils.deleteDirectory(path.toFile()); } catch (IOException e) { e.printStackTrace();
-								TWUtils.showError("Failed to delete leftover tone " + path, false); }
-						});
-			} catch (IOException e) {
-				e.printStackTrace();
-				TWUtils.showError("Failed to delete leftover tone entries!", false);
-			}
-
-		// Delete any leftover items (necessary if items have been removed since last save/load)
-		try (Stream<Path> files = Files.list(new File(tempProjectDirectory.getAbsolutePath()
-				+ File.separator + "items").toPath())) {
-			int finalIndex = index;
-			files.filter(path -> Integer.parseInt(path.getFileName().toString()) >= finalIndex)
-					.forEach(path -> {
-						try { Files.delete(path); } catch (IOException e) { e.printStackTrace();
-							TWUtils.showError("Failed to delete leftover item " + path, false); }
-					});
-		} catch (IOException e) {
-			e.printStackTrace();
-			TWUtils.showError("Failed to delete leftover item entries!", false);
 		}
 
 		// Compress the temp directory and save to a temp zip file
