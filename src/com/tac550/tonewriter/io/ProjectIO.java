@@ -249,24 +249,27 @@ public class ProjectIO {
 		}
 
 		// Unzip the project file
+
+		// Track error messages here to be displayed later if the file version is supported
+		ArrayList<String> extraction_errors = new ArrayList<>();
+
 		try (FileInputStream fis = new FileInputStream(tempZip);
-		     ZipInputStream zis = new ZipInputStream(fis)) {
+			 ZipInputStream zis = new ZipInputStream(fis)) {
+
 			byte[] buffer = new byte[1024];
 
 			ZipEntry zipEntry = zis.getNextEntry();
 			while (zipEntry != null) {
 				File unzippedFile = checkExtractionDestination(tempProjectDirectory, zipEntry);
-				if (!unzippedFile.getParentFile().mkdirs() && !unzippedFile.getParentFile().exists()) {
-					TWUtils.showError("Failed to construct internal temp directory!", true);
-					return null;
-				}
+				if (!unzippedFile.getParentFile().mkdirs() && !unzippedFile.getParentFile().exists())
+					extraction_errors.add("Failed to construct internal temp directory!");
+
 				try (FileOutputStream fos = new FileOutputStream(unzippedFile)) {
 					int len;
 					while ((len = zis.read(buffer)) > 0)
 						fos.write(buffer, 0, len);
 				} catch (IOException e) {
-					e.printStackTrace();
-					TWUtils.showError("Failed to extract file " + zipEntry.getName(), true);
+					extraction_errors.add("Failed to extract file " + zipEntry.getName());
 				}
 
 				zipEntry = zis.getNextEntry();
@@ -297,6 +300,10 @@ public class ProjectIO {
 						MainApp.APP_NAME, TWUtils.truncateVersionNumber(projectVersion, 2)), true);
 				return null;
 			}
+
+			// Display any file extraction errors encountered earlier.
+			for (String error : extraction_errors)
+				TWUtils.showError(error, true);
 
 			projectBuilder.title(readLine(reader).get(0));
 			numItems = Integer.parseInt(readLine(reader).get(0));
