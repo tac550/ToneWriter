@@ -322,7 +322,7 @@ public class ProjectIO {
 		Map<String, File> hashtoToneFile = new HashMap<>();
 		File tonesDir = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "tones");
 		File[] toneDirs = tonesDir.listFiles(); // Directory names are the hash of contained tone.
-		if (tonesDir.exists() && toneDirs != null) {
+		if (toneDirs != null) {
 			for (File toneDir : toneDirs)
 				hashtoToneFile.put(toneDir.getName(), new File(toneDir.getAbsolutePath()
 						+ File.separator + "Unsaved Tone.tone"));
