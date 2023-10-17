@@ -152,7 +152,7 @@ public class LilyPondInterface {
 		}
 
 		// If no items were passed, use the items contained in the project model for the export
-		if (items == null || items.size() == 0)
+		if (items == null || items.isEmpty())
 			items = project.getItems();
 
 		// Copy the render template file to the output path.
@@ -354,7 +354,7 @@ public class LilyPondInterface {
 		// Buffer for the piece's text.
 		StringBuilder verseText = new StringBuilder();
 		// Add initial bar line, if there are any vlines.
-		if (assignment_lines.size() > 0) {
+		if (!assignment_lines.isEmpty()) {
 			String bar = assignment_lines.get(0).getBeforeBar();
 			verseText.append(String.format("\\bar \"%s\"", bar.equals(BAR_UNCHANGED) ? " " : bar));
 		}
@@ -455,7 +455,7 @@ public class LilyPondInterface {
 							hideThisChord = false;
 						} else {
 							List<AssignedChordData> previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssignedChords();
-							if (previousSyllableChords.size() == 0)
+							if (previousSyllableChords.isEmpty())
 								// If the previous syllable has no chords assigned, then we know we shouldn't be hiding this one.
 								hideThisChord = false;
 							else
@@ -484,7 +484,7 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == chordList.size() - 1) {
 						// And if this isn't the last syllable with chords on it...
 						if (syllableList.indexOf(syllable) < syllableList.size() - 1
-								&& syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().size() > 0) {
+								&& !syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().isEmpty()) {
 							// Then the next note is the note from the first chord of the next syllable.
 							nextNote = getNoteAndDuration(syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().get(0), inOrderChords, i);
 						} else {
@@ -535,7 +535,7 @@ public class LilyPondInterface {
 					}
 
 					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
-					if (previousNote.equals("") || currentNote.equals("") || nextNote.equals(""))
+					if (previousNote.isEmpty() || currentNote.isEmpty() || nextNote.isEmpty())
 						hideThisChord = false;
 
 					// If the previous, current, and next notes are not all quarters and/or not all the same pitch...

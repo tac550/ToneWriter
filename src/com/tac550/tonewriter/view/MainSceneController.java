@@ -881,7 +881,7 @@ public class MainSceneController {
 		setHeaderStrings(tone.getToneText(), tone.getComposerText());
 
 		// If tone is empty, clear all lines and return.
-		if (tone.getChantPhrases().size() < 1) {
+		if (tone.getChantPhrases().isEmpty()) {
 			clearChantPhrases();
 			return true;
 		}

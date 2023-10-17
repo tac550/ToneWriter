@@ -589,7 +589,7 @@ public class ChantPhraseViewController implements CommentableView {
 		mainController.syncCVLMapping();
 	}
 	public void makePrime() {
-		if (nameChoice.getItems().size() > 0) {
+		if (!nameChoice.getItems().isEmpty()) {
 			nameChoice.getSelectionModel().select(1); // Works if both selections have already been loaded	
 		} else {
 			makePrimeLater = true;
@@ -602,7 +602,7 @@ public class ChantPhraseViewController implements CommentableView {
 		return hasPrime;
 	}
 	public void makeAlternate() {
-		if (nameChoice.getItems().size() > 0) {
+		if (!nameChoice.getItems().isEmpty()) {
 			nameChoice.getSelectionModel().select(2); // Works if both selections have already been loaded	
 		} else {
 			makeAlternateLater = true;

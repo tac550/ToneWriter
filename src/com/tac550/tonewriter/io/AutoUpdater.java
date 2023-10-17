@@ -81,7 +81,7 @@ public class AutoUpdater {
 					finalHTMLBuilder.append("</body>");
 
 					// If there's no update and this is the startup check, or the check has been cancelled, stop here.
-					if ((startup && versionOptions.size() == 0) || checkCancelled)
+					if ((startup && versionOptions.isEmpty()) || checkCancelled)
 						return null;
 
 					Platform.runLater(() -> {
@@ -213,6 +213,12 @@ public class AutoUpdater {
 			return;
 		}
 
+		Thread downloadThread = buildDownloadThread(version, downloadFile, sourceFileName);
+		downloadThread.start();
+
+	}
+
+	private static Thread buildDownloadThread(String version, File downloadFile, String sourceFileName) {
 		Task<Boolean> downloadTask = new Task<>() {
 			@Override
 			protected Boolean call() {
@@ -244,9 +250,7 @@ public class AutoUpdater {
 			TWUtils.showError("Failed to download update!", true);
 			hideDownloadAlert();
 		});
-		Thread downloadThread = new Thread(downloadTask);
-		downloadThread.start();
-
+		return new Thread(downloadTask);
 	}
 
 	private static void executeInstaller(File downloaded_file) {

@@ -54,7 +54,7 @@ public class ProjectRecoveryViewController {
 	}
 
 	boolean hasAutosavedProject() {
-		return listView.getItems().size() > 0;
+		return !listView.getItems().isEmpty();
 	}
 
 }
