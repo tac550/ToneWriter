@@ -469,6 +469,12 @@ public class MainSceneController {
 		setVersePane.setMouseTransparent(false);
 
 		// Sends off the contents of the verse field to be broken into syllables.
+		Thread syllableThread = buildSyllabificationThread();
+		syllableThread.start();
+
+	}
+
+	private Thread buildSyllabificationThread() {
 		Task<Void> syllabificationTask = new Task<>() {
 
 			@Override
@@ -493,9 +499,7 @@ public class MainSceneController {
 			}
 		};
 
-		Thread syllableThread = new Thread(syllabificationTask);
-		syllableThread.start();
-
+		return new Thread(syllabificationTask);
 	}
 
 	@FXML private void handleCancelSetVerse() {
