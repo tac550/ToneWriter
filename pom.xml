@@ -90,7 +90,7 @@
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
-                            <finalName>ToneWriter</finalName>
+                            <finalName>tonewriter</finalName>
                             <outputDirectory>build/res/jar</outputDirectory>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
