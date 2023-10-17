@@ -131,6 +131,9 @@ local.properties
 # .idea/*.iml
 # .idea/modules
 
+# Maven
+/target/
+
 # CMake
 cmake-build-*/
 

@@ -2,9 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <excludeFromCompile>
-      <file url="file://$PROJECT_DIR$/src/com/tac550/tonewriter/io/autoupdate-Linux.sh" />
-      <file url="file://$PROJECT_DIR$/src/com/tac550/tonewriter/io/autoupdate-macOS.sh" />
-      <file url="file://$PROJECT_DIR$/src/com/tac550/tonewriter/io/tryfix-LilyPond-macOS.sh" />
+      <file url="file://$PROJECT_DIR$/src/main/resources/updater/autoupdate-Linux.sh" />
+      <file url="file://$PROJECT_DIR$/src/main/resources/updater/autoupdate-macOS.sh" />
+      <file url="file://$PROJECT_DIR$/src/main/resources/updater/tryfix-LilyPond-macOS.sh" />
     </excludeFromCompile>
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="tonewriter" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ToneWriter" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>
