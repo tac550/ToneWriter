@@ -700,13 +700,7 @@ public class MainSceneController {
 	void handleSetKeySignature() {
 
 		new Thread(() -> Platform.runLater(() -> {
-			List<String> choices = new ArrayList<>(List.of("C major", "G major", "D major", "A major", "E major", "B major",
-					"F\u266F major", "C\u266F major", "F major", "B\u266Dmajor", "E\u266Dmajor", "A\u266Dmajor", "D\u266Dmajor",
-					"G\u266Dmajor", "C\u266Dmajor", "A minor", "E minor", "B minor", "F\u266F minor", "C\u266F minor", "G\u266F minor",
-					"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
-					"A\u266Dminor"));
-
-			ChoiceDialog<String> dialog = new ChoiceDialog<>(keySignature, choices);
+			ChoiceDialog<String> dialog = getKeyChoiceDialog();
 			dialog.setTitle("Key Choice");
 			dialog.setHeaderText("Choose a key");
 			ImageView keyIcon = new ImageView(Objects.requireNonNull(getClass().getResource(TopSceneController.keyIconPath)).toExternalForm());
@@ -725,6 +719,17 @@ public class MainSceneController {
 		})).start();
 
 	}
+
+	private ChoiceDialog<String> getKeyChoiceDialog() {
+		List<String> choices = new ArrayList<>(List.of("C major", "G major", "D major", "A major", "E major", "B major",
+				"F\u266F major", "C\u266F major", "F major", "B\u266Dmajor", "E\u266Dmajor", "A\u266Dmajor", "D\u266Dmajor",
+				"G\u266Dmajor", "C\u266Dmajor", "A minor", "E minor", "B minor", "F\u266F minor", "C\u266F minor", "G\u266F minor",
+				"D\u266F minor", "A\u266F minor", "D minor", "G minor", "C minor", "F minor", "B\u266Dminor", "E\u266Dminor",
+				"A\u266Dminor"));
+
+		return new ChoiceDialog<>(keySignature, choices);
+	}
+
 	void handleEditHeaderInfo() {
 
 		new Thread(() -> Platform.runLater(() -> {
