@@ -2,9 +2,14 @@
 
 [Project Site](https://github.com/tac550/ToneWriter) | [Download](https://github.com/tac550/ToneWriter/releases)
 
-ToneWriter is a JavaFX desktop application designed to make it easy to create sheet music for various (and user-definable) chant melodies like those used in Orthodox Christian worship. This type of music is typically unmetered and features repeating melodies and long stretches of recitative. These characteristics allow a wide variety of texts to be set to the music, but are unusual in the wider musical world, and thus are not well-supported by conventional WYSIWYG engravers like Finale and MuseScore. LilyPond provides the control needed to engrave this kind of music a little more easily, but the task is still laborious and the learning curve is steep.
+ToneWriter is an application which makes it easy to create sheet music for repeating chant melodies like those used in Orthodox Christian worship. This type of music is typically unmetered and features long stretches of recitative. For these reasons and others, it is a struggle to set this music in Western staff notation using conventional digital engraving software like Finale and MuseScore. ToneWriter makes it much easier to engrave this chant music on desktop computers. See the example below:
 
-ToneWriter attempts to solve this problem by abstracting the chant melodies themselves away from the particular text being used. The user can then easily define how to map the melody to any given text and automatically generate PDF sheet music in a graphical interface. Users may create their own chant data (commmonly called "tones" in church parlance) or use a tone that comes built into the software. Users then enter the text to be used, which is automatically broken into syllables. Mapping the chant melodies to each line of text is as simple as clicking on the syllable(s) to which each chord will apply. The application outputs printable sheet music in PDF format, with all the stylistic particularities of this type of music automatically applied.
+This...
+![image](https://github.com/tac550/ToneWriter/assets/9357248/15e542da-3eed-4c72-9262-9481d4f83e28)
+...beomces this:
+![image](https://github.com/tac550/ToneWriter/assets/9357248/72ae7d53-08e1-4162-ad58-462854b0d902)
+
+ToneWriter works by abstracting the chant melodies and harmonizations away from the particular text being used. The user defines how to map any given melody to any given text, and ToneWriter automatically generates PDF sheet music. Users may define their own chant melodies or use any of those that come built into the software. Users then enter the text to be used, which is automatically broken into syllables. Mapping the chant melodies to each line of text is as simple as clicking on the syllable(s) to which each chord will apply. The application outputs printable sheet music in PDF format, with all the stylistic peculiarities of this type of music automatically applied.
 
 ## Contributing
 
