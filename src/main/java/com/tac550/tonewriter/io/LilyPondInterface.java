@@ -534,13 +534,13 @@ public class LilyPondInterface {
 						}
 					}
 
-					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
-					if (previousNote.isEmpty() || currentNote.isEmpty() || nextNote.isEmpty())
-						hideThisChord = false;
-
 					// If the previous, current, and next notes are not all quarters and/or not all the same pitch...
 					if (!previousNote.equals(currentNote) || !currentNote.equals(nextNote) || !currentNote.contains("4"))
 						// Don't hide the current chord because neighboring chords are different.
+						hideThisChord = false;
+
+					// This is just protection against some kind of error resulting in empty notes. Just don't hide the chord in this case.
+					if (previousNote.isEmpty() || currentNote.isEmpty() || nextNote.isEmpty())
 						hideThisChord = false;
 				}
 
