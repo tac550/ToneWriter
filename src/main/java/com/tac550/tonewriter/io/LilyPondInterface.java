@@ -401,7 +401,7 @@ public class LilyPondInterface {
 			// Buffer for the syllable's text.
 			StringBuilder syllableTextBuffer = new StringBuilder();
 
-			// Whether or not notes were combined for each part in the previous chord.
+			// True if notes were combined for each part in the previous chord.
 			// Note that notes being combined means either being made into one note with a
 			// duration which is the sum of the two, or that the notes were tied (because there can be no single note with such a duration)
 			boolean[] noteCombined = new boolean[]{false, false, false, false};
@@ -419,11 +419,11 @@ public class LilyPondInterface {
 
 			for (AssignedChordData chordData : chordList) {
 
-				// Add an additional chord indicator for the syllable, unless the soprano part was combined two chords ago,
+				// Add another chord indicator for the syllable, unless the soprano part was combined two chords ago,
 				// or it contains a rest. We only check the soprano part because the text is mapped to it.
 				if (chordList.indexOf(chordData) != 0 && !previousNoteCombined[PART_SOPRANO]
 						&& !getNoteAndDuration(chordData, inOrderChords, PART_SOPRANO).contains("r"))
-					// For chords subsequent to the first for each syllable, we add this to the lyric line
+					// For chords after the first for each syllable, we add this to the lyric line
 					// to tell Lilypond this syllable has an additional chord attached to it.
 					syllableTextBuffer.append(" _ ");
 
