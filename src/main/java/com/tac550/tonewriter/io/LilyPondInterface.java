@@ -438,6 +438,13 @@ public class LilyPondInterface {
 				boolean lastChordInLine = false;
 				boolean currentNoteIsEighth = false;
 
+				// First, don't hide the chord if the next syllable (if any) has more than one assigned chord.
+				AssignmentSyllable nextSyllable;
+				if (syllableList.indexOf(syllable) < syllableList.size() - 1
+						&& (nextSyllable = syllableList.get(syllableList.indexOf(syllable) + 1)) != null)
+					if (nextSyllable.getAssignedChords().size() > 1)
+						hideThisChord = false;
+
 				// For each part...
 				for (int i = 0; i < 4; i++) {
 					// We need to get a previous note, the current note, and the next note in order to do this processing.
