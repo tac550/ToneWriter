@@ -4,9 +4,9 @@
 
 ToneWriter is an application which makes it easy to create sheet music for repeating chant melodies like those used in Orthodox Christian worship. This type of music is typically unmetered and features long stretches of recitative. For these reasons and others, it is a struggle to set this music in Western staff notation using conventional digital engraving software like Finale and MuseScore. ToneWriter makes it much easier to engrave this chant music on desktop computers. See the example below:
 
-This...
+ToneWriter lets you assign chords to syllables...
 ![image](https://github.com/tac550/ToneWriter/assets/9357248/15e542da-3eed-4c72-9262-9481d4f83e28)
-...becomes this:
+...to produce sheet music with a single click:
 ![image](https://github.com/tac550/ToneWriter/assets/9357248/cae57fe9-7913-44fa-b488-032999560e13)
 
 ToneWriter works by abstracting the chant melodies and harmonizations away from the particular text being used. The user defines how to map any given melody to any given text, and ToneWriter automatically generates PDF sheet music. Users may define their own chant melodies or use any of those that come built into the software. Users then enter the text to be used, which is automatically broken into syllables. Mapping the chant melodies to each line of text is as simple as clicking on the syllable(s) to which each chord will apply. The application outputs printable sheet music in PDF format, with all the stylistic peculiarities of this type of music automatically applied.
@@ -17,14 +17,14 @@ Please feel free to fork this repo and send in pull requests! I'm happy to accep
 
 ### Wishlist
 
- - I'm looking for someone to help make the app better-suited to Byzantine and other less-polyphonic tone systems. At the moment things are designed primarily to work with SATB voicing because that is what I'm most familiar with. Someone more knowledgeable about other chant styles would do a better job of adding support for them than I would.
+ - I'm looking for someone to help make the app better-suited to Byzantine and other monophonic chant systems. At the moment things are designed primarily to work with SATB voicing. Someone more knowledgeable about other chant styles would do a better job of adding support for them than I would.
 
 ## Building / Debugging
 
 Place official LilyPond binaries in a directory named `lilypond` at the root of the project.
 The binary gets included automatically by the packaging scripts for distribution.
 
-I'm building ToneWriter against Java 21 on all platforms. Recommended IDE is IntelliJ IDEA. I use Gluon SceneBuilder to edit the .fxml interface files. This project uses Maven for all dependencies and includes an IDEA run configuration for debugging.
+I'm building ToneWriter against Java 21 on all platforms. Recommended IDE is IntelliJ IDEA. I use Gluon SceneBuilder to edit the .fxml interface files. This project uses Maven for dependency management and includes an IDEA run configuration for debugging.
 
 ## Packaging
 
