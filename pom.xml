@@ -57,7 +57,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>updater/autoupdate-Linux.sh</exclude>
                     <exclude>updater/autoupdate-macOS.sh</exclude>
                     <exclude>updater/tryfix-LilyPond-macOS.sh</exclude>
                 </excludes>
