@@ -458,7 +458,7 @@ public class LilyPondInterface {
 					if (chordList.indexOf(chordData) == 0) {
 						// And if this is the first syllable in the whole text...
 						if (syllableList.indexOf(syllable) == 0) {
-							// Then we know we need to show the chord. It'll be the first chord on the page!
+							// Then we know we need to show the chord.
 							hideThisChord = false;
 						} else {
 							List<AssignedChordData> previousSyllableChords = syllableList.get(syllableList.indexOf(syllable) - 1).getAssignedChords();
@@ -496,7 +496,7 @@ public class LilyPondInterface {
 							nextNote = getNoteAndDuration(syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().get(0), inOrderChords, i);
 						} else {
 							// This is the last chord associated with the last syllable with chords on it,
-							// so we definitely do not want to hide it (it's the last chord on the page!)
+							// so we definitely do not want to hide it.
 							hideThisChord = false;
 							lastChordInLine = true;
 						}
