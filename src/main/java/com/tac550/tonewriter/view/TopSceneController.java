@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -86,7 +87,7 @@ public class TopSceneController {
 	private MainSceneController lastExportTab;
 
 	@FXML private TabPane tabPane;
-	private final HashMap<Tab, MainSceneController> tabControllerMap = new HashMap<>();
+	private final ConcurrentHashMap<Tab, MainSceneController> tabControllerMap = new ConcurrentHashMap<>();
 
 	@FXML private Button addTabButton;
 
@@ -608,7 +609,11 @@ public class TopSceneController {
 
 			// Null if this is the first tab being created
 			Tab prevTab = tabPane.getSelectionModel().getSelectedItem();
-			MainSceneController prevTabController = tabControllerMap.get(prevTab);
+			MainSceneController prevTabController;
+			if (prevTab != null)
+				prevTabController = tabControllerMap.get(prevTab);
+			else
+				prevTabController = null;
 
 			Platform.runLater(() -> {
 				tab.setContent(anchorPane);
@@ -768,7 +773,10 @@ public class TopSceneController {
 	}
 
 	MainSceneController getSelectedTabScene() {
-		return tabControllerMap.get(tabPane.getSelectionModel().getSelectedItem());
+		Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+		if (selectedTab != null)
+			return tabControllerMap.get(selectedTab);
+		else return null;
 	}
 
 	public String getProjectTitle() {
