@@ -1,0 +1,104 @@
+VERSION: 1.3.1
+Key Signature: F major
+Tone: Tone 1, "O Marvelous Wonder"
+Composer: Kiev Caves Monastery Chant
+Manually Assign Phrases: true
+
+
+A
+Comment: Ideally uses each phrase once in order./n/nIf necessary, phrases E and F may be repeated./n/nPhrases G, H, and Final are always the last three phrases.
+1: bf-g-c-c
+	Post: a-f-c-c
+2: bf-g-c-c
+	Post: g-e-c-c
+	Post: a-f-c-c
+3: a-f-c-f
+	Post: f-d-c-c
+	Post: g-e-c-c
+4: bf-g-d-g,
+	Prep: g-e-c-c
+	Prep: a-f-c-a,
+
+B
+1: a-fs-d-d
+2: bf-g-d-g
+3: a-fs-d-d
+4: bf-g-d-g
+5: c'-a-f-f
+	Post: d'-bf-f-bf
+END: c'-a-f-f
+
+C
+1: c'-a-f-f
+	Post: a-f-c-f
+2: bf-g-c-c
+	Post: a-f-c-c
+3: g-e-c-c
+END: a-f-c-f
+	Prep: f-d-c-c
+	Prep: g-e-c-c
+
+D
+1: a-f-c-f
+2: g-e-c-c
+3: a-f-c-f
+
+E
+1: g-e-c-c
+	Post: f-d-c-c
+2: e-c-c-c
+END: g-e-c-c
+	Prep: f-d-c-c
+
+F
+1: f-d-a,-d
+2: bf-g-c-c
+	Prep: g-e-c-c
+	Prep: a-f-c-c
+	Post: g-e-c-c
+	Post: a-f-c-c
+3: f-d-c-c
+END: bf-g-c-c
+	Prep: g-e-c-c
+	Prep: a-f-c-c
+
+G
+1: a-f-c-f
+	Post: bf-g-c-f
+2: c'-a-c-f: Shorter phrases may begin here
+	Post: a-f-c-f
+3: bf-g-c-e
+	Post: a-f-c-f
+END: g-e-c-c
+
+H
+1: a-f-c-f
+	Post: bf-g-c-f
+2: c'-a-c-f: Shorter phrases may begin here
+	Post: a-f-c-f
+	Post: bf-g-c-f
+3: bf-g-c-e
+	Post: a-f-c-f
+END: g-e-c-c
+
+Final
+1: g-e-c-c
+	Post: a-f-c-c
+2: bf-g-c-c: Shorter phrases may begin here
+	Post: c'-a-c-c
+3: g-e-c-c
+	Prep: bf-g-c-c
+	Prep: a-f-c-c
+	Post: g-e-c-c
+	Post: bf-g-c-c
+4: g-e-a,-a,
+	Prep: a-f-a,-d
+	Prep: g-e-a,-d
+	Prep: a-f-a,-d
+	Prep: bf-g-a,-d
+END: f-d-a,-d
+	Prep: f-d-a,-a,
+	Prep: e-cs-a,-a,
+
+
+First Repeated: E

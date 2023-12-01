@@ -1,0 +1,68 @@
+VERSION: 1.3.1
+Key Signature: G major
+Tone: Tone 6, "Having Placed All Their Hope"
+Composer: Sedmiezersk Hermitage Melody
+Manually Assign Phrases: false
+
+
+A
+1: a-fs-d-d
+	Post: a-fs-d-d
+	Post: g-e-d-d
+2: fs-d-a,-d
+END: a-fs-d-d
+	Prep: g-e-a,-d
+
+B
+1: g-e-b,-e
+2: b-g-d-g
+	Prep: a-fs-d-d
+	Post: a-fs-d-d
+	Post: b-g-d-g
+	Post: a-fs-d-d
+3: g-e-b,-e
+END: fs-ds-b,-b,
+
+C
+1: fs-ds-b,-b,
+2: g-e-b,-e
+	Post: fs-ds-b,-b,
+3: g-e-b,-e
+	Post: a-fs-d-d
+4: b-g-d-g
+END: a-fs-d-d
+
+D
+1: a-fs-d-d
+2: a-fs-d-d
+	Prep: b-g-d-g
+END: a-fs-d-d
+	Prep: g-e-b,-e
+	Prep: fs-ds-b,-b,
+	Prep: g-e-b,-e
+
+D'
+1: a-fs-d-d
+2: a-fs-d-d
+	Prep: b-g-d-g
+END: g-e-b,-e
+	Prep: g-e-b,-e
+	Prep: fs-ds-b,-b,
+
+E
+1: b-g-d-g
+END: a-fs-d-d
+	Prep: a-fs-d-d
+	Prep: c'-a-d-fs
+	Prep: b-g-d-g
+
+Final
+1: fs-ds-b,-b,
+	Post: g-e-b,-e
+	Post: a-fs-b,-ds
+	Post: g-e-b,-e
+2: fs-ds-b,-b,
+END: g-e-b,-e
+
+
+First Repeated: C

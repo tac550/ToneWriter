@@ -1,0 +1,94 @@
+VERSION: 1.3.1
+Key Signature: G major
+Tone: Tone 8, "What Shall We Call You"
+Composer: Optina Hermitage Melody
+Manually Assign Phrases: true
+
+
+A
+Comment: Typical stichera use the following phrase pattern:/n/nA/nB/nB/nC/nD/nE/nC/nFinal
+1: c'-a-d-d
+2: b-g-d-d
+3: a-fs-d-d: This is the main reciting note for the phrase,/nbut its final repetition is usually an eighth note beginning/na run of eighths including the following three Post chords.
+	Post: d'-b-d-d
+	Post: c'-a-d-d
+	Post: b-g-d-d
+4: a-fs-ds-<b b,>
+	Prep: b-g-d-g
+END: g-e-b,-e
+
+B
+1: b-g-d-g
+2: d'-b-d-g
+	Prep: c'-a-d-g
+3: c'-a-e-a
+	Post: c'-a-d-fs
+END: fs-d-a,-d
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: g-e-a,-a,
+	Prep: a-fs-a,-a,
+	Prep: g-e-a,-a,
+
+C
+1: a-fs-d-d
+END: g-e-b,-e
+	Prep: b-g-d-g
+	Prep: c'-a-d-fs
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+
+D
+1: a-fs-d-d
+END: g-e-b,-e
+	Prep: b-g-d-<g g,>
+	Prep: c'-a-d-<fs fs,>
+	Prep: b-g-d-<g g,>
+	Prep: a-fs-ds-<b b,>
+
+E
+1: b-g-d-g
+2: d'-b-d-g
+	Prep: c'-a-d-g
+3: c'-a-e-a
+	Post: d'-a-d-fs
+END: fs-d-a,-d
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: g-e-a,-a,
+	Prep: a-fs-a,-a,
+	Prep: g-e-a,-a,
+
+Final
+1: b-g-d-g
+2: d'-b-d-g
+	Prep: c'-a-d-g
+3: c'-a-e-a
+	Post: d'-a-d-fs
+END: fs-d-a,-d
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: g-e-a,-a,
+	Prep: a-fs-a,-a,
+	Prep: g-e-a,-a,
+
+
+First Repeated: 

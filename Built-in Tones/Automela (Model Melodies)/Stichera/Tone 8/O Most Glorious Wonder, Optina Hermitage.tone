@@ -1,0 +1,57 @@
+VERSION: 1.3.1
+Key Signature: G major
+Tone: Tone 8, "O Most Glorious Wonder"
+Composer: Optina Hermitage Melody
+Manually Assign Phrases: true
+
+
+A
+Comment: Phrases A and B are typically sung twice before/nmoving on to C and D./n/nExample of a typical sticheron:/n/nA/nB/nA/nB/nC/nD/nA/nFinal
+1: g-d-b,-g
+	Post: fs-d-a,-d
+END: e-b,-g,-e
+	Prep: g-d-b,-g
+	Prep: a-d-c-fs
+	Prep: g-d-b,-g
+	Prep: fs-d-a,-d
+
+B
+1: g-d-b,-g
+	Post: a-d-c-g
+END: g-d-b,-g
+	Prep: b-d-d-g
+	Prep: a-d-c-g
+	Prep: g-d-b,-g
+	Prep: fs-d-a,-d
+
+C
+1: a-e-c-a
+2: c'-e-e-a: Short phrases may begin here if the first syllable is stressed
+	Post: b-e-d-a
+3: a-e-c-a
+4: c'-e-e-a
+	Post: b-e-d-e
+END: a-e-c-a
+
+D
+1: a-e-c-a
+2: c'-e-e-a: Short phrases may begin here if the first syllable is stressed
+	Post: b-e-d-e
+3: a-e-c-a: Commonly skipped on very short phrases
+	Post: g-d-b,-g
+	Post: a-d-c-fs
+4: b-d-d-d
+END: g-d-b,-g
+	Prep: a-d-c-d
+
+Final
+1: g-d-b,-g
+2: e-b,-g,-e
+	Prep: fs-d-a,-d
+	Prep: g-d-b,-d
+END: e-b,-g,-e
+	Prep: ds-b,-fs,-b,
+	Prep: fs-b,-a,-b,
+
+
+First Repeated: 

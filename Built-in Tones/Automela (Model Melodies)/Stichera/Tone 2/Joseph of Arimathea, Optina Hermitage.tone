@@ -1,0 +1,51 @@
+VERSION: 1.3.1
+Key Signature: D major
+Tone: Tone 2, "Joseph of Arimathea"
+Composer: Optina Hermitage Melody
+Manually Assign Phrases: false
+
+
+A
+1: fs-d-d-d
+	Post: g-e-d-d
+2: a-fs-d-d
+3: fs-d-a,-d
+	Prep: g-e-d-d
+	Prep: a-fs-d-d
+	Post: d-b,-a,-fs
+	Post: e-cs-a,-e
+END: fs-d-a,-d
+	Prep: e-cs-a,-e
+
+B
+1: fs-d-a,-d
+2: g-e-a,-cs
+END: e-cs-a,-a
+	Prep: fs-d-a,-d
+	Prep: fs-d-a,-fs
+
+C
+1: g-e-a,-a,
+	Post: a-fs-a,-a,
+END: a-fs-d-d
+	Prep: fs-d-a,-d
+	Prep: g-e-a,-d
+
+D
+1: a-fs-d-d
+	Post: g-e-d-d
+END: g-e-b,-e
+	Prep: b-g-ds-b,
+	Prep: a-fs-ds-b,
+
+Final
+1: g-e-a,-a,
+	Post: fs-d-a,-a,
+2: a-fs-a,-d
+	Prep: g-e-a,-a,
+END: fs-d-a,-d
+	Prep: g-e-a,-a,
+	Prep: a-fs-a,-a,
+
+
+First Repeated: 

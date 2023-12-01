@@ -1,0 +1,38 @@
+VERSION: 1.3.0
+Key Signature: G major
+Tone: Tone 1, "Joy of the Heavenly Hosts"
+Composer: Sedmiezersk Hermitage Melody
+Manually Assign Phrases: false
+
+
+A
+1: e-e-e,-e
+2: g-e-b,-e
+	Post: e-e-b,-g
+3: a-e-c-a: Usually a dotted quarter
+	Post: b-e-c-a: Usually an eighth
+4: fs-ds-a,-b,
+	Prep: g-e-b,-b
+END: e-b,-g,-e
+
+B
+1: g-e-b,-e
+2: a-fs-c-d
+	Post: fs-d-a,-d
+3: g-d-b,-g
+	Prep: g-d-b,-g
+	Prep: b-d-d-g
+	Prep: a-d-c-fs
+END: g-d-b,-g
+	Prep: fs-d-a,-d
+
+Final
+1: g-e-b,-e
+2: a-fs-c-d
+	Post: b-g-d-g
+3: a-d-c-fs
+4: g-d-b,-g
+END: fs-d-a,-d
+
+
+First Repeated: 
