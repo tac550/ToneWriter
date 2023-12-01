@@ -11,4 +11,4 @@ cp -a "../../lilypond" "../lin/lilypond" && \
 cp -r ../../licenses ../lin/licenses && \
 cp ToneWriter.sh ../lin && \
 cd .. && \
-zip -r lin/ToneWriter1.3.1-Linux.zip lin/*
+zip -r lin/ToneWriter1.4.0-Linux.zip lin/*
