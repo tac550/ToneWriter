@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" stylesheets="@../styles/ChantChordView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ChordViewController">
+<AnchorPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="200.0" stylesheets="@../styles/ChantChordView.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ChordViewController">
    <children>
       <HBox prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -85,16 +85,12 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="3.0" GridPane.rowIndex="1">
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="S" />
-                        <TextField fx:id="SField" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
-                        <Text layoutX="67.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="A" />
-                        <TextField fx:id="AField" layoutX="74.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
-                        <Text layoutX="100.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="T" />
-                        <TextField fx:id="TField" layoutX="107.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
-                        <Text layoutX="78.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="B" />
-                        <TextField fx:id="BField" layoutX="85.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="38.0" promptText="N/A" />
+                        <TextField fx:id="SField" alignment="CENTER" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="41.0" promptText="S" />
+                        <TextField fx:id="AField" alignment="CENTER" layoutX="74.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="41.0" promptText="A" />
+                        <TextField fx:id="TField" alignment="CENTER" layoutX="107.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="41.0" promptText="T" />
+                        <TextField fx:id="BField" alignment="CENTER" layoutX="85.0" layoutY="10.0" onAction="#refreshChordPreview" prefHeight="25.0" prefWidth="41.0" promptText="B" />
                      </children>
                   </HBox>
                </children>
