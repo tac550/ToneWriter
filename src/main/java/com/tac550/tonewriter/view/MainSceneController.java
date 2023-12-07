@@ -293,7 +293,7 @@ public class MainSceneController {
 		mainChantPhrases.clear();
 
 		for (ChantPhraseViewController chantPhrase : chantPhraseControllers) {
-			if (chantPhraseControllers.get(chantPhraseControllers.size()-1) != chantPhrase) { // If not the last
+			if (chantPhraseControllers.getLast() != chantPhrase) { // If not the last
 				chantPhrase.setName(currentLetter, previousWasPrime, nextAlternate);
 				previousWasPrime = false;
 
@@ -375,7 +375,7 @@ public class MainSceneController {
 
 					// If there are no main chant lines, use the Final Phrase.
 					if (mainChantPhrases.isEmpty()) {
-						verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.get(chantPhraseControllers.size()-1)});
+						verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.getLast()});
 						continue;
 					}
 				}
@@ -384,7 +384,7 @@ public class MainSceneController {
 
 				// If it's the last line before the end or a separator, it gets the Final Phrase.
 				if (isLastVerseLineOfSection(verseLineControllers.get(VLNum))) {
-					verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.get(chantPhraseControllers.size()-1)});
+					verseLineControllers.get(VLNum).setPhraseChoices(new ChantPhraseViewController[] {chantPhraseControllers.getLast()});
 					CLNum = 0; // Resets back to the first chant line. Only matters if this was a separator ending.
 					VLNum++; // Skips over separator. If it's the final line overall, has no effect because loop stops anyway.
 					continue;

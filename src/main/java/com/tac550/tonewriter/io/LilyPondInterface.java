@@ -173,11 +173,11 @@ public class LilyPondInterface {
 		lines.set(2, "#(set-default-paper-size \"" + project.getPaperSize().split(" \\(")[0] + "\")");
 		if (generateHeader) {
 			lines.set(7, lines.get(7).replace("$PROJECT_TITLE",
-					items.size() == 1 ? (items.get(0).getTitleType() == ProjectItem.TitleType.LARGE ? "\\fontsize #3 \"" : "\"")
-							+ reformatTextForHeaders(items.get(0).getTitleText()) + "\"" : "\"" + reformatTextForHeaders(output_title) + "\""));
+					items.size() == 1 ? (items.getFirst().getTitleType() == ProjectItem.TitleType.LARGE ? "\\fontsize #3 \"" : "\"")
+							+ reformatTextForHeaders(items.getFirst().getTitleText()) + "\"" : "\"" + reformatTextForHeaders(output_title) + "\""));
 			lines.set(9, lines.get(9).replace("$VERSION", MainApp.APP_VERSION)
 					.replace("$APPNAME", MainApp.APP_NAME));
-			if (items.size() == 1 && items.get(0).getTitleType() == ProjectItem.TitleType.LARGE) {
+			if (items.size() == 1 && items.getFirst().getTitleType() == ProjectItem.TitleType.LARGE) {
 				lines.set(15, lines.get(15).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 				lines.set(16, lines.get(16).replace("\\fromproperty #'header:instrument", "\\fontsize #-3 \\fromproperty #'header:instrument"));
 			}
@@ -202,13 +202,13 @@ public class LilyPondInterface {
 
 			// Remove page break at beginning of item listing, if present.
 			if (index == 0)
-				lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceFirst("\n\\\\pageBreak\n", ""));
+				lines.set(lines.size() - 1, lines.getLast().replaceFirst("\n\\\\pageBreak\n", ""));
 
 			index++;
 		}
 
 		// Remove extra newline at end of file (result is one blank line)
-		lines.set(lines.size() - 1, lines.get(lines.size() - 1).replaceAll("\n$", ""));
+		lines.set(lines.size() - 1, lines.getLast().replaceAll("\n$", ""));
 
 		// Write the file back out.
 		Files.write(lilypond_file.toPath(), lines, StandardCharsets.UTF_8);
@@ -355,7 +355,7 @@ public class LilyPondInterface {
 		StringBuilder verseText = new StringBuilder();
 		// Add initial bar line, if there are any vlines.
 		if (!assignment_lines.isEmpty()) {
-			String bar = assignment_lines.get(0).getBeforeBar();
+			String bar = assignment_lines.getFirst().getBeforeBar();
 			verseText.append(String.format("\\bar \"%s\"", bar.equals(BAR_UNCHANGED) ? " " : bar));
 		}
 
@@ -467,7 +467,7 @@ public class LilyPondInterface {
 								hideThisChord = false;
 							else
 								// Otherwise, the previous note is the note from the last chord from the previous syllable.
-								previousNote = getNoteAndDuration(previousSyllableChords.get(previousSyllableChords.size() - 1), inOrderChords, i);
+								previousNote = getNoteAndDuration(previousSyllableChords.getLast(), inOrderChords, i);
 						}
 					} else {
 						// The previous note is the note just before this one on this same syllable.
@@ -493,7 +493,7 @@ public class LilyPondInterface {
 						if (syllableList.indexOf(syllable) < syllableList.size() - 1
 								&& !syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().isEmpty()) {
 							// Then the next note is the note from the first chord of the next syllable.
-							nextNote = getNoteAndDuration(syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().get(0), inOrderChords, i);
+							nextNote = getNoteAndDuration(syllableList.get(syllableList.indexOf(syllable) + 1).getAssignedChords().getFirst(), inOrderChords, i);
 						} else {
 							// This is the last chord associated with the last syllable with chords on it,
 							// so we definitely do not want to hide it.
@@ -585,7 +585,7 @@ public class LilyPondInterface {
 				// last and has only one chord, or the note which would precede the possible break point is an eighth note.
 				if (!disableLineBreaks && !lastChordInLine && measureBeats > measureBreakBeatThreshold
 						* breakCount + measureBreakBeatThreshold && (syllableList.indexOf(syllable) != syllableList.size() - 2
-						|| syllableList.get(syllableList.size() - 1).getAssignedChords().size() != 1) && !currentNoteIsEighth)
+						|| syllableList.getLast().getAssignedChords().size() != 1) && !currentNoteIsEighth)
 					breakCount += trySubdividing(syllableNoteBuffers, syllableTextBuffer);
 
 			}

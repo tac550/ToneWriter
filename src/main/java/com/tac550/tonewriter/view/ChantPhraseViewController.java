@@ -111,7 +111,7 @@ public class ChantPhraseViewController implements CommentableView {
 		// First repeated line status should not be available for "prime" lines
 		nameChoice.getSelectionModel().selectedIndexProperty().addListener((ov, oldVal, newVal) -> {
 			if (newVal.equals(0)) {
-				if (!nameChoice.getItems().get(0).endsWith("A")) {
+				if (!nameChoice.getItems().getFirst().endsWith("A")) {
 					setFirstRepeatedAvailable(true);
 				}
 			} else {
@@ -195,7 +195,7 @@ public class ChantPhraseViewController implements CommentableView {
 			return;
 		}
 		
-		if (previousSelection == -1 || nameChoice.getItems().get(0).equals("A") || previousSelection > nameChoice.getItems().size() - 1) {
+		if (previousSelection == -1 || nameChoice.getItems().getFirst().equals("A") || previousSelection > nameChoice.getItems().size() - 1) {
 			nameChoice.getSelectionModel().select(0);
 		} else {
 			nameChoice.getSelectionModel().select(previousSelection);
@@ -247,9 +247,9 @@ public class ChantPhraseViewController implements CommentableView {
 			// Dragging image creation
 			Screen screen;
 			try {
-				screen = Screen.getScreensForRectangle(event.getX(), event.getY(), 0, 0).get(0);
+				screen = Screen.getScreensForRectangle(event.getX(), event.getY(), 0, 0).getFirst();
 			} catch (IndexOutOfBoundsException e) {
-				screen = Screen.getScreens().get(0);
+				screen = Screen.getScreens().getFirst();
 			}
 			double scaleX = screen.getOutputScaleX();
 			double scaleY = screen.getOutputScaleY();

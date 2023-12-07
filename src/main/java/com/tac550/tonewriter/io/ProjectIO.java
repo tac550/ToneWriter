@@ -289,7 +289,7 @@ public class ProjectIO {
 		String projectVersion;
 		File projectInfoFile = new File(tempProjectDirectory.getAbsolutePath() + File.separator + "project");
 		try (BufferedReader reader = new BufferedReader(new FileReader(projectInfoFile, StandardCharsets.UTF_8))) {
-			projectVersion = readLine(reader).get(0);
+			projectVersion = readLine(reader).getFirst();
 
 			// Version checking
 			// Opening project files from future minor version increases is unsupported because the lazy saving system is
@@ -305,8 +305,8 @@ public class ProjectIO {
 			for (String error : extraction_errors)
 				TWUtils.showError(error, true);
 
-			projectBuilder.title(readLine(reader).get(0));
-			numItems = Integer.parseInt(readLine(reader).get(0));
+			projectBuilder.title(readLine(reader).getFirst());
+			numItems = Integer.parseInt(readLine(reader).getFirst());
 
 			// Before 1.0: no project-level paper size, spread type, or no-header option.
 			if (TWUtils.versionCompare("1.0", projectVersion) != 1) {
@@ -347,10 +347,10 @@ public class ProjectIO {
 				String origToneFilePath;
 
 				// If the first entry in the item is not a version number, we have a pre-1.0 project file.
-				String firstLine = readLine(reader).get(0);
+				String firstLine = readLine(reader).getFirst();
 				if (Pattern.compile("^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$").matcher(firstLine).matches()) {
 					itemVersion = firstLine;
-					origToneFilePath = readLine(reader).get(0);
+					origToneFilePath = readLine(reader).getFirst();
 				} else {
 					itemVersion = "0.9";
 					origToneFilePath = firstLine;
@@ -359,14 +359,14 @@ public class ProjectIO {
 				itemBuilder.originalToneFile(new File(separatorsToSystem(origToneFilePath
 						.replace("$BUILT_IN_DIR", MainApp.BUILT_IN_TONE_DIR.getAbsolutePath())
 						.replace("$PROJECT_DIR", project_file.getParent()))));
-				String toneHash = readLine(reader).get(0);
+				String toneHash = readLine(reader).getFirst();
 				Tone associatedTone = null;
 				if (!toneHash.isEmpty()) {
 					associatedTone = ToneIO.loadTone(hashtoToneFile.get(toneHash));
 					itemBuilder.toneLoadedFrom(hashtoToneFile.get(toneHash)).associatedTone(associatedTone);
 				}
 
-				itemBuilder.toneEdited(Boolean.parseBoolean(readLine(reader).get(0)));
+				itemBuilder.toneEdited(Boolean.parseBoolean(readLine(reader).getFirst()));
 				List<String> titleSubtitle = readLine(reader);
 				itemBuilder.titleText(titleSubtitle.get(0)).subtitleText(titleSubtitle.get(1));
 				List<String> options = readLine(reader);
@@ -380,7 +380,7 @@ public class ProjectIO {
 
 				List<String> topVerseData = readLine(reader);
 				itemBuilder.topVersePrefix(topVerseData.get(0)).topVerse(topVerseData.get(1));
-				itemBuilder.verseAreaText(TWUtils.decodeNewLines(readLine(reader).get(0)));
+				itemBuilder.verseAreaText(TWUtils.decodeNewLines(readLine(reader).getFirst()));
 				List<String> bottomVerseData = readLine(reader);
 				itemBuilder.bottomVersePrefix(bottomVerseData.get(0)).bottomVerse(bottomVerseData.get(1));
 
@@ -388,10 +388,10 @@ public class ProjectIO {
 
 				List<String> lineEntry;
 				boolean previousWasSeparator = false;
-				while ((lineEntry = readLine(reader)).get(0).startsWith("+")) {
+				while ((lineEntry = readLine(reader)).getFirst().startsWith("+")) {
 					AssignmentLine.AssignmentLineBuilder lineBuilder = new AssignmentLine.AssignmentLineBuilder();
 
-					String[] syllData = lineEntry.get(0).split("\\|");
+					String[] syllData = lineEntry.getFirst().split("\\|");
 
 					ChantPhrase selectedChantPhrase = null;
 					// assignedPhraseName = assigned phrase name (or divider indicator) without leading "+"
@@ -403,7 +403,7 @@ public class ProjectIO {
 						continue;
 					} else if (associatedTone != null) {
 						selectedChantPhrase = associatedTone.getChantPhrases().stream().filter(p ->
-								TWUtils.shortenPhraseName(p.getName()).equals(assignedPhraseName)).toList().get(0);
+								TWUtils.shortenPhraseName(p.getName()).equals(assignedPhraseName)).toList().getFirst();
 						lineBuilder.selectedChantPhrase(selectedChantPhrase);
 					}
 

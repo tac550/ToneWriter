@@ -646,7 +646,7 @@ public class TopSceneController {
 							if (verses.contains(prevTopVerse) && verses.indexOf(prevTopVerse) < verses.size() - 1) {
 								String nextVerse = verses.get(verses.indexOf(prevTopVerse) + 1);
 								if (nextVerse.startsWith("^"))
-									newTabController.setTopVerse(verses.get(0));
+									newTabController.setTopVerse(verses.getFirst());
 								else if (!nextVerse.startsWith("-"))
 									newTabController.setTopVerse(verses.get(verses.indexOf(prevTopVerse) + 1));
 							}
@@ -659,7 +659,7 @@ public class TopSceneController {
 							if (verses.contains(prevBottomVerse) && verses.indexOf(prevBottomVerse) < verses.size() - 1) {
 								String nextVerse = verses.get(verses.indexOf(prevBottomVerse) + 1);
 								if (nextVerse.startsWith("^"))
-									newTabController.setBottomVerse(verses.get(0));
+									newTabController.setBottomVerse(verses.getFirst());
 								else if (!nextVerse.startsWith("-"))
 									newTabController.setBottomVerse(verses.get(verses.indexOf(prevBottomVerse) + 1));
 							}

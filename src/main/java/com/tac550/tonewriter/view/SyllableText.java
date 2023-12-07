@@ -193,13 +193,13 @@ public class SyllableText extends Text {
 	}
 	
 	void removeLastChord() {
-		associatedChords.remove(associatedChords.size() - 1);
-		associatedButtons.remove(associatedButtons.size() - 1);
+		associatedChords.removeLast();
+		associatedButtons.removeLast();
 		
 		nextNoteButtonYPos -= VerseLineViewController.NOTE_BUTTON_HEIGHT.get();
 		
 		if (!associatedButtons.isEmpty()) {
-			String colorString = "#" + associatedButtons.get(associatedButtons.size() - 1).getStyle().split("#")[1];
+			String colorString = "#" + associatedButtons.getLast().getStyle().split("#")[1];
 			
 			setColor(Color.valueOf(colorString));
 		} else {

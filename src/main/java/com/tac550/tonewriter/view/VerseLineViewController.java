@@ -407,7 +407,7 @@ public class VerseLineViewController {
 
 			if (!(getCurrentChord() instanceof RecitingChordView)) {
 				if (nextChordIndex == 1) { // If no chords have been assigned yet...
-					((SyllableText) lineTextFlow.getChildren().get(0)).activate(); // Activate only the first syllable.
+					((SyllableText) lineTextFlow.getChildren().getFirst()).activate(); // Activate only the first syllable.
 				} else {
 					// Activate current syllable.
 					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).activate();

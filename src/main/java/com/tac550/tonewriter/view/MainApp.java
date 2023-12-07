@@ -266,7 +266,7 @@ public class MainApp extends Application {
 			List<String> params = getParameters().getRaw();
 			File fileToOpen = null;
 			if (!params.isEmpty()) {
-				File openFile = new File(params.get(0));
+				File openFile = new File(params.getFirst());
 				if (openFile.isFile()) fileToOpen = openFile;
 			}
 			topSceneController.performSetup(mainStage, fileToOpen);

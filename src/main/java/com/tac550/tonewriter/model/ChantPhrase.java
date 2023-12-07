@@ -31,7 +31,7 @@ public class ChantPhrase {
 
 		Queue<Chord> preps = new ArrayDeque<>();
 		Stack<Chord> posts = new Stack<>();
-		Chord mainChord = chords.get(0); // First chord in save order will always be a main chord.
+		Chord mainChord = chords.getFirst(); // First chord in save order will always be a main chord.
 		assert mainChord.getName().matches("\\d") || mainChord.getName().equalsIgnoreCase("End");
 
 		for (int i = 1; i < chords.size(); i++) {

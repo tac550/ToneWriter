@@ -25,7 +25,8 @@ import org.htmlunit.WebResponse;
 import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -114,7 +115,7 @@ public class AutoUpdater {
 					});
 
 
-				} catch (FailingHttpStatusCodeException | IOException e) {
+				} catch (FailingHttpStatusCodeException | IOException | URISyntaxException e) {
 					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
 							"Internet connection failure! Unable to check for updates.", true));
 				}
@@ -155,11 +156,11 @@ public class AutoUpdater {
 		updateCheckThread.start();
 	}
 
-    private static HashMap<String, String> retrieveReleaseInfo() throws IOException {
+    private static HashMap<String, String> retrieveReleaseInfo() throws IOException, URISyntaxException {
         HashMap<String, String> versionInfo = new HashMap<>();
         StringBuilder content = new StringBuilder();
-        URL url = new URL("https://api.github.com/repos/tac550/tonewriter/releases");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        URI uri = new URI("https://api.github.com/repos/tac550/tonewriter/releases");
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
         connection.setRequestMethod("GET");
         BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String respLine;

@@ -51,8 +51,8 @@ public class QuickVerseController {
 				filteredData.setPredicate(s -> s.toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT)));
 
 			// Automatically place top filter result in result field
-			if (filteredData.size() > 0)
-				resultField.setText(filteredData.get(0));
+			if (!filteredData.isEmpty())
+				resultField.setText(filteredData.getFirst());
 		});
 
 		filterInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
