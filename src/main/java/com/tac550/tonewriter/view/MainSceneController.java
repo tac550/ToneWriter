@@ -453,7 +453,7 @@ public class MainSceneController {
 
 		// Dashes, hyphens, and minuses surrounded by non-whitespace in the original text are converted to em-dashes.
 		// This allows us to know which hyphens should be forced to be visible by default.
-		lastVerseSet = verseArea.getText().replaceAll("(?<!\\s)[[-\u2010\u2011\u2012\u2013\u2014]+](?!\\s)", "\u2014");
+		lastVerseSet = verseArea.getText().replaceAll("(?<!\\s)[-\u2010\u2011\u2012\u2013\u2014+](?!\\s)", "\u2014");
 
 		if (lastVerseSet.isEmpty()) {
 			setVerseButton.setVisible(false);
