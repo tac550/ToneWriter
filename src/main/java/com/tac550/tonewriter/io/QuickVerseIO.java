@@ -95,7 +95,7 @@ public class QuickVerseIO {
 					removed = true;
 					continue; // Skips the following writer.write() line for the item to be removed (removes only one line)
 				}
-				writer.write(currentLine + System.getProperty("line.separator"));
+				writer.write(currentLine + System.lineSeparator());
 			}
 		}
 
