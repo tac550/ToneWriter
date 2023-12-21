@@ -239,7 +239,6 @@ public class MainApp extends Application {
 	}
 
 	private void loadMainLayout() {
-
 		try {
 			// Load layout from fxml file
 			FXMLLoader loader = new FXMLLoader();
@@ -357,7 +356,6 @@ public class MainApp extends Application {
 
 	private static boolean getSystemDarkMode() {
 		if (OS_NAME.startsWith("win")) {
-
 			try {
 				Process process = new ProcessBuilder(
 						"reg query HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",

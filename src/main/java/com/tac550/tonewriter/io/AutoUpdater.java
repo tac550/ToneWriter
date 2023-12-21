@@ -259,7 +259,6 @@ public class AutoUpdater {
 		File userDir = new File(System.getProperty("user.dir"));
 
 		if (MainApp.OS_NAME.startsWith("win")) {
-
 			try {
 				new ProcessBuilder("cmd", "/c", downloaded_file.getAbsolutePath(), "/D=" + userDir).start();
 			} catch (IOException e) {
