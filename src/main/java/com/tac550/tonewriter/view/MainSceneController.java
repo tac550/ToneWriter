@@ -540,7 +540,7 @@ public class MainSceneController {
 	private boolean createNewTone() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Tone As");
-		fileChooser.setInitialFileName(".tone");
+		fileChooser.setInitialFileName("New Tone.tone");
 
 		fileChooser.setInitialDirectory(getInitialToneChooserDir());
 
