@@ -9,7 +9,7 @@ ToneWriter lets you assign chords to syllables...
 ...to produce sheet music with a single click:
 ![image](https://github.com/tac550/ToneWriter/assets/9357248/cae57fe9-7913-44fa-b488-032999560e13)
 
-ToneWriter works by abstracting the chant melodies and harmonizations away from the particular text being used. The user defines how to map any given melody to any given text, and ToneWriter automatically generates PDF sheet music. Users may define their own chant melodies or use any of those that come built into the software. Users then enter the text to be used, which is automatically broken into syllables. Mapping the chant melodies to each line of text is as simple as clicking on the syllable(s) to which each chord will apply. The application outputs printable sheet music in PDF format, with all the stylistic peculiarities of this type of music automatically applied.
+ToneWriter works by defining the chant melodies and harmonizations separately from the particular texts being used. The user decides how to map any given melody to any given text, and ToneWriter automatically generates PDF sheet music. Users may define their own chant melodies or use any of those that come built into the software. Users then enter the text to be used, which is automatically broken into syllables. Mapping the chant melody to each line of text is done by clicking on the syllable(s) to which each chord will apply. The application outputs printable sheet music in PDF format, with all the stylistic peculiarities of this type of music automatically applied.
 
 ## Contributing
 
