@@ -14,21 +14,15 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.TouchEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.*;
 import org.apache.commons.io.FilenameUtils;
 
@@ -126,19 +120,9 @@ public class TopSceneController {
 	private static final RadioMenuItem halfNoteMenuItem = new RadioMenuItem("half note");
 	private static final RadioMenuItem dottedHalfNoteMenuItem = new RadioMenuItem("dotted half note");
 	private static final RadioMenuItem wholeNoteMenuItem = new RadioMenuItem("whole note");
-	private static final List<RadioMenuItem> clickItems = new ArrayList<>();
+	private static final List<RadioMenuItem> noteMenuItems = new ArrayList<>();
 	private static final ContextMenu noteMenu = new ContextMenu(eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem, halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 	private static final ToggleGroup durationGroup = new ToggleGroup();
-	private static final ImageView eighthNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/eighth.png")).toExternalForm());
-	private static final ImageView quarterNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/quarter.png")).toExternalForm());
-	private static final ImageView dottedQuarterNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-quarter.png")).toExternalForm());
-	private static final ImageView halfNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/half.png")).toExternalForm());
-	private static final ImageView dottedHalfNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-half.png")).toExternalForm());
-	private static final ImageView wholeNoteTouchItem = new ImageView(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/whole.png")).toExternalForm());
-	private static final List<ImageView> touchItems = new ArrayList<>();
-	private static final Text touchDescriptionText = new Text("Note info");
-	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(1, 1, 1, 1);
-	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
 	protected static final List<String> durationMapping = new ArrayList<>();
 
 	// Syllable formatting context menus
@@ -152,65 +136,17 @@ public class TopSceneController {
 				LilyPondInterface.NOTE_DOTTED_QUARTER, LilyPondInterface.NOTE_HALF, LilyPondInterface.NOTE_DOTTED_HALF,
 				LilyPondInterface.NOTE_WHOLE);
 
-		Collections.addAll(clickItems, eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem,
+		Collections.addAll(noteMenuItems, eighthNoteMenuItem, quarterNoteMenuItem, dottedQuarterNoteMenuItem,
 				halfNoteMenuItem, dottedHalfNoteMenuItem, wholeNoteMenuItem);
 
 		Platform.runLater(() -> {
-			for (RadioMenuItem item : clickItems)
+			for (RadioMenuItem item : noteMenuItems)
 				item.setToggleGroup(durationGroup);
 
 			// Removes drop shadow from note menu. The drop shadow blocks mouse click events,
 			// making it impossible to double-click a note button near the bottom of the screen.
 			noteMenu.setStyle("-fx-effect: null");
 		});
-
-		Collections.addAll(touchItems, eighthNoteTouchItem, quarterNoteTouchItem, dottedQuarterNoteTouchItem,
-				halfNoteTouchItem, dottedHalfNoteTouchItem, wholeNoteTouchItem);
-
-		VBox mainBox = new VBox();
-		mainBox.setAlignment(Pos.CENTER);
-		HBox durationTouchBox = new HBox();
-		durationTouchBox.setAlignment(Pos.CENTER);
-		durationTouchBox.setSpacing(10);
-		mainBox.getChildren().addAll(touchDescriptionText, durationTouchBox);
-
-		durationTouchBox.getChildren().addAll(touchItems);
-		Scene durationTouchScene = new Scene(mainBox);
-
-		for (ImageView item : touchItems) {
-			item.setPreserveRatio(true);
-			item.setFitWidth(40);
-			item.setFitHeight(40);
-		}
-
-		durationTouchScene.setOnTouchMoved(TopSceneController::selectTouchDuration);
-
-		durationTouchScene.setOnTouchReleased(event -> {
-			selectTouchDuration(event);
-			Platform.runLater(durationTouchStage::close);
-		});
-
-
-		durationTouchStage.focusedProperty().addListener((ov, oldVal, newVal) -> {
-			if (!newVal)
-				durationTouchStage.close();
-		});
-
-		durationTouchStage.setScene(durationTouchScene);
-
-	}
-	private static void selectTouchDuration(TouchEvent event) {
-		for (ImageView release_item : touchItems)
-			release_item.setEffect(null);
-
-		double totalWidth = durationTouchStage.getWidth();
-		double stepSize = totalWidth / touchItems.size();
-
-		Point2D touchPoint = durationTouchStage.getScene().getRoot()
-				.screenToLocal(event.getTouchPoint().getScreenX(), event.getTouchPoint().getScreenY());
-
-		int index = Math.min(Math.max(0, (int) (touchPoint.getX() / stepSize)), touchItems.size() - 1);
-		touchItems.get(index).setEffect(touchSelectionEffect);
 	}
 
 	@FXML private void initialize() {
@@ -1160,15 +1096,15 @@ public class TopSceneController {
 		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
 
 		// Behavior
-		for (RadioMenuItem item : clickItems) {
+		for (RadioMenuItem item : noteMenuItems) {
 			item.setOnAction(event -> {
-				syllable.setNoteDuration(durationMapping.get(clickItems.indexOf(item)), noteButtonIndex);
+				syllable.setNoteDuration(durationMapping.get(noteMenuItems.indexOf(item)), noteButtonIndex);
 				projectEdited();
 			});
 		}
 
 		// Initial state
-		clickItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex))).setSelected(true);
+		noteMenuItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex))).setSelected(true);
 
 		// Showing / Positioning
 		noteMenu.show(noteButton, Side.BOTTOM, 0,
@@ -1214,39 +1150,6 @@ public class TopSceneController {
 
 	void hideSyllableMenu() {
 		syllableMenu.hide();
-	}
-
-	void showTouchNoteMenu(SyllableText syllable, Button noteButton, TouchEvent touchEvent) {
-		int noteButtonIndex = syllable.getAssociatedButtons().indexOf(noteButton);
-
-		// Behavior
-		durationTouchStage.setOnHiding(event -> {
-			for (ImageView item : touchItems) {
-				if (item.getEffect() != null) {
-					syllable.setNoteDuration(durationMapping.get(touchItems.indexOf(item)), noteButtonIndex);
-					projectEdited();
-					item.setEffect(null);
-				}
-			}
-		});
-
-		// Initial state
-		ImageView selectedItem = touchItems.get(durationMapping.indexOf(syllable.getNoteDuration(noteButtonIndex)));
-		selectedItem.setEffect(touchSelectionEffect);
-		touchDescriptionText.setText(noteButton.getText());
-		durationTouchStage.getScene().getRoot().setStyle(noteButton.getStyle());
-
-		// Showing / Positioning
-		double totalWidth = durationTouchStage.getWidth();
-		double stepSize = totalWidth / touchItems.size();
-
-		touchEvent.getTouchPoint().ungrab();
-		touchEvent.getTouchPoint().grab(durationTouchStage.getScene());
-
-		durationTouchStage.show();
-		durationTouchStage.setX(touchEvent.getTouchPoint().getScreenX() - (stepSize * touchItems.indexOf(selectedItem))
-				- (stepSize / 2));
-		durationTouchStage.setY(touchEvent.getTouchPoint().getScreenY() - durationTouchStage.getHeight() / 2);
 	}
 
 	void setCurrentlyExporting(boolean exporting) {

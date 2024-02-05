@@ -611,8 +611,6 @@ public class VerseLineViewController {
 		noteButton.setPrefWidth(38);
 		noteButton.setPadding(Insets.EMPTY);
 
-		noteButton.setOnTouchPressed(te ->
-				topController.showTouchNoteMenu(syllable, noteButton, te));
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
 				if (me.getClickCount() == 2) { // Double click assigns half note
