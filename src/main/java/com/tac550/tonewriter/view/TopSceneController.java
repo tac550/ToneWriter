@@ -139,7 +139,7 @@ public class TopSceneController {
 	private static final Text touchDescriptionText = new Text("Note info");
 	private static final ColorAdjust touchSelectionEffect = new ColorAdjust(1, 1, 1, 1);
 	private static final Stage durationTouchStage = new Stage(StageStyle.UNDECORATED);
-	private static final List<String> durationMapping = new ArrayList<>();
+	protected static final List<String> durationMapping = new ArrayList<>();
 
 	// Syllable formatting context menus
 	private static final CheckMenuItem boldMenuItem = new CheckMenuItem("Bold");

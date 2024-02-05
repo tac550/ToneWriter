@@ -4,6 +4,7 @@ import com.tac550.tonewriter.model.AssignedChordData;
 import com.tac550.tonewriter.model.AssignmentSyllable;
 import com.tac550.tonewriter.util.TWUtils;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -176,6 +177,7 @@ public class SyllableText extends Text {
 
 	void setNoteDuration(String duration, int chord_index) {
 		associatedChords.get(chord_index).setDuration(duration);
+		associatedButtons.get(chord_index).setGraphic(new ImageView(VerseLineViewController.noteImages[TopSceneController.durationMapping.indexOf(duration)]));
 	}
 	String getNoteDuration(int chord_index) {
 		return associatedChords.get(chord_index).getDuration();

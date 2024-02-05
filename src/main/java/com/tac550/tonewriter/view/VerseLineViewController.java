@@ -15,9 +15,11 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
@@ -41,6 +43,16 @@ public class VerseLineViewController {
 	// How tall to make note buttons
 	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
 	private static final double EXPANDED_VIEW_PADDING = 5;
+
+	private static final Image eighthNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/eighth.png")).toExternalForm(), 8, -1, true, false);
+	private static final Image quarterNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/quarter.png")).toExternalForm(), 5, -1, true, false);
+	private static final Image dottedQuarterNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-quarter.png")).toExternalForm(), 8, -1, true, false);
+	private static final Image halfNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/half.png")).toExternalForm(), 5, -1, true, false);
+	private static final Image dottedHalfNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/dotted-half.png")).toExternalForm(), 8, -1, true, false);
+	private static final Image wholeNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/whole.png")).toExternalForm(), 8, -1, true, false);
+
+	protected static final Image[] noteImages = new Image[] {eighthNoteImage, quarterNoteImage, dottedQuarterNoteImage,
+			halfNoteImage, dottedHalfNoteImage, wholeNoteImage};
 
 	@FXML private StackPane rootPane;
 	@FXML private GridPane mainContentPane;
@@ -586,7 +598,8 @@ public class VerseLineViewController {
 		int buttonIndex = syllable.getAssociatedButtons().size();
 		int chordIndex = associatedChantPhrases[selectedChantPhrase].getChords().indexOf(chord);
 
-		Button noteButton = new Button(getCurrentChord().getName());
+		Button noteButton = new Button(getCurrentChord().getName(), new ImageView(quarterNoteImage));
+		noteButton.setAlignment(Pos.CENTER_LEFT);
 		noteButton.setStyle(String.format(Locale.US, "-fx-base: %s", TWUtils.toRGBCode(getCurrentChord().getColor())));
 		chordButtonPane.getChildren().add(noteButton);
 		noteButton.setLayoutX(syllable.getLayoutX());
@@ -595,7 +608,7 @@ public class VerseLineViewController {
 		noteButton.prefHeightProperty().bind(NOTE_BUTTON_HEIGHT);
 		noteButton.minHeightProperty().bind(NOTE_BUTTON_HEIGHT);
 
-		noteButton.setPrefWidth(30);
+		noteButton.setPrefWidth(38);
 		noteButton.setPadding(Insets.EMPTY);
 
 		noteButton.setOnTouchPressed(te ->
@@ -804,8 +817,8 @@ public class VerseLineViewController {
 	public void setAssignmentDurations(List<String> durations) {
 		int i = 0;
 		for (SyllableText syllable : getSyllables()) {
-			for (AssignedChordData chordData : syllable.getAssociatedChords()) {
-				chordData.setDuration(durations.get(i));
+			for (int j = 0; j < syllable.getAssociatedChords().length; j++) {
+				syllable.setNoteDuration(durations.get(i), j);
 				i++;
 			}
 		}
