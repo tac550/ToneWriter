@@ -1,0 +1,56 @@
+VERSION: 1.4.0
+Key Signature: G major
+Tone: Tone 2, "O House of Ephratha"
+Composer: Valaam Monastery Melody
+Manually Assign Phrases: false
+
+
+A
+1: b-g-d-g
+2: b-g-d-g
+	Prep: c'-a-d-d
+END: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: d'-b-d-d
+
+B
+1: b-g-d-g
+2: d'-b-d-g
+	Prep: c'-a-d-g
+3: c'-a-d-d
+	Post: d'-b-d-d
+4: b-g-d-g
+END: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: d'-b-d-d
+
+C
+1: c'-a-d-d
+END: b-g-d-g
+	Prep: d'-b-d-g
+	Prep: c'-a-d-g
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+
+D
+1: b-g-d-g
+	Post: a-fs-d-d
+2: g-e-b,-e
+3: c'-fs-d-d
+END: b-g-d-g
+
+Final
+1: c'-a-d-d
+	Post: a-fs-d-d
+2: b-g-d-g
+3: a-fs-d-d
+4: g-e-b,-e
+5: g-e-cs-a,
+END: fs-d-a,-d
+
+
+First Repeated: B
