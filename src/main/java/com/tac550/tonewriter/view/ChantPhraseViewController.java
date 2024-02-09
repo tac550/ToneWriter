@@ -437,7 +437,6 @@ public class ChantPhraseViewController implements CommentableView {
 
 		controller.setChantPhraseController(this);
 		controller.setKeySignature(mainController.getKeySignature());
-
 	}
 	public RecitingChordView addRecitingChord() throws IOException {
 		if (countRecitingChords() >= MainApp.CHORD_COLORS.length) { // Cap number of main (reciting) chords to available colors
