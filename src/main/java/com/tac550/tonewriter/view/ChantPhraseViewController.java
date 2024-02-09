@@ -453,34 +453,23 @@ public class ChantPhraseViewController implements CommentableView {
 
 		return controller;
 	}
-	public PrepChordView addPrepChord(MainChordView caller_chord, Color chord_color) throws IOException {
-
+	public void addPrepChord(PrepChordView new_chord, MainChordView caller_chord, Color chord_color) throws IOException {
 		int before_reciting_chord = chordViewControllers.indexOf(caller_chord);
 
-		PrepChordView controller = new PrepChordView();
+		addChord(before_reciting_chord, new_chord);
+		new_chord.setColor(chord_color);
 
-		addChord(before_reciting_chord, controller);
-
-		controller.setColor(chord_color);
 		recalcCHNames();
-		
-		return controller;
 	}
-	public PostChordView addPostChord(MainChordView caller_chord, Color chord_color) throws IOException {
-
+	public void addPostChord(PostChordView new_chord, MainChordView caller_chord, Color chord_color) throws IOException {
 		int after_reciting_chord = chordViewControllers.indexOf(caller_chord) + 1;
 
-		PostChordView controller = new PostChordView();
+		addChord(after_reciting_chord, new_chord);
+		new_chord.setColor(chord_color);
 
-		addChord(after_reciting_chord, controller);
-
-		controller.setColor(chord_color);
 		recalcCHNames();
-		
-		return controller;
 	}
 	public EndChordView addEndChord() throws IOException {
-
 		int last_position = chordViewControllers.size();
 
 		EndChordView controller = new EndChordView();

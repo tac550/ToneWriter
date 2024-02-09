@@ -15,20 +15,24 @@ public class MainChordView extends ChordViewController {
 	public PrepChordView addPrepChord() throws IOException {
 		chantPhraseController.edited();
 
-		PrepChordView prepChord = chantPhraseController.addPrepChord(this, chordColor);
-		prepChords.add(prepChord);
-		prepChord.setAssociatedChord(this);
+		PrepChordView controller = new PrepChordView();
+		prepChords.add(controller);
+		controller.setAssociatedChord(this);
 
-		return prepChord;
+		chantPhraseController.addPrepChord(controller, this, chordColor);
+
+		return controller;
 	}
 	public PostChordView addPostChord() throws IOException {
 		chantPhraseController.edited();
 
-		PostChordView postChord = chantPhraseController.addPostChord(this, chordColor);
-		postChords.add(postChord);
-		postChord.setAssociatedChord(this);
+		PostChordView controller = new PostChordView();
+		postChords.add(controller);
+		controller.setAssociatedChord(this);
 
-		return postChord;
+		chantPhraseController.addPostChord(controller, this, chordColor);
+
+		return controller;
 	}
 
 	public void rotatePrepsOrPosts(SubChordView source, SubChordView target) {
