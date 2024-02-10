@@ -548,14 +548,10 @@ public class ChantPhraseViewController implements CommentableView {
 		}
 	}
 
-	@FXML public void endButtonAction() {
+	@FXML public void endButtonAction() throws IOException {
 		edited();
 		removeEndingChords();
-		try {
-			addEndChord();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		addEndChord();
 	}
 	
 	@FXML public void delete() {
