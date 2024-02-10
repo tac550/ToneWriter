@@ -40,8 +40,8 @@ public class VerseLineViewController {
 
 	private VerseLine verseLine;
 
-	// How tall to make note buttons
 	static final SimpleIntegerProperty NOTE_BUTTON_HEIGHT = new SimpleIntegerProperty(15);
+	static final int NOTE_BUTTON_WIDTH = 39;
 	private static final double EXPANDED_VIEW_PADDING = 5;
 
 	private static final Image eighthNoteImage = new Image(Objects.requireNonNull(TopSceneController.class.getResource("/media/notes/eighth.png")).toExternalForm(), 8, -1, true, false);
@@ -608,7 +608,7 @@ public class VerseLineViewController {
 		noteButton.prefHeightProperty().bind(NOTE_BUTTON_HEIGHT);
 		noteButton.minHeightProperty().bind(NOTE_BUTTON_HEIGHT);
 
-		noteButton.setPrefWidth(38);
+		noteButton.setPrefWidth(NOTE_BUTTON_WIDTH);
 		noteButton.setPadding(Insets.EMPTY);
 
 		noteButton.setOnMouseClicked(me -> {
