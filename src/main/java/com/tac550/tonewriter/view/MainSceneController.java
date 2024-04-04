@@ -739,7 +739,7 @@ public class MainSceneController {
 		new Thread(() -> Platform.runLater(() -> {
 			Dialog<Pair<String, String>> dialog = new Dialog<>();
 			dialog.setTitle("Header Info");
-			dialog.setHeaderText("Input header info for first page");
+			dialog.setHeaderText("Set the header info for this tone");
 			ImageView headerIcon = new ImageView(Objects.requireNonNull(getClass().getResource(TopSceneController.headerIconPath)).toExternalForm());
 			headerIcon.setFitHeight(50);
 			headerIcon.setFitWidth(50);
