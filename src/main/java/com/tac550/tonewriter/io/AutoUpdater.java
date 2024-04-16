@@ -47,6 +47,11 @@ public class AutoUpdater {
 		Task<Void> updateCheckTask = new Task<>() {
 			@Override
 			protected Void call() {
+				// The HTML that appears in the updater window's WebView
+				StringBuilder finalHTMLBuilder = new StringBuilder("<body bgcolor=\""
+						+ TWUtils.toRGBCode(TWUtils.getUIBaseColor()) + "\">");
+				List<String> versionOptions = new ArrayList<>();
+
 				try {
 					webClient = new WebClient();
 					webClient.getOptions().setJavaScriptEnabled(false);
@@ -55,11 +60,6 @@ public class AutoUpdater {
 					// Get the available versions and their associated Markdown changelogs.
 					HashMap<String, String> versionInfo = retrieveReleaseInfo();
 
-					// The HTML that appears in the updater window's WebView
-					StringBuilder finalHTMLBuilder = new StringBuilder();
-					finalHTMLBuilder.append("<body bgcolor=\"").append(TWUtils.toRGBCode(TWUtils.getUIBaseColor())).append("\">");
-
-                    List<String> versionOptions = new ArrayList<>();
 					for (String version : versionInfo.keySet().stream().sorted(Comparator.reverseOrder()).toList()) {
 						int versionDiff = TWUtils.versionCompare(version, MainApp.APP_VERSION);
 
@@ -79,51 +79,32 @@ public class AutoUpdater {
 							versionOptions.add(version);
 					}
 
-					finalHTMLBuilder.append("</body>");
-
 					// If there's no update and this is the startup check, or the check has been cancelled, stop here.
 					if ((startup && versionOptions.isEmpty()) || checkCancelled)
 						return null;
 
+				} catch (FailingHttpStatusCodeException | IOException | URISyntaxException e) {
 					Platform.runLater(() -> {
-						FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("/fxml/UpdaterView.fxml");
-						UpdaterViewController updaterController = loader.getController();
+						TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+							"Internet connection failure! Unable to check for updates.", true);
 
-						updaterStage.setTitle("%s Automatic Updater".formatted(MainApp.APP_NAME));
-						updaterStage.getIcons().add(MainApp.APP_ICON);
-						updaterStage.setScene(new Scene(loader.getRoot()));
-						updaterStage.setOnShown(event -> {
-							updaterStage.setMinWidth(updaterStage.getWidth());
-							updaterStage.setMinHeight(updaterStage.getHeight());
-						});
-
-						updaterController.setWebViewContent(finalHTMLBuilder.toString());
-						updaterController.setVersionChoices(versionOptions);
-
-						if (updaterStage.getOwner() == null) {
-							updaterStage.initOwner(owner);
-							updaterStage.initModality(Modality.APPLICATION_MODAL);
-						}
-
-						updaterStage.show();
-
-						if (Taskbar.isTaskbarSupported()) {
-							if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION))
-								Taskbar.getTaskbar().requestUserAttention(true, true);
-						}
-
+						// Don't show an empty updater view if this is a startup check.
+						if (!startup)
+							showUpdaterView(finalHTMLBuilder, versionOptions, owner);
 					});
 
-
-				} catch (FailingHttpStatusCodeException | IOException | URISyntaxException e) {
-					Platform.runLater(() -> TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
-							"Internet connection failure! Unable to check for updates.", true));
+					return null;
+				} finally {
+					Platform.runLater(() -> {
+						if (updateAlert != null && updateAlert.isShowing())
+							updateAlert.close();
+					});
 				}
 
-				Platform.runLater(() -> {
-					if (updateAlert != null && updateAlert.isShowing())
-						updateAlert.close();
-				});
+				finalHTMLBuilder.append("</body>");
+
+				showUpdaterView(finalHTMLBuilder, versionOptions, owner);
+
 				return null;
 			}
 		};
@@ -156,7 +137,38 @@ public class AutoUpdater {
 		updateCheckThread.start();
 	}
 
-    private static HashMap<String, String> retrieveReleaseInfo() throws IOException, URISyntaxException {
+	private static void showUpdaterView(StringBuilder finalHTMLBuilder, List<String> versionOptions, Window owner) {
+		Platform.runLater(() -> {
+			FXMLLoader loader = FXMLLoaderIO.loadFXMLLayout("/fxml/UpdaterView.fxml");
+			UpdaterViewController updaterController = loader.getController();
+
+			updaterStage.setTitle("%s Automatic Updater".formatted(MainApp.APP_NAME));
+			updaterStage.getIcons().add(MainApp.APP_ICON);
+			updaterStage.setScene(new Scene(loader.getRoot()));
+			updaterStage.setOnShown(event -> {
+				updaterStage.setMinWidth(updaterStage.getWidth());
+				updaterStage.setMinHeight(updaterStage.getHeight());
+			});
+
+			updaterController.setWebViewContent(finalHTMLBuilder.toString());
+			updaterController.setVersionChoices(versionOptions);
+
+			if (updaterStage.getOwner() == null) {
+				updaterStage.initOwner(owner);
+				updaterStage.initModality(Modality.APPLICATION_MODAL);
+			}
+
+			updaterStage.show();
+
+			if (Taskbar.isTaskbarSupported()) {
+				if (Taskbar.getTaskbar().isSupported(Taskbar.Feature.USER_ATTENTION))
+					Taskbar.getTaskbar().requestUserAttention(true, true);
+			}
+
+		});
+	}
+
+	private static HashMap<String, String> retrieveReleaseInfo() throws IOException, URISyntaxException {
         HashMap<String, String> versionInfo = new HashMap<>();
         StringBuilder content = new StringBuilder();
         URI uri = new URI("https://api.github.com/repos/tac550/tonewriter/releases");

@@ -92,7 +92,7 @@ public class UpdaterViewController {
 			updateStatusText.setText("Update available: Version " + versionChoiceBox.getSelectionModel().getSelectedItem()
 					+ " (current version: " + MainApp.APP_VERSION + ")");
 		} else {
-			updateStatusText.setText("Already up to date! (Version " + MainApp.APP_VERSION + ")");
+			updateStatusText.setText("No update found! (Version " + MainApp.APP_VERSION + ")");
 			updateButton.setDisable(true);
 			laterButton.setText("Close");
 		}
