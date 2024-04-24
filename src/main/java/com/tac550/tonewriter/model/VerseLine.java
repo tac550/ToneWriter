@@ -19,11 +19,11 @@ public class VerseLine {
 
 	private List<String> splitSyllables(String line) {
 		List<String> new_syllables = new ArrayList<>(Arrays.asList(
-				// Em-dashes (\u2014), minuses (-), and spaces ( ) are acceptable syllable separators.
-				// To keep the separators in the resulting strings, place an underscore before each occurrence of these
-				// and split at the underscores.
-				line.replace("\u2014", "_\u2014").replace("-", "_-")
-						.replace(" ", "_ ").split("_")));
+			// Em-dashes (\u2014), minuses (-), and spaces ( ) are acceptable syllable separators.
+			// To keep the separators in the resulting strings, place an underscore before each occurrence of these
+			// and split at the underscores.
+			line.replace("\u2014", "_\u2014").replace("-", "_-")
+				.replace(" ", "_ ").split("_")));
 
 		// Filter out syllables that are just single hyphens and apply smart quotes to each syllable.
 		return new_syllables.stream().filter(str -> !str.equals("-")).map(TWUtils::applySmartQuotes).toList();
