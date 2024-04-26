@@ -183,9 +183,6 @@ public class TopSceneController {
 		setMenuIcon(updateMenuItem, "/media/cloud-sync.png");
 		setMenuIcon(aboutMenuItem, "/media/sign-info.png");
 
-		if (MainApp.OS_NAME.startsWith("lin"))
-			resetLilyPondLocationItem.setText("Reset LilyPond Location (use /usr/bin/lilypond)");
-
 		updateLilyPondMenuItemState();
 
 		// Initial state and behavior for "Save LilyPond file" option
