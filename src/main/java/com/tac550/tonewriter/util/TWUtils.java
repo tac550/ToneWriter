@@ -46,6 +46,7 @@ public class TWUtils {
 
 	private static final String LEFT_DOUBLE_QUOTE = "\u201C";
 	private static final String RIGHT_DOUBLE_QUOTE = "\u201D";
+	public static final String LEFT_APOSTROPHE = "\u2018";
 	public static final String APOSTROPHE = "\u2019";
 	public static final String SHARP = "\u266F";
 	public static final String FLAT = "\u266D";
@@ -153,22 +154,35 @@ public class TWUtils {
 	}
 
 	public static String applySmartQuotes(String text) {
-		Pattern pattern = Pattern.compile("\"");
+		Pattern pattern = Pattern.compile("\"|'");
 		Matcher matcher = pattern.matcher(text);
 
-		List<Character> punctuation = List.of('.', ',', '!', '?', ';', '\'');
+		List<Character> punctuation = List.of('.', ',', '!', '?', ';', '\'',
+				RIGHT_DOUBLE_QUOTE.charAt(0), APOSTROPHE.charAt(0));
 
 		int lastPos;
 		while (matcher.find()) {
 			lastPos = matcher.end();
 
-			if (lastPos < 2 || lastPos - 1 > text.length())
-				text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
-			else if (!Character.isLetterOrDigit(text.charAt(lastPos - 2))
-					&& !punctuation.contains(text.charAt(lastPos - 2)))
-				text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
-			else
-				text = text.replaceFirst("\"", RIGHT_DOUBLE_QUOTE);
+			char matching_char = text.charAt(lastPos - 1);
+
+			if (matching_char == '\"') {
+				if (lastPos < 2 || lastPos - 1 > text.length())
+					text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
+				else if (!Character.isLetterOrDigit(text.charAt(lastPos - 2))
+						&& !punctuation.contains(text.charAt(lastPos - 2)))
+					text = text.replaceFirst("\"", LEFT_DOUBLE_QUOTE);
+				else
+					text = text.replaceFirst("\"", RIGHT_DOUBLE_QUOTE);
+			} else if (matching_char == '\'') {
+				if (lastPos < 2 || lastPos - 1 > text.length())
+					text = text.replaceFirst("'", LEFT_APOSTROPHE);
+				else if (!Character.isLetterOrDigit(text.charAt(lastPos - 2))
+						&& !punctuation.contains(text.charAt(lastPos - 2)))
+					text = text.replaceFirst("'", LEFT_APOSTROPHE);
+				else
+					text = text.replaceFirst("'", APOSTROPHE);
+			}
 		}
 
 		text = text.replaceAll("\\\\[\"\u201C\u201D]", "\""); // \u201C\u201D = “”
