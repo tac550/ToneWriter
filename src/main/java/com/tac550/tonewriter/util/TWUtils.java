@@ -311,8 +311,6 @@ public class TWUtils {
 			super(c -> {
 				String changeText = c.getText();
 
-				if (changeText.contains("'"))
-					c.setText(changeText.replace("'", APOSTROPHE));
 				if (changeText.contains("\t"))
 					c.setText(changeText.replace("\t", " "));
 
