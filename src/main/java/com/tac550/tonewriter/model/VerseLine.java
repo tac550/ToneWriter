@@ -14,7 +14,7 @@ public class VerseLine {
 
 	public VerseLine(String line_text) {
 		line = TWUtils.applySmartQuotes(line_text);
-		syllables = splitSyllables(line_text);
+		syllables = splitSyllables(line);
 	}
 
 	private List<String> splitSyllables(String line) {
@@ -25,8 +25,8 @@ public class VerseLine {
 				line.replace("\u2014", "_\u2014").replace("-", "_-")
 						.replace(" ", "_ ").split("_")));
 
-		// Filter out syllables that are just single hyphens and apply smart quotes to each syllable.
-		return new_syllables.stream().filter(str -> !str.equals("-")).map(TWUtils::applySmartQuotes).toList();
+		// Filter out syllables that are just single hyphens.
+		return new_syllables.stream().filter(str -> !str.equals("-")).toList();
 	}
 
 	public String getLine() {
