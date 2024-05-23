@@ -294,7 +294,7 @@ public class ToneIO {
 
 	private static String getRecentsFilePath() throws IOException {
 		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
-		if (appDataDir == null) throw new IOException("Unknown platform.");
+		if (appDataDir == null) throw new IOException("Unable to locate app data directory.");
 		return appDataDir + File.separator + "RecentTones.txt";
 	}
 }

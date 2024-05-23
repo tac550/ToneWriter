@@ -107,7 +107,7 @@ public class QuickVerseIO {
 		return removed;
 	}
 
-	private static File getVerseFile() {
+	private static File getVerseFile() throws IOException {
 		String appDataDir = MainApp.getPlatformSpecificAppDataDir();
 
 		if (appDataDir == null) return null;

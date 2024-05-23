@@ -321,11 +321,14 @@ public class MainApp extends Application {
 		else return "/";
 	}
 
-	public static String getPlatformSpecificAppDataDir() {
+	public static String getPlatformSpecificAppDataDir() throws IOException {
 		String subDirString = File.separator + APP_NAME;
 
 		if (OS_NAME.startsWith("win")) {
-			return System.getenv("APPDATA") + subDirString;
+			File appDataDir = new File(System.getenv("APPDATA"));
+			if (!appDataDir.isAbsolute())
+				return null;
+			return appDataDir.getCanonicalPath() + subDirString;
 		} if (OS_NAME.startsWith("mac")) {
 			return System.getProperty("user.home") + "/Library/Preferences" + subDirString;
 		} if (OS_NAME.startsWith("lin")) {
