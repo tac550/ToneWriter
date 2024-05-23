@@ -382,7 +382,7 @@ public class MainApp extends Application {
 		} if (OS_NAME.startsWith("mac")) {
 			try {
 				// checking for exit status only.
-				final Process process = Runtime.getRuntime().exec(new String[] {"defaults", "read", "-g", "AppleInterfaceStyle"});
+				Process process = Runtime.getRuntime().exec(new String[] {"defaults", "read", "-g", "AppleInterfaceStyle"});
 				process.waitFor(100, TimeUnit.MILLISECONDS);
 				return process.exitValue() == 0;
 			} catch (IOException | InterruptedException | IllegalThreadStateException ex) {
