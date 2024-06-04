@@ -171,7 +171,10 @@ public class SyllableText extends Text {
 		active = false;
 	}
 	void activate() {
-		applyDefaultFill();
+		if (isHover())
+			setFill(highlightColor);
+		else
+			applyDefaultFill();
 		active = true;
 	}
 

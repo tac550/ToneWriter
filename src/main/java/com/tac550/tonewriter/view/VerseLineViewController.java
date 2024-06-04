@@ -414,27 +414,7 @@ public class VerseLineViewController {
 			skipChordButton.setDisable(false);
 			nextChordIndex++;
 
-			// Special disabling based on prep/post/normal
-			deactivateAll();
-
-			if (!(getCurrentChord() instanceof RecitingChordView)) {
-				if (nextChordIndex == 1) { // If no chords have been assigned yet...
-					((SyllableText) lineTextFlow.getChildren().getFirst()).activate(); // Activate only the first syllable.
-				} else {
-					// Activate current syllable.
-					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).activate();
-					if (lastSyllableAssigned < lineTextFlow.getChildren().size() - 1) { // Avoid error if there is no next SyllableText
-						// Activate next syllable. (repeats above operation if lastSyllableAssigned is -1)
-						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).activate();
-					}
-				}
-			} else { // If current chord is a reciting (numbered) chord
-				for (int i = lastSyllableAssigned; i < lineTextFlow.getChildren().size(); i++) {
-					if (i < 0) continue; // In case we haven't assigned anything yet (lastSyllableAssigned is -1)
-					((SyllableText) lineTextFlow.getChildren().get(i)).activate();
-				}
-			}
-
+			refreshSyllableActivation();
 		} else { // If we have just placed or skipped the last chord for the line
 			doneAssigning = true;
 
@@ -451,6 +431,33 @@ public class VerseLineViewController {
 		expandButton.setVisible(view_expanded || expansionNecessary());
 
 		topController.projectEdited();
+	}
+
+	protected void refreshSyllableActivation() {
+		// Don't change syllable activation state during a drag operation
+		if (dragStartIndex != -1) return;
+
+		deactivateAll();
+
+		if (!doneAssigning) {
+			if (!(getCurrentChord() instanceof RecitingChordView) && !MainApp.isChordPlacementUnrestricted()) {
+				if (nextChordIndex == 1) { // If no chords have been assigned yet...
+					((SyllableText) lineTextFlow.getChildren().getFirst()).activate(); // Activate only the first syllable.
+				} else {
+					// Activate current syllable.
+					((SyllableText) lineTextFlow.getChildren().get(Math.max(lastSyllableAssigned, 0))).activate();
+					if (lastSyllableAssigned < lineTextFlow.getChildren().size() - 1) { // Avoid error if there is no next SyllableText
+						// Activate next syllable. (repeats above operation if lastSyllableAssigned is -1)
+						((SyllableText) lineTextFlow.getChildren().get(lastSyllableAssigned+1)).activate();
+					}
+				}
+			} else { // If current chord is a reciting (numbered) chord
+				for (int i = lastSyllableAssigned; i < lineTextFlow.getChildren().size(); i++) {
+					if (i < 0) continue; // In case we haven't assigned anything yet (lastSyllableAssigned is -1)
+					((SyllableText) lineTextFlow.getChildren().get(i)).activate();
+				}
+			}
+		}
 	}
 
 	void deactivateAll() {
@@ -489,11 +496,10 @@ public class VerseLineViewController {
 	void syllableDragStarted(SyllableText dragged_text) {
 		if (notAssigning()) return;
 
-		// Only allow drag operation to continue if assigning a reciting chord.
-		if (getCurrentChord() instanceof RecitingChordView) {
+		// Only allow drag operation to continue if assigning a reciting chord or overriding restrictions.
+		if (getCurrentChord() instanceof RecitingChordView || MainApp.isChordPlacementUnrestricted()) {
 			dragStartIndex = lineTextFlow.getChildren().indexOf(dragged_text);
 			dragged_text.startFullDrag();
-
 		}
 	}
 	void syllableDragEntered(SyllableText entered_text) {
@@ -518,7 +524,7 @@ public class VerseLineViewController {
 	void syllableDragReleased() {
 		defaultSyllableColors();
 
-		dragStartIndex = -1;
+		cleanUpAfterDragOperation();
 	}
 	void syllableDragCompleted(SyllableText released_text) {
 		if (dragStartIndex == -1) return; // Drag did not start on this line - don't proceed.
@@ -532,11 +538,15 @@ public class VerseLineViewController {
 
 		assignChord(smaller, larger);
 
-		dragStartIndex = -1;
+		cleanUpAfterDragOperation();
 	}
 	private void defaultSyllableColors() {
 		for (SyllableText syllable : getSyllables())
 			syllable.applyDefaultFill();
+	}
+	private void cleanUpAfterDragOperation() {
+		dragStartIndex = -1;
+		refreshSyllableActivation();
 	}
 
 	@FXML private void skipChordAction() {

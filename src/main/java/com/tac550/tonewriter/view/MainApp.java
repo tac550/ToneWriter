@@ -89,6 +89,8 @@ public class MainApp extends Application {
 	private static boolean lilyPondAvailable = false;
 	private static File lilyPondDirectory;
 
+	private static boolean placementUnrestricted = false;
+
 	// Fields for main stage, controller, and main tab pane.
 	private static Stage mainStage;
 	private static TopSceneController topSceneController;
@@ -275,6 +277,20 @@ public class MainApp extends Application {
 
 			mainScene.getAccelerators().put(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN),
 					() -> topSceneController.closeSelectedTab());
+
+			// Listeners for prep/post chord placement restriction override
+			mainScene.setOnKeyPressed(event -> {
+				if (event.getCode() == KeyCode.SHIFT) {
+					placementUnrestricted = true;
+					topSceneController.getSelectedTabScene().refreshSyllableActivation();
+				}
+			});
+			mainScene.setOnKeyReleased(event -> {
+				if (event.getCode() == KeyCode.SHIFT) {
+					placementUnrestricted = false;
+					topSceneController.getSelectedTabScene().refreshSyllableActivation();
+				}
+			});
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -569,5 +585,9 @@ public class MainApp extends Application {
 				}
 			});
 		});
+	}
+
+	public static boolean isChordPlacementUnrestricted() {
+		return placementUnrestricted;
 	}
 }

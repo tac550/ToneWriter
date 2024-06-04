@@ -1204,6 +1204,12 @@ public class MainSceneController {
 		return titleTextField.textProperty();
 	}
 
+	protected void refreshSyllableActivation() {
+		for (VerseLineViewController controller : verseLineControllers) {
+			controller.refreshSyllableActivation();
+		}
+	}
+
 	void setDividerPosition(double position) {
 		mainSplitPane.setDividerPosition(0, position);
 	}
