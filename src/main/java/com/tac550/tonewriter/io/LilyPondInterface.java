@@ -187,10 +187,10 @@ public class LilyPondInterface {
 				lines.set(16, lines.get(16).replace("  oddHeaderMarkup =", "  evenHeaderMarkup ="));
 			}
 		}
-		lines.set(generateHeader ? 18 : 13, "  top-margin = %s\\%s".formatted(project.getMarginInfo()[0], project.getMarginInfo()[1]));
-		lines.set(generateHeader ? 19 : 14, "  bottom-margin = %s\\%s".formatted(project.getMarginInfo()[2], project.getMarginInfo()[3]));
-		lines.set(generateHeader ? 20 : 15, "  left-margin = %s\\%s".formatted(project.getMarginInfo()[4], project.getMarginInfo()[5]));
-		lines.set(generateHeader ? 21 : 16, "  right-margin = %s\\%s".formatted(project.getMarginInfo()[6], project.getMarginInfo()[7]));
+		lines.set(generateHeader ? 18 : 12, "  top-margin = %s\\%s".formatted(project.getMarginInfo()[0], project.getMarginInfo()[1]));
+		lines.set(generateHeader ? 19 : 13, "  bottom-margin = %s\\%s".formatted(project.getMarginInfo()[2], project.getMarginInfo()[3]));
+		lines.set(generateHeader ? 20 : 14, "  left-margin = %s\\%s".formatted(project.getMarginInfo()[4], project.getMarginInfo()[5]));
+		lines.set(generateHeader ? 21 : 15, "  right-margin = %s\\%s".formatted(project.getMarginInfo()[6], project.getMarginInfo()[7]));
 
 		// Add a blank line before scores begin
 		lines.add("");
