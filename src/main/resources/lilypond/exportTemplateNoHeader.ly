@@ -1,8 +1,12 @@
-\version "2.20.0"
+\version "2.24.0"
 
 #(set-default-paper-size "letter")
 
 \language english
+
+\header {
+  pdftitle = ""
+}
 
 \paper {
   print-page-number = ##f
