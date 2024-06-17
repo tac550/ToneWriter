@@ -5,7 +5,7 @@
 ToneWriter is an application which makes it easy to create sheet music for repeating chant melodies like those used in Orthodox Christian worship. This type of music is typically unmetered and features long stretches of recitative. For these reasons and others, it is a struggle to set this music in Western staff notation using conventional digital engraving software like Finale and MuseScore. ToneWriter makes it much easier to engrave this chant music on desktop computers. See the example below:
 
 ToneWriter lets you assign chords to syllables...
-![image](https://github.com/tac550/ToneWriter/assets/9357248/15e542da-3eed-4c72-9262-9481d4f83e28)
+![image](https://github.com/tac550/ToneWriter/assets/9357248/78072db5-1bf6-4c8b-a475-78c3b192c6ff)
 ...to produce sheet music with a single click:
 ![image](https://github.com/tac550/ToneWriter/assets/9357248/cae57fe9-7913-44fa-b488-032999560e13)
 
