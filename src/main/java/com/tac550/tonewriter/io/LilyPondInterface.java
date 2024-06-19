@@ -768,44 +768,12 @@ public class LilyPondInterface {
 	private static String combineNotes(String curr, String next) {
 		// This string replaces duration information from the current note with %s so we can "format in" its new duration (if the duration combination method is chosen later).
 		String noteFormat = curr.replaceAll("\\d+", "%s").replace(".", "");
-		float combinedDur = combineDurations(curr, next);
+		String durSum = TWUtils.addDurations(curr, next);
 
-		String newDur;
-
-		// If the note combination process yielded a whole number...
-		if (combinedDur % 1 == 0) {
-			// We just take it as the new duration and continue to the return statement.
-			newDur = String.valueOf((int) combinedDur);
-		} else { // If a fractional number resulted it may be covered by a special case.
-			// Invert the computed duration.
-			float inverse = 1 / combinedDur;
-
-			if (inverse == 0.75) // Dotted half
-				newDur = "2.";
-			else if (inverse == 0.375) // Dotted quarter
-				newDur = "4.";
-			else // If no definition exists, we simply tie the notes, unless they are rests. In this case, return "".
-				return noteFormat.contains("r") ? "" : curr + "~ " + next;
-		}
-
-		// If we got this far, the notes will be combined into one. We just format the new duration string into the note and return it.
-		return String.format(Locale.US, noteFormat, newDur);
-	}
-
-	private static float combineDurations(String curr, String next) {
-		float durCurrent = Float.parseFloat(curr.replaceAll("\\D", ""));
-		float durNext = Float.parseFloat(next.replaceAll("\\D", ""));
-
-		// Inverse durations (so they read as fractions of a whole note in x/4 time).
-		durCurrent = 1 / durCurrent;
-		durNext = 1 / durNext;
-
-		// Increase the duration by half if the note is dotted.
-		if (curr.contains(".")) durCurrent += (durCurrent / 2);
-		if (next.contains(".")) durNext += (durNext / 2);
-
-		// Add the note durations and inverse again to return to LilyPond's duration format.
-		return 1 / (durCurrent + durNext);
+		if (durSum == null) // Combination failed, so we tie the notes, unless they are rests. In that case, return "".
+			return noteFormat.contains("r") ? "" : curr + "~ " + next;
+		else // Combination succeeded. We just format the new duration string into the note and return it.
+			return String.format(Locale.US, noteFormat, durSum);
 	}
 
 	// Returns the number of beats for which the given note (or notes, if tied) last(s).

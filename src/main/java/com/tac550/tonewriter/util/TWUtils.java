@@ -194,6 +194,44 @@ public class TWUtils {
 				.replaceAll("[\u201C\u201D]", "\""); // \u201C\u201D = “”
 	}
 
+	// Notation
+
+	public static String addDurations(String curr, String next) {
+		float durCurrent = Float.parseFloat(curr.replaceAll("\\D", ""));
+		float durNext = Float.parseFloat(next.replaceAll("\\D", ""));
+
+		// Inverse durations (so they read as fractions of a whole note in x/4 time).
+		durCurrent = 1 / durCurrent;
+		durNext = 1 / durNext;
+
+		// Increase the duration by half if the note is dotted.
+		if (curr.contains(".")) durCurrent += (durCurrent / 2);
+		if (next.contains(".")) durNext += (durNext / 2);
+
+		// Add the note durations and inverse again to return to LilyPond's duration format.
+		float newDurFloat = 1 / (durCurrent + durNext);
+
+		String newDur;
+
+		// If the note combination process yielded a whole number...
+		if (newDurFloat % 1 == 0) {
+			// We just take it as the new duration and continue to the return statement.
+			newDur = String.valueOf((int) newDurFloat);
+		} else { // If a fractional number resulted it may be covered by a special case.
+			// Invert the computed duration.
+			float inverse = 1 / newDurFloat;
+
+			if (inverse == 0.75) // Dotted half
+				newDur = "2.";
+			else if (inverse == 0.375) // Dotted quarter
+				newDur = "4.";
+			else
+				newDur = null;
+		}
+
+		return newDur;
+	}
+
 	// Filesystem
 
 	public static String readFile(String path, Charset encoding) throws IOException {
