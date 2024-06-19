@@ -623,9 +623,13 @@ public class VerseLineViewController {
 
 		noteButton.setOnMouseClicked(me -> {
 			if (me.getButton() == MouseButton.PRIMARY && !me.isSynthesized()) {
-				if (me.getClickCount() == 2) { // Double click assigns half note
-					topController.projectEdited();
-					syllable.setNoteDuration(LilyPondInterface.NOTE_HALF, buttonIndex);
+				if (me.getClickCount() == 2) { // Double click doubles note duration
+					String selectedDur = syllable.getNoteDuration(buttonIndex);
+					String doubled = TWUtils.addDurations(selectedDur, selectedDur);
+					if (doubled != null && TopSceneController.durationMapping.contains(doubled)) {
+						topController.projectEdited();
+						syllable.setNoteDuration(doubled, buttonIndex);
+					}
 				}
 				topController.showNoteMenu(syllable, noteButton);
 			} else if (me.getButton() == MouseButton.SECONDARY) { // Right click plays chord associated with button
