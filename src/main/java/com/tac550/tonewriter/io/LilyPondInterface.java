@@ -667,13 +667,13 @@ public class LilyPondInterface {
 		String startSymbol = "\\(";
 		String endSymbol = "\\)";
 
-		// If the syllable contains nothing but eighth notes, apply beam instead of slur
-		// (prevents auto-connecting beam to note(s) from previous syllable).
+		// If the syllable contains nothing but eighth notes, apply beam along with slur
+		// (also prevents auto-connecting beam to note(s) from previous syllable).
 		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
 				t.contains("8") || !t.matches(".*\\d.*")).count();
 		if (eighthNotes == tokens.length) {
-			startSymbol = "[";
-			endSymbol = "]";
+			startSymbol = "\\([";
+			endSymbol = "]\\)";
 		}
 
 		// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
