@@ -660,7 +660,7 @@ public class LilyPondInterface {
 
 		// If this part has any hidden notes, or all notes are tied, or the part contains any rests, skip adding a slur.
 		if (syllable_notes.contains("noteHide")
-				|| Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~"))
+				|| (tokens.length > 1 && Arrays.stream(tokens).limit(tokens.length - 1).allMatch(val -> val.contains("~")))
 				|| Arrays.stream(tokens).anyMatch(val -> Pattern.matches("r\\S", val)))
 			return syllable_notes;
 
@@ -669,11 +669,15 @@ public class LilyPondInterface {
 
 		// If the syllable contains nothing but eighth notes, apply beam along with slur
 		// (also prevents auto-connecting beam to note(s) from previous syllable).
-		int eighthNotes = (int) Arrays.stream(tokens).filter(t ->
-				t.contains("8") || !t.matches(".*\\d.*")).count();
-		if (eighthNotes == tokens.length) {
+		int eighthNotes = (int) Arrays.stream(tokens).filter(t -> t.contains("8")).count();
+		int totalNotes = (int) Arrays.stream(tokens).filter(t -> t.matches(".*\\d.*")).count();
+		if (eighthNotes == totalNotes) {
 			startSymbol = "\\([";
 			endSymbol = "]\\)";
+
+			// If there's only one note in the syllable, disable any beam connecting to another syllable.
+			if (totalNotes == 1)
+				tokens[0] += "\\noBeam";
 		}
 
 		// Reconstruct the syllable note buffer, adding the beginning slur parenthesis after the first note (as LilyPond syntax dictates).
