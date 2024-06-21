@@ -483,7 +483,8 @@ public class LilyPondInterface {
 					else
 						currentNote = getNoteAndDuration(chordData, inOrderChords, i);
 
-					currentNoteIsEighth = currentNote.contains("8");
+					if (i == 0)
+						currentNoteIsEighth = currentNote.contains("8");
 
 					// NEXT NOTE
 
