@@ -94,6 +94,7 @@ public class UpdaterViewController {
 		} else {
 			updateStatusText.setText("No update found! (Version " + MainApp.APP_VERSION + ")");
 			updateButton.setDisable(true);
+			versionChoiceBox.setDisable(true);
 			laterButton.setText("Close");
 		}
 	}
