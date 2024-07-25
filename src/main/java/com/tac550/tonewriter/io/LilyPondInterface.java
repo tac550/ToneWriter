@@ -580,7 +580,7 @@ public class LilyPondInterface {
 				}
 
 				// Decide whether to place an invisible barline after this chord (allows for line breaking here).
-				// Individual lines can disable this. Also, don't  try subdividing if this is the last chord in the
+				// Individual lines can disable this. Also, don't try subdividing if this is the last chord in the
 				// phrase, we haven't reached the beat threshold for adding an optional break, the next syllable is the
 				// last and has only one chord, or the note which would precede the possible break point is an eighth note.
 				if (!disableLineBreaks && !lastChordInLine && measureBeats > measureBreakBeatThreshold
@@ -619,6 +619,10 @@ public class LilyPondInterface {
 		boolean noteGroup = false;
 		// Work backward through the tokens.
 		for (int i = tokens.length - 1; i >= 0; i--) {
+			// Skip barline token
+			if (tokens[i].equals("$bar"))
+				continue;
+
 			if (tokens[i].matches(".*[a-gr].*")) {
 				if (noteGroup) {
 					// If we hit the beginning of the note group (last token to remove)...
