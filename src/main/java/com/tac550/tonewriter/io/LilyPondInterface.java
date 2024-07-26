@@ -467,11 +467,11 @@ public class LilyPondInterface {
 								hideThisChord = false;
 							else
 								// Otherwise, the previous note is the note from the last chord from the previous syllable.
-								previousNote = getNoteAndDuration(previousSyllableChords.getLast(), inOrderChords, i);
+								previousNote = getLastNote(parts[i]);
 						}
 					} else {
 						// The previous note is the note just before this one on this same syllable.
-						previousNote = getNoteAndDuration(chordList.get(chordList.indexOf(chordData) - 1), inOrderChords, i);
+						previousNote = getLastNote(syllableNoteBuffers[i]);
 					}
 
 					// CURRENT NOTE
@@ -537,6 +537,8 @@ public class LilyPondInterface {
 
 								// Remember that we just did a note combination for the current part.
 								noteCombined[i] = true;
+								// Don't try to hide chords with combined notes.
+								hideThisChord = false;
 							}
 						}
 					}
@@ -613,8 +615,8 @@ public class LilyPondInterface {
 				PART_ADJUSTMENTS[part]) + chord.getDuration();
 	}
 
-	private static String removeLastNote(String syllable_notes) {
-		String[] tokens = syllable_notes.split(" ");
+	private static String removeLastNote(String notes) {
+		String[] tokens = notes.split(" ");
 		// This flag gets set if the previous token removed was in a note group.
 		boolean noteGroup = false;
 		// Work backward through the tokens.
@@ -655,6 +657,40 @@ public class LilyPondInterface {
 		}
 		// Save back to the buffer.
 		return editedBuffer.toString();
+	}
+
+	private static String getLastNote(String notes) {
+		StringBuilder lastNoteBuffer = new StringBuilder();
+
+		String[] tokens = notes.split(" ");
+		// This flag gets set if the previous token selected was in a note group.
+		boolean noteGroup = false;
+		// Work backward through the tokens.
+		for (int i = tokens.length - 1; i >= 0; i--) {
+			// Skip barline token
+			if (tokens[i].equals("$bar"))
+				continue;
+
+			if (tokens[i].matches(".*[a-gr].*")) {
+				lastNoteBuffer.append(new StringBuilder(tokens[i]).insert(0, " ").reverse());
+				if (noteGroup) {
+					// If we hit the beginning of the note group (last token to remove)...
+					if (tokens[i].contains("<")) {
+						// We found the last token in the note group and are done.
+						break;
+					}
+				} else if (tokens[i].contains(">")) { // If the note we're trying to remove is part of a note group...
+					// Set the flag.
+					noteGroup = true;
+				}
+
+				if (!noteGroup) // Stop here because we just removed the previous note.
+					break;
+
+			}
+		}
+
+		return lastNoteBuffer.reverse().toString().trim();
 	}
 
 	private static String applySlursAndBeams(String syllable_notes) {
