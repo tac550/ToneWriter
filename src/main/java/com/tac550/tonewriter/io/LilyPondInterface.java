@@ -533,7 +533,7 @@ public class LilyPondInterface {
 									tempCurrentNotes[i] = addedNotes;
 								else
 									// If the combination resulted in a tie, the temporary current note is the second of the two tied notes.
-									tempCurrentNotes[i] = addedNotes.split(" ")[1];
+									tempCurrentNotes[i] = getLastNote(addedNotes);
 
 								// Remember that we just did a note combination for the current part.
 								noteCombined[i] = true;
