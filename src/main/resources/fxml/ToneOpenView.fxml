@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ToneOpenViewController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.ToneOpenViewController">
    <children>
       <GridPane VBox.vgrow="ALWAYS">
         <columnConstraints>
@@ -19,7 +19,6 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints prefHeight="30.0" vgrow="ALWAYS" />
-          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" />
         </rowConstraints>
          <children>
             <TitledPane animated="false" collapsible="false" focusTraversable="false" maxHeight="1.7976931348623157E308" text="Built-in Tones" GridPane.vgrow="ALWAYS">
@@ -32,15 +31,11 @@
                   <TreeView fx:id="recentTonesView" showRoot="false" />
                </content>
             </TitledPane>
-            <Button mnemonicParsing="false" onAction="#handleBrowse" text="Browse..." GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </Button>
          </children>
       </GridPane>
       <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
+            <Button mnemonicParsing="false" onAction="#handleBrowse" text="Browse..." translateX="-25.0" />
           <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOpen" text="Open" />
             <Button cancelButton="true" layoutX="530.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
         </buttons>
