@@ -70,7 +70,6 @@ public class TopSceneController {
 	@FXML private CheckMenuItem hoverHighlightMenuItem;
 	@FXML private CheckMenuItem saveLPMenuItem;
 	@FXML private CheckMenuItem saveMIDIMenuItem;
-	@FXML private MenuItem resetLilyPondLocationItem;
 	@FXML private CheckMenuItem darkModeMenuItem;
 
 	@FXML private MenuItem aboutMenuItem;

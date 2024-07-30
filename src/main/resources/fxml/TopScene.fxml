@@ -17,7 +17,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.TopSceneController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tac550.tonewriter.view.TopSceneController">
    <top>
       <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
          <menus>
@@ -132,7 +132,7 @@
                      </content>
                   </CustomMenuItem>
                   <MenuItem mnemonicParsing="false" onAction="#handleSetLilyPondDir" text="Set LilyPond Install Directory..." />
-                  <MenuItem fx:id="resetLilyPondLocationItem" mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Location (use default)" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleResetLilyPondDir" text="Reset LilyPond Location (use default)" />
                   <CustomMenuItem mnemonicParsing="false" text="Interface Separator">
                      <content>
                         <HBox alignment="CENTER_LEFT" prefHeight="10.0" prefWidth="20.0">
