@@ -778,14 +778,14 @@ public class VerseLineViewController {
 			controller.setDisableLineBreaks(disableLineBreaks);
 
 			Platform.runLater(() -> {
-				Stage syllableStage = new Stage();
-				syllableStage.setTitle("Edit Line");
-				syllableStage.getIcons().add(MainApp.APP_ICON);
-				syllableStage.setScene(new Scene(rootLayout));
-				syllableStage.initModality(Modality.APPLICATION_MODAL);
-				syllableStage.setResizable(false);
-				syllableStage.initOwner(rootPane.getScene().getWindow());
-				syllableStage.show();
+				Stage lineEditStage = new Stage();
+				lineEditStage.setTitle("Edit Line");
+				lineEditStage.getIcons().add(MainApp.APP_ICON);
+				lineEditStage.setScene(new Scene(rootLayout));
+				lineEditStage.initModality(Modality.APPLICATION_MODAL);
+				lineEditStage.setResizable(false);
+				lineEditStage.initOwner(rootPane.getScene().getWindow());
+				lineEditStage.show();
 			});
 		});
 	}
