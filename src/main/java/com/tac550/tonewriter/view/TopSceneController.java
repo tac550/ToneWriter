@@ -407,8 +407,14 @@ public class TopSceneController {
 	}
 
 	@FXML private void handleExport() {
-		lastExportTab = getSelectedTabScene();
-		lastExportTab.handleExport();
+		if (!currentlyExporting) {
+			lastExportTab = getSelectedTabScene();
+			lastExportTab.handleExport();
+		} else {
+			TWUtils.showAlert(Alert.AlertType.WARNING, "Warning",
+					"Please wait for the ongoing export process to finish.",
+					false, parentStage);
+		}
 	}
 	@FXML private void handleExit() {
 		Window window = parentStage.getScene().getWindow();
