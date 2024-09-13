@@ -2,17 +2,24 @@ package com.tac550.tonewriter.util;
 
 import com.tac550.tonewriter.io.LilyPondInterface;
 import com.tac550.tonewriter.model.Chord;
+import com.tac550.tonewriter.view.MainApp;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class ToneChordRenderAdapter {
+
+    private static final Logger logger = MainApp.debugChordThreads ?
+            Logger.getLogger(ToneChordRenderAdapter.class.getCanonicalName()) : null;
 
     public static class DoneSignal {
         public final Lock lock;
@@ -35,7 +42,8 @@ public class ToneChordRenderAdapter {
     }
 
     public static void renderChord(Chord chord, String key_sig, Consumer<File[]> exit_actions) {
-        Renderer renderer = new Renderer(chord, key_sig);
+        String uuid = logger != null ? UUID.randomUUID().toString() : null;
+        Renderer renderer = new Renderer(chord, key_sig, uuid);
         Thread thread = new Thread(renderer);
         thread.start();
 
@@ -45,6 +53,7 @@ public class ToneChordRenderAdapter {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            if (logger != null) logger.info(String.format(Locale.US, "%s: %s: C: Finished.", uuid, generateChordId(chord, key_sig)));
             exit_actions.accept(renderer.getResults());
         }).start();
     }
@@ -55,9 +64,13 @@ public class ToneChordRenderAdapter {
         private final Chord chord;
         private final String key_sig;
 
-        public Renderer(Chord chord, String key_sig) {
+        private final String uuid;
+
+        public Renderer(Chord chord, String key_sig, String uuid) {
             this.chord = chord;
             this.key_sig = key_sig;
+
+            this.uuid = uuid;
         }
 
         @Override
@@ -66,6 +79,7 @@ public class ToneChordRenderAdapter {
 
             renderMapLock.lock();
             if (!uniqueChordRenders.containsKey(chordID)) {
+                if (logger != null) logger.info(String.format(Locale.US, "%s: %s: A: Rendering new chord.", uuid, chordID));
                 uniqueChordRenders.put(chordID, null);
                 sigMapLock.lock();
                 uniqueChordSig.put(chordID, new DoneSignal());
@@ -89,6 +103,7 @@ public class ToneChordRenderAdapter {
                     uniqueChordSig.get(chordID).lock.unlock();
                 }
             } else if (uniqueChordRenders.get(chordID) == null) {
+                if (logger != null) logger.info(String.format(Locale.US, "%s: %s: B: Awaiting ongoing render.", uuid, chordID));
                 renderMapLock.unlock();
                 uniqueChordSig.get(chordID).lock.lock();
                 try {

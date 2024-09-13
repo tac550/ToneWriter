@@ -9,6 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/res/javafx-jmods-21" />
       <excludeFolder url="file://$MODULE_DIR$/build/win" />
       <excludeFolder url="file://$MODULE_DIR$/lilypond" />
+      <excludeFolder url="file://$MODULE_DIR$/Python/venv" />
     </content>
   </component>
 </module>

@@ -55,6 +55,7 @@ public class MainApp extends Application {
 	public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ROOT);
 
 	static final boolean developerMode = "true".equalsIgnoreCase(System.getenv("developerMode"));
+	public static final boolean debugChordThreads = "true".equalsIgnoreCase(System.getenv("debugChordThreads"));
 	public static final File BUILT_IN_TONE_DIR = new File(System.getProperty("user.dir") + File.separator + "Built-in Tones");
 
 	// Splash screen stuff
