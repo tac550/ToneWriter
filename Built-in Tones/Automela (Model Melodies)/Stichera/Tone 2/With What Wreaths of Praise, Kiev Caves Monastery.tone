@@ -1,0 +1,167 @@
+VERSION: 1.4.1
+Key Signature: G major
+Tone: Tone 2, "With What Wreaths of Praise"
+Composer: Kiev Caves Monastery Chant
+Manually Assign Phrases: false
+
+
+A
+Comment: Designed for stichera with exactly seven phrases.
+1: g-e-b,-e
+	Post: b-g-b,-e
+	Post: a-fs-b,-e
+2: c'-a-d-d
+	Post: c'-a-d-d
+	Post: b-g-d-d
+3: d'-b-d-g
+	Post: c'-a-d-g
+4: b-g-d-g
+	Post: a-fs-b,-e
+	Post: b-g-b,-e
+	Post: a-fs-d-d
+5: g-e-b,-e
+6: fs-d-a,-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: g-e-d-d
+	Post: d-d-fs,-d
+	Post: e-d-g,-d
+END: g-d-b,-g
+	Prep: e-d-g,-d
+	Prep: fs-d-a,-d
+
+B
+1: c'-a-d-d
+2: b-g-d-g
+	Post: a-fs-d-d
+3: b-g-d-g
+	Prep: b-g-d-g
+	Prep: c'-a-d-g
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: g-e-b,-e
+	Prep: a-fs-d-d
+4: a-fs-d-d
+5: g-e-b,-e
+6: b-g-d-g
+	Prep: a-fs-b,-e
+	Prep: b-g-b,-e
+	Prep: c'-a-d-d
+	Post: a-fs-d-d
+END: a-fs-d-d
+	Prep: b-g-d-g
+	Prep: c'-a-d-g
+	Prep: b-g-d-g
+	Prep: a-fs-d-d
+	Prep: g-e-b,-e
+	Prep: a-fs-d-d
+	Prep: b-g-d-g
+
+C
+1: a-fs-a,-d
+2: a-fs-d-d
+	Prep: fs-d-a,-d
+	Prep: g-e-a,-d
+	Post: g-d-b,-g
+3: fs-d-a,-d
+	Post: d-d-fs,-d
+	Post: e-d-g,-d
+END: g-d-b,-g
+	Prep: e-d-g,-d
+	Prep: fs-d-a,-d
+
+D
+1: g-e-b,-e
+	Prep: g-e-b,-e
+	Prep: a-fs-b,-e
+	Prep: g-e-b,-e
+	Prep: fs-ds-b,-e
+2: c'-a-d-d
+	Prep: a-fs-b,-e
+	Prep: b-g-b,-e
+3: d'-b-d-d
+	Prep: b-g-d-d
+	Prep: c'-a-d-d
+	Post: b-g-d-d
+	Post: c'-a-d-d
+4: c'-a-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+5: g-e-b,-e
+	Prep: b-g-d-g,
+	Prep: a-fs-c-a,
+	Prep: g-e-b,-b,
+	Prep: fs-ds-b,-b,
+END: fs-d-a,-d
+	Prep: g-e-cs-a,
+
+E
+1: g-e-b,-e
+2: g-e-b,-e
+	Prep: a-fs-b,-e
+	Prep: g-e-b,-e
+	Prep: fs-ds-b,-e
+	Post: b-g-b,-e
+	Post: a-fs-b,-e
+3: c'-a-d-d
+	Prep: c'-a-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+4: g-e-b,-e
+	Prep: b-g-d-g,
+	Prep: a-fs-c-a,
+	Prep: g-e-b,-b,
+	Prep: fs-ds-b,-b,
+END: fs-d-a,-d
+	Prep: g-e-cs-a,
+
+F
+1: a-fs-d-d
+	Post: a-fs-d-a
+	Post: b-g-d-g
+	Post: a-fs-d-d
+	Post: g-e-d-d
+2: fs-d-a,-d
+	Prep: g-e-cs-a,
+3: b-g-d-g
+	Prep: a-fs-d-d
+	Post: g-e-d-d
+	Post: a-fs-d-d
+END: fs-d-a,-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-g
+	Prep: a-fs-d-a
+	Prep: g-e-cs-a,
+
+Final
+1: g-e-b,-e
+2: c'-a-d-d
+	Prep: a-fs-b,-e
+	Prep: b-g-b,-e
+	Post: b-g-d-g
+3: b-g-d-d
+	Prep: c'-a-d-d
+	Prep: d'-b-d-d
+	Prep: c'-a-d-d
+	Prep: a-fs-d-d
+4: c'-a-d-d
+	Prep: a-fs-d-d
+	Prep: b-g-d-d
+5: b-g-d-g
+	Post: a-fs-d-d
+6: b-g-d-g
+	Prep: g-e-b,-e
+	Prep: a-fs-d-d
+7: g-e-cs-<a a,>
+	Prep: a-fs-d-d
+	Prep: g-e-d-d
+	Prep: b-g-d-d
+	Prep: a-fs-d-d
+END: fs-d-a,-d
+
+
+First Repeated: 

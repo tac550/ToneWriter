@@ -1,0 +1,44 @@
+VERSION: 1.4.1
+Key Signature: D major
+Tone: Tone 4, "You Have Given a Sign"
+Composer: Kievan Chant
+Manually Assign Phrases: false
+
+
+A
+1: a-fs-d-d
+	Post: g-e-a,-d
+2: fs-d-a,-d
+3: g-e-a,-d
+4: a-fs-d-d
+
+B
+1: b-g-d-g
+	Post: a-fs-d-d
+2: g-e-b,-e
+3: fs-ds-b,-b,
+4: g-e-b,-e
+END: a-fs-d-d
+	Prep: fs-d-b,-e
+	Prep: g-e-b,-e
+
+C
+1: fs-d-a,-d
+	Post: e-cs-a,-a,
+2: fs-d-a,-d: Phrase C often begins here if there is not ample opportunity to/ninclude the first two chords.
+	Post: e-cs-a,-a,
+3: d-b,-fs,-b,
+4: e-cs-a,-a,
+5: fs-d-a,-d
+
+Final
+1: g-e-a,-a,
+	Post: fs-d-a,-a,
+2: a-fs-a,-d
+	Prep: g-e-a,-a,
+END: fs-d-a,-d
+	Prep: g-e-a,-a,
+	Prep: a-fs-a,-a,
+
+
+First Repeated: 

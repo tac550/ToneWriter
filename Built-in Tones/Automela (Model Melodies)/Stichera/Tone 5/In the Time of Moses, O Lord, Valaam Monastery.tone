@@ -1,0 +1,51 @@
+VERSION: 1.5.0
+Key Signature: Bf  major
+Tone: Tone 5, "In the Time of Moses, O Lord"
+Composer: Based on Valaam Chant, +Benedict (Churchill)/T. Crosby
+Manually Assign Phrases: false
+
+
+A
+1: g-d-bf,-g
+2: bf-g-d-g
+	Prep: a-f-c-f
+END: c'-a-c-f
+	Prep: c'-g-ef-g
+	Prep: a-g-c-g
+	Prep: bf-g-d-g
+
+B
+1: a-f-c-f: On shorter phrases, begin here, skip chord 3 and continue/nafter chord 4.
+	Post: bf-g-c-f
+2: c'-a-c-f: Most longer phrases begin here.
+3: c'-a-f-f
+	Post: bf-g-d-f
+	Post: c'-a-ef-f
+4: c'-a-c-f
+END: bf-g-d-g
+	Prep: d'-bf-c-f
+	Prep: c'-a-d-fs
+
+C
+1: bf-g-d-g
+2: c'-g-ef-<c' c>
+	Post: a-f-c-f
+END: g-d-bf,-g
+	Prep: bf-f-d-<bf bf,>
+	Prep: c'-f-ef-<bf bf,>
+	Prep: bf-f-d-<bf bf,>
+	Prep: a-f-c-f
+
+Final
+Comment: Final Phrase should always follow Phrase B.
+1: bf-g-d-g
+2: c'-g-ef-<c' c>
+	Post: a-f-c-f
+END: g-d-bf,-g
+	Prep: bf-f-d-<bf bf,>
+	Prep: c'-f-ef-<bf bf,>
+	Prep: bf-f-d-<bf bf,>
+	Prep: a-f-c-f
+
+
+First Repeated: 

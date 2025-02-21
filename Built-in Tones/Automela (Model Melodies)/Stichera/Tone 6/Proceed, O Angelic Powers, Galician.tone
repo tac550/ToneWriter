@@ -1,0 +1,48 @@
+VERSION: 1.4.1
+Key Signature: F major
+Tone: Tone 6, "Proceed, O Angelic Powers"
+Composer: Galician Chant, arr. Archpriest Stephan Meholick
+Manually Assign Phrases: false
+
+
+A
+1: g-e-c-c
+2: e-c-g,-c
+END: d-d-a,-d
+	Prep: f-d-a,-d
+	Prep: g-d-a,-d
+	Prep: f-d-a,-d
+	Prep: e-d-a,-d
+
+B
+1: a-f-d-d
+	Post: a-f-d-d
+	Post: g-e-d-d
+2: bf-g-d-d
+3: g-e-d-d
+4: a-f-d-d
+
+C
+1: a-f-d-d
+	Post: a-f-d-d
+	Post: bf-g-d-d
+2: g-e-d-d
+3: f-d-d-d
+4: g-e-c-c
+
+Final
+1: a-f-d-d
+2: c'-a-d-d
+	Prep: bf-g-d-d
+	Post: bf-g-d-d
+3: a-f-d-d
+4: f-d-a,-d
+	Prep: g-e-a,-d
+5: a-f-d-d
+	Post: g-e-d-d
+6: bf-g-d-g
+7: a-f-d-d
+END: g-e-c-c
+
+
+First Repeated: 
