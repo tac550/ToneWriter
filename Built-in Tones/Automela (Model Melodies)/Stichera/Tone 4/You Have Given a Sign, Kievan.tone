@@ -1,4 +1,4 @@
-VERSION: 1.4.1
+VERSION: 1.5.0
 Key Signature: D major
 Tone: Tone 4, "You Have Given a Sign"
 Composer: Kievan Chant
@@ -34,11 +34,11 @@ C
 Final
 1: g-e-a,-a,
 	Post: fs-d-a,-a,
-2: a-fs-a,-d
+2: a-fs-d-d
 	Prep: g-e-a,-a,
 END: fs-d-a,-d
-	Prep: g-e-a,-a,
-	Prep: a-fs-a,-a,
+	Prep: g-e-cs-a,
+	Prep: a-fs-cs-a,
 
 
 First Repeated: 
