@@ -9,6 +9,7 @@ import com.tac550.tonewriter.util.ToneChordRenderAdapter;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -99,6 +100,7 @@ public abstract class ChordViewController implements CommentableView {
 
 		// Consume mouse click events so that move handle will not pan the scroll pane.
 		moveHandleImage.addEventFilter(MouseEvent.MOUSE_DRAGGED, Event::consume);
+		moveHandleImage.setCursor(Cursor.H_RESIZE);
 
 	}
 	
